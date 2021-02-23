@@ -6,6 +6,7 @@ import Create from "views/Dashboard/Create/Create";
 import Dashboard from "views/Dashboard/Dashboard";
 import NetworkStatus from "views/Dashboard/NetworkStatus";
 import ForgotPassword from "views/Onboarding/ForgotPassword";
+import MyApp from "views/Dashboard/MyApp";
 import NewPassword from "views/Onboarding/NewPassword";
 import Login from "views/Onboarding/Login";
 import Signup from "views/Onboarding/Signup";
@@ -15,6 +16,8 @@ export default function DashboardRoutes() {
   const { within } = useViewport();
 
   const compactMode = within(-1, "medium");
+
+  console.log(path, "path");
 
   return (
     <div
@@ -64,12 +67,12 @@ export default function DashboardRoutes() {
         </Route>
         <Route exact path={`${path}/apps/setup`}>
           <Dashboard>
-            <Login />
+            <Create />
           </Dashboard>
         </Route>
-        <Route exact path={`$${path}/apps/:appId`}>
+        <Route exact path={`${path}/apps/:appId`}>
           <Dashboard>
-            <Login />
+            <MyApp />
           </Dashboard>
         </Route>
       </Switch>

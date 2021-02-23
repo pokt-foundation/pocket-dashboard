@@ -27,6 +27,8 @@ export default function DashboardView({ children }) {
           margin: 0 auto;
           padding-left: ${4 * GU}px;
           padding-right: ${4 * GU}px;
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
         `}
       >
         <div

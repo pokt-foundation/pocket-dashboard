@@ -5,6 +5,7 @@ import CheckBox from "ui/CheckBox/CheckBox";
 import CircleGraph from "ui/CircleGraph/CircleGraph";
 import Field from "ui/Field/Field";
 import Help from "ui/Help/Help";
+import MultiCircleGraph from "ui/MultiCircleGraph/MultiCircleGraph";
 import LineChart from "ui/LineChart/LineChart";
 import Link from "ui/Link/Link";
 import Popover from "ui/Popover/Popover";
@@ -26,6 +27,7 @@ export {
   CircleGraph,
   Field,
   Help,
+  MultiCircleGraph,
   LineChart,
   Link,
   Popover,

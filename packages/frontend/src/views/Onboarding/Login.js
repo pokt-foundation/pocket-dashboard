@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import "styled-components/macro";
 import {
   Button,
@@ -17,6 +17,7 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const theme = useTheme();
+  const history = useHistory();
 
   const onUsernameChange = useCallback((e) => setUsername(e.target.value), []);
   const onPasswordChange = useCallback((e) => setPassword(e.target.value), []);
@@ -80,7 +81,7 @@ export default function Login() {
         </Field>
         <RouterLink
           to={{
-            pathname: "dashboard/forgotpassword",
+            pathname: "/dashboard/forgotpassword",
           }}
           component={Link}
           external={false}
@@ -95,6 +96,11 @@ export default function Login() {
           css={`
             margin-bottom: ${2 * GU}px;
           `}
+          onClick={() =>
+            history.push({
+              pathname: "/dashboard/home",
+            })
+          }
         >
           Log in
         </Button>
@@ -106,7 +112,7 @@ export default function Login() {
           Don't have an account?{" "}
           <RouterLink
             to={{
-              pathname: "dashboard/signup",
+              pathname: "/dashboard/signup",
             }}
             component={Link}
             external={false}

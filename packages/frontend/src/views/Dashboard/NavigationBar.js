@@ -9,6 +9,7 @@ export default function NavigationBar() {
         display: flex;
         flex-direction: row;
         margin-top: ${5 * GU}px;
+        align-items: center;
       `}
     >
       <span
