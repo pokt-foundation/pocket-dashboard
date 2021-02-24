@@ -21,8 +21,6 @@ import { PocketNetworkError } from "../models/Exceptions";
 
 const POCKET_NETWORK_CONFIGURATION = env("pocket_network");
 
-console.log(POCKET_NETWORK_CONFIGURATION.dispatchers);
-
 const POCKET_CONFIGURATION = new Configuration(
   POCKET_NETWORK_CONFIGURATION.max_dispatchers,
   POCKET_NETWORK_CONFIGURATION.max_sessions,
