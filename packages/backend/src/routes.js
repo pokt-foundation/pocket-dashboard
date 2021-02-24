@@ -1,10 +1,10 @@
-import Index from "./apis/IndexApi";
-import User from "./apis/UserApi";
-import Account from "./apis/AccountApi";
-import SecurityQuestion from "./apis/SecurityQuestionApi";
-import Application from "./apis/ApplicationApi";
-import Node from "./apis/NodeApi";
-import Network from "./apis/NetworkApi";
+import Index from "apis/IndexApi";
+import User from "apis/UserApi";
+import Account from "apis/AccountApi";
+import SecurityQuestion from "apis/SecurityQuestionApi";
+import Application from "apis/ApplicationApi";
+import Node from "apis/NodeApi";
+import Network from "apis/NetworkApi";
 
 /**
  * @param {object} expressApp Express application object.

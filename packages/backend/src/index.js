@@ -1,5 +1,5 @@
-import { app } from "./app";
-import { startCronJobs } from "./CronJob";
+import { app } from "app";
+import { startCronJobs } from "CronJob";
 
 startCronJobs();
 
