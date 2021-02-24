@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "Pocket dashboard",
   "repository": {
-    "url": "https://github.com/pokt-network/pocket-dashboard",
+    "url": "https://github.com/pokt-foundation/pocket-dashboard",
     "type": "git"
   },
-  "author": "Codemera",
+  "author": "Pocket Foundation",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --watch --mode development --config webpack.config.js",
+    "build": "babel ./src --out-dir ./dist--source-maps --copy-files",
     "start": "nodemon --ignore ./dist --exec babel-node ./src/index.js",
     "test": "mocha test",
     "test:services": "mocha test/services",
