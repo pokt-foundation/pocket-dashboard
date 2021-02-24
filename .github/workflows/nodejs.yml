@@ -44,7 +44,7 @@ jobs:
 
       - name: Running prod build
         working-directory: packages/backend
-        run: yarn build:prod
+        run: yarn build
 
   # Frontend CI
   Frontend:
