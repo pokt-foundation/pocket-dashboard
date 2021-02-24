@@ -3,8 +3,9 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
 import { errorHandler } from "apis/_helpers";
-import customJwt from "middlewares/jwt";
-import sessionRefresh from "middlewares/session-refresh";
+import customJwtMiddleware from "middlewares/jwt";
+import notFoundMiddleware from "middlewares/not-found";
+import sessionRefreshMiddleware from "middlewares/session-refresh";
 import { configureRoutes } from "routes";
 
 const app = express();
@@ -17,14 +18,16 @@ app.use(
 );
 app.use(cookieParser());
 app.use(morgan("dev"));
-app.use(errorHandler);
 app.use(
   cors({
     exposedHeaders: ["Authorization"],
   })
 );
-app.use(customJwt());
-app.use(sessionRefresh);
+app.use(customJwtMiddleware());
+app.use(sessionRefreshMiddleware);
+app.use(notFoundMiddleware);
+app.use(errorHandler);
+
 configureRoutes(app);
 
 export { app };
