@@ -23,7 +23,7 @@ import {
 } from "../models/Exceptions";
 import TransactionService from "./TransactionService";
 import { POST_ACTION_TYPE, TransactionPostAction } from "../models/Transaction";
-import { Configurations } from "../_configuration";
+import env from "environment";
 import { POKT_DENOMINATIONS } from "./PocketService";
 import PocketService from "./PocketService";
 import { ObjectID } from "mongodb";
@@ -31,7 +31,7 @@ import { Encryptor, Decryptor } from "strong-cryptor";
 import EmailService from "../services/EmailService";
 
 const crypto = require("crypto");
-const cryptoKey = Configurations.persistence.default.db_encryption_key;
+const cryptoKey = env("persistence").default.db_encryption_key;
 const encryptor = new Encryptor({ key: cryptoKey });
 const decryptor = new Decryptor({ key: cryptoKey });
 
@@ -600,7 +600,7 @@ export default class ApplicationService extends BasePocketService {
     }
 
     try {
-      const { aat_version: aatVersion } = Configurations.pocket_network;
+      const { aat_version: aatVersion } = env("pocket_network");
       const {
         publicPocketAccount: { publicKey: applicationPublicKeyHex },
         freeTierApplicationAccount: {
@@ -637,7 +637,7 @@ export default class ApplicationService extends BasePocketService {
         stake_amount: upoktToStake,
         max_relay_per_day_amount: maxRelayPerDayAmount,
       },
-    } = Configurations.pocket_network;
+    } = env("pocket_network");
 
     if (
       aatVersion === undefined ||
@@ -720,7 +720,7 @@ export default class ApplicationService extends BasePocketService {
       secret_access_key: awsSecretAccessKey,
       region: awsRegion,
       s3_fts_bucket: awsS3FTSBucket,
-    } = Configurations.aws;
+    } = env("aws");
 
     const s3 = new aws.S3({
       accessKeyId: awsAccessKeyID,
@@ -906,7 +906,7 @@ export default class ApplicationService extends BasePocketService {
     const {
       aat_version: aatVersion,
       free_tier: { client_pub_key: clientPublicKey },
-    } = Configurations.pocket_network;
+    } = env("pocket_network");
 
     application.pocketApplication.updatingStatus = true;
 

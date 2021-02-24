@@ -1,40 +1,17 @@
 import BaseService from "./BaseService";
-import { get_auth_providers, getAuthProvider } from "../providers/auth/Index";
-import { AuthProviderUser, EmailUser, PocketUser } from "../models/User";
+import { EmailUser, PocketUser } from "../models/User";
 import { AnsweredSecurityQuestion } from "../models/AnsweredSecurityQuestion";
 import { SecurityQuestion } from "../models/SecurityQuestion";
-import BaseAuthProvider from "../providers/auth/BaseAuthProvider";
-import { Configurations } from "../_configuration";
+import env from "environment";
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import { DashboardError, DashboardValidationError } from "../models/Exceptions";
 
-const AUTH_TOKEN_TYPE = "access_token";
 const USER_COLLECTION_NAME = "Users";
 
 export default class UserService extends BaseService {
   constructor() {
     super();
-
-    /** @type {BaseAuthProvider[]} */
-    this.__authProviders = get_auth_providers();
-  }
-
-  /**
-   * Retrieve User data from Auth provider.
-   *
-   * @param {string} providerName Name of Auth provider.
-   * @param {string} code Code returned by Auth provider.
-   *
-   * @returns {Promise<AuthProviderUser>} An Auth Provider user.
-   * @private
-   * @async
-   */
-  async __getProviderUserData(providerName, code) {
-    const authProvider = getAuthProvider(this.__authProviders, providerName);
-    const accessToken = await authProvider.getToken(code, AUTH_TOKEN_TYPE);
-
-    return authProvider.getUserData(accessToken, AUTH_TOKEN_TYPE);
   }
 
   /**
@@ -224,27 +201,6 @@ export default class UserService extends BaseService {
     });
 
     return result;
-  }
-
-  /**
-   * Authenticate User using an Auth provider. If the user does not exist on our database it will create.
-   *
-   * @param {string} providerName Name of Auth provider.
-   * @param {string} code Code returned by Auth provider.
-   *
-   * @returns {Promise<PocketUser>} an authenticated(via Auth provider) pocket user.
-   * @async
-   */
-  async authenticateWithAuthProvider(providerName, code) {
-    const user = await this.__getProviderUserData(providerName, code);
-
-    // Create the user if not exists on DB.
-    await this.__persistUserIfNotExists(user);
-
-    // Update last login of user on DB.
-    await this.__updateLastLogin(user);
-
-    return user;
   }
 
   /**
@@ -771,8 +727,8 @@ export default class UserService extends BaseService {
       {
         data: payload,
       },
-      Configurations.auth.jwt.secret_key,
-      { expiresIn: Configurations.auth.jwt.expiration }
+      env("auth").secret_key,
+      { expiresIn: env("auth").expiration }
     );
 
     // Refresh token
@@ -780,8 +736,8 @@ export default class UserService extends BaseService {
       {
         data: payload,
       },
-      Configurations.auth.jwt.secret_key,
-      { expiresIn: Configurations.auth.jwt.refresh_expiration }
+      env("auth").secret_key,
+      { expiresIn: env("auth").refresh_expiration }
     );
 
     return {
@@ -801,7 +757,7 @@ export default class UserService extends BaseService {
   async generateToken(userEmail) {
     const payload = { email: userEmail };
 
-    return jwt.sign(payload, Configurations.auth.jwt.secret_key);
+    return jwt.sign(payload, env("auth").secret_key);
   }
 
   /**
@@ -841,7 +797,7 @@ export default class UserService extends BaseService {
    * @async
    */
   async decodeToken(token, ignoreExpiration = false) {
-    const payload = jwt.verify(token, Configurations.auth.jwt.secret_key, {
+    const payload = jwt.verify(token, env("auth").secret_key, {
       ignoreExpiration: ignoreExpiration,
     });
 
@@ -872,7 +828,7 @@ export default class UserService extends BaseService {
    * @async
    */
   async verifyCaptcha(token) {
-    const secret = Configurations.recaptcha.google_server;
+    const secret = env("recaptcha").google_server;
 
     /**
      * Although is a POST request, google requires the data to be sent by query

@@ -1,13 +1,12 @@
-import {describe, it} from "mocha";
+import { describe, it } from "mocha";
 import "chai/register-should";
 
-import {Configurations} from "../../../src/_configuration";
+import { Configurations } from "../../../src/_configuration";
 import MongoDBAdapter from "../../../src/providers/data/db/MongoDBAdapter";
 
 const mongoDBProvider = new MongoDBAdapter(Configurations.persistence.test);
 
 describe("MongoDBAdapter", () => {
-
   describe("open", () => {
     it("Expected a successfully connection", async () => {
       const connection = await mongoDBProvider.open();

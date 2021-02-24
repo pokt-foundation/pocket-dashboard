@@ -1,33 +1,45 @@
 import express from "express";
-import { configureRoutes } from "./_routes";
-import { configureExpress, handleErrors } from "./_configuration";
-import { startCronJobs } from "./CronJob";
+import cookieParser from "cookie-parser";
+import logger from "morgan";
+import cors from "cors";
+import { errorHandler } from "./apis/_helpers";
+import customJwt from "middlewares/jwt";
+import sessionRefresh from "middlewares/session-refresh";
+import { configureRoutes } from "_routes";
 
-import webpack from "webpack";
-import webPackConfig from "../webpack.config";
-import webpackDevMiddleware from "webpack-dev-middleware";
+/**
+ * @param {object} expressApp Express application object.
+ */
+export function configureExpress(expressApp) {
+  expressApp.use(express.json());
+  expressApp.use(
+    express.urlencoded({
+      extended: false,
+    })
+  );
+  expressApp.use(cookieParser());
+  expressApp.use(logger("dev"));
+  expressApp.use(
+    cors({
+      exposedHeaders: ["Authorization"],
+    })
+  );
 
-const webPackCompiler = webpack(webPackConfig);
+  expressApp.use(customJwt());
+  expressApp.use(sessionRefresh);
+}
+
+/**
+ * @param {object} expressApp Express application object.
+ */
+export function handleErrors(expressApp) {
+  expressApp.use(errorHandler);
+}
+
+// Initialize express app
 const app = express();
 
 configureExpress(app);
 configureRoutes(app);
-handleErrors(app);
-startCronJobs();
 
-// Tell express to use the webpack-dev-middleware and use the webpack.config.js
-// configuration file as a base.
-app.use(
-  webpackDevMiddleware(webPackCompiler, {
-    publicPath: webPackConfig.output.publicPath,
-  })
-);
-
-const PORT = process.env.PORT || 4200;
-
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`App listening to ${PORT}....`);
-  // eslint-disable-next-line no-console
-  console.log("Press Ctrl+C to quit.");
-});
+export { app };
