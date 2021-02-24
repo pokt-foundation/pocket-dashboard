@@ -37,7 +37,6 @@ module.exports = {
   plugins: ["jsdoc", "prettier"],
   extends: [
     "eslint:recommended",
-    "plugin:jsdoc/recommended",
     "plugin:prettier/recommended",
     "prettier/babel",
   ],

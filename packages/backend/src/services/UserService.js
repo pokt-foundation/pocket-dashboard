@@ -1,40 +1,15 @@
 import BaseService from "./BaseService";
-import { get_auth_providers, getAuthProvider } from "../providers/auth/Index";
-import { AuthProviderUser, EmailUser, PocketUser } from "../models/User";
-import { AnsweredSecurityQuestion } from "../models/AnsweredSecurityQuestion";
-import { SecurityQuestion } from "../models/SecurityQuestion";
-import BaseAuthProvider from "../providers/auth/BaseAuthProvider";
-import { Configurations } from "../_configuration";
+import { EmailUser, PocketUser } from "../models/User";
+import env from "environment";
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import { DashboardError, DashboardValidationError } from "../models/Exceptions";
 
-const AUTH_TOKEN_TYPE = "access_token";
 const USER_COLLECTION_NAME = "Users";
 
 export default class UserService extends BaseService {
   constructor() {
     super();
-
-    /** @type {BaseAuthProvider[]} */
-    this.__authProviders = get_auth_providers();
-  }
-
-  /**
-   * Retrieve User data from Auth provider.
-   *
-   * @param {string} providerName Name of Auth provider.
-   * @param {string} code Code returned by Auth provider.
-   *
-   * @returns {Promise<AuthProviderUser>} An Auth Provider user.
-   * @private
-   * @async
-   */
-  async __getProviderUserData(providerName, code) {
-    const authProvider = getAuthProvider(this.__authProviders, providerName);
-    const accessToken = await authProvider.getToken(code, AUTH_TOKEN_TYPE);
-
-    return authProvider.getUserData(accessToken, AUTH_TOKEN_TYPE);
   }
 
   /**
@@ -135,7 +110,6 @@ export default class UserService extends BaseService {
   async isUserValidated(userEmail, authProvider = undefined) {
     let filter = {
       email: userEmail,
-      securityQuestions: { $ne: null },
     };
 
     if (authProvider) {
@@ -224,27 +198,6 @@ export default class UserService extends BaseService {
     });
 
     return result;
-  }
-
-  /**
-   * Authenticate User using an Auth provider. If the user does not exist on our database it will create.
-   *
-   * @param {string} providerName Name of Auth provider.
-   * @param {string} code Code returned by Auth provider.
-   *
-   * @returns {Promise<PocketUser>} an authenticated(via Auth provider) pocket user.
-   * @async
-   */
-  async authenticateWithAuthProvider(providerName, code) {
-    const user = await this.__getProviderUserData(providerName, code);
-
-    // Create the user if not exists on DB.
-    await this.__persistUserIfNotExists(user);
-
-    // Update last login of user on DB.
-    await this.__updateLastLogin(user);
-
-    return user;
   }
 
   /**
@@ -344,100 +297,6 @@ export default class UserService extends BaseService {
   }
 
   /**
-   * Add or update answered security questions to user.
-   *
-   * @param {string} userEmail Email of user.
-   * @param {Array<{question: string, answer:string}>} questions Questions to add or update.
-   *
-   * @returns {Promise<boolean>} If user record was updated or not.
-   * @throws {DashboardValidationError} If user is invalid.
-   * @async
-   */
-  async addOrUpdateUserSecurityQuestions(userEmail, questions) {
-    const filter = { email: userEmail };
-    const userDB = await this.persistenceService.getEntityByFilter(
-      USER_COLLECTION_NAME,
-      filter
-    );
-
-    if (!userDB) {
-      throw new DashboardValidationError("Invalid user.");
-    }
-
-    const data = {
-      securityQuestions: AnsweredSecurityQuestion.createAnsweredSecurityQuestions(
-        questions
-      ),
-    };
-    /** @type {{result: {n:number, ok: number}}} */
-
-    const result = await this.persistenceService.updateEntity(
-      USER_COLLECTION_NAME,
-      filter,
-      data
-    );
-
-    return result.result.ok === 1;
-  }
-
-  /**
-   * Get user security questions.
-   *
-   * @param {string} userEmail Email of user.
-   *
-   * @returns {Promise<SecurityQuestion[]>} User security questions.
-   * @throws {DashboardValidationError} If user is invalid.
-   * @async
-   */
-  async getUserSecurityQuestions(userEmail) {
-    const filter = {
-      email: userEmail,
-      securityQuestions: { $ne: null },
-    };
-    const userDB = await this.persistenceService.getEntityByFilter(
-      USER_COLLECTION_NAME,
-      filter
-    );
-
-    if (!userDB) {
-      throw new DashboardValidationError("Invalid user.");
-    }
-
-    return SecurityQuestion.createSecurityQuestions(userDB.securityQuestions);
-  }
-
-  /**
-   * Validate user security questions.
-   *
-   * @param {string} userEmail Email of user.
-   * @param {{question: string, answer: string}[]} userAnswers User input answers.
-   *
-   * @returns {Promise<SecurityQuestion[]>} True or false if the answers are valid.
-   * @throws {DashboardValidationError} If user is invalid.
-   * @async
-   */
-  async validateUserSecurityQuestions(userEmail, userAnswers) {
-    const filter = {
-      email: userEmail,
-      securityQuestions: { $ne: null },
-    };
-    const userDB = await this.persistenceService.getEntityByFilter(
-      USER_COLLECTION_NAME,
-      filter
-    );
-
-    if (!userDB) {
-      throw new DashboardValidationError("Invalid user.");
-    }
-    const isValid = await AnsweredSecurityQuestion.validateAnsweredSecurityQuestions(
-      userDB,
-      userAnswers
-    );
-
-    return isValid;
-  }
-
-  /**
    * Generate a password reset token and expiration date for user.
    *
    * @param {string} userEmail User's email to update password reset fields.
@@ -472,7 +331,6 @@ export default class UserService extends BaseService {
       resetPasswordToken,
       expiringDate,
       user.lastLogin,
-      user.securityQuestions,
       user.customerID
     );
 
@@ -771,8 +629,8 @@ export default class UserService extends BaseService {
       {
         data: payload,
       },
-      Configurations.auth.jwt.secret_key,
-      { expiresIn: Configurations.auth.jwt.expiration }
+      env("auth").secret_key,
+      { expiresIn: env("auth").expiration }
     );
 
     // Refresh token
@@ -780,8 +638,8 @@ export default class UserService extends BaseService {
       {
         data: payload,
       },
-      Configurations.auth.jwt.secret_key,
-      { expiresIn: Configurations.auth.jwt.refresh_expiration }
+      env("auth").secret_key,
+      { expiresIn: env("auth").refresh_expiration }
     );
 
     return {
@@ -801,7 +659,7 @@ export default class UserService extends BaseService {
   async generateToken(userEmail) {
     const payload = { email: userEmail };
 
-    return jwt.sign(payload, Configurations.auth.jwt.secret_key);
+    return jwt.sign(payload, env("auth").secret_key);
   }
 
   /**
@@ -841,7 +699,7 @@ export default class UserService extends BaseService {
    * @async
    */
   async decodeToken(token, ignoreExpiration = false) {
-    const payload = jwt.verify(token, Configurations.auth.jwt.secret_key, {
+    const payload = jwt.verify(token, env("auth").secret_key, {
       ignoreExpiration: ignoreExpiration,
     });
 
@@ -872,7 +730,7 @@ export default class UserService extends BaseService {
    * @async
    */
   async verifyCaptcha(token) {
-    const secret = Configurations.recaptcha.google_server;
+    const secret = env("recaptcha").google_server;
 
     /**
      * Although is a POST request, google requires the data to be sent by query

@@ -1,7 +1,6 @@
 import TransactionService from "./services/TransactionService";
 import PocketService from "./services/PocketService";
 import EmailService from "./services/EmailService";
-import NodeService from "./services/NodeService";
 import CronJobService from "./services/CronJobService";
 import ApplicationService from "./services/ApplicationService";
 import cron from "node-cron";
@@ -18,7 +17,6 @@ export function startCronJobs() {
   const TRANSACTION_SERVICE = new TransactionService();
   const POCKET_SERVICE = new PocketService();
   const APPLICATION_SERVICE = new ApplicationService();
-  const NODE_SERVICE = new NodeService();
   const CRON_SERVICE = new CronJobService();
 
   cron.schedule("0 */20 * * * *", async () => {
@@ -31,12 +29,8 @@ export function startCronJobs() {
     console.log("cronJobData.lastHeight = " + cronJobData.lastHeight);
     if (height !== cronJobData.lastHeight) {
       runPendingTransaction(cronJobData);
-      runNodeStakeProcess(cronJobData);
-      runNodeUnstakeProcess(cronJobData);
       runAppStakeProcess(cronJobData);
       runAppUnstakeProcess(cronJobData);
-
-      runNodeUnjailProcess(cronJobData);
 
       cronJobData.lastHeight = height;
       CRON_SERVICE.update(cronJobData.id, cronJobData);
@@ -198,71 +192,7 @@ export function startCronJobs() {
 
     start();
   }
-  /**
-   * Runs a node stake process
-   *
-   * @param {CronJobData} cronJobData Cron job data.
-   *
-   * @throws {Error}
-   * @async
-   */
-  function runNodeStakeProcess(cronJobData) {
-    const start = async () => {
-      await asyncForEach(
-        cronJobData.nodeStakeTransactions,
-        async (nodeStakePocketTransaction) => {
-          const hash = nodeStakePocketTransaction.hash;
-          const transactionOrError = await POCKET_SERVICE.getTransaction(hash);
 
-          if (typeGuard(transactionOrError, RpcError)) {
-            throw new Error(transactionOrError.message);
-          }
-
-          const postAction = nodeStakePocketTransaction.postAction;
-
-          const {
-            address,
-            contactEmail,
-            emailData,
-            paymentEmailData,
-          } = postAction.data;
-
-          const { pocketNode, networkData, error } = await NODE_SERVICE.getNode(
-            address
-          );
-
-          const hasError = error ? true : false;
-          const errorType = hasError === true ? error : "";
-
-          if (hasError || pocketNode === undefined) {
-            throw new Error(
-              errorType !== ""
-                ? errorType
-                : "Failed to retrieve the node data from the DB."
-            );
-          }
-
-          const status = getStakeStatus(parseInt(networkData.status));
-
-          if (status === STAKE_STATUS.Staked) {
-            await EmailService.to(contactEmail).sendStakeNodeEmail(
-              contactEmail,
-              emailData,
-              paymentEmailData
-            );
-
-            await NODE_SERVICE.changeUpdatingStatus(address, false);
-
-            await CRON_SERVICE.removeNodeStakeTransaction(
-              nodeStakePocketTransaction
-            );
-          }
-        }
-      );
-    };
-
-    start();
-  }
   /**
    * Runs an app unstake process
    *
@@ -330,99 +260,7 @@ export function startCronJobs() {
 
     start();
   }
-  /**
-   * Runs a node unstake process
-   *
-   * @param {CronJobData} cronJobData Cron job data.
-   *
-   * @throws {Error}
-   * @async
-   */
-  function runNodeUnstakeProcess(cronJobData) {
-    const start = async () => {
-      await asyncForEach(
-        cronJobData.nodeUnstakeTransactions,
-        async (nodeUnstakeTransaction) => {
-          const hash = nodeUnstakeTransaction.hash;
-          const transactionOrError = await POCKET_SERVICE.getTransaction(hash);
 
-          if (typeGuard(transactionOrError, RpcError)) {
-            throw new Error(transactionOrError.message);
-          }
-
-          const postAction = nodeUnstakeTransaction.postAction;
-          const { contactEmail, userName, nodeData, address } = postAction.data;
-
-          const { pocketNode, networkData, error } = await NODE_SERVICE.getNode(
-            address
-          );
-
-          const hasError = error ? true : false;
-          const errorType = hasError === true ? error : "";
-
-          if (hasError || pocketNode === undefined) {
-            throw new Error(
-              errorType !== ""
-                ? errorType
-                : "Failed to retrieve the node data from the DB."
-            );
-          }
-
-          const status = getStakeStatus(parseInt(networkData.status));
-
-          if (status === STAKE_STATUS.Unstaked) {
-            await EmailService.to(contactEmail).sendUnstakeNodeEmail(
-              userName,
-              nodeData
-            );
-
-            await NODE_SERVICE.changeUpdatingStatus(address, false);
-
-            await CRON_SERVICE.removeNodeUnstakeTransaction(
-              nodeUnstakeTransaction
-            );
-          }
-        }
-      );
-    };
-
-    start();
-  }
-  /**
-   * Runs a node unjail process
-   *
-   * @param {CronJobData} cronJobData Cron job data.
-   *
-   * @throws {Error}
-   * @async
-   */
-  function runNodeUnjailProcess(cronJobData) {
-    const start = async () => {
-      await asyncForEach(
-        cronJobData.nodeUnjailTransactions,
-        async (nodeUnjailTransaction) => {
-          const hash = nodeUnjailTransaction.hash;
-          const transactionOrError = await POCKET_SERVICE.getTransaction(hash);
-
-          if (typeGuard(transactionOrError, RpcError)) {
-            throw new Error(transactionOrError.message);
-          }
-
-          const postAction = nodeUnjailTransaction.postAction;
-          const { contactEmail, userName, nodeData } = postAction.data;
-
-          await EmailService.to(contactEmail).sendNodeUnJailedEmail(
-            userName,
-            nodeData
-          );
-
-          await CRON_SERVICE.removeNodeUnjailTransaction(nodeUnjailTransaction);
-        }
-      );
-    };
-
-    start();
-  }
   /**
    * Runs an async call for a one or more records
    *

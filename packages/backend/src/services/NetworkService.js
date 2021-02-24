@@ -1,5 +1,5 @@
 import BasePocketService from "./BasePocketService";
-import { Configurations } from "../_configuration";
+import env from "environment";
 import { Application, Node, StakingStatus } from "@pokt-network/pocket-js";
 import { NetworkSummaryData, NetworkChain } from "../models/Network";
 import bigInt from "big-integer";
@@ -71,7 +71,7 @@ export default class NetworkService extends BasePocketService {
    * @private
    */
   __getPOKTPrice() {
-    return Configurations.pocket_network.pokt_market_price;
+    return env("pocket_network").pokt_market_price;
   }
 
   /**

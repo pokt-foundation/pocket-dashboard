@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import { AnsweredSecurityQuestion } from "./AnsweredSecurityQuestion";
 import { EMAIL_REGEX } from "./Regex";
 import { DashboardValidationError } from "./Exceptions";
 
@@ -15,7 +14,6 @@ export class PocketUser {
    * @param {string} [resetPasswordToken] Reset password token.
    * @param {string} [resetPasswordExpiration] Reset password token expiration date.
    * @param {string} [lastLogin] Last login.
-   * @param {Array<AnsweredSecurityQuestion>} [securityQuestions] Answered security question of user.
    * @param {string} [customerID] Customer ID.
    */
   constructor(
@@ -26,7 +24,6 @@ export class PocketUser {
     resetPasswordToken,
     resetPasswordExpiration,
     lastLogin,
-    securityQuestions,
     customerID
   ) {
     Object.assign(this, {
@@ -37,7 +34,6 @@ export class PocketUser {
       resetPasswordToken,
       resetPasswordExpiration,
       lastLogin,
-      securityQuestions,
       customerID,
     });
   }
@@ -61,7 +57,6 @@ export class PocketUser {
       user.resetPasswordToken,
       user.resetPasswordExpiration,
       lastLoginUTC,
-      user.securityQuestions,
       user.customerID
     );
   }
@@ -75,7 +70,6 @@ export class PocketUser {
    * @param {string} user.username User name.
    * @param {string} user.password Password.
    * @param {string} user.lastLogin Last login.
-   * @param {Array<AnsweredSecurityQuestion>} user.securityQuestions Security questions.
    * @param {string} user.customerID Customer ID.
    *
    * @returns {PocketUser} A new Pocket user.
@@ -90,7 +84,6 @@ export class PocketUser {
       user.resetPasswordToken,
       user.resetPasswordExpiration,
       user.lastLogin,
-      user.securityQuestions,
       user.customerID
     );
   }

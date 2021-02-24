@@ -1,14 +1,12 @@
 import { SendGridEmailProvider } from "../providers/data/SendGridEmailProvider";
-import { Configurations } from "../_configuration";
+import env from "environment";
 
 export default class EmailService {
   /**
    * @param {string} toEmail Recipient of email.
    */
   constructor(toEmail) {
-    this.emailProvider = new SendGridEmailProvider(
-      Configurations.email.api_key
-    );
+    this.emailProvider = new SendGridEmailProvider(env("email").api_key);
     this.__toEmail = toEmail;
   }
 
@@ -34,7 +32,7 @@ export default class EmailService {
    * @private
    */
   async __sendEmail(templateID, templateData) {
-    const fromEmail = Configurations.email.from_email;
+    const fromEmail = env("email").from_email;
 
     try {
       /** @type {{statusCode: number}[]} */
@@ -117,7 +115,7 @@ export default class EmailService {
       POST_VALIDATION_LINK: postValidationLink,
     };
 
-    await this.__sendEmail(Configurations.email.template_ids.SignUp, data);
+    await this.__sendEmail(env("email").template_ids.SignUp, data);
   }
 
   /**
@@ -132,10 +130,7 @@ export default class EmailService {
       POST_VALIDATION_LINK: postValidationLink,
     };
 
-    await this.__sendEmail(
-      Configurations.email.template_ids.EmailChanged,
-      data
-    );
+    await this.__sendEmail(env("email").template_ids.EmailChanged, data);
   }
 
   /**
@@ -148,10 +143,7 @@ export default class EmailService {
       USER_NAME: userName,
     };
 
-    await this.__sendEmail(
-      Configurations.email.template_ids.PasswordChanged,
-      data
-    );
+    await this.__sendEmail(env("email").template_ids.PasswordChanged, data);
   }
 
   /**
@@ -169,10 +161,7 @@ export default class EmailService {
       POST_VALIDATION_LINK: postValidationLink,
     };
 
-    await this.__sendEmail(
-      Configurations.email.template_ids.PasswordReset,
-      data
-    );
+    await this.__sendEmail(env("email").template_ids.PasswordReset, data);
   }
 
   /**
@@ -190,10 +179,7 @@ export default class EmailService {
       NODE_LINK: nodeData.link,
     };
 
-    await this.__sendEmail(
-      Configurations.email.template_ids.CreateOrImportNode,
-      data
-    );
+    await this.__sendEmail(env("email").template_ids.CreateOrImportNode, data);
   }
 
   /**
@@ -209,7 +195,7 @@ export default class EmailService {
       NODES_LINK: nodeData.nodesLink,
     };
 
-    await this.__sendEmail(Configurations.email.template_ids.NodeDeleted, data);
+    await this.__sendEmail(env("email").template_ids.NodeDeleted, data);
   }
 
   /**
@@ -225,10 +211,7 @@ export default class EmailService {
       NODE_LINK: nodeData.link,
     };
 
-    await this.__sendEmail(
-      Configurations.email.template_ids.NodeUnJailed,
-      data
-    );
+    await this.__sendEmail(env("email").template_ids.NodeUnJailed, data);
   }
 
   /**
@@ -248,7 +231,7 @@ export default class EmailService {
       POKT_STAKED: paymentData.poktStaked,
     };
 
-    await this.__sendEmail(Configurations.email.template_ids.StakeNode, data);
+    await this.__sendEmail(env("email").template_ids.StakeNode, data);
   }
 
   /**
@@ -264,7 +247,7 @@ export default class EmailService {
       NODE_LINK: nodeData.link,
     };
 
-    await this.__sendEmail(Configurations.email.template_ids.UnstakeNode, data);
+    await this.__sendEmail(env("email").template_ids.UnstakeNode, data);
   }
 
   /**
@@ -282,10 +265,7 @@ export default class EmailService {
       APP_LINK: applicationData.link,
     };
 
-    await this.__sendEmail(
-      Configurations.email.template_ids.CreateOrImportApp,
-      data
-    );
+    await this.__sendEmail(env("email").template_ids.CreateOrImportApp, data);
   }
 
   /**
@@ -301,7 +281,7 @@ export default class EmailService {
       APPS_LINK: applicationData.appsLink,
     };
 
-    await this.__sendEmail(Configurations.email.template_ids.AppDeleted, data);
+    await this.__sendEmail(env("email").template_ids.AppDeleted, data);
   }
 
   /**
@@ -321,7 +301,7 @@ export default class EmailService {
       POKT_STAKED: paymentData.poktStaked,
     };
 
-    await this.__sendEmail(Configurations.email.template_ids.StakeApp, data);
+    await this.__sendEmail(env("email").template_ids.StakeApp, data);
   }
 
   /**
@@ -337,7 +317,7 @@ export default class EmailService {
       APP_LINK: applicationData.link,
     };
 
-    await this.__sendEmail(Configurations.email.template_ids.UnstakeApp, data);
+    await this.__sendEmail(env("email").template_ids.UnstakeApp, data);
   }
 
   /**
@@ -354,10 +334,7 @@ export default class EmailService {
       PAY_AMOUNT: paymentData.amountPaid,
     };
 
-    await this.__sendEmail(
-      Configurations.email.template_ids.PaymentDeclined,
-      data
-    );
+    await this.__sendEmail(env("email").template_ids.PaymentDeclined, data);
   }
 
   /**
@@ -377,10 +354,7 @@ export default class EmailService {
       POKT_STAKED: paymentData.poktStaked,
     };
 
-    await this.__sendEmail(
-      Configurations.email.template_ids.PaymentCompletedApp,
-      data
-    );
+    await this.__sendEmail(env("email").template_ids.PaymentCompletedApp, data);
   }
 
   /**
@@ -401,7 +375,7 @@ export default class EmailService {
     };
 
     await this.__sendEmail(
-      Configurations.email.template_ids.PaymentCompletedNode,
+      env("email").template_ids.PaymentCompletedNode,
       data
     );
   }
