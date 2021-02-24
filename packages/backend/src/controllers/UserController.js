@@ -1,8 +1,8 @@
 import express from "express";
-import UserService from "../services/UserService";
-import EmailService from "../services/EmailService";
-import { apiAsyncWrapper } from "./_helpers";
-import { DashboardValidationError } from "./../models/Exceptions";
+import asyncMiddleware from "middlewares/async";
+import { DashboardValidationError } from "models/Exceptions";
+import EmailService from "services/EmailService";
+import UserService from "services/UserService";
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ const userService = new UserService();
  */
 router.post(
   "/exists",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, authProvider: string}} */
     const data = req.body;
 
@@ -28,7 +28,7 @@ router.post(
  */
 router.get(
   "/auth/providers",
-  apiAsyncWrapper((req, res) => {
+  asyncMiddleware((req, res) => {
     res.json(userService.getConsentProviderUrls());
   })
 );
@@ -38,7 +38,7 @@ router.get(
  */
 router.post(
   "/auth/provider/login",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{provider_name:string, code:string}} */
     const data = req.body;
     const user = await userService.authenticateWithAuthProvider(
@@ -55,7 +55,7 @@ router.post(
  */
 router.post(
   "/auth/login",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{username:string, password:string}} */
     const data = req.body;
 
@@ -79,7 +79,7 @@ router.post(
  */
 router.post(
   "/auth/signup",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, username:string, password1:string, password2:string, postValidationBaseLink:string}} */
     const data = req.body;
 
@@ -105,7 +105,7 @@ router.post(
  */
 router.post(
   "/auth/resend-signup-email",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, postValidationBaseLink:string}} */
     const data = req.body;
 
@@ -131,7 +131,7 @@ router.post(
  */
 router.post(
   "/auth/logout",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string}} */
     const data = req.body;
 
@@ -146,7 +146,7 @@ router.post(
  */
 router.post(
   "/auth/is-validated",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, authProvider: string}} */
     const data = req.body;
 
@@ -164,7 +164,7 @@ router.post(
  */
 router.post(
   "/auth/verify-password",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, password: string}} */
     const data = req.body;
 
@@ -182,7 +182,7 @@ router.post(
  */
 router.put(
   "/auth/change-password",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email: string, oldPassword: string, password1: string, password2: string}} */
     const data = req.body;
 
@@ -206,7 +206,7 @@ router.put(
  */
 router.put(
   "/auth/reset-password",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, token: string, password1: string, password2: string}} */
     const data = req.body;
 
@@ -230,7 +230,7 @@ router.put(
  */
 router.put(
   "/auth/send-reset-password-email",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, passwordResetLinkPage: string}} */
     const data = req.body;
 
@@ -253,7 +253,7 @@ router.put(
  */
 router.put(
   "/auth/change-username",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, username: string}} */
     const data = req.body;
 
@@ -268,7 +268,7 @@ router.put(
  */
 router.put(
   "/auth/change-email",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string, newEmail: string, postValidationBaseLink:string}} */
     const data = req.body;
 
@@ -297,7 +297,7 @@ router.put(
  */
 router.post(
   "/validate-token",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{token:string}} */
     const data = req.body;
 
@@ -328,7 +328,7 @@ router.post(
  */
 router.post(
   "/verify-captcha",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{token:string}} */
     const { token } = req.body;
     const result = await userService.verifyCaptcha(token);
@@ -342,7 +342,7 @@ router.post(
  */
 router.post(
   "/unsubscribe",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string}} */
     const data = req.body;
 
@@ -357,7 +357,7 @@ router.post(
  */
 router.post(
   "/subscribe",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{email:string}} */
     const data = req.body;
 

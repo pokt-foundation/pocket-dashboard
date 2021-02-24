@@ -1,6 +1,6 @@
 import express from "express";
-import NetworkService from "../services/NetworkService";
-import { apiAsyncWrapper } from "./_helpers";
+import NetworkService from "services/NetworkService";
+import { apiAsyncWrapper } from "helpers/utils";
 
 const router = express.Router();
 

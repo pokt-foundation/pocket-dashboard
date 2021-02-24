@@ -1,15 +1,12 @@
 import express from "express";
-import ApplicationService from "../services/ApplicationService";
+import ApplicationService from "services/ApplicationService";
 import {
   apiAsyncWrapper,
   getOptionalQueryOption,
   getQueryOption,
-} from "./_helpers";
-import EmailService from "../services/EmailService";
-// import PaymentService from "../services/PaymentService";
-// import ApplicationCheckoutService from "../services/checkout/ApplicationCheckoutService";
-import UserService from "../services/UserService";
-// import numeral from "numeral";
+} from "helpers/utils";
+import EmailService from "services/EmailService";
+import UserService from "services/UserService";
 
 const router = express.Router();
 
