@@ -9,7 +9,7 @@
   "author": "Pocket Foundation",
   "license": "MIT",
   "scripts": {
-    "build": "babel ./src --out-dir ./dist--source-maps --copy-files",
+    "build": "babel ./src --out-dir ./dist --source-maps --copy-files",
     "start": "nodemon --ignore ./dist --exec babel-node ./src/index.js",
     "test": "mocha test",
     "test:services": "mocha test/services",

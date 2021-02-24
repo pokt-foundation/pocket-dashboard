@@ -88,8 +88,6 @@ export const ENV_VARS = {
   },
 };
 
-console.log(ENV_VARS.auth());
-
 /**
  * Returns the corresponding object for the named passed
  *
