@@ -1,7 +1,5 @@
 import BaseService from "./BaseService";
 import { EmailUser, PocketUser } from "../models/User";
-import { AnsweredSecurityQuestion } from "../models/AnsweredSecurityQuestion";
-import { SecurityQuestion } from "../models/SecurityQuestion";
 import env from "environment";
 import jwt from "jsonwebtoken";
 import axios from "axios";
@@ -112,7 +110,6 @@ export default class UserService extends BaseService {
   async isUserValidated(userEmail, authProvider = undefined) {
     let filter = {
       email: userEmail,
-      securityQuestions: { $ne: null },
     };
 
     if (authProvider) {
@@ -300,100 +297,6 @@ export default class UserService extends BaseService {
   }
 
   /**
-   * Add or update answered security questions to user.
-   *
-   * @param {string} userEmail Email of user.
-   * @param {Array<{question: string, answer:string}>} questions Questions to add or update.
-   *
-   * @returns {Promise<boolean>} If user record was updated or not.
-   * @throws {DashboardValidationError} If user is invalid.
-   * @async
-   */
-  async addOrUpdateUserSecurityQuestions(userEmail, questions) {
-    const filter = { email: userEmail };
-    const userDB = await this.persistenceService.getEntityByFilter(
-      USER_COLLECTION_NAME,
-      filter
-    );
-
-    if (!userDB) {
-      throw new DashboardValidationError("Invalid user.");
-    }
-
-    const data = {
-      securityQuestions: AnsweredSecurityQuestion.createAnsweredSecurityQuestions(
-        questions
-      ),
-    };
-    /** @type {{result: {n:number, ok: number}}} */
-
-    const result = await this.persistenceService.updateEntity(
-      USER_COLLECTION_NAME,
-      filter,
-      data
-    );
-
-    return result.result.ok === 1;
-  }
-
-  /**
-   * Get user security questions.
-   *
-   * @param {string} userEmail Email of user.
-   *
-   * @returns {Promise<SecurityQuestion[]>} User security questions.
-   * @throws {DashboardValidationError} If user is invalid.
-   * @async
-   */
-  async getUserSecurityQuestions(userEmail) {
-    const filter = {
-      email: userEmail,
-      securityQuestions: { $ne: null },
-    };
-    const userDB = await this.persistenceService.getEntityByFilter(
-      USER_COLLECTION_NAME,
-      filter
-    );
-
-    if (!userDB) {
-      throw new DashboardValidationError("Invalid user.");
-    }
-
-    return SecurityQuestion.createSecurityQuestions(userDB.securityQuestions);
-  }
-
-  /**
-   * Validate user security questions.
-   *
-   * @param {string} userEmail Email of user.
-   * @param {{question: string, answer: string}[]} userAnswers User input answers.
-   *
-   * @returns {Promise<SecurityQuestion[]>} True or false if the answers are valid.
-   * @throws {DashboardValidationError} If user is invalid.
-   * @async
-   */
-  async validateUserSecurityQuestions(userEmail, userAnswers) {
-    const filter = {
-      email: userEmail,
-      securityQuestions: { $ne: null },
-    };
-    const userDB = await this.persistenceService.getEntityByFilter(
-      USER_COLLECTION_NAME,
-      filter
-    );
-
-    if (!userDB) {
-      throw new DashboardValidationError("Invalid user.");
-    }
-    const isValid = await AnsweredSecurityQuestion.validateAnsweredSecurityQuestions(
-      userDB,
-      userAnswers
-    );
-
-    return isValid;
-  }
-
-  /**
    * Generate a password reset token and expiration date for user.
    *
    * @param {string} userEmail User's email to update password reset fields.
@@ -428,7 +331,6 @@ export default class UserService extends BaseService {
       resetPasswordToken,
       expiringDate,
       user.lastLogin,
-      user.securityQuestions,
       user.customerID
     );
 

@@ -10,8 +10,5 @@ export const excludedPaths = [
   "/api/users/auth/reset-password",
   "/api/users/auth/send-reset-password-email",
   "/api/users/auth/verify-captcha",
-  "/api/security_questions/user/validate-answers",
-  "/api/security_questions/user/all",
-  "/api/security_questions/answered",
   "login",
 ];

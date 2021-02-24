@@ -1,7 +1,6 @@
 import Index from "apis/IndexApi";
 import User from "apis/UserApi";
 import Account from "apis/AccountApi";
-import SecurityQuestion from "apis/SecurityQuestionApi";
 import Application from "apis/ApplicationApi";
 import Network from "apis/NetworkApi";
 
@@ -17,9 +16,6 @@ export function configureRoutes(expressApp) {
 
   // Account API
   expressApp.use("/api/accounts", Account);
-
-  // Security Questions API
-  expressApp.use("/api/security_questions", SecurityQuestion);
 
   // Applications API
   expressApp.use("/api/applications", Application);
