@@ -1,10 +1,7 @@
 import express from "express";
 import ApplicationService from "services/ApplicationService";
-import {
-  apiAsyncWrapper,
-  getOptionalQueryOption,
-  getQueryOption,
-} from "helpers/utils";
+import { getOptionalQueryOption, getQueryOption } from "helpers/utils";
+import asyncMiddleware from "middlewares/async";
 import EmailService from "services/EmailService";
 import UserService from "services/UserService";
 
@@ -12,15 +9,13 @@ const router = express.Router();
 
 const userService = new UserService();
 const applicationService = new ApplicationService();
-// const applicationCheckoutService = ApplicationCheckoutService.getInstance();
-// const paymentService = new PaymentService();
 
 /**
  * Create new application.
  */
 router.post(
   "",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{application: {name:string, owner:string, url:string, contactEmail:string, user:string, description:string, icon:string}}} */
     const data = req.body;
 
@@ -37,7 +32,7 @@ router.post(
  */
 router.post(
   "/account",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{applicationID: string, applicationData: {address: string, publicKey: string}, applicationBaseLink:string, ppkData?: object}} */
     const data = req.body;
 
@@ -70,7 +65,7 @@ router.post(
  */
 router.put(
   "/:applicationId",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{name:string, owner:string, url:string, contactEmail:string, user:string, description:string, icon:string}} */
     let data = req.body;
 
@@ -100,7 +95,7 @@ router.put(
  */
 router.post(
   "/:applicationId",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{applicationId:string}} */
     const data = req.params;
     /** @type {{user:string, appsLink:string}} */
@@ -141,7 +136,7 @@ router.post(
  */
 router.get(
   "/summary/staked",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     const summaryData = await applicationService.getStakedApplicationSummary();
 
     res.json(summaryData);
@@ -153,7 +148,7 @@ router.get(
  */
 router.get(
   "/:applicationAccountAddress",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{applicationAccountAddress:string}} */
     const data = req.params;
     const application = await applicationService.getApplication(
@@ -169,7 +164,7 @@ router.get(
  */
 router.get(
   "/client/:applicationId",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{applicationId:string}} */
     const data = req.params;
 
@@ -195,7 +190,7 @@ router.get(
  */
 router.post(
   "/user/all",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     const limit = parseInt(getQueryOption(req, "limit"));
 
     const offsetData = getOptionalQueryOption(req, "offset");
@@ -232,7 +227,7 @@ router.post(
  */
 router.post(
   "/freetier/stake",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     // [>* @type {{stakeInformation: {client_address: string, chains: string[], stake_amount: string}, applicationLink: string}} <]
     const data = req.body;
 
@@ -261,7 +256,7 @@ router.post(
  */
 router.get(
   "/freetier/aat/:applicationId",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     /** @type {{applicationId:string}} */
     const data = req.params;
 
@@ -284,7 +279,7 @@ router.get(
 
 router.post(
   "/update/gateway/settings",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     const data = req.body;
     const applicationId = data.id;
 

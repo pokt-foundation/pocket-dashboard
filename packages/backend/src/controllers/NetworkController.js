@@ -1,6 +1,6 @@
 import express from "express";
 import NetworkService from "services/NetworkService";
-import { apiAsyncWrapper } from "helpers/utils";
+import asyncMiddleware from "middlewares/async";
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const networkService = new NetworkService();
  */
 router.get(
   "/chains",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     const chains = await networkService.getAvailableNetworkChains();
 
     res.json(chains);
@@ -23,7 +23,7 @@ router.get(
  */
 router.get(
   "/summary",
-  apiAsyncWrapper(async (req, res) => {
+  asyncMiddleware(async (req, res) => {
     const networkData = await networkService.getNetworkSummaryData();
 
     res.json(networkData);
