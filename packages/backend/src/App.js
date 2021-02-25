@@ -2,7 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
-import { errorHandler } from "apis/_helpers";
+import { errorHandler } from "helpers/utils";
 import customJwtMiddleware from "middlewares/jwt";
 import notFoundMiddleware from "middlewares/not-found";
 import sessionRefreshMiddleware from "middlewares/session-refresh";

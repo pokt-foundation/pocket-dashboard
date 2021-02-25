@@ -149,22 +149,6 @@ router.get(
 );
 
 /**
- * Import application from network.
- */
-router.get(
-  "/import/:applicationAccountAddress",
-  apiAsyncWrapper(async (req, res) => {
-    /** @type {{applicationAccountAddress:string}} */
-    const data = req.params;
-    const application = await applicationService.importApplication(
-      data.applicationAccountAddress
-    );
-
-    res.json(application);
-  })
-);
-
-/**
  * Get application that is already on dashboard by address.
  */
 router.get(
@@ -203,42 +187,6 @@ router.get(
     } else {
       res.status(400).send("Application doesn't belong to the client account.");
     }
-  })
-);
-
-/**
- * Get application that is on network by address.
- */
-router.get(
-  "/network/:applicationAccountAddress",
-  apiAsyncWrapper(async (req, res) => {
-    /** @type {{applicationAccountAddress:string}} */
-    const data = req.params;
-    const application = await applicationService.getNetworkApplication(
-      data.applicationAccountAddress
-    );
-
-    res.json(application);
-  })
-);
-
-/**
- * Get all applications.
- */
-router.get(
-  "",
-  apiAsyncWrapper(async (req, res) => {
-    const limit = parseInt(getQueryOption(req, "limit"));
-
-    const offsetData = getOptionalQueryOption(req, "offset");
-    const offset = offsetData !== "" ? parseInt(offsetData) : 0;
-
-    const applications = await applicationService.getAllApplications(
-      limit,
-      offset
-    );
-
-    res.json(applications);
   })
 );
 
@@ -305,88 +253,6 @@ router.post(
     );
 
     res.json(aat);
-  })
-);
-
-/**
- * Unstake a free tier application.
- */
-// router.post("/freetier/unstake", apiAsyncWrapper(async (req, res) => {
-//   /** @type {{unstakeInformation: {application_id: string}, applicationLink: string}} */
-//   const data = req.body;
-
-//   const unstakeInformation = data.unstakeInformation;
-
-//   await applicationService.unstakeFreeTierApplication(unstakeInformation, data.applicationLink);
-
-//   res.send(true);
-// }));
-
-/**
- * Stake an application.
- */
-// router.post("/custom/stake", apiAsyncWrapper(async (req, res) => {
-// [>* @type {{applicationId: string, appStakeTransaction: {address: string, raw_hex_bytes: string}, paymentId: string, applicationLink: string, gatewayAATSignature: string, upoktToStake: string}} <]
-// const data = req.body;
-// const paymentHistory = await paymentService.getPaymentFromHistory(data.paymentId);
-
-// console.log("paymentHistory = ");
-// console.log(paymentHistory);
-
-// if (
-// paymentHistory.isSuccessPayment() &&
-// paymentHistory.isApplicationPaymentItem(true)
-// ) {
-// const appStakeTransaction = data.appStakeTransaction;
-// const application = await applicationService.getClientApplication(data.applicationId);
-
-// if (await applicationService.verifyApplicationBelongsToClient(data.applicationId, req.headers.authorization)) {
-// const item = paymentHistory.getItem();
-// // For the email, convert to pokt
-// const poktStaked = data.upoktToStake / 1000000;
-
-// const applicationEmailData = {
-// name: application.pocketApplication.name,
-// link: data.applicationLink
-// };
-
-// const paymentEmailData = {
-// amountPaid: numeral(paymentHistory.amount / 100).format("0,0.00"),
-// maxRelayPerDayAmount: numeral(item.maxRelays).format("0,0.00"),
-// poktStaked: numeral(poktStaked).format("0,0.000000")
-// };
-
-// await applicationService.stakeApplication(appStakeTransaction.address, data.upoktToStake, appStakeTransaction, application, applicationEmailData, paymentEmailData, data.gatewayAATSignature);
-
-// res.send(true);
-// } else {
-// res.status(400).send("Application doesn't belong to the provided client account.");
-// }
-// } else {
-// // Return error if payment was unsuccessful
-// throw new Error("Error processing payment, please try a different method");
-// }
-// }));
-
-/**
- * Unstake an application.
- */
-router.post(
-  "/custom/unstake",
-  apiAsyncWrapper(async (req, res) => {
-    /** @type {{appUnstakeTransaction: {address: string, raw_hex_bytes: string}, applicationLink: string}} */
-    const data = req.body;
-    const { appUnstakeTransaction, applicationLink } = data;
-
-    // Submit Unstake transaction to the pocket network
-    await applicationService.unstakeApplication(
-      appUnstakeTransaction,
-      applicationLink,
-      req.headers.authorization
-    );
-
-    // Respond
-    res.send(true);
   })
 );
 

@@ -24,53 +24,21 @@ router.post(
 );
 
 /**
- * Provides Auth provider urls to show consent.
- */
-router.get(
-  "/auth/providers",
-  asyncMiddleware((req, res) => {
-    res.json(userService.getConsentProviderUrls());
-  })
-);
-
-/**
- * User authentication using an Auth provider.
- */
-router.post(
-  "/auth/provider/login",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{provider_name:string, code:string}} */
-    const data = req.body;
-    const user = await userService.authenticateWithAuthProvider(
-      data.provider_name,
-      data.code
-    );
-
-    res.json(user);
-  })
-);
-
-/**
  * User authentication using username and password.
  */
 router.post(
-  "/auth/login",
+  "/login",
   asyncMiddleware(async (req, res) => {
     /** @type {{username:string, password:string}} */
     const data = req.body;
 
-    const isValidated = await userService.isUserValidated(data.username);
+    // TODO: Introduce some sort of user email validation.
+    const userSession = await userService.authenticateUser(
+      data.username,
+      data.password
+    );
 
-    if (isValidated) {
-      const userSession = await userService.authenticateUser(
-        data.username,
-        data.password
-      );
-
-      res.json(userSession);
-    } else {
-      res.json("User is not validated.");
-    }
+    res.json(userSession);
   })
 );
 
@@ -78,9 +46,8 @@ router.post(
  * User sign up using email.
  */
 router.post(
-  "/auth/signup",
+  "/signup",
   asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, username:string, password1:string, password2:string, postValidationBaseLink:string}} */
     const data = req.body;
 
     const result = await userService.signupUser(data);
@@ -104,7 +71,7 @@ router.post(
  * User sign up using email.
  */
 router.post(
-  "/auth/resend-signup-email",
+  "/resend-signup-email",
   asyncMiddleware(async (req, res) => {
     /** @type {{email:string, postValidationBaseLink:string}} */
     const data = req.body;
@@ -130,7 +97,7 @@ router.post(
  * User logout.
  */
 router.post(
-  "/auth/logout",
+  "/logout",
   asyncMiddleware(async (req, res) => {
     /** @type {{email:string}} */
     const data = req.body;
@@ -145,7 +112,7 @@ router.post(
  * Check if user is validated.
  */
 router.post(
-  "/auth/is-validated",
+  "/is-validated",
   asyncMiddleware(async (req, res) => {
     /** @type {{email:string, authProvider: string}} */
     const data = req.body;
@@ -160,28 +127,10 @@ router.post(
 );
 
 /**
- * Verify user password.
- */
-router.post(
-  "/auth/verify-password",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, password: string}} */
-    const data = req.body;
-
-    const passwordVerified = await userService.verifyPassword(
-      data.email,
-      data.password
-    );
-
-    res.send(passwordVerified);
-  })
-);
-
-/**
  * Change user password.
  */
 router.put(
-  "/auth/change-password",
+  "/change-password",
   asyncMiddleware(async (req, res) => {
     /** @type {{email: string, oldPassword: string, password1: string, password2: string}} */
     const data = req.body;
@@ -205,7 +154,7 @@ router.put(
  * Reset the user password.
  */
 router.put(
-  "/auth/reset-password",
+  "/reset-password",
   asyncMiddleware(async (req, res) => {
     /** @type {{email:string, token: string, password1: string, password2: string}} */
     const data = req.body;
@@ -229,7 +178,7 @@ router.put(
  * Send's to the user a password reset email.
  */
 router.put(
-  "/auth/send-reset-password-email",
+  "/send-reset-password-email",
   asyncMiddleware(async (req, res) => {
     /** @type {{email:string, passwordResetLinkPage: string}} */
     const data = req.body;
@@ -245,50 +194,6 @@ router.put(
     }
 
     res.send(true);
-  })
-);
-
-/**
- * Change user name.
- */
-router.put(
-  "/auth/change-username",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, username: string}} */
-    const data = req.body;
-
-    const changed = await userService.changeUsername(data.email, data.username);
-
-    res.send(changed);
-  })
-);
-
-/**
- * Change user email.
- */
-router.put(
-  "/auth/change-email",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, newEmail: string, postValidationBaseLink:string}} */
-    const data = req.body;
-
-    const emailChanged = await userService.changeEmail(
-      data.email,
-      data.newEmail
-    );
-
-    if (emailChanged) {
-      const postValidationLink = `${
-        data.postValidationBaseLink
-      }?d=${await userService.generateToken(data.newEmail)}`;
-
-      await EmailService.to(data.newEmail).sendEmailChangedEmail(
-        data.newEmail,
-        postValidationLink
-      );
-    }
-
-    res.send(emailChanged);
   })
 );
 
