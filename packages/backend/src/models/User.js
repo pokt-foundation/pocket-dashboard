@@ -1,10 +1,91 @@
+import { Schema, model } from "mongoose";
+import axios from "axios";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import isEmail from "validator/lib/isEmail";
+import isStrongPassword from "validator/lib/isStrongPassword";
 import { EMAIL_REGEX } from "./Regex";
 import { DashboardValidationError } from "./Exceptions";
+import env from "environment";
 
 const PASSWORD_MIN_LENGTH = 8;
 const SALT_ROUNDS = 10;
 
+const userSchema = new Schema(
+  {
+    provider: String,
+    email: String,
+    username: String,
+    password: String,
+    resetPasswordExpiration: String,
+    resetPasswordToken: String,
+    lastLogin: String,
+  },
+  { collection: "Users" }
+);
+
+userSchema.statics.validateEmail = function validateEmail(email) {
+  return isEmail(email);
+};
+
+userSchema.statics.validatePassword = function validatePassword(password) {
+  return isStrongPassword(password);
+};
+
+userSchema.statics.encryptPassword = function encryptPassword(password) {
+  return bcrypt.hash(password, SALT_ROUNDS);
+};
+
+userSchema.statics.comparePassword = function comparePassword(
+  plainPassword,
+  userPassword
+) {
+  return bcrypt.compare(plainPassword, userPassword);
+};
+
+userSchema.statics.verifyCaptcha = function verifyCaptcha(token) {
+  const secret = env("recaptcha").google_server;
+
+  /**
+   * Although is a POST request, google requires the data to be sent by query
+   * params, trying to do so in the body will result on an error.
+   */
+  return axios.post(
+    `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
+  );
+};
+
+userSchema.statics.generateNewSessionTokens = function generateNewSessionTokens(
+  userId,
+  userEmail
+) {
+  const payload = { id: userId, email: userEmail };
+
+  const accessToken = jwt.sign(
+    {
+      data: payload,
+    },
+    env("auth").secret_key,
+    { expiresIn: env("auth").expiration }
+  );
+
+  const refreshToken = jwt.sign(
+    {
+      data: payload,
+    },
+    env("auth").secret_key,
+    { expiresIn: env("auth").refresh_expiration }
+  );
+
+  return {
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  };
+};
+
+const User = model("User", userSchema);
+
+export default User;
 export class PocketUser {
   /**
    * @param {string} provider Provider name.
@@ -108,30 +189,6 @@ export class PocketUser {
     return user;
   }
 }
-
-export class AuthProviderUser extends PocketUser {
-  /**
-   * @param {string} provider Provider name.
-   * @param {string} email Email of user.
-   * @param {string} name Name of user.
-   */
-  constructor(provider, email, name) {
-    super(provider, email, name);
-  }
-}
-
-export class GithubUser extends AuthProviderUser {
-  constructor(email, name) {
-    super("github", email, name);
-  }
-}
-
-export class GoogleUser extends AuthProviderUser {
-  constructor(email, name) {
-    super("google", email, name);
-  }
-}
-
 export class EmailUser extends PocketUser {
   /**
    * @param {string} email Email of user.

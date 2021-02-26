@@ -51,6 +51,7 @@ export function getOptionalQueryOption(request, option) {
 export function errorHandler(error, req, res, next) {
   const { message, name } = error;
 
+  console.error(error);
   switch (error.name) {
     case "PocketNetworkError":
       console.error(`Name: ${name}, Message: ${message}`);

@@ -1,8 +1,11 @@
 import express from "express";
 import asyncMiddleware from "middlewares/async";
-import { DashboardValidationError } from "models/Exceptions";
 import EmailService from "services/EmailService";
 import UserService from "services/UserService";
+import User from "models/User";
+import HttpError from "errors/http-error";
+
+const DEFAULT_PROVIDER = "EMAIL";
 
 const router = express.Router();
 
@@ -15,9 +18,9 @@ router.post(
   "/exists",
   asyncMiddleware(async (req, res) => {
     /** @type {{email:string, authProvider: string}} */
-    const data = req.body;
+    const { email } = req.body;
 
-    const exists = await userService.userExists(data.email, data.authProvider);
+    const exists = await User.exists({ email });
 
     res.send(exists);
   })
@@ -31,11 +34,27 @@ router.post(
   asyncMiddleware(async (req, res) => {
     /** @type {{username:string, password:string}} */
     const data = req.body;
+    const { email, password } = data;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw HttpError.BAD_REQUEST({ error: "user not found" });
+    }
+
+    const isPasswordMatching = await User.comparePassword(
+      password,
+      user.password
+    );
+
+    if (!isPasswordMatching) {
+      throw HttpError.BAD_REQUEST({ error: "Passwords don't match" });
+    }
 
     // TODO: Introduce some sort of user email validation.
-    const userSession = await userService.authenticateUser(
-      data.username,
-      data.password
+    const userSession = await User.generateNewSessionTokens(
+      user._id,
+      user.email
     );
 
     res.json(userSession);
@@ -49,21 +68,55 @@ router.post(
   "/signup",
   asyncMiddleware(async (req, res) => {
     const data = req.body;
+    const { email, password1, password2 } = data;
 
-    const result = await userService.signupUser(data);
+    const isEmailValid = User.validateEmail(email);
 
-    if (result) {
-      const postValidationLink = `${
-        data.postValidationBaseLink
-      }?d=${await userService.generateToken(data.email)}`;
-
-      await EmailService.to(data.email).sendSignUpEmail(
-        data.username,
-        postValidationLink
-      );
+    if (!isEmailValid) {
+      throw HttpError.BAD_REQUEST({ message: "email is not valid" });
     }
 
-    res.send(result);
+    if (password1 !== password2) {
+      throw HttpError.BAD_REQUEST({ message: "Passwords do not match" });
+    }
+
+    const dbUser = await User.exists({ email });
+
+    if (dbUser) {
+      throw HttpError.BAD_REQUEST({ message: "Email already in use" });
+    }
+
+    const encryptedPassword = await User.encryptPassword(password1);
+
+    const user = new User({
+      provider: DEFAULT_PROVIDER,
+      email: email,
+      username: email,
+      password: encryptedPassword,
+      resetPasswordToken: null,
+      resetPasswordExpiration: null,
+      lastLogin: null,
+    });
+
+    const result = await user.save();
+
+    if (!result) {
+      throw HttpError.INTERNAL_SERVER_ERROR({
+        message: "There was a problem while updating the DB",
+      });
+    }
+
+    // TODO: Figure out email validation
+    // const postValidationLink = `${
+    //   data.postValidationBaseLink
+    // }?d=${await userService.generateToken(data.email)}`;
+
+    // await EmailService.to(data.email).sendSignUpEmail(
+    //   data.username,
+    //   postValidationLink
+    // );
+
+    res.status(204).send();
   })
 );
 
@@ -90,21 +143,6 @@ router.post(
     }
 
     res.send(user !== undefined);
-  })
-);
-
-/**
- * User logout.
- */
-router.post(
-  "/logout",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string}} */
-    const data = req.body;
-
-    const result = await userService.logout(data.email);
-
-    res.send(result);
   })
 );
 
@@ -198,37 +236,6 @@ router.put(
 );
 
 /**
- * Validate token.
- */
-router.post(
-  "/validate-token",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{token:string}} */
-    const data = req.body;
-
-    /** @type {{email:string}} */
-    const tokenPayload = await userService.decodeToken(data.token, true);
-
-    if (tokenPayload instanceof DashboardValidationError) {
-      res.json({ success: false, data: tokenPayload.message });
-    } else {
-      const userEmail = tokenPayload.email;
-
-      if (await userService.userExists(userEmail)) {
-        const user = await userService.getUser(userEmail);
-
-        res.json({ success: true, data: user });
-      } else {
-        res.json({
-          success: false,
-          data: "User does not exists or is invalid.",
-        });
-      }
-    }
-  })
-);
-
-/**
  * Validate captcha token
  */
 router.post(
@@ -236,7 +243,7 @@ router.post(
   asyncMiddleware(async (req, res) => {
     /** @type {{token:string}} */
     const { token } = req.body;
-    const result = await userService.verifyCaptcha(token);
+    const result = await User.verifyCaptcha(token);
 
     res.json(result.data);
   })
