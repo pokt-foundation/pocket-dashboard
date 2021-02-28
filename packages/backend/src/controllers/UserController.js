@@ -1,15 +1,12 @@
 import express from "express";
 import asyncMiddleware from "middlewares/async";
 import EmailService from "services/EmailService";
-import UserService from "services/UserService";
 import User from "models/User";
 import HttpError from "errors/http-error";
 
 const DEFAULT_PROVIDER = "EMAIL";
 
 const router = express.Router();
-
-const userService = new UserService();
 
 /**
  * Check if user exists.
@@ -22,7 +19,7 @@ router.post(
 
     const exists = await User.exists({ email });
 
-    res.send(exists);
+    res.status(200).send({ exists });
   })
 );
 
@@ -51,6 +48,14 @@ router.post(
       throw HttpError.BAD_REQUEST({ error: "Passwords don't match" });
     }
 
+    const isOldUser = user.v2;
+
+    if (isOldUser) {
+      throw HttpError.BAD_REQUEST({
+        message: "Sign ins with old users is not allowed.",
+      });
+    }
+
     // TODO: Introduce some sort of user email validation.
     const userSession = await User.generateNewSessionTokens(
       user._id,
@@ -68,7 +73,7 @@ router.post(
   "/signup",
   asyncMiddleware(async (req, res) => {
     const data = req.body;
-    const { email, password1, password2 } = data;
+    const { email, password1, password2, postValidationBaseLink = "" } = data;
 
     const isEmailValid = User.validateEmail(email);
 
@@ -96,6 +101,7 @@ router.post(
       resetPasswordToken: null,
       resetPasswordExpiration: null,
       lastLogin: null,
+      v2: true,
     });
 
     const result = await user.save();
@@ -107,42 +113,16 @@ router.post(
     }
 
     // TODO: Figure out email validation
-    // const postValidationLink = `${
-    //   data.postValidationBaseLink
-    // }?d=${await userService.generateToken(data.email)}`;
+    const postValidationLink = `${postValidationBaseLink}?d=${await User.generateToken(
+      data.email
+    )}`;
 
-    // await EmailService.to(data.email).sendSignUpEmail(
-    //   data.username,
-    //   postValidationLink
-    // );
+    await EmailService.to(data.email).sendSignUpEmail(
+      data.username,
+      postValidationLink
+    );
 
     res.status(204).send();
-  })
-);
-
-/**
- * User sign up using email.
- */
-router.post(
-  "/resend-signup-email",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, postValidationBaseLink:string}} */
-    const data = req.body;
-
-    const user = await userService.getUser(data.email);
-
-    if (user) {
-      const postValidationLink = `${
-        data.postValidationBaseLink
-      }?d=${await userService.generateToken(data.email)}`;
-
-      await EmailService.to(data.email).sendSignUpEmail(
-        user.username,
-        postValidationLink
-      );
-    }
-
-    res.send(user !== undefined);
   })
 );
 
@@ -152,86 +132,11 @@ router.post(
 router.post(
   "/is-validated",
   asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, authProvider: string}} */
-    const data = req.body;
+    const { email } = req.body;
 
-    const validated = await userService.isUserValidated(
-      data.email,
-      data.authProvider
-    );
+    const { verified } = await User.findOne({ email });
 
-    res.send(validated);
-  })
-);
-
-/**
- * Change user password.
- */
-router.put(
-  "/change-password",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email: string, oldPassword: string, password1: string, password2: string}} */
-    const data = req.body;
-
-    const passwordChanged = await userService.changePassword(
-      data.email,
-      data.oldPassword,
-      data.password1,
-      data.password2
-    );
-
-    if (passwordChanged) {
-      await EmailService.to(data.email).sendPasswordChangedEmail(data.email);
-    }
-
-    res.send(passwordChanged);
-  })
-);
-
-/**
- * Reset the user password.
- */
-router.put(
-  "/reset-password",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, token: string, password1: string, password2: string}} */
-    const data = req.body;
-
-    const passwordChanged = await userService.resetPassword(
-      data.email,
-      data.token,
-      data.password1,
-      data.password2
-    );
-
-    if (passwordChanged) {
-      await EmailService.to(data.email).sendPasswordChangedEmail(data.email);
-    }
-
-    res.send(passwordChanged);
-  })
-);
-
-/**
- * Send's to the user a password reset email.
- */
-router.put(
-  "/send-reset-password-email",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, passwordResetLinkPage: string}} */
-    const data = req.body;
-
-    const token = await userService.retrievePasswordResetToken(data.email);
-
-    if (typeof token === "string") {
-      await EmailService.to(data.email).sendResetPasswordEmail(
-        data.email,
-        token,
-        data.passwordResetLinkPage
-      );
-    }
-
-    res.send(true);
+    res.status(200).send({ verified });
   })
 );
 

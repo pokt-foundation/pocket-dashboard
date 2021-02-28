@@ -5,7 +5,6 @@ import cors from "cors";
 import { errorHandler } from "helpers/utils";
 import customJwtMiddleware from "middlewares/jwt";
 import notFoundMiddleware from "middlewares/not-found";
-import sessionRefreshMiddleware from "middlewares/session-refresh";
 import { configureRoutes } from "routes";
 import { connect } from "db";
 
@@ -25,9 +24,8 @@ app.use(
   })
 );
 app.use(customJwtMiddleware());
-app.use(sessionRefreshMiddleware);
 configureRoutes(app);
-app.use(notFoundMiddleware);
+app.use(notFoundMiddleware());
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 4200;

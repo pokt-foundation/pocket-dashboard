@@ -1,5 +1,3 @@
-import { DashboardValidationError } from "models/Exceptions";
-import UserService from "services/UserService";
 import { excludedPaths } from "excluded-paths";
 
 // TODO: Refactor middleware
@@ -28,7 +26,7 @@ export default async function (err, req, res, next) {
             userEmail
           );
 
-          if (newSessionTokens instanceof DashboardValidationError) {
+          if (newSessionTokens instanceof Error) {
             throw newSessionTokens;
           }
 
