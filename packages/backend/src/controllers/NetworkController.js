@@ -1,10 +1,9 @@
 import express from "express";
-import NetworkService from "services/NetworkService";
+import Chain from "models/Blockchains";
+import NetworkData from "models/NetworkData";
 import asyncMiddleware from "middlewares/async";
 
 const router = express.Router();
-
-const networkService = new NetworkService();
 
 /**
  * Get info for all chains.
@@ -12,21 +11,21 @@ const networkService = new NetworkService();
 router.get(
   "/chains",
   asyncMiddleware(async (req, res) => {
-    const chains = await networkService.getAvailableNetworkChains();
+    const chains = await Chain.find();
 
-    res.json(chains);
+    res.status(200).send({ chains });
   })
 );
 
-/**
- * Get network summary data.
- */
 router.get(
   "/summary",
   asyncMiddleware(async (req, res) => {
-    const networkData = await networkService.getNetworkSummaryData();
+    const latestNetworkData = await NetworkData.findOne(
+      {},
+      { sort: { $natural: -1 } }
+    );
 
-    res.json(networkData);
+    res.status(200).send({ summary: latestNetworkData });
   })
 );
 
