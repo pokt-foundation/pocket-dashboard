@@ -13,5 +13,8 @@
   },
   "scripts": {
     "init:db": "sh scripts/init-db.sh"
+  },
+  "dependencies": {
+    "lodash.merge": "^4.6.2"
   }
 }

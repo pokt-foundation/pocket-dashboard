@@ -1,305 +1,161 @@
 import express from "express";
-import ApplicationService from "services/ApplicationService";
-import { getOptionalQueryOption, getQueryOption } from "helpers/utils";
+import merge from "lodash.merge";
 import asyncMiddleware from "middlewares/async";
-import EmailService from "services/EmailService";
-import UserService from "services/UserService";
+import Application from "models/Application";
+import ApplicationPool from "models/PreStakedApp";
+import User from "models/User";
+import HttpError from "errors/http-error";
+import { APPLICATION_STATUSES } from "application-statuses";
 
 const router = express.Router();
 
-const userService = new UserService();
-const applicationService = new ApplicationService();
+router.get(
+  "/:applicationId",
+  asyncMiddleware(async (req, res) => {
+    /** @type {{applicationId:string}} */
+    const { applicationId } = req.params;
 
-/**
- * Create new application.
- */
+    // TODO: Verify app belongs to client
+    const application = await Application.findById(applicationId);
+
+    res.status(200).send(application);
+  })
+);
+
 router.post(
   "",
   asyncMiddleware(async (req, res) => {
-    /** @type {{application: {name:string, owner:string, url:string, contactEmail:string, user:string, description:string, icon:string}}} */
-    const data = req.body;
+    /** @type {{application: {name:string, owner:string, contactEmail:string, user:string }}} */
+    const { name, chain, email, gatewaySettings } = req.body;
 
-    const applicationID = await applicationService.createApplication(
-      data.application
-    );
+    try {
+      const user = await User.findOne({ email });
+      const id = user._id;
 
-    res.send(applicationID);
-  })
-);
+      const preStakedApp = ApplicationPool.findOne({
+        status: APPLICATION_STATUSES.READY,
+        chain,
+      });
 
-/**
- * Save application account.
- */
-router.post(
-  "/account",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{applicationID: string, applicationData: {address: string, publicKey: string}, applicationBaseLink:string, ppkData?: object}} */
-    const data = req.body;
+      if (!preStakedApp) {
+        throw new Error("No application available");
+      }
 
-    const application = await applicationService.saveApplicationAccount(
-      data.applicationID,
-      data.applicationData
-    );
-    const emailAction = data.ppkData ? "imported" : "created";
-    const applicationEmailData = {
-      name: application.name,
-      link: `${data.applicationBaseLink}/${data.applicationData.address}`,
-    };
+      const application = new Application({
+        chain,
+        name,
+        user: id,
+        status: APPLICATION_STATUSES.READY,
+        lastChangedStatusAt: Date.now(),
+        // We enforce every app to be treated as a free-tier app for now.
+        freeTier: true,
+        freeTierApplicationAccount: preStakedApp.freeTierApplicationAccount,
+        gatewayAAT: preStakedApp.gatewayAAT,
+        gatewaySettings,
+      });
+      await application.save();
 
-    if (emailAction) {
-      await EmailService.to(
-        application.contactEmail
-      ).sendCreateOrImportAppEmail(
-        emailAction,
-        application.contactEmail,
-        applicationEmailData
-      );
+      const { ok } = await ApplicationPool.deleteOne({ _id: preStakedApp._id });
+
+      if (Number(ok) !== 1) {
+        throw new Error("There was a problem while updating the DB");
+      }
+      // TODO: Send application creation email
+    } catch (err) {
+      throw HttpError.INTERNAL_SERVER_ERROR(err);
     }
 
-    res.send(application);
+    res.status(204).send();
   })
 );
 
-/**
- * Update an application.
- */
 router.put(
   "/:applicationId",
   asyncMiddleware(async (req, res) => {
     /** @type {{name:string, owner:string, url:string, contactEmail:string, user:string, description:string, icon:string}} */
-    let data = req.body;
+    const data = req.body;
 
     /** @type {{applicationId:string}} */
-    const params = req.params;
+    const { applicationId } = req.params;
 
-    if (
-      await applicationService.verifyApplicationBelongsToClient(
-        params.applicationId,
-        req.headers.authorization
-      )
-    ) {
-      const updated = await applicationService.updateApplication(
-        params.applicationId,
-        data
-      );
-
-      res.send(updated);
-    } else {
-      res.status(400).send("Application doesn't belong to the client account.");
-    }
-  })
-);
-
-/**
- * Delete an application from dashboard.
- */
-router.post(
-  "/:applicationId",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{applicationId:string}} */
-    const data = req.params;
-    /** @type {{user:string, appsLink:string}} */
-    const bodyData = req.body;
-
-    if (
-      await applicationService.verifyApplicationBelongsToClient(
-        data.applicationId,
-        req.headers.authorization
-      )
-    ) {
-      const application = await applicationService.deleteApplication(
-        data.applicationId,
-        bodyData.user
-      );
-
-      if (application) {
-        const applicationEmailData = {
-          name: application.name,
-          appsLink: bodyData.appsLink,
-        };
-
-        await EmailService.to(application.contactEmail).sendAppDeletedEmail(
-          application.contactEmail,
-          applicationEmailData
-        );
+    try {
+      const application = await Application.findById(applicationId);
+      if (!application) {
+        throw HttpError.BAD_REQUEST({ message: "Application not found" });
       }
 
-      res.send(application !== undefined);
-    } else {
-      res.status(400).send("Application doesn't belong to the client account.");
+      // TODO: find user by the authorization header and verify if it belongs to him
+
+      // lodash's merge mutates the target object passed in.
+      // This is what we want, as we don't want to lose any of the mongoose functionality
+      // while at the same time updating the model itself
+      const mutatedApplication = merge(application, data);
+      const savedApplication = await mutatedApplication.save();
+      if (!savedApplication) {
+        throw new Error("There was an error while updating to the DB");
+      }
+    } catch (err) {
+      throw HttpError.INTERNAL_SERVER_ERROR(err);
     }
-  })
-);
 
-/**
- * Get staked summary data.
- */
-router.get(
-  "/summary/staked",
-  asyncMiddleware(async (req, res) => {
-    const summaryData = await applicationService.getStakedApplicationSummary();
-
-    res.json(summaryData);
-  })
-);
-
-/**
- * Get application that is already on dashboard by address.
- */
-router.get(
-  "/:applicationAccountAddress",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{applicationAccountAddress:string}} */
-    const data = req.params;
-    const application = await applicationService.getApplication(
-      data.applicationAccountAddress
-    );
-
-    res.json(application);
-  })
-);
-
-/**
- * Get application that is already on dashboard using the application id.
- */
-router.get(
-  "/client/:applicationId",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{applicationId:string}} */
-    const data = req.params;
-
-    if (
-      await applicationService.verifyApplicationBelongsToClient(
-        data.applicationId,
-        req.headers.authorization
-      )
-    ) {
-      const application = await applicationService.getClientApplication(
-        data.applicationId
-      );
-
-      res.json(application);
-    } else {
-      res.status(400).send("Application doesn't belong to the client account.");
-    }
-  })
-);
-
-/**
- * Get all user applications.
- */
-router.post(
-  "/user/all",
-  asyncMiddleware(async (req, res) => {
-    const limit = parseInt(getQueryOption(req, "limit"));
-
-    const offsetData = getOptionalQueryOption(req, "offset");
-    const offset = offsetData !== "" ? parseInt(offsetData) : 0;
-
-    /** @type {{user: string}} */
-    const data = req.body;
-
-    if (
-      await userService.verifySessionForClient(
-        req.headers.authorization,
-        data.user
-      )
-    ) {
-      const applications = await applicationService.getUserApplications(
-        data.user,
-        limit,
-        offset
-      );
-
-      res.json(applications);
-    } else {
-      res
-        .status(400)
-        .send(
-          "Application list doesn't belong to the provided client account."
-        );
-    }
-  })
-);
-
-/**
- * Stake a free tier application.
- */
-router.post(
-  "/freetier/stake",
-  asyncMiddleware(async (req, res) => {
-    // [>* @type {{stakeInformation: {client_address: string, chains: string[], stake_amount: string}, applicationLink: string}} <]
-    const data = req.body;
-
-    const stakeInformation = data.stakeInformation;
-    const application = await applicationService.getApplication(
-      stakeInformation.client_address
-    );
-
-    const applicationEmailData = {
-      name: application.pocketApplication.name,
-      link: data.applicationLink,
-    };
-
-    const aat = await applicationService.stakeFreeTierApplication(
-      application,
-      stakeInformation,
-      applicationEmailData
-    );
-
-    res.json(aat);
-  })
-);
-
-/**
- * Get AAT for Free tier
- */
-router.get(
-  "/freetier/aat/:applicationId",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{applicationId:string}} */
-    const data = req.params;
-
-    if (
-      await applicationService.verifyApplicationBelongsToClient(
-        data.applicationId,
-        req.headers.authorization
-      )
-    ) {
-      const aat = await applicationService.getFreeTierAAT(data.applicationId);
-
-      res.json(aat);
-    } else {
-      res
-        .status(400)
-        .send("Application doesn't belong to the provided client account.");
-    }
+    res.status(204).send();
   })
 );
 
 router.post(
-  "/update/gateway/settings",
+  "/switch-chains/:applicationId",
   asyncMiddleware(async (req, res) => {
-    const data = req.body;
-    const applicationId = data.id;
+    const { chain } = req.body;
+    const { applicationId } = req.params;
 
-    if (
-      await applicationService.verifyApplicationBelongsToClient(
-        applicationId,
-        req.headers.authorization
-      )
-    ) {
-      const updated = await applicationService.updateApplication(
-        applicationId,
-        data
-      );
+    try {
+      const replacementApplication = await ApplicationPool.findOne({
+        chain,
+        status: APPLICATION_STATUSES.READY,
+      });
 
-      res.send(updated);
-    } else {
-      res
-        .status(400)
-        .send("Application doesn't belong to the provided client account.");
+      if (!replacementApplication) {
+        throw new Error("No application for the selected chain is available");
+      }
+
+      const oldApplication = await Application.findById(applicationId);
+
+      if (!oldApplication) {
+        throw new Error("Cannot find application");
+      }
+
+      // TODO: Check if at least a week has passed since the last status update.
+
+      // Set old app in the 1 week grace period
+      oldApplication.status = APPLICATION_STATUSES.AWAITING_GRACE_PERIOD;
+      oldApplication.lastChangedStatusAt = Date.now();
+      await oldApplication.save();
+
+      // Create a new Application for the user and copy the previous user config
+      const newReplacementApplication = new Application({
+        // As we're moving to a new chain, everything related to the account and gateway AAT
+        // information will change, so we use all the data from the application that we took
+        // from the pool.
+        chain: replacementApplication.chain,
+        freeTierApplicationAccount:
+          replacementApplication.freeTierApplicationAccount,
+        gatewayAAT: replacementApplication.gatewayAAT,
+        status: APPLICATION_STATUSES.READY,
+        lastChangedStatusAt: Date.now(),
+        freeTier: true,
+        // We wanna preserve user-related configuration fields, so we just copy them over
+        // from the old application.
+        name: oldApplication.name,
+        user: oldApplication.user,
+        gatewaySettings: oldApplication.gatewaySettings,
+      });
+
+      await newReplacementApplication.save();
+    } catch (err) {
+      throw HttpError.INTERNAL_SERVER_ERROR(err);
     }
+
+    res.status(204).send();
   })
 );
 
