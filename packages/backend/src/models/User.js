@@ -6,6 +6,9 @@ import isEmail from "validator/lib/isEmail";
 import isStrongPassword from "validator/lib/isStrongPassword";
 import env from "environment";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 const SALT_ROUNDS = 10;
 
 const userSchema = new Schema(
@@ -14,8 +17,6 @@ const userSchema = new Schema(
     email: String,
     username: String,
     password: String,
-    resetPasswordExpiration: String,
-    resetPasswordToken: String,
     lastLogin: String,
     validated: Boolean,
     v2: Boolean,
@@ -54,12 +55,6 @@ userSchema.statics.verifyCaptcha = function verifyCaptcha(token) {
   );
 };
 
-userSchema.statics.generateToken = function generateToken(email) {
-  const payload = { email };
-
-  return jwt.sign(payload, env("auth").secret_key);
-};
-
 userSchema.statics.generateNewSessionTokens = function generateNewSessionTokens(
   userId,
   userEmail
@@ -86,6 +81,18 @@ userSchema.statics.generateNewSessionTokens = function generateNewSessionTokens(
     accessToken: accessToken,
     refreshToken: refreshToken,
   };
+};
+
+userSchema.methods.generateVerificationToken = function generateVerificationToken() {
+  const token = jwt.sign({ id: this._id }, env("auth").private_secret, {
+    expiresIn: "10d",
+    algorithm: "RS256",
+  });
+  return token;
+};
+
+userSchema.methods.comparePassword = function comparePassword(password) {
+  return bcrypt.compare(password, this.password);
 };
 
 const User = model("User", userSchema);

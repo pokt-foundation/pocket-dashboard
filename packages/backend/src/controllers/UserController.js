@@ -1,68 +1,61 @@
 import express from "express";
 import asyncMiddleware from "middlewares/async";
-import EmailService from "services/EmailService";
+import Token, { TOKEN_TYPES } from "models/Token";
 import User from "models/User";
 import HttpError from "errors/http-error";
+import passport from "lib/passport-local";
 
 const DEFAULT_PROVIDER = "EMAIL";
+const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
 
 const router = express.Router();
 
-/**
- * Check if user exists.
- */
-router.post(
-  "/exists",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, authProvider: string}} */
-    const { email } = req.body;
+function createCookieFromToken(user, statusCode, req, res) {
+  const token = user.generateVerificationToken();
 
-    const exists = await User.exists({ email });
+  const cookieOptions = {
+    // Expires in 10 days
+    expires: new Date(Date.now() + TEN_DAYS),
+    httpOnly: true,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+  };
 
-    res.status(200).send({ exists });
-  })
-);
+  res.cookie("jwt", token, cookieOptions);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+}
 
 /**
  * User authentication using username and password.
  */
 router.post(
   "/login",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{username:string, password:string}} */
-    const data = req.body;
-    const { email, password } = data;
+  asyncMiddleware(async (req, res, next) => {
+    passport.authenticate(
+      "login",
+      // As we're using an API which requires a token for each request,
+      // we don't need to save a session in the server
+      { session: false },
+      async (err, user) => {
+        if (err) {
+          throw HttpError.BAD_REQUEST(err);
+        }
 
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      throw HttpError.BAD_REQUEST({ error: "user not found" });
-    }
-
-    const isPasswordMatching = await User.comparePassword(
-      password,
-      user.password
-    );
-
-    if (!isPasswordMatching) {
-      throw HttpError.BAD_REQUEST({ error: "Passwords don't match" });
-    }
-
-    const isOldUser = user.v2;
-
-    if (isOldUser) {
-      throw HttpError.BAD_REQUEST({
-        message: "Sign ins with old users is not allowed.",
-      });
-    }
-
-    // TODO: Introduce some sort of user email validation.
-    const userSession = await User.generateNewSessionTokens(
-      user._id,
-      user.email
-    );
-
-    res.json(userSession);
+        if (!user) {
+          throw HttpError.BAD_REQUEST({
+            status: "error",
+            meessage: "Incorrect email or password",
+          });
+        }
+        createCookieFromToken(user, 200, req, res);
+      }
+    )(req, res, next);
   })
 );
 
@@ -71,72 +64,21 @@ router.post(
  */
 router.post(
   "/signup",
-  asyncMiddleware(async (req, res) => {
-    const data = req.body;
-    const { email, password1, password2, postValidationBaseLink = "" } = data;
+  asyncMiddleware(async (req, res, next) => {
+    passport.authenticate("signup", { session: false }, async (err, user) => {
+      console.log("alo");
+      if (err) {
+        throw HttpError.BAD_REQUEST(err);
+      }
 
-    const isEmailValid = User.validateEmail(email);
-
-    if (!isEmailValid) {
-      throw HttpError.BAD_REQUEST({ message: "email is not valid" });
-    }
-
-    if (password1 !== password2) {
-      throw HttpError.BAD_REQUEST({ message: "Passwords do not match" });
-    }
-
-    const dbUser = await User.exists({ email });
-
-    if (dbUser) {
-      throw HttpError.BAD_REQUEST({ message: "Email already in use" });
-    }
-
-    const encryptedPassword = await User.encryptPassword(password1);
-
-    const user = new User({
-      provider: DEFAULT_PROVIDER,
-      email: email,
-      username: email,
-      password: encryptedPassword,
-      resetPasswordToken: null,
-      resetPasswordExpiration: null,
-      lastLogin: null,
-      v2: true,
-    });
-
-    const result = await user.save();
-
-    if (!result) {
-      throw HttpError.INTERNAL_SERVER_ERROR({
-        message: "There was a problem while updating the DB",
-      });
-    }
-
-    // TODO: Figure out email validation
-    const postValidationLink = `${postValidationBaseLink}?d=${await User.generateToken(
-      data.email
-    )}`;
-
-    await EmailService.to(data.email).sendSignUpEmail(
-      data.username,
-      postValidationLink
-    );
-
-    res.status(204).send();
-  })
-);
-
-/**
- * Check if user is validated.
- */
-router.post(
-  "/is-validated",
-  asyncMiddleware(async (req, res) => {
-    const { email } = req.body;
-
-    const { verified } = await User.findOne({ email });
-
-    res.status(200).send({ verified });
+      if (!user) {
+        throw HttpError.BAD_REQUEST({
+          status: "error",
+          meessage: "Incorrect email or password",
+        });
+      }
+      createCookieFromToken(user, 200, req, res);
+    })(req, res, next);
   })
 );
 
@@ -155,32 +97,172 @@ router.post(
 );
 
 /**
- * Unsubscribe email
+ * Send signup email
  */
 router.post(
-  "/unsubscribe",
+  "/send-signup-email",
   asyncMiddleware(async (req, res) => {
-    /** @type {{email:string}} */
-    const data = req.body;
+    const { email, validationRoute } = req.body;
 
-    const unsubscribed = await EmailService.to(data.email).unsubscribeEmail();
 
-    res.send(unsubscribed);
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw HttpError.BAD_REQUEST({ message: "User does not exist" });
+    }
+
+    // TODO: First check if there's an active token, and delete it
+    const staleToken = await Token.findOne({ userId: user._id });
+
+    if (staleToken) {
+      await staleToken.deleteOne();
+    }
+    // TODO: Make validation token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashedResetToken = await bcrypt.hash(resetToken, SALT_ROUNDS);
+
+    const userResetToken = new Token({
+      userId: user._id,
+      token: hashedResetToken,
+      type: TOKEN_TYPES.verification,
+      createdAt: Date.now(),
+    });
+
+    await userResetToken.save();
+
+    const validationLink = `${validationRoute}/?token=${resetToken}&email=${email}`;
+    // TODO: Send email with link
+
+    return res.status(204).send();
   })
 );
 
-/**
- * Subscribe email
- */
 router.post(
-  "/subscribe",
+  "/send-reset-email",
   asyncMiddleware(async (req, res) => {
-    /** @type {{email:string}} */
-    const data = req.body;
+    const { email, resetRoute } = req.body;
 
-    const subscribed = await EmailService.to(data.email).subscribeEmail();
+    const user = await User.findOne({ email });
 
-    res.send(subscribed);
+    if (!user) {
+      throw HttpError.BAD_REQUEST({ message: "User does not exist" });
+    }
+
+    // TODO: First check if there's an active token, and delete it
+    const staleToken = await Token.findOne({ userId: user._id });
+
+    if (staleToken) {
+      await staleToken.deleteOne();
+    }
+    // TODO: Make validation token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashedResetToken = await bcrypt.hash(resetToken, SALT_ROUNDS);
+
+    const userResetToken = new Token({
+      userId: user._id,
+      token: hashedResetToken,
+      type: TOKEN_TYPES.reset,
+      createdAt: Date.now(),
+    });
+
+    await userResetToken.save();
+
+    const resetLink = `${resetRoute}/?token=${resetToken}&email=${email}`;
+    // TODO: Send email with link
+
+    return res.status(204).send();
+  })
+);
+
+router.post(
+  "/reset-password",
+  asyncMiddleware(async (req, res) => {
+    const { plainToken, password1, password2, email } = req.body;
+
+    if (!plainToken || !password1 || !password2 || !email) {
+      throw HttpError.BAD_REQUEST({
+        message: "Missing required fields in body",
+      });
+    }
+
+    const isPasswordValid = await User.validatePassword(password1);
+
+    if (!isPasswordValid) {
+      throw HttpError.BAD_REQUEST({ message: "Password is not secure enough" });
+    }
+
+    if (password1 !== password2) {
+      throw HttpError.BAD_REQUEST({ message: "Passwords don't match" });
+    }
+
+    const storedToken = await Token.findOne({
+      email,
+      type: TOKEN_TYPES.TOKEN_RESET,
+    });
+
+    if (!storedToken) {
+      throw HttpError.BAD_REQUEST({ message: "Token is not valid" });
+    }
+
+    const isTokenMatching = await bcrypt.compare(plainToken, storedToken);
+
+    if (!isTokenMatching) {
+      throw HttpError.BAD_REQUEST({ message: "Token is not matching" });
+    }
+
+    const newHashedPassword = await bcrypt.hash(password1, SALT_ROUNDS);
+
+    await User.updateOne(
+      {
+        email,
+      },
+      { $set: { password: newHashedPassword } },
+      { new: true }
+    );
+
+    await storedToken.deleteOne();
+    
+    res.status(204).send();
+  })
+);
+
+router.post(
+  "/validate-user",
+  asyncMiddleware(async (req, res) => {
+    const { plainToken, email } = req.body;
+
+    if (!plainToken || !password || !email) {
+      throw HttpError.BAD_REQUEST({
+        message: "Missing required fields in body",
+      });
+    }
+
+    const storedToken = await Token.findOne({
+      email,
+      type: TOKEN_TYPES.TOKEN_VERIFICATION,
+    });
+
+    if (!storedToken) {
+      throw HttpError.BAD_REQUEST({ message: "Token is not valid" });
+    }
+
+    const isTokenMatching = await bcrypt.compare(plainToken, storedToken);
+
+    if (!isTokenMatching) {
+      throw HttpError.BAD_REQUEST({ message: "Token is not matching" });
+    }
+
+    await User.updateOne(
+      {
+        email,
+      },
+      { $set: { verified: true } },
+      { new: true }
+    );
+
+    await storedToken.deleteOne();
+
+    res.status(204).send();
   })
 );
 
