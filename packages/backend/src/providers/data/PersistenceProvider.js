@@ -32,18 +32,6 @@ export default class PersistenceProvider {
   }
 
   /**
-   * Drop a Database.
-   *
-   * @returns {Promise<*>} Drop database result.
-   */
-  async dropDataBase() {
-    const connection = await this.__openConnection();
-    const db = this.__getDB(connection);
-
-    return await db.dropDatabase();
-  }
-
-  /**
    * @param {string} entityName Collection name of entities.
    * @param {object} [filter] Filter used to retrieve elements.
    * @param {number} [limit] Limit used to retrieve elements.

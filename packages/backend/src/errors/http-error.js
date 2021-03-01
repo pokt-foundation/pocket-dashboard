@@ -25,6 +25,12 @@ export default class HttpError extends Error {
   static NOT_FOUND(content) {
     return new this(HttpStatus.NOT_FOUND, content);
   }
+  /**
+   * non existing resource
+   */
+  static INTERNAL_SERVER_ERROR(content) {
+    return new this(HttpStatus.INTERNAL_SERVER_ERROR, content);
+  }
 
   constructor(code, content) {
     super(`HTTP error ${code}`);

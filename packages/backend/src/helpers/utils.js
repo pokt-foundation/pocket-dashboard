@@ -40,9 +40,6 @@ export function getOptionalQueryOption(request, option) {
   return parsedData[option];
 }
 
-// https://strongloop.com/strongblog/async-error-handling-expressjs-es7-promises-generators/
-export const apiAsyncWrapper = (fn) => (...args) => fn(...args).catch(args[2]);
-
 /**
  * Handle API errors.
  *
@@ -54,6 +51,7 @@ export const apiAsyncWrapper = (fn) => (...args) => fn(...args).catch(args[2]);
 export function errorHandler(error, req, res, next) {
   const { message, name } = error;
 
+  console.error(error);
   switch (error.name) {
     case "PocketNetworkError":
       console.error(`Name: ${name}, Message: ${message}`);

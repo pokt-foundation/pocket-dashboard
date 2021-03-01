@@ -2,11 +2,11 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
-import { errorHandler } from "apis/_helpers";
+import { errorHandler } from "helpers/utils";
 import customJwtMiddleware from "middlewares/jwt";
 import notFoundMiddleware from "middlewares/not-found";
-import sessionRefreshMiddleware from "middlewares/session-refresh";
 import { configureRoutes } from "routes";
+import { connect } from "db";
 
 const app = express();
 
@@ -24,10 +24,21 @@ app.use(
   })
 );
 app.use(customJwtMiddleware());
-app.use(sessionRefreshMiddleware);
-app.use(notFoundMiddleware);
+configureRoutes(app);
+app.use(notFoundMiddleware());
 app.use(errorHandler);
 
-configureRoutes(app);
+const PORT = process.env.PORT || 4200;
 
-export { app };
+export const startServer = async () => {
+  try {
+    await connect();
+    app.listen(PORT, () => {
+      console.log(`App listening to ${PORT}....`);
+      console.log("Press Ctrl+C to quit.");
+    });
+  } catch (err) {
+    console.error(err);
+    // TODO: Log error to sentry
+  }
+};
