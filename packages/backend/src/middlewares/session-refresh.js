@@ -7,7 +7,6 @@ export default async function (err, req, res, next) {
   try {
     // Try to renew the session if expired
     if (err.message === "jwt expired") {
-      console.log("alo2");
       // Try to get new session tokens using the refresh token
       if (
         req.headers.authorization.split(", ")[1].split(" ")[0] === "Refresh" &&

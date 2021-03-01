@@ -1,9 +1,9 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import morgan from "morgan";
 import cors from "cors";
+import morgan from "morgan";
+import passport from "passport";
 import { errorHandler } from "helpers/utils";
-import customJwtMiddleware from "middlewares/jwt";
 import notFoundMiddleware from "middlewares/not-found";
 import { configureRoutes } from "routes";
 import { connect } from "db";
@@ -23,7 +23,10 @@ app.use(
     exposedHeaders: ["Authorization"],
   })
 );
-app.use(customJwtMiddleware());
+// app.use(customJwtMiddleware());
+
+passport.initialize();
+
 configureRoutes(app);
 app.use(notFoundMiddleware());
 app.use(errorHandler);

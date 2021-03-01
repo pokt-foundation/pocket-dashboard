@@ -1,68 +1,62 @@
 import express from "express";
 import asyncMiddleware from "middlewares/async";
+import { authenticate } from "middlewares/passport-auth";
 import EmailService from "services/EmailService";
+import Token, { TOKEN_TYPES } from "models/Token";
 import User from "models/User";
 import HttpError from "errors/http-error";
+import passport from "lib/passport-local";
 
 const DEFAULT_PROVIDER = "EMAIL";
 
 const router = express.Router();
 
-/**
- * Check if user exists.
- */
-router.post(
-  "/exists",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{email:string, authProvider: string}} */
-    const { email } = req.body;
+function createCookieFromToken(user, statusCode, req, res) {
+  const token = user.generateVerificationToken();
 
-    const exists = await User.exists({ email });
+  const cookieOptions = {
+    // Expires in 10 days
+    expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+  };
 
-    res.status(200).send({ exists });
-  })
-);
+  res.cookie("jwt", token, cookieOptions);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+}
 
 /**
  * User authentication using username and password.
  */
 router.post(
   "/login",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{username:string, password:string}} */
-    const data = req.body;
-    const { email, password } = data;
+  asyncMiddleware(async (req, res, next) => {
+    passport.authenticate(
+      "login",
+      // As we're using an API which requires a token for each request,
+      // we don't need to save a session in the server
+      { session: false },
+      async (err, user) => {
+        if (err) {
+          throw HttpError.BAD_REQUEST(err);
+        }
 
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      throw HttpError.BAD_REQUEST({ error: "user not found" });
-    }
-
-    const isPasswordMatching = await User.comparePassword(
-      password,
-      user.password
-    );
-
-    if (!isPasswordMatching) {
-      throw HttpError.BAD_REQUEST({ error: "Passwords don't match" });
-    }
-
-    const isOldUser = user.v2;
-
-    if (isOldUser) {
-      throw HttpError.BAD_REQUEST({
-        message: "Sign ins with old users is not allowed.",
-      });
-    }
-
-    // TODO: Introduce some sort of user email validation.
-    const userSession = await User.generateNewSessionTokens(
-      user._id,
-      user.email
-    );
-
-    res.json(userSession);
+        if (!user) {
+          throw HttpError.BAD_REQUEST({
+            status: "error",
+            meessage: "Incorrect email or password",
+          });
+        }
+        createCookieFromToken(user, 200, req, res);
+      }
+    )(req, res, next);
   })
 );
 
@@ -71,58 +65,21 @@ router.post(
  */
 router.post(
   "/signup",
-  asyncMiddleware(async (req, res) => {
-    const data = req.body;
-    const { email, password1, password2, postValidationBaseLink = "" } = data;
+  asyncMiddleware(async (req, res, next) => {
+    passport.authenticate("signup", { session: false }, async (err, user) => {
+      console.log("alo");
+      if (err) {
+        throw HttpError.BAD_REQUEST(err);
+      }
 
-    const isEmailValid = User.validateEmail(email);
-
-    if (!isEmailValid) {
-      throw HttpError.BAD_REQUEST({ message: "email is not valid" });
-    }
-
-    if (password1 !== password2) {
-      throw HttpError.BAD_REQUEST({ message: "Passwords do not match" });
-    }
-
-    const dbUser = await User.exists({ email });
-
-    if (dbUser) {
-      throw HttpError.BAD_REQUEST({ message: "Email already in use" });
-    }
-
-    const encryptedPassword = await User.encryptPassword(password1);
-
-    const user = new User({
-      provider: DEFAULT_PROVIDER,
-      email: email,
-      username: email,
-      password: encryptedPassword,
-      resetPasswordToken: null,
-      resetPasswordExpiration: null,
-      lastLogin: null,
-      v2: true,
-    });
-
-    const result = await user.save();
-
-    if (!result) {
-      throw HttpError.INTERNAL_SERVER_ERROR({
-        message: "There was a problem while updating the DB",
-      });
-    }
-
-    // TODO: Figure out email validation
-    const postValidationLink = `${postValidationBaseLink}?d=${await User.generateToken(
-      data.email
-    )}`;
-
-    await EmailService.to(data.email).sendSignUpEmail(
-      data.username,
-      postValidationLink
-    );
-
-    res.status(204).send();
+      if (!user) {
+        throw HttpError.BAD_REQUEST({
+          status: "error",
+          meessage: "Incorrect email or password",
+        });
+      }
+      createCookieFromToken(user, 200, req, res);
+    })(req, res, next);
   })
 );
 
@@ -134,7 +91,7 @@ router.post(
   asyncMiddleware(async (req, res) => {
     const { email } = req.body;
 
-    const { verified } = await User.findOne({ email });
+    const { verified = false } = await User.findOne({ email });
 
     res.status(200).send({ verified });
   })
@@ -153,6 +110,17 @@ router.post(
     res.json(result.data);
   })
 );
+
+router.post(
+  "/send-signup-email",
+  asyncMiddleware(async (req, res) => {
+    const { email, validationRoute } = req.body;
+
+    // TODO: Make validation token
+  })
+);
+
+router.use(authenticate);
 
 /**
  * Unsubscribe email
