@@ -104,6 +104,7 @@ router.post(
   asyncMiddleware(async (req, res) => {
     const { email, validationRoute } = req.body;
 
+
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -220,7 +221,7 @@ router.post(
     );
 
     await storedToken.deleteOne();
-
+    
     res.status(204).send();
   })
 );

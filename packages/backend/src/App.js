@@ -23,6 +23,7 @@ app.use(
     exposedHeaders: ["Authorization"],
   })
 );
+
 // app.use(customJwtMiddleware());
 
 passport.initialize();
