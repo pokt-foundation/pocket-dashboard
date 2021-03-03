@@ -10,7 +10,6 @@ export function startWorkers() {
 
   for (const { name, color, workerFn, recurrence } of WORKERS) {
     cron.schedule(recurrence, async function handleWorkerProcess() {
-      // TODO: Log worker start time, name
       let startTime = Date.now(),
         endTime;
       const startInUtc = new Date(startTime).toUTCString();
