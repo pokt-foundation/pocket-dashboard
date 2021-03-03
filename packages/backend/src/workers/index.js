@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { handleWorkerProcess, WORKERS } from "workers/config";
+import { WORKERS } from "workers/config";
 import Logger from "@pokt-network/pocket-dashboard-shared/helpers/logger";
 
 const ONE_SECOND = 1000;
@@ -16,7 +16,7 @@ export function startWorkers() {
       const startInUtc = new Date(startTime).toUTCString();
 
       logger.log(
-        `Starting worker ${name} at ${startInUtc} with color ${color}`
+        `Starting worker "${name}" at ${startInUtc} with color ${color}`
       );
       try {
         await workerFn();
