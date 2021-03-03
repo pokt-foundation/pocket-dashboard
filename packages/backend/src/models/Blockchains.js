@@ -7,7 +7,7 @@ const chainSchema = new Schema(
     name: String,
     description: String,
     hash: String,
-    nodeCount: Number
+    nodeCount: Number,
   },
   { collection: "Blockchains" }
 );

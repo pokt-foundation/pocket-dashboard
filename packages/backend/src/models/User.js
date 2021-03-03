@@ -88,6 +88,7 @@ userSchema.methods.generateVerificationToken = function generateVerificationToke
     expiresIn: "10d",
     algorithm: "RS256",
   });
+
   return token;
 };
 
