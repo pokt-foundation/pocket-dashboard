@@ -1,0 +1,13 @@
+{
+  "name": "@pokt-network/pocket-dashboard-shared",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Pocket Foundation",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chalk": "^4.1.0",
+    "dotenv": "^8.2.0",
+    "graphql-request": "^3.4.0"
+  }
+}
