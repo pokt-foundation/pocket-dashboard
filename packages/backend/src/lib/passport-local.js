@@ -77,6 +77,7 @@ passport.use(
         validated: false,
         v2: true,
       });
+
       await user.save();
 
       return done(null, user);

@@ -1,5 +1,5 @@
 {
-  "name": "pocket-dashboard",
+  "name": "@pokt-network/pocket-dashboard-backend",
   "version": "1.0.0",
   "description": "Pocket dashboard",
   "repository": {
@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.8.4",
+    "@pokt-network/pocket-dashboard-shared": "^1.0.0",
     "@pokt-network/pocket-js": "0.6.3-rc",
     "@sendgrid/client": "^7.2.0",
     "@sendgrid/mail": "^7.1.0",

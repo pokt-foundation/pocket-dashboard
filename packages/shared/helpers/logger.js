@@ -28,7 +28,7 @@ class Logger {
     this.log(msg, "🚨", "red");
   }
 
-  log(msg, emoji, color = "white") {
+  log(msg, emoji = "⚡️", color = "white") {
     if (DEFAULTS.silent) return;
     let formattedMessage = chalk.keyword(color)(
       `${emoji}  ${this._stringify(msg)}`
@@ -49,7 +49,7 @@ module.exports = (actor, color) => new Logger(actor, color);
 
 module.exports.Logger = Logger;
 
-module.exports.setDefaults = (silent, verbose) => {
+module.exports.setDefaults = ({ silent, verbose }) => {
   DEFAULTS.silent = silent;
   DEFAULTS.verbose = verbose;
 };

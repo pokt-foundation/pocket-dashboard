@@ -24,8 +24,6 @@ app.use(
   })
 );
 
-// app.use(customJwtMiddleware());
-
 passport.initialize();
 
 configureRoutes(app);
