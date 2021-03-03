@@ -1,4 +1,6 @@
 import express from "express";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
 import asyncMiddleware from "middlewares/async";
 import Token, { TOKEN_TYPES } from "models/Token";
 import User from "models/User";
@@ -6,6 +8,7 @@ import HttpError from "errors/http-error";
 import passport from "lib/passport-local";
 
 const DEFAULT_PROVIDER = "EMAIL";
+const SALT_ROUNDS = 10;
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
 
 const router = express.Router();
@@ -103,7 +106,6 @@ router.post(
   "/send-signup-email",
   asyncMiddleware(async (req, res) => {
     const { email, validationRoute } = req.body;
-
 
     const user = await User.findOne({ email });
 
@@ -221,7 +223,7 @@ router.post(
     );
 
     await storedToken.deleteOne();
-    
+
     res.status(204).send();
   })
 );
@@ -231,7 +233,7 @@ router.post(
   asyncMiddleware(async (req, res) => {
     const { plainToken, email } = req.body;
 
-    if (!plainToken || !password || !email) {
+    if (!plainToken || !email) {
       throw HttpError.BAD_REQUEST({
         message: "Missing required fields in body",
       });

@@ -4,35 +4,25 @@ import { CHAINS } from "workers/utils";
 // TODO: Add Sentry, logger
 
 async function createApplicationAndFund() {
-  try {
-    // TODO: Create application credentials
-    // TODO: Create application in DB
-    // TODO: Send funds from Main account to App
-  } catch (err) {
-    // TODO: Log to sentry (big warning), logger
-  }
+  // TODO: Create application credentials
+  // TODO: Create application in DB
+  // TODO: Send funds from Main account to App
 }
 
 async function stakeApplication(app, chain) {
-  try {
-    // TODO: Check if app can be staked (has funds)
-    //
-    // TODO: Stake app for selected chain
-  } catch (err) {}
+  // TODO: Check if app can be staked (has funds)
+  //
+  // TODO: Stake app for selected chain
 }
 
 async function unstakeApplication(app) {
-  try {
-    // TODO: Check if app can be unstaked
-    // TODO: Unstake and set for decomissioning
-  } catch (err) {}
+  // TODO: Check if app can be unstaked
+  // TODO: Unstake and set for decomissioning
 }
 
 async function defundApplication(app) {
-  try {
-    // TODO: Cehck if app can be defunded (has been unstaked)
-    // TODO: Send funds back to main account and set as decomissioned
-  } catch (err) {}
+  // TODO: Cehck if app can be defunded (has been unstaked)
+  // TODO: Send funds back to main account and set as decomissioned
 }
 
 export async function fillAppPool() {

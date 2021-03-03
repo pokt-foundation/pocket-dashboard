@@ -1,7 +1,6 @@
 {
   "name": "@pokt-network/pocket-dashboard-shared",
   "version": "1.0.0",
-  "private": true,
   "author": "Pocket Foundation",
   "license": "MIT",
   "dependencies": {

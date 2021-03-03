@@ -53,6 +53,7 @@ router.post(
         gatewayAAT: preStakedApp.gatewayAAT,
         gatewaySettings,
       });
+
       await application.save();
 
       const { ok } = await ApplicationPool.deleteOne({ _id: preStakedApp._id });
@@ -80,6 +81,7 @@ router.put(
 
     try {
       const application = await Application.findById(applicationId);
+
       if (!application) {
         throw HttpError.BAD_REQUEST({ message: "Application not found" });
       }
@@ -91,6 +93,7 @@ router.put(
       // while at the same time updating the model itself
       const mutatedApplication = merge(application, data);
       const savedApplication = await mutatedApplication.save();
+
       if (!savedApplication) {
         throw new Error("There was an error while updating to the DB");
       }
