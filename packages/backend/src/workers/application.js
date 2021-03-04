@@ -1,6 +1,5 @@
 import PreStakedApp from "models/PreStakedApp";
 import { CHAINS } from "workers/utils";
-
 // TODO: Add Sentry, logger
 
 async function createApplicationAndFund(chain) {
