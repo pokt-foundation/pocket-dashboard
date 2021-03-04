@@ -7,7 +7,7 @@ import {
   getTotalNodeCount,
   getTotalAppCount,
   getTotalPoktStaked,
-  getTotalNodeCountForChains,
+  getNodeCountForChains,
 } from "workers/network";
 import {
   ONE_MINUTES,
@@ -64,7 +64,7 @@ export const WORKERS = [
   {
     name: "Nodes per chain counter",
     color: "yellow",
-    workerFn: getTotalNodeCountForChains,
+    workerFn: getNodeCountForChains,
     recurrence: SIXTY_MINUTES,
   },
 ];

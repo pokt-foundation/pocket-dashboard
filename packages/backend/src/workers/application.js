@@ -3,7 +3,7 @@ import { CHAINS } from "workers/utils";
 
 // TODO: Add Sentry, logger
 
-async function createApplicationAndFund() {
+async function createApplicationAndFund(chain) {
   // TODO: Create application credentials
   // TODO: Create application in DB
   // TODO: Send funds from Main account to App
