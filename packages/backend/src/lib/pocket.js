@@ -16,7 +16,7 @@ import {
   UnlockedAccount,
   PocketAAT,
 } from "@pokt-network/pocket-js";
-import env from 'environment'
+import env from "environment";
 
 const POCKET_NETWORK_CONFIGURATION = env("pocket_network");
 
@@ -334,12 +334,10 @@ export async function createUnlockedAccount(passphrase) {
   );
 
   if (typeGuard(unlockedAccountOrError, Error)) {
-    throw new PocketNetworkError(unlockedAccountOrError.message);
+    throw new Error(unlockedAccountOrError.message);
   } else if (typeGuard(unlockedAccountOrError, UnlockedAccount)) {
     return unlockedAccountOrError;
   } else {
-    throw new PocketNetworkError(
-      "Unknown error while creating an unlocked account"
-    );
+    throw new Error("Unknown error while creating an unlocked account");
   }
 }
