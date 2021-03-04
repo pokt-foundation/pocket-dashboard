@@ -40,7 +40,7 @@ async function getTotalPoktStaked() {
   return BigInt(totalNodePoktStaked + totalAppPoktStaked);
 }
 
-export async function getNetworkStatsCount() {
+export async function getNetworkStatsCount(ctx) {
   const totalNodesStaked = await getTotalNodesStaked();
   const totalAppsStaked = await getTotalAppsStaked();
   const totalPoktStaked = await getTotalPoktStaked();
@@ -55,7 +55,7 @@ export async function getNetworkStatsCount() {
   await networkStats.save();
 }
 
-export async function getNodeCountForChains() {
+export async function getNodeCountForChains(ctx) {
   const chainNodeCounter = new Map();
   const stakedNodes = await getNodes(StakingStatus.Staked);
 
@@ -79,7 +79,9 @@ export async function getNodeCountForChains() {
     const blockchain = await Blockchains.findById(id);
 
     if (!blockchain) {
-      // TODO: Add logger through dep injection to signal a non-registered chain
+      ctx.logger.warn(
+        `NOTICE: chain ${id} not detected, count of nodes is ${count}`
+      );
       return;
     }
 
