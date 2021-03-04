@@ -235,13 +235,21 @@ async function getApplications(status) {
 }
 
 async function getTotalNodesStaked() {
-  const stakedNodes = (await getNodes(StakingStatus.Staked)) ?? [];
+  const stakedNodes = await getNodes(StakingStatus.Staked);
+
+  if (!stakedNodes || stakedNodes?.length === 0) {
+    throw new Error("PocketJS failed to retrieve staked nodes");
+  }
 
   return stakedNodes.length;
 }
 
 async function getTotalAppsStaked() {
-  const stakedApps = (await getApplications(StakingStatus.Staked)) ?? [];
+  const stakedApps = await getApplications(StakingStatus.Staked);
+
+  if (!stakedApps || stakedApps?.length === 0) {
+    throw new Error("PocketJS failed to retrieve staked apps");
+  }
 
   return stakedApps.length;
 }
