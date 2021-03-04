@@ -1,17 +1,12 @@
 /* global BigInt */
 import {
-  Account,
   Application,
-  ApplicationParams,
   Configuration,
   HttpRpcProvider,
   Node,
-  NodeParams,
   Pocket,
   PocketRpcProvider,
   RpcError,
-  StakingStatus,
-  Transaction,
   typeGuard,
   UnlockedAccount,
   PocketAAT,
@@ -295,7 +290,7 @@ export async function transferFromFreeTierFund(amount, customerAddress) {
 
   const pocketRpcProvider = await getRPCProvider();
 
-  this.__pocket.rpc(pocketRpcProvider);
+  pocketInstance.rpc(pocketRpcProvider);
 
   const rawTxResponse = await pocketInstance
     .withPrivateKey(POCKET_FREE_TIER_FUND_ACCOUNT)
@@ -328,7 +323,7 @@ export async function createUnlockedAccount(passphrase) {
     POCKET_CONFIGURATION
   );
   const account = await pocketInstance.keybase.createAccount(passphrase);
-  const unlockedAccountOrError = await this.__pocket.keybase.getUnlockedAccount(
+  const unlockedAccountOrError = await pocketInstance.keybase.getUnlockedAccount(
     account.addressHex,
     passphrase
   );
@@ -340,4 +335,30 @@ export async function createUnlockedAccount(passphrase) {
   } else {
     throw new Error("Unknown error while creating an unlocked account");
   }
+}
+
+export async function getBalance(addressHex) {
+  const pocketInstance = new Pocket(
+    getPocketDispatchers(),
+    undefined,
+    POCKET_CONFIGURATION
+  );
+  const pocketRpcProvider = await getRPCProvider();
+  const applicationResponse = await pocketInstance
+    .rpc(pocketRpcProvider)
+    .query.getBalance(addressHex);
+  console.log(applicationResponse);
+}
+
+export async function getTX(addressHex) {
+  const pocketInstance = new Pocket(
+    getPocketDispatchers(),
+    undefined,
+    POCKET_CONFIGURATION
+  );
+  const pocketRpcProvider = await getRPCProvider();
+  const applicationResponse = await pocketInstance
+    .rpc(pocketRpcProvider)
+    .query.getTX(addressHex);
+  console.log(applicationResponse);
 }

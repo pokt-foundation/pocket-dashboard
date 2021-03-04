@@ -4,6 +4,7 @@ const preStakedAppSchema = new Schema(
   {
     chain: String,
     status: String,
+    createdAt: Date,
     freeTierApplicationAccount: {
       address: String,
       publicKey: String,
