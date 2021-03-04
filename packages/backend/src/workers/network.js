@@ -65,6 +65,59 @@ function getHttpRPCProvider() {
   return new HttpRpcProvider(new URL(httpProviderNode));
 }
 
+async function getPocketRPCProvider() {
+  const chain = POCKET_NETWORK_CONFIGURATION.chain_hash;
+  const clientPubKeyHex = POCKET_NETWORK_CONFIGURATION.client_pub_key;
+  const clientPrivateKey = POCKET_NETWORK_CONFIGURATION.client_priv_key;
+  const clientPassphrase = POCKET_NETWORK_CONFIGURATION.client_passphrase;
+  const appPublicKey = POCKET_NETWORK_CONFIGURATION.app_pub_key;
+  const appSignature = POCKET_NETWORK_CONFIGURATION.app_signature;
+
+  // Pocket instance
+  const pocket = new Pocket(
+    getPocketDispatchers(),
+    undefined,
+    POCKET_CONFIGURATION
+  );
+
+  // Import client Account
+  const clientAccountOrError = await pocket.keybase.importAccount(
+    Buffer.from(clientPrivateKey, "hex"),
+    clientPassphrase
+  );
+
+  if (typeGuard(clientAccountOrError, Error)) {
+    throw clientAccountOrError;
+  }
+  // Unlock the client account
+  const unlockOrError = await pocket.keybase.unlockAccount(
+    clientAccountOrError.addressHex,
+    clientPassphrase,
+    0
+  );
+
+  if (typeGuard(unlockOrError, Error)) {
+    throw clientAccountOrError;
+  }
+
+  // Generate the AAT
+  const aat = new PocketAAT(
+    POCKET_NETWORK_CONFIGURATION.aat_version,
+    clientPubKeyHex,
+    appPublicKey,
+    appSignature
+  );
+  // Pocket Rpc Instance
+  const pocketRpcProvider = new PocketRpcProvider(
+    pocket,
+    aat,
+    chain,
+    POCKET_NETWORK_CONFIGURATION.enable_consensus_relay
+  );
+
+  return pocketRpcProvider;
+}
+
 /**
  * @returns {HttpRpcProvider | PocketRpcProvider} RPC Provider.
  */
@@ -183,11 +236,13 @@ async function getApplications(status) {
 
 async function getTotalNodesStaked() {
   const stakedNodes = (await getNodes(StakingStatus.Staked)) ?? [];
+
   return stakedNodes.length;
 }
 
 async function getTotalAppsStaked() {
   const stakedApps = (await getApplications(StakingStatus.Staked)) ?? [];
+
   return stakedApps.length;
 }
 
@@ -218,6 +273,7 @@ export async function getNetworkStatsCount() {
     poktStaked: totalPoktStaked.toString(),
     createdAt: new Date(Date.now()),
   });
+
   await networkStats.save();
 }
 
@@ -235,6 +291,7 @@ export async function getNodeCountForChains() {
         chainNodeCounter.set(chainId, 0);
       } else {
         const currentCount = Number(chainNodeCounter.get(chainId));
+
         chainNodeCounter.set(chainId, currentCount + 1);
       }
     }
@@ -242,6 +299,7 @@ export async function getNodeCountForChains() {
 
   chainNodeCounter.forEach(async function updateChainCount(count, id) {
     const blockchain = await Blockchains.findById(id);
+
     if (!blockchain) {
       // TODO: Add logger through dep injection to signal a non-registered chain
       return;
