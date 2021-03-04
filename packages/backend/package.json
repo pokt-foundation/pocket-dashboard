@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "build": "babel ./src --out-dir ./dist --source-maps --copy-files",
-    "start": "nodemon --ignore ./dist --exec babel-node ./src/index.js",
+    "start": "NODE_ENV=development nodemon --ignore ./dist --exec babel-node ./src/index.js",
     "test": "mocha test",
     "test:services": "mocha test/services",
     "test:providers": "mocha test/providers",
@@ -25,9 +25,7 @@
   "mocha": {
     "exit": true,
     "require": "@babel/register",
-    "file": [
-      "test/setupTests.js"
-    ]
+    "file": ["test/setupTests.js"]
   },
   "dependencies": {
     "@babel/runtime": "^7.8.4",
