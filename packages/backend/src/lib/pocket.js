@@ -57,7 +57,7 @@ function getHttpRPCProvider() {
   const httpProviderNode = POCKET_NETWORK_CONFIGURATION.http_provider_node;
 
   if (!httpProviderNode || httpProviderNode === "") {
-    throw new Error("Invalid HTTP Provider Node: " + httpProviderNode);
+    throw new Error(`Invalid HTTP Provider Node: ${httpProviderNode}`);
   }
   return new HttpRpcProvider(new URL(httpProviderNode));
 }
@@ -312,6 +312,7 @@ export async function createUnlockedAccount(passphrase) {
     undefined,
     POCKET_CONFIGURATION
   );
+
   const account = await pocketInstance.keybase.createAccount(passphrase);
   const unlockedAccountOrError = await pocketInstance.keybase.getUnlockedAccount(
     account.addressHex,
@@ -333,7 +334,9 @@ export async function getBalance(addressHex) {
     undefined,
     POCKET_CONFIGURATION
   );
+
   const pocketRpcProvider = await getRPCProvider();
+
   const applicationResponse = await pocketInstance
     .rpc(pocketRpcProvider)
     .query.getBalance(addressHex);
@@ -347,7 +350,9 @@ export async function getTX(addressHex) {
     undefined,
     POCKET_CONFIGURATION
   );
+
   const pocketRpcProvider = await getRPCProvider();
+
   const applicationResponse = await pocketInstance
     .rpc(pocketRpcProvider)
     .query.getTX(addressHex);
