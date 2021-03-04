@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 
 const chainSchema = new Schema(
   {
+    _id: String,
     networkID: String,
     ticker: String,
     name: String,

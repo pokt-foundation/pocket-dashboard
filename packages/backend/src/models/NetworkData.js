@@ -3,8 +3,8 @@ import { Schema, model } from "mongoose";
 const networkDataSchema = new Schema(
   {
     nodesStaked: Number,
-    AppsStaked: Number,
-    poktStaked: Number,
+    appsStaked: Number,
+    poktStaked: String,
     createdAt: Date,
   },
   { collection: "NetworkData" }

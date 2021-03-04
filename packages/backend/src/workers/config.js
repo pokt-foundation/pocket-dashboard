@@ -3,12 +3,7 @@ import {
   stakeAppPool,
   unstakeAvailableApps,
 } from "workers/application";
-import {
-  getTotalNodeCount,
-  getTotalAppCount,
-  getTotalPoktStaked,
-  getTotalNodeCountForChains,
-} from "workers/network";
+import { getNetworkStatsCount, getNodeCountForChains } from "workers/network";
 import {
   ONE_MINUTES,
   FIVE_MINUTES,
@@ -44,27 +39,15 @@ export const WORKERS = [
     recurrence: FIFTEEN_MINUTES,
   },
   {
-    name: "Global node counter",
+    name: "Network stats counter",
     color: "yellow",
-    workerFn: getTotalNodeCount,
-    recurrence: SIXTY_MINUTES,
-  },
-  {
-    name: "Global app counter",
-    color: "yellow",
-    workerFn: getTotalAppCount,
-    recurrence: SIXTY_MINUTES,
-  },
-  {
-    name: "Global pokt staked counter",
-    color: "yellow",
-    workerFn: getTotalPoktStaked,
+    workerFn: getNetworkStatsCount,
     recurrence: SIXTY_MINUTES,
   },
   {
     name: "Nodes per chain counter",
     color: "yellow",
-    workerFn: getTotalNodeCountForChains,
+    workerFn: getNodeCountForChains,
     recurrence: SIXTY_MINUTES,
   },
 ];
