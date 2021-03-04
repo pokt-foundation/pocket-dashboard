@@ -39,14 +39,14 @@ export const POKT_DENOMINATIONS = {
 };
 
 function getPocketDispatchers() {
-  const dispatchersStr = POCKET_NETWORK_CONFIGURATION.dispatchers;
+  const dispatchers = POCKET_NETWORK_CONFIGURATION.dispatchers;
 
-  if (dispatchersStr === "") {
+  if (dispatchers === "") {
     return [];
   }
 
-  return dispatchersStr.split(",").map(function (dispatcherURLStr) {
-    return new URL(dispatcherURLStr);
+  return dispatchers.split(",").map(function (dispatcherUri) {
+    return new URL(dispatcherUri);
   });
 }
 
@@ -70,14 +70,12 @@ async function getPocketRPCProvider() {
   const appPublicKey = POCKET_NETWORK_CONFIGURATION.app_pub_key;
   const appSignature = POCKET_NETWORK_CONFIGURATION.app_signature;
 
-  // Pocket instance
   const pocket = new Pocket(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
   );
 
-  // Import client Account
   const clientAccountOrError = await pocket.keybase.importAccount(
     Buffer.from(clientPrivateKey, "hex"),
     clientPassphrase
@@ -86,7 +84,7 @@ async function getPocketRPCProvider() {
   if (typeGuard(clientAccountOrError, Error)) {
     throw clientAccountOrError;
   }
-  // Unlock the client account
+
   const unlockOrError = await pocket.keybase.unlockAccount(
     clientAccountOrError.addressHex,
     clientPassphrase,
@@ -97,14 +95,12 @@ async function getPocketRPCProvider() {
     throw clientAccountOrError;
   }
 
-  // Generate the AAT
   const aat = new PocketAAT(
     POCKET_NETWORK_CONFIGURATION.aat_version,
     clientPubKeyHex,
     appPublicKey,
     appSignature
   );
-  // Pocket Rpc Instance
   const pocketRpcProvider = new PocketRpcProvider(
     pocket,
     aat,
@@ -211,29 +207,24 @@ export async function getApplications(status) {
     .rpc(pocketRpcProvider)
     .query.getApps(status, BigInt(0), undefined, page, perPage);
 
-  // Check for RpcError
   if (applicationsResponse instanceof RpcError) {
     return [];
   }
 
-  // Retrieve the total pages count
   const totalPages = applicationsResponse.totalPages;
 
-  // Retrieve the app list
   while (page <= totalPages) {
     const response = await pocketInstance
       .rpc(pocketRpcProvider)
       .query.getApps(status, BigInt(0), undefined, page, perPage);
 
-    // Increment page variable
     page++;
 
-    // Check for error
     if (response instanceof RpcError) {
       page = totalPages;
       return;
     }
-    // Add the result to the application list
+
     response.applications.forEach((app) => {
       applicationList.push(app);
     });
@@ -275,7 +266,6 @@ export async function transferFromFreeTierFund(amount, customerAddress) {
     );
   }
 
-  // Include transaction fee for the stake transaction
   const totalAmount = BigInt(Number(amount) + Number(transactionFee));
 
   if (!totalAmount) {
@@ -347,6 +337,7 @@ export async function getBalance(addressHex) {
   const applicationResponse = await pocketInstance
     .rpc(pocketRpcProvider)
     .query.getBalance(addressHex);
+
   console.log(applicationResponse);
 }
 
@@ -360,5 +351,6 @@ export async function getTX(addressHex) {
   const applicationResponse = await pocketInstance
     .rpc(pocketRpcProvider)
     .query.getTX(addressHex);
+
   console.log(applicationResponse);
 }
