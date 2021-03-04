@@ -23,31 +23,31 @@ export const WORKERS = [
   {
     name: "App pool filler",
     color: "green",
-    workerFn: fillAppPool,
+    workerFn: (ctx) => fillAppPool(ctx),
     recurrence: ONE_MINUTES,
   },
   {
     name: "App pool staker",
     color: "green",
-    workerFn: stakeAppPool,
+    workerFn: (ctx) => stakeAppPool(ctx),
     recurrence: FIVE_MINUTES,
   },
   {
     name: "App decomissioner",
     color: "green",
-    workerFn: unstakeAvailableApps,
+    workerFn: (ctx) => unstakeAvailableApps(ctx),
     recurrence: FIFTEEN_MINUTES,
   },
   {
     name: "Network stats counter",
     color: "yellow",
-    workerFn: getNetworkStatsCount,
+    workerFn: (ctx) => getNetworkStatsCount(ctx),
     recurrence: SIXTY_MINUTES,
   },
   {
     name: "Nodes per chain counter",
     color: "yellow",
-    workerFn: getNodeCountForChains,
+    workerFn: (ctx) => getNodeCountForChains(ctx),
     recurrence: SIXTY_MINUTES,
   },
 ];

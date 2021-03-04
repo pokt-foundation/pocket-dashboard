@@ -18,7 +18,7 @@ export function startWorkers() {
         `Starting worker "${name}" at ${startInUtc} with color ${color}`
       );
       try {
-        await workerFn();
+        await workerFn({ logger });
 
         endTime = Date.now();
         const endInUtc = new Date(endTime).toUTCString();
