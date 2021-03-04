@@ -312,6 +312,7 @@ export async function getNodeCountForChains() {
       // TODO: Add logger through dep injection to signal a non-registered chain
       return;
     }
+
     blockchain.nodeCount = count;
     await blockchain.save();
   });
