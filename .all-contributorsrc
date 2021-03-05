@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "Evalir",
+      "name": "Enrique Ortiz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "profile": "https://enriqueortiz.dev/",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "pocket-dashboard",
+  "projectOwner": "pokt-foundation",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
