@@ -34,6 +34,15 @@
         "design",
         "ideas"
       ]
+    },
+    {
+      "login": "rem1niscence",
+      "name": "Roniel Valdez",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3951338?v=4",
+      "profile": "https://github.com/rem1niscence",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
