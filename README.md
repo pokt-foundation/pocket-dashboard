@@ -1,19 +1,17 @@
 <div align="center">
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors)
-<!-- ALL-CONTRIBUTORS-BADGE:END --> 
   <a href="https://www.pokt.network">
     <img src="https://user-images.githubusercontent.com/16605170/74199287-94f17680-4c18-11ea-9de2-b094fab91431.png" alt="Pocket Network logo" width="340"/>
   </a>
 </div>
 
 # Pocket Dashboard
+[![All Contributors](https://img.shields.io/badge/all_contributors-47-orange.svg?style=flat-square)](#contributors)
+[![Build Status](https://img.shields.io/github/workflow/status/pokt-foundation/pocket-dashboard/Main%20CI?style=flat-square)](https://github.com/pokt-foundation/pocket-dashboard/actions)
 
 The pocket dashboard where you can register, stake, unstake, unjail(nodes) apps and nodes on the pocket network.
 
 ## Overview
 <div>
-    <a href="https://github.com/pokt-network/pocket-dashboard/pulse"><img src="https://img.shields.io/github/contributors/pokt-network/pocket-dashboard.svg"/></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg"/></a>
     <a href="https://github.com/pokt-network/pocket-dashboard/pulse"><img src="https://img.shields.io/github/last-commit/pokt-network/pocket-dashboard.svg"/></a>
     <a href="https://github.com/pokt-network/pocket-dashboard/pulls"><img src="https://img.shields.io/github/issues-pr/pokt-network/pocket-dashboard.svg"/></a>
