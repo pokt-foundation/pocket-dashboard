@@ -211,7 +211,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://enriqueortiz.dev/"><img src="https://avatars.githubusercontent.com/u/26014927?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Enrique Ortiz</b></sub></a><br /><a href="#design-evalir" title="Design">🎨</a> <a href="#ideas-evalir" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://enriqueortiz.dev/"><img src="https://avatars.githubusercontent.com/u/26014927?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Enrique Ortiz</b></sub></a><br /><a href="#code-evalir" title="Development">💻</a><a href="#design-evalir" title="Design">🎨</a> <a href="#ideas-evalir" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
