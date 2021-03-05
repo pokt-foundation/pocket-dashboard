@@ -15,6 +15,15 @@
         "design",
         "ideas"
       ]
+    },
+    {
+      "login": "mokn",
+      "name": "Michael O'Rourke",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4922823?v=4",
+      "profile": "http://throwingdarts.co",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
