@@ -341,7 +341,7 @@ export async function getBalance(addressHex) {
     .rpc(pocketRpcProvider)
     .query.getBalance(addressHex);
 
-  console.log(applicationResponse);
+  return applicationResponse;
 }
 
 export async function getTX(addressHex) {
@@ -357,5 +357,108 @@ export async function getTX(addressHex) {
     .rpc(pocketRpcProvider)
     .query.getTX(addressHex);
 
-  console.log(applicationResponse);
+  return applicationResponse;
+}
+
+export async function getAccount(addressHex) {
+  const pocketInstance = new Pocket(
+    getPocketDispatchers(),
+    undefined,
+    POCKET_CONFIGURATION
+  );
+
+  const pocketRpcProvider = await getRPCProvider();
+
+  const applicationResponse = await pocketInstance
+    .rpc(pocketRpcProvider)
+    .query.getAccount(addressHex);
+
+  return applicationResponse;
+}
+
+export async function getApp(addressHex) {
+  const pocketInstance = new Pocket(
+    getPocketDispatchers(),
+    undefined,
+    POCKET_CONFIGURATION
+  );
+
+  const pocketRpcProvider = await getRPCProvider();
+
+  const applicationResponse = await pocketInstance
+    .rpc(pocketRpcProvider)
+    .query.getApp(addressHex);
+
+  return applicationResponse;
+}
+
+/**
+ * Creates a transaction request to stake an application.
+ *
+ * @param {string} address - Application address.
+ * @param {string} passphrase - Application passphrase.
+ * @param {string[]} chains - Network identifier list to be requested by this app.
+ * @param {string} stakeAmount - the amount to stake, must be greater than 0.
+ *
+ * @returns {Promise<{address:string, txHex:string} | string>} - A transaction sender.
+ */
+export async function createAppStakeTx(
+  address,
+  passphrase,
+  privateKey,
+  chains,
+  stakeAmount
+) {
+  const {
+    chain_id: chainID,
+    transaction_fee: transactionFee,
+  } = POCKET_NETWORK_CONFIGURATION;
+
+  const pocketInstance = new Pocket(
+    getPocketDispatchers(),
+    undefined,
+    POCKET_CONFIGURATION
+  );
+
+  const unlockedAccount = await pocketInstance.keybase.importAccount(
+    privateKey,
+    passphrase
+  );
+
+  if (unlockedAccount instanceof Error) {
+    throw unlockedAccount;
+  }
+
+  const senderAccount = await pocketInstance.withImportedAccount(
+    unlockedAccount.addressHex,
+    passphrase
+  );
+
+  const { unlockedAccount: account } = senderAccount;
+
+  return await senderAccount
+    .appStake(account.publicKey.toString("hex"), chains, stakeAmount.toString())
+    .createTransaction(chainID, transactionFee);
+}
+
+export async function getPocketInstance() {
+  return new Pocket(getPocketDispatchers(), undefined, POCKET_CONFIGURATION);
+}
+
+export async function submitRawTransaction(fromAddress, rawTxBytes) {
+  const pocketInstance = new Pocket(
+    getPocketDispatchers(),
+    undefined,
+    POCKET_CONFIGURATION
+  );
+  const pocketRpcProvider = await getRPCProvider();
+  const rawTxResponse = await pocketInstance
+    .rpc(pocketRpcProvider)
+    .client.rawtx(fromAddress, rawTxBytes);
+
+  if (typeGuard(rawTxResponse, RpcError)) {
+    throw new Error(rawTxResponse.message);
+  }
+
+  return rawTxResponse.hash;
 }
