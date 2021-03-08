@@ -1,0 +1,54 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "evalir",
+      "name": "Enrique Ortiz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26014927?v=4",
+      "profile": "https://enriqueortiz.dev/",
+      "contributions": [
+        "code",
+        "design",
+        "ideas"
+      ]
+    },
+    {
+      "login": "mokn",
+      "name": "Michael O'Rourke",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4922823?v=4",
+      "profile": "http://throwingdarts.co",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "valebeflo",
+      "name": "valebeflo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67430643?v=4",
+      "profile": "https://github.com/Valebeflo",
+      "contributions": [
+        "design",
+        "ideas"
+      ]
+    },
+    {
+      "login": "rem1niscence",
+      "name": "Roniel Valdez",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3951338?v=4",
+      "profile": "https://github.com/rem1niscence",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "pocket-dashboard",
+  "projectOwner": "pokt-foundation",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
