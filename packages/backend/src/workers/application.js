@@ -49,7 +49,6 @@ async function createApplicationAndFund(ctx) {
 }
 
 async function stakeApplication(ctx, app, chain = "0002") {
-  // TODO: Check if app can be staked (has funds)
   const { address, passPhrase, privateKey } = app.freeTierApplicationAccount;
   const { balance } = await getBalance(address);
 
@@ -63,7 +62,6 @@ async function stakeApplication(ctx, app, chain = "0002") {
 
   ctx.logger.log(`Staking app ${address} for chain ${chain}`);
 
-  // TODO: Stake app for selected chain
   const stakeTxToSend = await createAppStakeTx(
     address,
     passPhrase,
@@ -76,6 +74,7 @@ async function stakeApplication(ctx, app, chain = "0002") {
 
   app.status = APPLICATION_STATUSES.READY;
   app.stakingTxHash = txHash;
+  app.chain = chain;
   await app.save();
 
   ctx.logger.log(
@@ -131,12 +130,60 @@ export async function stakeAppPool(ctx) {
   // 2. Log
   //    - number of apps staked
   //    - chain they were staked for
-  const appPool = await PreStakedApp.find({
-    status: APPLICATION_STATUSES.AWAITING_STAKING,
-  });
+  const appPool = await PreStakedApp.find();
+  const appsToStake = appPool.filter(
+    ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
+  );
+  const stakedApps = appPool.filter(
+    ({ status }) => status === APPLICATION_STATUSES.READY
+  );
+  const appAllocationCount = new Map();
 
-  for (const app of appPool) {
-    await stakeApplication(ctx, app);
+  if (!appsToStake.length) {
+    ctx.logger.log("No apps to stake");
+    return;
+  }
+
+  // fill the allocation count with the default from all chains
+  for (const [, { id, limit }] of Object.entries(CHAINS)) {
+    appAllocationCount.set(id, limit);
+  }
+
+  // Now, remove the excess entries depending on the pool allocation
+  for (const { chain } of stakedApps) {
+    if (chain && !appAllocationCount.has(chain)) {
+      ctx.logger.warn(
+        `stakeAppPool(): Found chain ${chain} not found in chains config`
+      );
+      continue;
+    }
+    const currentCount = appAllocationCount.get(chain);
+
+    appAllocationCount.set(chain, Math.max(currentCount - 1, 0));
+  }
+
+  for (const [chain, count] of appAllocationCount) {
+    if (!count) {
+      continue;
+    }
+    ctx.logger.log(`Creating ${count} apps for chain ${chain}`);
+
+    Array(count)
+      .fill(0)
+      .map(async () => {
+        const chosenApplication = appsToStake.pop();
+
+        if (!chosenApplication) {
+          ctx.logger.warn("NOTICE: No more space in the pool for app demand.");
+          return;
+        }
+
+        ctx.logger.log(
+          `Staking application ${chosenApplication.freeTierApplicationAccount.address} for chain ${chain}`
+        );
+
+        await stakeApplication(ctx, chosenApplication, chain);
+      });
   }
 }
 
