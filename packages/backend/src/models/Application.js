@@ -22,6 +22,7 @@ const applicationSchema = new Schema(
       address: String,
       publicKey: String,
       privateKey: String,
+      passPhrase: String,
     },
     gatewayAAT: {
       version: String,
@@ -34,6 +35,10 @@ const applicationSchema = new Schema(
       secretKeyRequired: Boolean,
       whilelistOrigins: [],
       whitelistUserAgents: [],
+    },
+    createdAt: {
+      type: Date,
+      default: new Date(Date.now()),
     },
   },
   { collection: "Applications" }

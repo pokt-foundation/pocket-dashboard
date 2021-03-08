@@ -25,12 +25,14 @@
   "mocha": {
     "exit": true,
     "require": "@babel/register",
-    "file": ["test/setupTests.js"]
+    "file": [
+      "test/setupTests.js"
+    ]
   },
   "dependencies": {
     "@babel/runtime": "^7.8.4",
     "@pokt-network/pocket-dashboard-shared": "^1.0.0",
-    "@pokt-network/pocket-js": "0.6.3-rc",
+    "@pokt-network/pocket-js": "^0.6.6-rc",
     "@sendgrid/client": "^7.2.0",
     "@sendgrid/mail": "^7.1.0",
     "aws-sdk": "^2.727.1",

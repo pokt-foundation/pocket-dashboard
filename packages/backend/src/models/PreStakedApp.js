@@ -5,10 +5,13 @@ const preStakedAppSchema = new Schema(
     chain: String,
     status: String,
     createdAt: Date,
+    fundingTxHash: String,
+    stakingTxHash: String,
     freeTierApplicationAccount: {
       address: String,
       publicKey: String,
       privateKey: String,
+      passPhrase: String,
     },
     gatewayAAT: {
       version: String,
