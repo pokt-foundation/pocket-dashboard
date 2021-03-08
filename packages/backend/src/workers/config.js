@@ -30,7 +30,7 @@ export const WORKERS = [
     name: "App pool staker",
     color: "green",
     workerFn: (ctx) => stakeAppPool(ctx),
-    recurrence: ONE_MINUTES,
+    recurrence: FIVE_MINUTES,
   },
   {
     name: "App decomissioner",

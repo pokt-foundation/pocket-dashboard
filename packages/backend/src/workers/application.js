@@ -4,8 +4,6 @@ import { CHAINS } from "workers/utils";
 import {
   createAppStakeTx,
   createUnlockedAccount,
-  getAccount,
-  getApp,
   getBalance,
   submitRawTransaction,
   transferFromFreeTierFund,

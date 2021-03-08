@@ -426,7 +426,7 @@ export async function createAppStakeTx(
   );
 
   if (unlockedAccount instanceof Error) {
-    throw account;
+    throw unlockedAccount;
   }
 
   const senderAccount = await pocketInstance.withImportedAccount(
