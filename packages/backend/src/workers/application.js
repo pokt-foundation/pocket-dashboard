@@ -18,7 +18,6 @@ async function createApplicationAndFund(ctx) {
   const freeTierAccount = await createUnlockedAccount(passphrase);
   const newAppForPool = new PreStakedApp({
     status: APPLICATION_STATUSES.AWAITING_FUNDS,
-    // TODO: Encrypt info
     freeTierApplicationAccount: {
       address: freeTierAccount.addressHex,
       publicKey: freeTierAccount.publicKey.toString("hex"),
@@ -93,12 +92,6 @@ async function defundApplication(app) {
 }
 
 export async function fillAppPool(ctx) {
-  // TODO: Loop for each chain and
-  // 1. Determine how many apps exist in the pool
-  // 2. if less than limit, run createApplicationAndFund()
-  // 3. Log
-  //    - number of apps created
-  //    - chain they were created for
   const totalPoolSize = Object.values(CHAINS).reduce(
     (prev, { limit }) => prev + limit,
     0
@@ -125,11 +118,6 @@ export async function fillAppPool(ctx) {
 }
 
 export async function stakeAppPool(ctx) {
-  // TODO: Loop for each chain and
-  // 1. stake each app that isn't staaked but has funds to stake
-  // 2. Log
-  //    - number of apps staked
-  //    - chain they were staked for
   const appPool = await PreStakedApp.find();
   const appsToStake = appPool.filter(
     ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
