@@ -47,14 +47,15 @@ router.post(
       { session: false },
       async (err, user) => {
         if (err) {
-          throw HttpError.BAD_REQUEST(err);
+          return next(err);
         }
 
         if (!user) {
-          throw HttpError.BAD_REQUEST({
-            status: "error",
-            meessage: "Incorrect email or password",
-          });
+          return next(
+            HttpError.BAD_REQUEST({
+              errors: [{ auth: "Wrong email or password" }],
+            })
+          );
         }
         createCookieFromToken(user, 200, req, res);
       }
@@ -71,14 +72,16 @@ router.post(
     passport.authenticate("signup", { session: false }, async (err, user) => {
       console.log("alo");
       if (err) {
-        throw HttpError.BAD_REQUEST(err);
+        return next(err);
       }
 
       if (!user) {
-        throw HttpError.BAD_REQUEST({
-          status: "error",
-          meessage: "Incorrect email or password",
-        });
+        return next(
+          HttpError.BAD_REQUEST({
+            status: "error",
+            meessage: "Incorrect email or password",
+          })
+        );
       }
       createCookieFromToken(user, 200, req, res);
     })(req, res, next);

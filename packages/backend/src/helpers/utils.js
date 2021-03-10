@@ -1,3 +1,5 @@
+import HttpError from "errors/http-error";
+
 /**
  * @param {{query:object}} request Request.
  * @param {string} option Option.
@@ -40,38 +42,15 @@ export function getOptionalQueryOption(request, option) {
   return parsedData[option];
 }
 
-/**
- * Handle API errors.
- *
- * @param {*} error Error to handler.
- * @param {*} req Request.
- * @param {*} res Response.
- * @param {*} next Next object.
- */
-export function errorHandler(error, req, res, next) {
-  const { message, name } = error;
+export const errorHandler = (app) => (err, req, res, next) => {
+  console.log("compay", err);
 
-  console.error(error);
-  switch (error.name) {
-    case "PocketNetworkError":
-      console.error(`Name: ${name}, Message: ${message}`);
-      res.status(408).json({ message, name }); // Request Timeout.
-      break;
-    case "DashboardError":
-      console.error(`Name: ${name}, Message: ${message}`);
-      break;
-    case "DashboardValidationError":
-      console.error(`Name: ${name}, Message: ${message}`);
-      res.status(400).json({ message, name }); // Bad request.
-      break;
-    default:
-      console.error(`Name: ${name}, Message: ${message}`);
-      res.status(500).json({ message, name }); // Server Error.
+  let code;
+  let body;
 
-      if (process.env.NODE_ENV === "development") {
-        next(error);
-      }
-      break;
+  if (err instanceof HttpError) {
+    code = err.code;
+    body = err.content;
   }
-  next();
-}
+  res.status(code).send(body);
+};

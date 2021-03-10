@@ -28,7 +28,7 @@ passport.initialize();
 
 configureRoutes(app);
 app.use(notFoundMiddleware());
-app.use(errorHandler);
+app.use(errorHandler(app));
 
 const PORT = process.env.PORT || 4200;
 
