@@ -3,6 +3,7 @@ import { Strategy } from "passport-local";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import User from "models/User";
 import env from "environment";
+import HttpError from "errors/http-error";
 
 const AUTH_FIELDS = {
   usernameField: "email",
@@ -32,13 +33,23 @@ passport.use(
       const user = await User.findOne({ email });
 
       if (!user) {
-        return done({ message: "Incorrect email or password" }, null);
+        return done(
+          HttpError.BAD_REQUEST({
+            errors: [{ auth: "Incorrect email or password" }],
+          }),
+          null
+        );
       }
 
       const isPasswordValid = await user.comparePassword(password);
 
       if (!isPasswordValid) {
-        return done({ message: "Incorreect email or password" }, null);
+        return done(
+          HttpError.BAD_REQUEST({
+            errors: [{ auth: "Incorrect email or password" }],
+          }),
+          null
+        );
       }
 
       return done(null, user);
