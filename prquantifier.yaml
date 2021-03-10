@@ -41,7 +41,7 @@ Thresholds:
 - GitOperationType:
   - Add
   - Delete
-  Value: 1000
+  Value: 700
   Label: Extra Large
   Color: Red
   Formula: Sum
