@@ -52,5 +52,10 @@ export const errorHandler = (app) => (err, req, res, next) => {
     code = err.code;
     body = err.content;
   }
-  res.status(code).send(body);
+
+  res
+    .status(code || 500)
+    .send(
+      body || { errors: [{ message: "There was an error with your request" }] }
+    );
 };
