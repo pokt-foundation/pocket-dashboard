@@ -53,10 +53,19 @@ router.post(
         if (!user) {
           return next(
             HttpError.BAD_REQUEST({
-              errors: [{ auth: "Wrong email or password" }],
+              errors: [{ message: "Wrong email or password" }],
             })
           );
         }
+
+        if (!user.validated) {
+          return next(
+            HttpError.BAD_REQUEST({
+              errors: [{ message: "User is not validated" }],
+            })
+          );
+        }
+
         createCookieFromToken(user, 200, req, res);
       }
     )(req, res, next);
@@ -78,12 +87,12 @@ router.post(
       if (!user) {
         return next(
           HttpError.BAD_REQUEST({
-            status: "error",
-            meessage: "Incorrect email or password",
+            message: "Incorrect email or password",
           })
         );
       }
-      createCookieFromToken(user, 200, req, res);
+
+      // TODO: Send validation email
     })(req, res, next);
   })
 );

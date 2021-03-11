@@ -11,7 +11,10 @@ const router = express.Router();
 router.get(
   "/chains",
   asyncMiddleware(async (req, res) => {
-    const chains = await Chain.find();
+    const chains = await Chain.find(
+      { nodeCount: { $exists: true } },
+      { _id: false }
+    );
 
     res.status(200).send({ chains });
   })
@@ -22,7 +25,8 @@ router.get(
   asyncMiddleware(async (req, res) => {
     const latestNetworkData = await NetworkData.findOne(
       {},
-      { sort: { $natural: -1 } }
+      {},
+      { sort: { createdAt: -1 } }
     );
 
     res.status(200).send({ summary: latestNetworkData });
