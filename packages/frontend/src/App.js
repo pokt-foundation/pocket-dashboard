@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { ViewportProvider } from "use-viewport";
 import { AppWrapper } from "ui";
 import Home from "views/Home/Home";
@@ -9,24 +10,28 @@ import Home from "views/Home/Home";
  */
 const DashboardRoutes = lazy(() => import("views/DashboardRoutes"));
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <AppWrapper>
-      <ViewportProvider>
-        <Router>
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/dashboard">
-              <Suspense fallback={<div>Loading...</div>}>
-                <DashboardRoutes />
-              </Suspense>
-            </Route>
-          </Switch>
-        </Router>
-      </ViewportProvider>
-    </AppWrapper>
+    <QueryClientProvider client={queryClient}>
+      <AppWrapper>
+        <ViewportProvider>
+          <Router>
+            <Switch>
+              <Route exact path="/">
+                <Home />
+              </Route>
+              <Route path="/dashboard">
+                <Suspense fallback={<div>Loading...</div>}>
+                  <DashboardRoutes />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Router>
+        </ViewportProvider>
+      </AppWrapper>
+    </QueryClientProvider>
   );
 }
 
