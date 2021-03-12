@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { PocketAAT } from "@pokt-network/pocket-js";
 import PreStakedApp from "models/PreStakedApp";
 import { CHAINS } from "workers/utils";
 import {
@@ -9,13 +10,27 @@ import {
   transferFromFreeTierFund,
 } from "lib/pocket";
 import { APPLICATION_STATUSES } from "application-statuses";
+import env from "environment";
 // TODO: Add Sentry, logger
 
 const FREE_TIER_STAKE_AMOUNT = 24950100000n;
 
 async function createApplicationAndFund(ctx) {
+  const {
+    free_tier: { client_pub_key: clientPubKey },
+    aat_version: aatVersion,
+  } = env("pocket_network");
+
   const passphrase = crypto.randomBytes(16).toString("hex");
   const freeTierAccount = await createUnlockedAccount(passphrase);
+
+  const gatewayAat = await PocketAAT.from(
+    aatVersion,
+    clientPubKey,
+    freeTierAccount.publicKey.toString("hex"),
+    freeTierAccount.privateKey.toString("hex")
+  );
+
   const newAppForPool = new PreStakedApp({
     status: APPLICATION_STATUSES.AWAITING_FUNDS,
     freeTierApplicationAccount: {
@@ -23,6 +38,12 @@ async function createApplicationAndFund(ctx) {
       publicKey: freeTierAccount.publicKey.toString("hex"),
       privateKey: freeTierAccount.privateKey.toString("hex"),
       passPhrase: passphrase,
+    },
+    gatewayAAT: {
+      version: gatewayAat.version,
+      clientPublicKey: gatewayAat.clientPublicKey,
+      applicationPublicKey: gatewayAat.applicationPublicKey,
+      applicationSignature: gatewayAat.applicationSignature,
     },
     createdAt: new Date(Date.now()),
   });

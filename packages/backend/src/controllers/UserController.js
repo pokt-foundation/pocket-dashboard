@@ -47,15 +47,25 @@ router.post(
       { session: false },
       async (err, user) => {
         if (err) {
-          throw HttpError.BAD_REQUEST(err);
+          return next(err);
         }
 
         if (!user) {
-          throw HttpError.BAD_REQUEST({
-            status: "error",
-            meessage: "Incorrect email or password",
-          });
+          return next(
+            HttpError.BAD_REQUEST({
+              errors: [{ message: "Wrong email or password" }],
+            })
+          );
         }
+
+        if (!user.validated) {
+          return next(
+            HttpError.BAD_REQUEST({
+              errors: [{ message: "User is not validated" }],
+            })
+          );
+        }
+
         createCookieFromToken(user, 200, req, res);
       }
     )(req, res, next);
@@ -71,16 +81,18 @@ router.post(
     passport.authenticate("signup", { session: false }, async (err, user) => {
       console.log("alo");
       if (err) {
-        throw HttpError.BAD_REQUEST(err);
+        return next(err);
       }
 
       if (!user) {
-        throw HttpError.BAD_REQUEST({
-          status: "error",
-          meessage: "Incorrect email or password",
-        });
+        return next(
+          HttpError.BAD_REQUEST({
+            message: "Incorrect email or password",
+          })
+        );
       }
-      createCookieFromToken(user, 200, req, res);
+
+      // TODO: Send validation email
     })(req, res, next);
   })
 );

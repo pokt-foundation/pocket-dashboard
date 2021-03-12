@@ -1,22 +1,37 @@
 import express from "express";
 import merge from "lodash.merge";
 import asyncMiddleware from "middlewares/async";
+import { authenticate } from "middlewares/passport-auth";
 import Application from "models/Application";
 import ApplicationPool from "models/PreStakedApp";
-import User from "models/User";
 import HttpError from "errors/http-error";
 import { APPLICATION_STATUSES } from "application-statuses";
 
+const DEFAULT_GATEWAY_SETTINGS = {
+  secretKey: "",
+  secretKeyRequired: false,
+  whitelistOrigins: [],
+  whitelistUserAgents: [],
+};
+
 const router = express.Router();
 
-router.get(
-  "/:applicationId",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{applicationId:string}} */
-    const { applicationId } = req.params;
+router.use(authenticate);
 
-    // TODO: Verify app belongs to client
-    const application = await Application.findById(applicationId);
+router.get(
+  "",
+  asyncMiddleware(async (req, res) => {
+    const id = req.user._id;
+    const application = await Application.findOne({
+      status: APPLICATION_STATUSES.READY,
+      user: id,
+    });
+
+    if (!application) {
+      throw HttpError.NOT_FOUND({
+        errors: [{ message: "User does not have an active application" }],
+      });
+    }
 
     res.status(200).send(application);
   })
@@ -26,13 +41,27 @@ router.post(
   "",
   asyncMiddleware(async (req, res) => {
     /** @type {{application: {name:string, owner:string, contactEmail:string, user:string }}} */
-    const { name, chain, email, gatewaySettings } = req.body;
+    const {
+      name,
+      chain,
+      gatewaySettings = DEFAULT_GATEWAY_SETTINGS,
+    } = req.body;
 
     try {
-      const user = await User.findOne({ email });
-      const id = user._id;
+      const id = req.user._id;
 
-      const preStakedApp = ApplicationPool.findOne({
+      const isNewAppRequestInvalid = await Application.exists({
+        status: APPLICATION_STATUSES.READY,
+        user: id,
+      });
+
+      if (isNewAppRequestInvalid) {
+        throw HttpError.BAD_REQUEST({
+          errors: [{ apps: "User already has an existing free tier app" }],
+        });
+      }
+
+      const preStakedApp = await ApplicationPool.findOne({
         status: APPLICATION_STATUSES.READY,
         chain,
       });
@@ -46,7 +75,7 @@ router.post(
         name,
         user: id,
         status: APPLICATION_STATUSES.READY,
-        lastChangedStatusAt: Date.now(),
+        lastChangedStatusAt: new Date(Date.now()),
         // We enforce every app to be treated as a free-tier app for now.
         freeTier: true,
         freeTierApplicationAccount: preStakedApp.freeTierApplicationAccount,
@@ -59,7 +88,9 @@ router.post(
       const { ok } = await ApplicationPool.deleteOne({ _id: preStakedApp._id });
 
       if (Number(ok) !== 1) {
-        throw new Error("There was a problem while updating the DB");
+        throw HttpError.INTERNAL_SERVER_ERROR({
+          errors: [{ apps: "There was an error while updating the DB" }],
+        });
       }
       // TODO: Send application creation email
     } catch (err) {
@@ -87,6 +118,13 @@ router.put(
       }
 
       // TODO: find user by the authorization header and verify if it belongs to him
+      const userId = req.user._id;
+
+      if (application.user !== userId) {
+        throw HttpError.BAD_REQUEST({
+          message: "Application does not belong to user",
+        });
+      }
 
       // lodash's merge mutates the target object passed in.
       // This is what we want, as we don't want to lose any of the mongoose functionality

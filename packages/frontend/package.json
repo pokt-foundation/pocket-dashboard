@@ -22,6 +22,7 @@
     "babel-plugin-styled-components": "^1.12.0",
     "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
+    "chromatic": "^5.6.3",
     "husky": "^4.3.0",
     "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",
@@ -78,7 +79,8 @@
     "eject": "node_modules/.bin/react-scripts eject",
     "lint": "eslint src/",
     "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
+    "build-storybook": "build-storybook -s public",
+    "chromatic": "npx chromatic --project-token 7b40f09c655f"
   },
   "browserslist": {
     "production": [
