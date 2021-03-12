@@ -28,12 +28,12 @@
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-dropzone": "10.2.2",
+    "react-query": "^3.12.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "react-spring": "^8.0.27",
     "secure-ls": "^1.2.6",
     "styled-components": "^5.2.1",
-    "swr": "^0.5.0",
     "use-inside": "^0.2.0",
     "use-viewport": "^0.2.0"
   },
