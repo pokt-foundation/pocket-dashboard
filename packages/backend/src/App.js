@@ -20,6 +20,10 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(
   cors({
+    // TODO: Configure this to depend on prod/dev
+    origin: "http://localhost:3000",
+    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+    credentials: true,
     exposedHeaders: ["Authorization"],
   })
 );

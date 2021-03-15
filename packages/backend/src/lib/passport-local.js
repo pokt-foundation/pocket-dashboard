@@ -35,7 +35,12 @@ passport.use(
       if (!user) {
         return done(
           HttpError.BAD_REQUEST({
-            errors: [{ auth: "Incorrect email or password" }],
+            errors: [
+              {
+                id: "WRONG_EMAIL_OR_PASSWORD",
+                message: "Incorrect email or password",
+              },
+            ],
           }),
           null
         );
@@ -46,7 +51,12 @@ passport.use(
       if (!isPasswordValid) {
         return done(
           HttpError.BAD_REQUEST({
-            errors: [{ auth: "Incorrect email or password" }],
+            errors: [
+              {
+                id: "WRONG_EMAIL_OR_PASSWORD",
+                message: "Incorrect email or password",
+              },
+            ],
           }),
           null
         );
@@ -55,7 +65,7 @@ passport.use(
       return done(null, user);
     } catch (err) {
       // TODO: Log error to sentry and with a logger
-      return done({ statusCode: 400, message: err.message });
+      return done({ status: 400, message: err.message });
     }
   })
 );
@@ -67,14 +77,23 @@ passport.use(
       const emailRegistered = await User.findOne({ email });
 
       if (emailRegistered) {
-        return done({ statusCode: 400, message: "Email already in use" }, null);
+        return done(
+          HttpError.BAD_REQUEST({
+            errors: [{ id: "BAD_EMAIL", message: "Email already in use" }],
+          }),
+          null
+        );
       }
 
       const isPasswordSecure = await User.validatePassword(password);
 
       if (!isPasswordSecure) {
         return done(
-          { statusCode: 400, message: "Password not strong enough" },
+          HttpError.BAD_REQUEST({
+            errors: [
+              { id: "BAD_PASSWORD", message: "Password's not strong enough" },
+            ],
+          }),
           null
         );
       }

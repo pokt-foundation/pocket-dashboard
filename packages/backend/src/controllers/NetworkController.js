@@ -2,9 +2,11 @@ import express from "express";
 import Chain from "models/Blockchains";
 import NetworkData from "models/NetworkData";
 import asyncMiddleware from "middlewares/async";
+import { authenticate } from "middlewares/passport-auth";
 
 const router = express.Router();
 
+router.use(authenticate);
 /**
  * Get info for all chains.
  */

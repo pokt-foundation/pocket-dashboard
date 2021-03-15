@@ -43,8 +43,6 @@ export function getOptionalQueryOption(request, option) {
 }
 
 export const errorHandler = (app) => (err, req, res, next) => {
-  console.log("compay", err);
-
   let code;
   let body;
 
