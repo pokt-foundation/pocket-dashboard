@@ -72,18 +72,20 @@ export default function NetworkStatus() {
   const {
     isLoading: isChainsLoading,
     isError: isChainsError,
-    data: chainsData,
+    data: chains,
   } = useQuery("/network/chains", async function getNetworkChains() {
-    const path = `${env("BACKEND_URL")}/api/network/summary`;
+    const path = `${env("BACKEND_URL")}/api/network/chains`;
 
     try {
       const res = await axios.get(path, {
         withCredentials: true,
       });
 
-      console.log("res", res);
+      const {
+        data: { chains },
+      } = res;
 
-      return res;
+      return chains;
     } catch (err) {
       console.log("?", err);
     }
