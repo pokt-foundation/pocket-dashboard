@@ -31,7 +31,9 @@ router.get(
       { sort: { createdAt: -1 } }
     );
 
-    res.status(200).send({ summary: latestNetworkData });
+    const { _id, ...networkData } = latestNetworkData;
+
+    res.status(200).send({ summary: networkData });
   })
 );
 

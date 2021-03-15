@@ -40,7 +40,6 @@ router.get(
 router.post(
   "",
   asyncMiddleware(async (req, res) => {
-    /** @type {{application: {name:string, owner:string, contactEmail:string, user:string }}} */
     const {
       name,
       chain,
@@ -49,7 +48,6 @@ router.post(
 
     try {
       const id = req.user._id;
-
       const isNewAppRequestInvalid = await Application.exists({
         status: APPLICATION_STATUSES.READY,
         user: id,
@@ -57,7 +55,12 @@ router.post(
 
       if (isNewAppRequestInvalid) {
         throw HttpError.BAD_REQUEST({
-          errors: [{ apps: "User already has an existing free tier app" }],
+          errors: [
+            {
+              id: "ALREADY_EXISTING",
+              message: "User already has an existing free tier app",
+            },
+          ],
         });
       }
 
@@ -67,7 +70,14 @@ router.post(
       });
 
       if (!preStakedApp) {
-        throw new Error("No application available");
+        throw HttpError.BAD_REQUEST({
+          errors: [
+            {
+              id: "POOL_EMPTY",
+              message: "No pre-staked apps available for this chain.",
+            },
+          ],
+        });
       }
 
       const application = new Application({
@@ -89,7 +99,12 @@ router.post(
 
       if (Number(ok) !== 1) {
         throw HttpError.INTERNAL_SERVER_ERROR({
-          errors: [{ apps: "There was an error while updating the DB" }],
+          errors: [
+            {
+              id: "DB_ERROR",
+              message: "There was an error while updating the DB",
+            },
+          ],
         });
       }
       // TODO: Send application creation email

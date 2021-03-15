@@ -1,4 +1,7 @@
 import React from "react";
+import { useQuery } from "react-query";
+import axios from "axios";
+import { request as gqlRequest, gql } from "graphql-request";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import {
@@ -14,14 +17,121 @@ import {
   RADIUS,
 } from "ui";
 import FloatUp from "components/FloatUp/FloatUp";
+import env from "environment";
 
 const LINES = [{ id: 1, values: [0.1, 0.8, 0.4, 1] }];
 
 const LABELS = ["", "", "", ""];
 
+const RELAY_APPS_QUERY = gql`
+  query DAILY_RELAYS_QUERY {
+    relays_daily(limit: 7, order_by: { bucket: desc }) {
+      bucket
+      total_relays
+    }
+  }
+`;
+
+const SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY = gql`
+  query DAILY_RELAYS_QUERY($_gte: timestamptz = "2021-03-08T16:00:00+00:00") {
+    relay_apps_hourly_aggregate(
+      where: { bucket: { _gte: $_gte }, result: { _eq: "200" } }
+    ) {
+      aggregate {
+        sum {
+          total_relays
+        }
+      }
+    }
+  }
+`;
+
 export default function NetworkStatus() {
   const { within } = useViewport();
   const compactMode = within(-1, "medium");
+
+  const {
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+    data: summaryData,
+  } = useQuery("/network/summary", async function getNetworkSummary() {
+    const path = `${env("BACKEND_URL")}/api/network/summary`;
+
+    try {
+      const res = await axios.get(path, {
+        withCredentials: true,
+      });
+
+      console.log("res", res);
+
+      return res;
+    } catch (err) {
+      console.log("?", err);
+    }
+  });
+  const {
+    isLoading: isChainsLoading,
+    isError: isChainsError,
+    data: chainsData,
+  } = useQuery("/network/chains", async function getNetworkChains() {
+    const path = `${env("BACKEND_URL")}/api/network/summary`;
+
+    try {
+      const res = await axios.get(path, {
+        withCredentials: true,
+      });
+
+      console.log("res", res);
+
+      return res;
+    } catch (err) {
+      console.log("?", err);
+    }
+  });
+  const {
+    isLoading: isRelaysLoading,
+    isError: isRelaysError,
+    data: isRelaysData,
+  } = useQuery("network/weekly-relays", async function getWeeklyRelays() {
+    try {
+      console.log(env("HASURA_URL"));
+      const res = await gqlRequest(env("HASURA_URL"), RELAY_APPS_QUERY);
+
+      const { relays_daily: dailyRelays } = res;
+      const totalWeeklyRelays = dailyRelays.reduce(
+        (total, { total_relays }) => total + total_relays,
+        0
+      );
+
+      return { dailyRelays, totalWeeklyRelays };
+    } catch (err) {
+      console.log(err, "rip");
+    }
+  });
+  const {
+    isLoading: isSucessRateLoading,
+    isError: isSuccessRateError,
+    data: successRateData,
+  } = useQuery("network/success-rate", async function getWeeklyRelays() {
+    try {
+      const res = await gqlRequest(
+        env("HASURA_URL"),
+        SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY
+      );
+
+      const {
+        relay_apps_hourly_aggregate: {
+          aggregate: {
+            sum: { total_relays: totalSucessfulWeeklyRelays },
+          },
+        },
+      } = res;
+
+      return { successRateData };
+    } catch (err) {
+      console.log(err, "rip");
+    }
+  });
 
   return (
     <FloatUp

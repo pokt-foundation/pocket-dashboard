@@ -3,7 +3,7 @@ const ENV_VARS = {
     return process.env.REACT_APP_BACKEND_URL ?? "";
   },
   HASURA_URL() {
-    return process.env.REACT_APP_TIMESCALE_URL ?? "";
+    return process.env.REACT_APP_HASURA_URL ?? "";
   },
   BUILD() {
     return process.env.REACT_APP_BUILD ?? "undefined";

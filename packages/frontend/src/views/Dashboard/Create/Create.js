@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useMutation } from "react-query";
 import { animated, useTransition } from "react-spring";
 import "styled-components/macro";
 import {
@@ -6,6 +7,7 @@ import {
   ButtonBase,
   Help,
   IconPlus,
+  Spacer,
   Split,
   Switch,
   TextCopy,
@@ -21,6 +23,13 @@ import {
 } from "ui";
 import FloatUp from "components/FloatUp/FloatUp";
 import { log } from "lib/utils";
+import env from "environment";
+import axios from "axios";
+
+const SCREENS = new Map([
+  [0, BasicSetup],
+  [1, SecuritySetup],
+]);
 
 const APP_CONFIG_DATA_KEY = "POKT_NETWORK_APP_CONFIG_DATA";
 const APP_CONFIG_SCREEN_KEY = "POKT_NETWORK_APP_CONFIG_SREEN";
@@ -28,33 +37,37 @@ const APP_CONFIG_SCREEN_KEY = "POKT_NETWORK_APP_CONFIG_SREEN";
 const UPDATE_TYPES = new Map([
   ["UPDATE_APP_NAME", "appName"],
   ["UPDATE_SELECTED_NETWORK", "selectedNetwork"],
-  ["UPDATE_WHITELISTED_USER_AGENTS", "whitelistedUserAgents"],
-  ["UPDATE_WHITELISTED_ORIGINS", "whitelistedOrigins"],
-  ["UPDATE_REQUIRE_PRIVATE_SECRET", "requirePrivateSecret"],
+  ["UPDATE_WHITELISTED_USER_AGENTS", "whitelistUserAgents"],
+  ["UPDATE_WHITELISTED_ORIGINS", "whitelistOrigins"],
+  ["UPDATE_REQUIRE_SECRET_KEY", "secretKeyRequired"],
 ]);
 
-const SCREENS = new Map([
-  [0, BasicSetup],
-  [1, SecuritySetup],
-]);
+const DEFAULT_CONFIGURE_STATE = {
+  appName: "",
+  selectedNetwork: "0022",
+  whitelistUserAgents: [],
+  whitelistOrigins: [],
+  secretKeyRequired: false,
+};
 
 function loadConfigureState() {
   const appConfigData = localStorage.getItem(APP_CONFIG_DATA_KEY);
   const screenIndex = localStorage.getItem(APP_CONFIG_SCREEN_KEY);
 
   try {
-    const deserializedConfigData = JSON.parse(appConfigData);
-    const deserializedScreenIndex = JSON.parse(screenIndex);
+    const deserializedConfigData =
+      JSON.parse(appConfigData) ?? DEFAULT_CONFIGURE_STATE;
+    const deserializedScreenIndex = JSON.parse(screenIndex) ?? 0;
 
     return {
       appConfigData: deserializedConfigData,
-      screenIndex: Number(deserializedScreenIndex) ?? 0,
+      screenIndex: Number(deserializedScreenIndex),
     };
   } catch (err) {
     // This might look weird at first, but we've got no good way to tell if
     // failure to deserialize this data is a browser issue, or just people
     // cleaning their localStorage data, so we just assume the happy path.
-    return {};
+    return DEFAULT_CONFIGURE_STATE;
   }
 }
 
@@ -120,14 +133,47 @@ export default function Create() {
     updateAppConfigData,
   } = useConfigureState();
 
-  const direction = screenIndex > prevScreenIndex ? 1 : -1;
+  const { isError, isLoading, mutate } = useMutation(
+    async function createApp() {
+      try {
+        const {
+          appName,
+          selectedNetwork,
+          whitelistOrigins,
+          whitelistUserAgents,
+          secretKeyRequired,
+        } = appConfigData;
 
-  log(appConfigData, screenIndex);
+        const path = `${env("BACKEND_URL")}/api/applications`;
+
+        const res = await axios.post(
+          path,
+          {
+            name: appName,
+            chain: selectedNetwork,
+            gatewaySettings: {
+              whitelistOrigins,
+              whitelistUserAgents,
+              secretKeyRequired,
+            },
+          },
+          {
+            withCredentials: true,
+          }
+        );
+
+        console.log(res);
+
+        return res;
+      } catch (err) {}
+    }
+  );
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,
   ]);
 
+  const direction = screenIndex > prevScreenIndex ? 1 : -1;
   const transitionProps = useTransition(screenIndex, null, {
     from: {
       opacity: 0,
@@ -147,6 +193,11 @@ export default function Create() {
     config: springs.smooth,
     immediate: screenIndex === 0 && prevScreenIndex === -1,
   });
+
+  useEffect(() => log(appConfigData, screenIndex), [
+    appConfigData,
+    screenIndex,
+  ]);
 
   return (
     <FloatUp
@@ -173,6 +224,8 @@ export default function Create() {
                 data={appConfigData}
                 decrementScreen={decrementScreenIndex}
                 incrementScreen={incrementScreenIndex}
+                onCreateApp={mutate}
+                isCreateDisabled={isLoading}
                 updateData={updateAppConfigData}
               />
             </animated.div>
@@ -208,7 +261,7 @@ function Box({ children, title, ...props }) {
   );
 }
 
-function BasicSetup({ data, decrementScreen, incrementScreen, updateData }) {
+function BasicSetup({ data, incrementScreen, onCreateApp, updateData }) {
   return (
     <>
       <Split
@@ -235,28 +288,15 @@ function BasicSetup({ data, decrementScreen, incrementScreen, updateData }) {
           </Box>
         }
         secondary={
-          <Box title="Free-tier info">
-            <ul
-              css={`
-                list-style: none;
-                height: 100%;
-                li {
-                  display: flex;
-                  justify-content: space-between;
-                }
-                li:not(:last-child) {
-                  margin-bottom: ${4 * GU}px;
-                }
-              `}
-            >
-              <li>
-                Amount of POKT: <span>25,000</span>
-              </li>
-              <li>
-                Max relays per day: <span>1M</span>
-              </li>
-            </ul>
-          </Box>
+          <>
+            <Button wide onClick={onCreateApp} mode="strong">
+              Launch Application
+            </Button>
+            <Spacer size={2 * GU} />
+            <Button wide onClick={() => incrementScreen()}>
+              Set up app security
+            </Button>
+          </>
         }
       />
       <Split
@@ -335,9 +375,28 @@ function BasicSetup({ data, decrementScreen, incrementScreen, updateData }) {
           </Box>
         }
         secondary={
-          <Button wide onClick={() => incrementScreen()}>
-            Set up app security
-          </Button>
+          <Box title="Free-tier info">
+            <ul
+              css={`
+                list-style: none;
+                height: 100%;
+                li {
+                  display: flex;
+                  justify-content: space-between;
+                }
+                li:not(:last-child) {
+                  margin-bottom: ${4 * GU}px;
+                }
+              `}
+            >
+              <li>
+                Amount of POKT: <span>25,000</span>
+              </li>
+              <li>
+                Max relays per day: <span>1M</span>
+              </li>
+            </ul>
+          </Box>
         }
       />
     </>
@@ -436,11 +495,11 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
                 </Help>
               </div>
               <Switch
-                checked={data?.requirePrivateSecret ?? false}
+                checked={data?.secretKeyRequired ?? false}
                 onChange={() =>
                   updateData({
-                    type: "UPDATE_REQUIRE_PRIVATE_SECRET",
-                    payload: !data?.requirePrivateSecret,
+                    type: "UPDATE_REQUIRE_SECRET_KEY",
+                    payload: !data?.secretKeyRequired,
                   })
                 }
               />
@@ -477,7 +536,7 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
             }
           `}
         >
-          {data?.whitelistedUserAgents?.map((agent) => (
+          {data?.whitelistUserAgents?.map((agent) => (
             <li key={agent}>
               <TextCopy
                 onCopy={() => log("killao")}
@@ -518,7 +577,7 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
             }
           `}
         >
-          {data?.whitelistedOrigins?.map((origin) => (
+          {data?.whitelistOrigins?.map((origin) => (
             <li key={origin}>
               <TextCopy
                 onCopy={() => log("killao")}
