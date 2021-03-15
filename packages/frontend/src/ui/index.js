@@ -9,6 +9,7 @@ import MultiCircleGraph from "ui/MultiCircleGraph/MultiCircleGraph";
 import LineChart from "ui/LineChart/LineChart";
 import Link from "ui/Link/Link";
 import Popover from "ui/Popover/Popover";
+import Spacer from "ui/Spacer/Spacer";
 import Split from "ui/Split/Split";
 import Switch from "ui/Switch/Switch";
 import Table from "ui/Table/Table";
@@ -31,6 +32,7 @@ export {
   LineChart,
   Link,
   Popover,
+  Spacer,
   Split,
   Switch,
   Table,
