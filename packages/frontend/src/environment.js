@@ -14,9 +14,6 @@ const ENV_VARS = {
   SENTRY_DSN() {
     return process.env.REACT_APP_SENTRY_DSN.trim() ?? "";
   },
-  TIMESCALE_DB_ENDPOINT() {
-    return process.env.RECT_APP_TIMESCALEDB_ENDPOINT ?? "";
-  },
 };
 
 export default function env(name) {

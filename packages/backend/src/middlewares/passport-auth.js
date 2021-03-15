@@ -1,20 +1,26 @@
+import HttpError from "errors/http-error";
 import passport from "lib/passport-local";
 
 export const authenticate = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
     if (err) {
-      return next(err);
+      return next(
+        HttpError.UNAUTHORIZED({
+          errors: [{ id: "UNAUTHORIZED", message: "Unauthorized" }],
+        })
+      );
     }
 
     if (!user) {
-      throw new Error({
-        statusCode: 400,
-        message: "Invalid token",
-      });
+      console.log(err, user);
+      return next(
+        HttpError.UNAUTHORIZED({
+          errors: [{ id: "UNAUTHORIZED", message: "Unauthorized" }],
+        })
+      );
     }
 
     req.user = user;
-    // DEBUG(user.userName);
     return next();
   })(req, res, next);
 };

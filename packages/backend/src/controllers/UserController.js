@@ -53,7 +53,12 @@ router.post(
         if (!user) {
           return next(
             HttpError.BAD_REQUEST({
-              errors: [{ message: "Wrong email or password" }],
+              errors: [
+                {
+                  id: "INVALID_CREDENTIALS",
+                  message: "Wrong email or password",
+                },
+              ],
             })
           );
         }
@@ -61,7 +66,9 @@ router.post(
         if (!user.validated) {
           return next(
             HttpError.BAD_REQUEST({
-              errors: [{ message: "User is not validated" }],
+              errors: [
+                { id: "NOT_VALIDATED", message: "Please verify your email" },
+              ],
             })
           );
         }
@@ -93,6 +100,7 @@ router.post(
       }
 
       // TODO: Send validation email
+      return res.status(204).send();
     })(req, res, next);
   })
 );

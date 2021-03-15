@@ -1,4 +1,8 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useMutation } from "react-query";
+import axios from "axios";
+import { isEmail, isStrongPassword } from "validator";
 import "styled-components/macro";
 import { useViewport } from "use-viewport";
 import {
@@ -13,23 +17,123 @@ import {
   RADIUS,
 } from "ui";
 import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
+import env from "environment";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatedPassword, setRepeatedPassword] = useState("");
+  const [errors, setErrors] = useState([]);
   const [checked, setChecked] = useState(false);
   const theme = useTheme();
   const { within } = useViewport();
+  const history = useHistory();
 
   const compactMode = within(-1, "medium");
 
+  const { isError, isLoading, mutate } = useMutation(async function signup(e) {
+    e.preventDefault();
+    try {
+      const path = `${env("BACKEND_URL")}/api/users/signup`;
+      const res = await axios.post(path, {
+        email,
+        password,
+      });
+
+      if (res.status === 200 || res.status === 204) {
+        history.push({
+          pathname: "/dashboard/login",
+        });
+      }
+    } catch (err) {
+      // TODO: Set err on UI AND send to sentry.
+      const { errors } = err.response.data;
+
+      setErrors(() => [...errors]);
+    }
+  });
+
   const onCheckChange = useCallback((e) => setChecked(e), []);
-  const onUsernameChange = useCallback((e) => setUsername(e.target.value), []);
+  const onEmailChange = useCallback((e) => setEmail(e.target.value), []);
   const onPasswordChange = useCallback((e) => setPassword(e.target.value), []);
   const onRepeatedPasswordChange = useCallback(
     (e) => setRepeatedPassword(e.target.value),
     []
+  );
+  const onInputFocus = useCallback(() => {
+    if (errors.length) {
+      setErrors([]);
+    }
+  }, [errors]);
+  const onEmailBlur = useCallback(() => {
+    if (!email) {
+      const emailError = {
+        id: "INVALID_EMAIL",
+        message: "Email cannot be empty",
+      };
+
+      const filteredErrors = errors.filter(({ id }) => emailError.id !== id);
+
+      setErrors([...filteredErrors, emailError]);
+    }
+
+    if (!isEmail(email)) {
+      const emailError = {
+        id: "INVALID_EMAIL",
+        message: "Please enter a valid email.",
+      };
+
+      const filteredErrors = errors.filter(({ id }) => emailError.id !== id);
+
+      setErrors([...filteredErrors, emailError]);
+    }
+  }, [errors, email]);
+  const onPasswordBlur = useCallback(() => {
+    if (!password) {
+      const passwordError = {
+        id: "INVALID_PASSWORD",
+        message: "Password cannot be empty",
+      };
+
+      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
+
+      setErrors([...filteredErrors, passwordError]);
+    } else if (!isStrongPassword(password)) {
+      const passwordError = {
+        id: "INVALID_PASSWORD",
+        message: "Password's not strong enough.",
+      };
+
+      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
+
+      setErrors([...filteredErrors, passwordError]);
+    }
+  }, [errors, password]);
+  const onRepeatedPasswordBlur = useCallback(() => {
+    if (!password) {
+      const passwordError = {
+        id: "INVALID_PASSWORD",
+        message: "Password cannot be empty",
+      };
+
+      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
+
+      setErrors([...filteredErrors, passwordError]);
+    } else if (password !== repeatedPassword) {
+      const passwordError = {
+        id: "NON_MATCHING_PASSWORD",
+        message: "Passwords don't match",
+      };
+
+      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
+
+      setErrors([...filteredErrors, passwordError]);
+    }
+  }, [errors, password, repeatedPassword]);
+
+  const isSubmitDisabled = useMemo(
+    () => isLoading || isError || errors.length > 0,
+    [errors, isError, isLoading]
   );
 
   return (
@@ -66,71 +170,108 @@ export default function Login() {
         >
           Get started
         </h2>
-        <Field
-          label="Username"
-          required
+        <form
+          onSubmit={!isSubmitDisabled ? mutate : undefined}
           css={`
-            margin-bottom: ${5 * GU}px;
+            display: flex;
+            flex-direction: column;
           `}
         >
-          <TextInput wide value={username} onChange={onUsernameChange} />
-        </Field>
-        <Field label="Password" required>
-          <TextInput
-            wide
-            value={password}
-            onChange={onPasswordChange}
-            type="password"
-          />
-        </Field>
-        <Field label="Repeat Password" required>
-          <TextInput
-            wide
-            value={repeatedPassword}
-            onChange={onRepeatedPasswordChange}
-            type="password"
-          />
-        </Field>
-        <label
-          css={`
-            margin-bottom: ${6 * GU}px;
-            ${textStyle("body2")}
-            word-break: ${compactMode ? "break-word" : "break-all"};
-          `}
-        >
-          <CheckBox
-            checked={checked}
-            onChange={onCheckChange}
-            aria-label="I agree to the pocket Dashboard terms and conditions"
+          <Field
+            label="Email"
+            required
             css={`
-              display: inline-block;
-            `}
-          />
-          <span
-            css={`
-              padding-top: 5px;
-              vertical-align: bottom;
-              margin-left: ${1 * GU}px;
+              margin-bottom: ${5 * GU}px;
             `}
           >
-            I Agree to the Pocket Dashboard's{" "}
-            <Link
-              href="#"
+            <TextInput
+              wide
+              value={email}
+              onBlur={onEmailBlur}
+              onChange={onEmailChange}
+              onFocus={onInputFocus}
+            />
+          </Field>
+          <Field label="Password" required>
+            <TextInput
+              wide
+              value={password}
+              onBlur={onPasswordBlur}
+              onChange={onPasswordChange}
+              onFocus={onInputFocus}
+              type="password"
+            />
+          </Field>
+          <Field label="Repeat Password" required>
+            <TextInput
+              wide
+              value={repeatedPassword}
+              onBlur={onRepeatedPasswordBlur}
+              onChange={onRepeatedPasswordChange}
+              onFocus={onInputFocus}
+              type="password"
+            />
+          </Field>
+          <ul
+            css={`
+              list-style-type: none;
+            `}
+          >
+            {errors.map(({ id, message }) => (
+              <li
+                key={`${id}_${message}`}
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {message}
+              </li>
+            ))}
+          </ul>
+          <label
+            css={`
+              margin-bottom: ${6 * GU}px;
+              ${textStyle("body2")}
+              word-break: ${compactMode ? "break-word" : "break-all"};
+            `}
+          >
+            <CheckBox
+              checked={checked}
+              onChange={onCheckChange}
+              aria-label="I agree to the pocket Dashboard terms and conditions"
               css={`
-                display: inline;
+                display: inline-block;
+              `}
+            />
+            <span
+              css={`
+                padding-top: 5px;
+                vertical-align: bottom;
+                margin-left: ${1 * GU}px;
               `}
             >
-              T. &amp; C. and Privacy Policy
-            </Link>
-          </span>
-        </label>
-        <Button
-          css={`
-            margin-bottom: ${2 * GU}px;
-          `}
-        >
-          Sign up
-        </Button>
+              I Agree to the Pocket Dashboard's{" "}
+              <Link
+                href="#"
+                css={`
+                  display: inline;
+                `}
+              >
+                T. &amp; C. and Privacy Policy
+              </Link>
+            </span>
+          </label>
+          <Button
+            type="submit"
+            disabled={isSubmitDisabled}
+            onClick={mutate}
+            css={`
+              margin-bottom: ${2 * GU}px;
+            `}
+          >
+            Sign up
+          </Button>
+        </form>
       </main>
     </div>
   );
