@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, useRouteMatch } from "react-router-dom";
+import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import Create from "views/Dashboard/Create/Create";
@@ -61,12 +61,12 @@ export default function DashboardRoutes() {
             <NetworkStatus />
           </Route>
           <Route exact path={`/apps`}>
+            <Redirect to="/create" />
+          </Route>
+          <Route exact path={`/create`}>
             <Create />
           </Route>
-          <Route exact path={`/apps/setup`}>
-            <Create />
-          </Route>
-          <Route exact path={`/apps/:appId`}>
+          <Route exact path={`/app/:appId`}>
             <MyApp />
           </Route>
         </Dashboard>
