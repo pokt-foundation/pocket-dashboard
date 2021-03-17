@@ -52,7 +52,6 @@ function Split({ primary, secondary, invert, secondaryWidth, ...props }) {
       <div
         css={`
           display: ${oneColumn ? "block" : "flex"};
-          padding-bottom: ${3 * GU}px;
           width: 100%;
         `}
         {...props}
