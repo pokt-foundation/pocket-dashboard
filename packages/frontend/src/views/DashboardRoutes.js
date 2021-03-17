@@ -37,6 +37,7 @@ export default function DashboardRoutes() {
           max-width: 100vw;
           max-height: 100vh;
         `}
+        overflow-x: hidden;
       `}
     >
       <Switch>

@@ -21,11 +21,6 @@ const MENU_ROUTES = [
     id: "apps",
     title: "My Apps",
   },
-  {
-    icon: ButtonIcon,
-    id: "docs",
-    title: "Docs",
-  },
 ];
 
 function getLocationId(pathname) {
