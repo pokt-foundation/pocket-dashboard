@@ -4,7 +4,7 @@ import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import Create from "views/Dashboard/Create/Create";
 import Dashboard from "views/Dashboard/Dashboard";
-import NetworkStatus from "views/Dashboard/NetworkStatus";
+import NetworkStatus from "views/Dashboard/Network/NetworkStatus";
 import ForgotPassword from "views/Onboarding/ForgotPassword";
 import MyApp from "views/Dashboard/MyApp";
 import NewPassword from "views/Onboarding/NewPassword";
