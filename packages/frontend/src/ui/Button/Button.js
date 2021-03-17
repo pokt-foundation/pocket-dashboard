@@ -11,18 +11,18 @@ import ButtonBase from "../ButtonBase/ButtonBase";
 const SIZE_STYLES = {
   medium: {
     textStyleName: "body2",
-    height: 8 * GU,
+    height: 5 * GU,
     padding: 3 * GU,
     iconPadding: 2 * GU,
-    minWidth: 23 * GU,
+    minWidth: 14.5 * GU,
     middleSpace: 1 * GU,
   },
   small: {
     textStyleName: "body2",
-    height: 5 * GU,
-    padding: 3 * GU,
+    height: 4 * GU,
+    padding: 2 * GU,
     iconPadding: 1.5 * GU,
-    minWidth: 21 * GU,
+    minWidth: 13 * GU,
     middleSpace: 1 * GU,
   },
   mini: {

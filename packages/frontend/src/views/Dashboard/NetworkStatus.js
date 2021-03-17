@@ -177,7 +177,7 @@ export default function NetworkStatus() {
               <Box title="Relay Success rate">
                 <CircleGraph
                   color="white"
-                  size={30 * GU}
+                  size={20 * GU}
                   strokeWidth={10}
                   value={0.74}
                 />
@@ -199,89 +199,78 @@ export default function NetworkStatus() {
                   `}
                 `}
               >
-                <div
+                <Table
+                  noSideBorders
+                  noTopBorders
                   css={`
-                    ${!compactMode &&
-                    `
-                      max-height: ${35 * GU}px;
-                      overflow-y: scroll;
-                    `}
+                    background: transparent;
                   `}
+                  header={
+                    <>
+                      <TableRow>
+                        <TableHeader title="Network" />
+                        <TableHeader title="Network ID" />
+                        <TableHeader title="Ticker" />
+                        <TableHeader title="Node count" />
+                        <TableHeader title="Staked apps" />
+                      </TableRow>
+                    </>
+                  }
                 >
-                  <Table
-                    noSideBorders
-                    noTopBorders
-                    css={`
-                      background: transparent;
-                    `}
-                    header={
-                      <>
-                        <TableRow>
-                          <TableHeader title="Network" />
-                          <TableHeader title="Network ID" />
-                          <TableHeader title="Ticker" />
-                          <TableHeader title="Node count" />
-                          <TableHeader title="Staked apps" />
-                        </TableRow>
-                      </>
-                    }
-                  >
-                    <TableRow>
-                      <TableCell>
-                        <p>Ethereum Mainnet</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>0021</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>ETH</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>600</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>1400</p>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <p>Ethereum Mainnet</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>0021</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>ETH</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>600</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>1400</p>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <p>Ethereum Mainnet</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>0021</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>ETH</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>600</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>1400</p>
-                      </TableCell>
-                    </TableRow>
-                  </Table>
-                </div>
+                  <TableRow>
+                    <TableCell>
+                      <p>Ethereum Mainnet</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>0021</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>ETH</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>600</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>1400</p>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <p>Ethereum Mainnet</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>0021</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>ETH</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>600</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>1400</p>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <p>Ethereum Mainnet</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>0021</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>ETH</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>600</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>1400</p>
+                    </TableCell>
+                  </TableRow>
+                </Table>
               </Box>
             }
-            secondaryWidth={`${80 * GU}px;`}
             secondary={
               <Box title="Network stats">
                 <ul
@@ -293,7 +282,7 @@ export default function NetworkStatus() {
                       justify-content: space-between;
                     }
                     li:not(:last-child) {
-                      margin-bottom: ${6 * GU}px;
+                      margin-bottom: ${4 * GU}px;
                     }
                   `}
                 >
@@ -320,21 +309,22 @@ export default function NetworkStatus() {
   );
 }
 
-function Box({ children, title, ...props }) {
+function Box({ children, title, className, ...props }) {
   return (
     <div
       css={`
         background: #1b2331;
-        min-height: 280px;
-        padding: ${2 * GU}px ${4 * GU}px;
-        border-radius: ${RADIUS / 2}px;
+        min-height: ${35 * GU}px;
+        padding: ${2 * GU}px ${2 * GU}px;
+        border-radius: ${RADIUS * 2}px;
       `}
+      className={className}
       {...props}
     >
       <h3
         css={`
           ${textStyle("title3")}
-          margin-bottom: ${5 * GU}px;
+          margin-bottom: ${3 * GU}px;
         `}
       >
         {title}

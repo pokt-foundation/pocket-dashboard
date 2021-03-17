@@ -53,14 +53,14 @@ export default function MenuPanel() {
     !compactMode && (
       <div
         css={`
-          width: ${27 * GU}px;
+          width: ${17 * GU}px;
           height: 100vh;
           background: ${theme.surface};
           border-radius: 0px 20px 20px 0;
           flex-grow: 0;
-          padding: ${3 * GU}px 0;
+          padding: ${2 * GU}px 0;
           button:not(:last-child) {
-            margin-bottom: ${7 * GU}px;
+            margin-bottom: ${5 * GU}px;
           }
         `}
       >
@@ -114,7 +114,7 @@ function MenuPanelButton({ active, icon, label, onClick, ...props }) {
       css={`
         position: relative;
         width: 100%;
-        height: ${12 * GU}px;
+        min-height: ${10 * GU}px;
         border-radius: 0px;
         color: black;
         transition: background 150ms ease-in-out;
@@ -127,6 +127,7 @@ function MenuPanelButton({ active, icon, label, onClick, ...props }) {
         css={`
           position: absolute;
           left: 0;
+          top: 0;
           width: 3px;
           height: 100%;
           background: ${theme.accent};
@@ -145,10 +146,11 @@ function MenuPanelButton({ active, icon, label, onClick, ...props }) {
           flex-direction: column;
           justify-content: center;
           align-items: center;
+          height: 100%;
           img {
             display: block;
-            width: ${8 * GU}px;
-            height: ${8 * GU}px;
+            width: ${5 * GU}px;
+            height: ${5 * GU}px;
           }
         `}
       >

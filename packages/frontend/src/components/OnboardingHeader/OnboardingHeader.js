@@ -7,8 +7,8 @@ export default function OnboardingHeader() {
     <header
       css={`
         position: absolute;
-        top: ${4 * GU}px;
-        left: ${5 * GU}px;
+        top: ${2 * GU}px;
+        left: ${3 * GU}px;
         ${textStyle("title1")}
       `}
     >
