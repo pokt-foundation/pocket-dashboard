@@ -8,8 +8,6 @@ import { ButtonBase, useTheme, springs, GU, RADIUS } from "ui";
 import ButtonIcon from "components/MenuPanel/ButtonIcon.png";
 import PocketLogo from "assets/pnlogo.png";
 
-const DASHBOARD_BASE_PREFIX = "dashboard";
-
 const MENU_ROUTES = [
   {
     icon: ButtonIcon,
@@ -23,26 +21,34 @@ const MENU_ROUTES = [
   },
 ];
 
+function useActiveRouteName() {
+  const { pathname } = useLocation();
+  const [activeId, setActiveId] = useState(() => getLocationId(pathname));
+
+  useEffect(() => {
+    const [, id = ""] = pathname.split("/");
+
+    setActiveId(id);
+  }, [pathname]);
+
+  return {
+    activeId,
+  };
+}
+
 function getLocationId(pathname) {
   const [, , id = ""] = pathname.split("/");
 
   return id;
 }
 
-export default function MenuPanel() {
-  const { pathname } = useLocation();
+export default function MenuPanel({ apps = [] }) {
   const history = useHistory();
   const theme = useTheme();
   const { within } = useViewport();
-  const [activeId, setActiveId] = useState(() => getLocationId(pathname));
+  const { activeId } = useActiveRouteName();
 
   const compactMode = within(-1, "medium");
-
-  useEffect(() => {
-    const [, , id = ""] = pathname.split("/");
-
-    setActiveId(id);
-  }, [pathname]);
 
   return (
     !compactMode && (
@@ -86,7 +92,7 @@ export default function MenuPanel() {
             onClick={() => {
               if (id !== "docs") {
                 history.push({
-                  pathname: `/${DASHBOARD_BASE_PREFIX}/${id}`,
+                  pathname: `/${id}`,
                 });
               }
             }}

@@ -41,41 +41,35 @@ export default function DashboardRoutes() {
       `}
     >
       <Switch>
-        <Route exact path={`${path}/`}>
+        <Route exact path={`/`}>
           <Login />
         </Route>
-        <Route exact path={`${path}/signup`}>
+        <Route exact path={`/signup`}>
           <Signup />
         </Route>
-        <Route exact path={`${path}/login`}>
+        <Route exact path={`/login`}>
           <Login />
         </Route>
-        <Route exact path={`${path}/forgotpassword`}>
+        <Route exact path={`/forgotpassword`}>
           <ForgotPassword />
         </Route>
-        <Route exact path={`${path}/newpassword`}>
+        <Route exact path={`/newpassword`}>
           <NewPassword />
         </Route>
-        <Route exact path={`${path}/home`}>
-          <Dashboard>
+        <Dashboard>
+          <Route exact path={`/home`}>
             <NetworkStatus />
-          </Dashboard>
-        </Route>
-        <Route exact path={`${path}/apps`}>
-          <Dashboard>
+          </Route>
+          <Route exact path={`/apps`}>
             <Create />
-          </Dashboard>
-        </Route>
-        <Route exact path={`${path}/apps/setup`}>
-          <Dashboard>
+          </Route>
+          <Route exact path={`/apps/setup`}>
             <Create />
-          </Dashboard>
-        </Route>
-        <Route exact path={`${path}/apps/:appId`}>
-          <Dashboard>
+          </Route>
+          <Route exact path={`/apps/:appId`}>
             <MyApp />
-          </Dashboard>
-        </Route>
+          </Route>
+        </Dashboard>
       </Switch>
     </div>
   );
