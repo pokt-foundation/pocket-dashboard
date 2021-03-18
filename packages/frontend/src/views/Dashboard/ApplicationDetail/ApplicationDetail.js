@@ -18,6 +18,7 @@ import {
   GU,
   RADIUS,
 } from "ui";
+import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
 
 const ENDPOINT_URL =
@@ -396,31 +397,6 @@ export default function MyApp() {
         />
       )}
     />
-  );
-}
-
-function Box({ children, title, ...props }) {
-  return (
-    <div
-      css={`
-        background: #1b2331;
-        padding: ${2 * GU}px ${4 * GU}px;
-        border-radius: ${RADIUS / 2}px;
-      `}
-      {...props}
-    >
-      {title && (
-        <h3
-          css={`
-            ${textStyle("title3")}
-            margin-bottom: ${5 * GU}px;
-          `}
-        >
-          {title}
-        </h3>
-      )}
-      {children}
-    </div>
   );
 }
 

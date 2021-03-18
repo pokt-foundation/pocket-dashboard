@@ -21,6 +21,7 @@
     "axios": "^0.21.1",
     "babel-plugin-styled-components": "^1.12.0",
     "chromatic": "^5.6.3",
+    "dayjs": "^1.10.4",
     "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
     "husky": "^4.3.0",
@@ -35,6 +36,7 @@
     "react-spring": "^8.0.27",
     "secure-ls": "^1.2.6",
     "styled-components": "^5.2.1",
+    "token-amount": "^0.3.0",
     "use-inside": "^0.2.0",
     "use-viewport": "^0.2.0",
     "validator": "^13.5.2"
