@@ -7,7 +7,6 @@ export default function Box({ children, title, className, ...props }) {
     <div
       css={`
         background: #1b2331;
-        min-height: ${35 * GU}px;
         padding: ${2 * GU}px ${2 * GU}px;
         border-radius: ${RADIUS * 2}px;
       `}
