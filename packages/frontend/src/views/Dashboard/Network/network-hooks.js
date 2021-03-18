@@ -1,11 +1,13 @@
 import axios from "axios";
+import * as dayjs from "dayjs";
+import * as dayJsutcPlugin from "dayjs/plugin/utc";
 import { request as gqlRequest, gql } from "graphql-request";
 import { useQuery } from "react-query";
 import env from "environment";
 
 const RELAY_APPS_QUERY = gql`
   query DAILY_RELAYS_QUERY {
-    relays_daily(limit: 7, order_by: { bucket: desc }) {
+    relays_daily(limit: 8, order_by: { bucket: desc }) {
       bucket
       total_relays
     }
@@ -13,10 +15,22 @@ const RELAY_APPS_QUERY = gql`
 `;
 
 const SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY = gql`
-  query DAILY_RELAYS_QUERY($_gte: timestamptz = "2021-03-08T16:00:00+00:00") {
+  query DAILY_RELAYS_QUERY($_gte: timestamptz!) {
     relay_apps_hourly_aggregate(
       where: { bucket: { _gte: $_gte }, result: { _eq: "200" } }
     ) {
+      aggregate {
+        sum {
+          total_relays
+        }
+      }
+    }
+  }
+`;
+
+const WEEKLY_RELAY_COUNT_QUERY = gql`
+  query DAILY_RELAYS_QUERY($_gte: timestamptz!) {
+    relay_apps_hourly_aggregate(where: { bucket: { _gte: $_gte } }) {
       aggregate {
         sum {
           total_relays
@@ -38,8 +52,6 @@ export function useNetworkSummary() {
       const res = await axios.get(path, {
         withCredentials: true,
       });
-
-      console.log("res", res);
 
       return res;
     } catch (err) {
@@ -91,14 +103,32 @@ export function useTotalWeeklyRelays() {
     data: relayData,
   } = useQuery("network/weekly-relays", async function getWeeklyRelays() {
     try {
-      console.log(env("HASURA_URL"));
       const res = await gqlRequest(env("HASURA_URL"), RELAY_APPS_QUERY);
 
-      const { relays_daily: dailyRelays } = res;
-      const totalWeeklyRelays = dailyRelays.reduce(
-        (total, { total_relays }) => total + total_relays,
-        0
+      dayjs.extend(dayJsutcPlugin);
+
+      const sevenDaysAgo = dayjs.utc().subtract(7, "day");
+
+      const formattedTimestamp = `${sevenDaysAgo.year()}-0${
+        sevenDaysAgo.month() + 1
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+
+      const totalWeeklyRelaysRes = await gqlRequest(
+        env("HASURA_URL"),
+        WEEKLY_RELAY_COUNT_QUERY,
+        {
+          _gte: formattedTimestamp,
+        }
       );
+
+      const {
+        relay_apps_hourly_aggregate: {
+          aggregate: {
+            sum: { total_relays: totalWeeklyRelays },
+          },
+        },
+      } = totalWeeklyRelaysRes;
+      const { relays_daily: dailyRelays } = res;
 
       return { dailyRelays, totalWeeklyRelays };
     } catch (err) {
@@ -120,9 +150,20 @@ export function useNetworkSuccessRate() {
     data: successRateData,
   } = useQuery("network/success-rate", async function getWeeklyRelays() {
     try {
+      dayjs.extend(dayJsutcPlugin);
+
+      const sevenDaysAgo = dayjs.utc().subtract(7, "day");
+
+      const formattedTimestamp = `${sevenDaysAgo.year()}-0${
+        sevenDaysAgo.month() + 1
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+
       const res = await gqlRequest(
         env("HASURA_URL"),
-        SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY
+        SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY,
+        {
+          _gte: formattedTimestamp,
+        }
       );
 
       const {

@@ -14,14 +14,16 @@ export default function Box({ children, title, className, ...props }) {
       className={className}
       {...props}
     >
-      <h3
-        css={`
-          ${textStyle("title3")}
-          margin-bottom: ${3 * GU}px;
-        `}
-      >
-        {title}
-      </h3>
+      {title && (
+        <h3
+          css={`
+            ${textStyle("title3")}
+            margin-bottom: ${3 * GU}px;
+          `}
+        >
+          {title}
+        </h3>
+      )}
       {children}
     </div>
   );
