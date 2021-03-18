@@ -49,11 +49,15 @@ export function useNetworkSummary() {
     const path = `${env("BACKEND_URL")}/api/network/summary`;
 
     try {
-      const res = await axios.get(path, {
+      const {
+        data: { summary },
+      } = await axios.get(path, {
         withCredentials: true,
       });
 
-      return res;
+      console.log(summary);
+
+      return summary;
     } catch (err) {
       console.log("?", err);
     }

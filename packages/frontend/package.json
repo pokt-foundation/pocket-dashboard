@@ -36,6 +36,7 @@
     "react-spring": "^8.0.27",
     "secure-ls": "^1.2.6",
     "styled-components": "^5.2.1",
+    "token-amount": "^0.3.0",
     "use-inside": "^0.2.0",
     "use-viewport": "^0.2.0",
     "validator": "^13.5.2"

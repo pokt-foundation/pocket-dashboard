@@ -12841,6 +12841,11 @@ js-yaml@^3.13.1:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
+jsbi@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/jsbi/-/jsbi-3.1.4.tgz#9654dd02207a66a4911b4e4bb74265bc2cbc9dd0"
+  integrity sha512-52QRRFSsi9impURE8ZUbzAMCLjPm4THO7H2fcuIvaaeFTbSysvkodbQQXIVsNgq/ypDbq6dJiuGKL0vZ/i9hUg==
+
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
@@ -20067,6 +20072,13 @@ toidentifier@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
   integrity sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==
+
+token-amount@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/token-amount/-/token-amount-0.3.0.tgz#0ab93000a26ebe364aee30ec7ec6bc92a043bc25"
+  integrity sha512-T9dCmen36//NFhoKoGLG/7m3pcxgG7JYc5rh24hMOHmMLLyDWsLkpXaMGZes3TOZiNW/tsfK9wGp6ZjfKVJE7g==
+  dependencies:
+    jsbi "^3.1.4"
 
 touch@^3.1.0:
   version "3.1.0"
