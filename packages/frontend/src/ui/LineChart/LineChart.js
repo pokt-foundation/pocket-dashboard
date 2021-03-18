@@ -42,7 +42,6 @@ function useMeasuredWidth() {
 
 function LineChart({
   animDelay,
-  backgroundFill,
   borderColor,
   color,
   dotRadius,
@@ -94,12 +93,8 @@ function LineChart({
   );
 
   const getLabelPosition = useCallback((index, length) => {
-    if (index === 0) {
-      return "start";
-    }
-    if (index === length - 1) {
-      return "end";
-    }
+    if (index === 0) return "start";
+    if (index === length - 1) return "end";
     return "middle";
   }, []);
 
@@ -114,7 +109,7 @@ function LineChart({
       height={chartHeight}
       rx="3"
       ry="3"
-      fill={backgroundFill}
+      fill="#ffffff"
       strokeWidth="1"
       stroke={borderColor}
     />
@@ -137,9 +132,6 @@ function LineChart({
           css="display: block"
           {...props}
         >
-          <mask id="chart-mask">{rectangle}</mask>
-          {rectangle}
-
           <g mask="url(#chart-mask)">
             {totalCount > 0 && (
               <path
@@ -228,11 +220,8 @@ LineChart.propTypes = {
   height: PropTypes.number,
   dotRadius: PropTypes.number,
   animDelay: PropTypes.number,
-  backgroundFill: PropTypes.string,
   borderColor: PropTypes.string,
   labelColor: PropTypes.string,
-  renderCheckpoints: PropTypes.bool,
-  reset: PropTypes.bool,
   lines: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.shape({
@@ -245,6 +234,8 @@ LineChart.propTypes = {
     ])
   ),
   label: PropTypes.oneOfType([PropTypes.func, PropTypes._null]),
+  renderCheckpoints: PropTypes.bool,
+  reset: PropTypes.bool,
   color: PropTypes.func,
 };
 
@@ -254,11 +245,10 @@ LineChart.defaultProps = {
   height: 200,
   dotRadius: 7 / 2,
   animDelay: 500,
-  backgroundFill: "#ffffff",
-  renderCheckpoints: true,
+  rendercheckpoints: false,
   reset: false,
   borderColor: "rgba(209, 209, 209, 0.5)",
-  labelColor: "#6d777b",
+  labelColor: "white",
   lines: [],
   label: (index) => index + 1,
   color: (index, { lines }) =>

@@ -53,7 +53,6 @@ function MultiCircleGraph({ color, label, size, strokeWidth, values }) {
     enter: (v) => v,
   });
 
-  console.log(transitions);
   if (label === undefined) {
     label = labelDefault;
   }
@@ -94,7 +93,6 @@ function MultiCircleGraph({ color, label, size, strokeWidth, values }) {
         const radius = (size - strokeWidth) / 2 - RADIUS_SPACING * idx;
         const length = Math.PI * 2 * radius;
 
-        console.log("length/radius", length, radius);
         return (
           <React.Fragment key={idx}>
             <svg

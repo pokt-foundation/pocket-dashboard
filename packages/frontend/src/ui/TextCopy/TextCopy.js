@@ -8,7 +8,7 @@ import { noop, warn } from "ui/utils";
 import TextInput from "ui/TextInput/TextInput";
 import ButtonIcon from "ui/Button/ButtonIcon";
 
-const HEIGHT = 8 * GU;
+const HEIGHT = 5 * GU;
 
 const TextCopy = React.memo(
   React.forwardRef(function TextCopy(

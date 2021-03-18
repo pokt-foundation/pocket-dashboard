@@ -23,7 +23,7 @@ function Help({ hint, children }) {
         ref={buttonElement}
         description={hint}
         onClick={open}
-        size={3 * GU}
+        size={2 * GU}
         css={`
           margin-top: ${insideFieldLabel ? -3 : 0}px;
           margin-left: ${insideBoxHeading || insideFieldLabel ? 1 * GU : 0}px;
@@ -54,7 +54,7 @@ function Help({ hint, children }) {
               top: 0;
               left: 0;
               bottom: 0;
-              width: ${1 * GU}px;
+              width: ${0.5 * GU}px;
               background: ${theme.help};
             }
           `}

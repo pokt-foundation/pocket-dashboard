@@ -1,12 +1,12 @@
 import React from "react";
-import { Route, Switch, useRouteMatch } from "react-router-dom";
+import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import Create from "views/Dashboard/Create/Create";
 import Dashboard from "views/Dashboard/Dashboard";
-import NetworkStatus from "views/Dashboard/NetworkStatus";
+import NetworkStatus from "views/Dashboard/Network/NetworkStatus";
 import ForgotPassword from "views/Onboarding/ForgotPassword";
-import MyApp from "views/Dashboard/MyApp";
+import MyApp from "views/Dashboard/ApplicationDetail/ApplicationDetail";
 import NewPassword from "views/Onboarding/NewPassword";
 import Login from "views/Onboarding/Login";
 import Signup from "views/Onboarding/Signup";
@@ -37,44 +37,39 @@ export default function DashboardRoutes() {
           max-width: 100vw;
           max-height: 100vh;
         `}
+        overflow-x: hidden;
       `}
     >
       <Switch>
-        <Route exact path={`${path}/`}>
+        <Route exact path={`/`}>
           <Login />
         </Route>
-        <Route exact path={`${path}/signup`}>
+        <Route exact path={`/signup`}>
           <Signup />
         </Route>
-        <Route exact path={`${path}/login`}>
+        <Route exact path={`/login`}>
           <Login />
         </Route>
-        <Route exact path={`${path}/forgotpassword`}>
+        <Route exact path={`/forgotpassword`}>
           <ForgotPassword />
         </Route>
-        <Route exact path={`${path}/newpassword`}>
+        <Route exact path={`/newpassword`}>
           <NewPassword />
         </Route>
-        <Route exact path={`${path}/home`}>
-          <Dashboard>
+        <Dashboard>
+          <Route exact path={`/home`}>
             <NetworkStatus />
-          </Dashboard>
-        </Route>
-        <Route exact path={`${path}/apps`}>
-          <Dashboard>
+          </Route>
+          <Route exact path={`/apps`}>
+            <Redirect to="/create" />
+          </Route>
+          <Route exact path={`/create`}>
             <Create />
-          </Dashboard>
-        </Route>
-        <Route exact path={`${path}/apps/setup`}>
-          <Dashboard>
-            <Create />
-          </Dashboard>
-        </Route>
-        <Route exact path={`${path}/apps/:appId`}>
-          <Dashboard>
+          </Route>
+          <Route exact path={`/app/:appId`}>
             <MyApp />
-          </Dashboard>
-        </Route>
+          </Route>
+        </Dashboard>
       </Switch>
     </div>
   );

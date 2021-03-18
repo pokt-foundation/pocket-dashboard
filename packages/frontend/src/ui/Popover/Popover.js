@@ -184,7 +184,6 @@ class PopoverBase extends React.Component {
     const { rootBoundary } = this.props;
     const hasWindow = typeof window !== "undefined";
 
-    console.log("window boundary", window.innerWidth, window.innerHeight);
     return rootBoundary
       ? [rootBoundary.clientWidth, rootBoundary.clientHeight]
       : [hasWindow ? window.innerWidth : 0, hasWindow ? window.innerHeight : 0];
@@ -240,7 +239,6 @@ function Popover({ scaleEffect, visible, ...props }) {
   const theme = useTheme();
   const root = useRoot();
 
-  console.log("is visible", visible);
   return (
     <RootPortal>
       <Transition

@@ -21,6 +21,7 @@ router.get(
         _id,
         ticker,
         network,
+        description,
         nodeCount,
       }) {
         const isAvailableForStaking = await ApplicationPool.exists({
@@ -31,6 +32,7 @@ router.get(
           id: _id,
           ticker,
           network,
+          description,
           nodeCount,
           isAvailableForStaking,
         };
@@ -50,9 +52,13 @@ router.get(
       { sort: { createdAt: -1 } }
     );
 
-    const { _id, ...networkData } = latestNetworkData;
-
-    res.status(200).send({ summary: networkData });
+    res.status(200).send({
+      summary: {
+        appsStaked: latestNetworkData.appsStaked,
+        nodesStaked: latestNetworkData.nodesStaked,
+        poktStaked: latestNetworkData.poktStaked,
+      },
+    });
   })
 );
 
