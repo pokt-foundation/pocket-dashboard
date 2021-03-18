@@ -40,8 +40,8 @@ function Field({ children, label, required, ...props }) {
             css={`
               display: flex;
               align-items: center;
-              height: ${3 * GU}px;
-              margin-bottom: ${1 * GU}px;
+              height: ${2 * GU}px;
+              margin-bottom: ${0.5 * GU}px;
               color: ${theme.surfaceContentSecondary};
               white-space: nowrap;
               ${textStyle("label2")};

@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useMutation, useQuery } from "react-query";
 import { animated, useTransition } from "react-spring";
+import axios from "axios";
 import "styled-components/macro";
 import {
   Button,
   ButtonBase,
   Help,
   IconPlus,
+  Spacer,
   Split,
   Switch,
   TextCopy,
@@ -21,6 +24,12 @@ import {
 } from "ui";
 import FloatUp from "components/FloatUp/FloatUp";
 import { log } from "lib/utils";
+import env from "environment";
+
+const SCREENS = new Map([
+  [0, BasicSetup],
+  [1, SecuritySetup],
+]);
 
 const APP_CONFIG_DATA_KEY = "POKT_NETWORK_APP_CONFIG_DATA";
 const APP_CONFIG_SCREEN_KEY = "POKT_NETWORK_APP_CONFIG_SREEN";
@@ -28,38 +37,42 @@ const APP_CONFIG_SCREEN_KEY = "POKT_NETWORK_APP_CONFIG_SREEN";
 const UPDATE_TYPES = new Map([
   ["UPDATE_APP_NAME", "appName"],
   ["UPDATE_SELECTED_NETWORK", "selectedNetwork"],
-  ["UPDATE_WHITELISTED_USER_AGENTS", "whitelistedUserAgents"],
-  ["UPDATE_WHITELISTED_ORIGINS", "whitelistedOrigins"],
-  ["UPDATE_REQUIRE_PRIVATE_SECRET", "requirePrivateSecret"],
+  ["UPDATE_WHITELISTED_USER_AGENTS", "whitelistUserAgents"],
+  ["UPDATE_WHITELISTED_ORIGINS", "whitelistOrigins"],
+  ["UPDATE_REQUIRE_SECRET_KEY", "secretKeyRequired"],
 ]);
 
-const SCREENS = new Map([
-  [0, BasicSetup],
-  [1, SecuritySetup],
-]);
+const DEFAULT_CONFIGURE_STATE = {
+  appName: "",
+  selectedNetwork: "",
+  whitelistUserAgents: [],
+  whitelistOrigins: [],
+  secretKeyRequired: false,
+};
 
 function loadConfigureState() {
   const appConfigData = localStorage.getItem(APP_CONFIG_DATA_KEY);
   const screenIndex = localStorage.getItem(APP_CONFIG_SCREEN_KEY);
 
   try {
-    const deserializedConfigData = JSON.parse(appConfigData);
-    const deserializedScreenIndex = JSON.parse(screenIndex);
+    const deserializedConfigData =
+      JSON.parse(appConfigData) ?? DEFAULT_CONFIGURE_STATE;
+    const deserializedScreenIndex = JSON.parse(screenIndex) ?? 0;
 
     return {
       appConfigData: deserializedConfigData,
-      screenIndex: Number(deserializedScreenIndex) ?? 0,
+      screenIndex: Number(deserializedScreenIndex),
     };
   } catch (err) {
     // This might look weird at first, but we've got no good way to tell if
     // failure to deserialize this data is a browser issue, or just people
     // cleaning their localStorage data, so we just assume the happy path.
-    return {};
+    return DEFAULT_CONFIGURE_STATE;
   }
 }
 
 function useConfigureState() {
-  const [appConfigData, setAppConfigData] = useState(null);
+  const [appConfigData, setAppConfigData] = useState(DEFAULT_CONFIGURE_STATE);
   const [prevScreenIndex, setPrevScreenIndex] = useState(-1);
   const [screenIndex, setScreenIndex] = useState(0);
 
@@ -119,15 +132,73 @@ export default function Create() {
     screenIndex,
     updateAppConfigData,
   } = useConfigureState();
+  const {
+    appName,
+    selectedNetwork,
+    whitelistOrigins,
+    whitelistUserAgents,
+    secretKeyRequired,
+  } = appConfigData;
 
-  const direction = screenIndex > prevScreenIndex ? 1 : -1;
+  const {
+    isLoading: isChainsLoading,
+    isError: isChainsError,
+    data: chains,
+  } = useQuery("/network/chains", async function getNetworkChains() {
+    const path = `${env("BACKEND_URL")}/api/network/chains`;
 
-  log(appConfigData, screenIndex);
+    try {
+      const res = await axios.get(path, {
+        withCredentials: true,
+      });
+
+      const {
+        data: { chains },
+      } = res;
+
+      return chains;
+    } catch (err) {
+      console.log("?", err);
+    }
+  });
+
+  const {
+    isError: isCreateError,
+    isLoading: isCreateLoading,
+    mutate,
+  } = useMutation(async function createApp() {
+    try {
+      const path = `${env("BACKEND_URL")}/api/applications`;
+
+      const res = await axios.post(
+        path,
+        {
+          name: appName,
+          chain: selectedNetwork,
+          gatewaySettings: {
+            whitelistOrigins,
+            whitelistUserAgents,
+            secretKeyRequired,
+          },
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log(res);
+
+      return res;
+    } catch (err) {
+      // TODO: Catch error with Sentry
+    }
+  });
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,
   ]);
 
+  const direction = screenIndex > prevScreenIndex ? 1 : -1;
   const transitionProps = useTransition(screenIndex, null, {
     from: {
       opacity: 0,
@@ -147,6 +218,24 @@ export default function Create() {
     config: springs.smooth,
     immediate: screenIndex === 0 && prevScreenIndex === -1,
   });
+
+  const isCreateDisabled = useMemo(
+    () =>
+      isChainsError ||
+      isChainsLoading ||
+      isCreateError ||
+      isCreateLoading ||
+      !appName ||
+      !selectedNetwork,
+    [
+      appName,
+      selectedNetwork,
+      isChainsError,
+      isChainsLoading,
+      isCreateError,
+      isCreateLoading,
+    ]
+  );
 
   return (
     <FloatUp
@@ -173,6 +262,8 @@ export default function Create() {
                 data={appConfigData}
                 decrementScreen={decrementScreenIndex}
                 incrementScreen={incrementScreenIndex}
+                onCreateApp={mutate}
+                isCreateDisabled={isCreateDisabled}
                 updateData={updateAppConfigData}
               />
             </animated.div>
@@ -183,32 +274,13 @@ export default function Create() {
   );
 }
 
-function Box({ children, title, ...props }) {
-  return (
-    <div
-      css={`
-        background: #1b2331;
-        padding: ${2 * GU}px ${4 * GU}px;
-        padding-bottom: ${4 * GU}px;
-        border-radius: ${RADIUS / 2}px;
-      `}
-      {...props}
-    >
-      {title && (
-        <h3
-          css={`
-            ${textStyle("title3")}
-          `}
-        >
-          {title}
-        </h3>
-      )}
-      {children}
-    </div>
-  );
-}
-
-function BasicSetup({ data, decrementScreen, incrementScreen, updateData }) {
+function BasicSetup({
+  data,
+  incrementScreen,
+  isCreateDisabled,
+  onCreateApp,
+  updateData,
+}) {
   return (
     <>
       <Split
@@ -222,7 +294,7 @@ function BasicSetup({ data, decrementScreen, incrementScreen, updateData }) {
             `}
           >
             <TextInput
-              value={data?.appName ?? ""}
+              value={data.appName ?? ""}
               onChange={(e) =>
                 updateData({
                   type: "UPDATE_APP_NAME",
@@ -232,6 +304,88 @@ function BasicSetup({ data, decrementScreen, incrementScreen, updateData }) {
               placeholder="New App Name"
               wide
             />
+          </Box>
+        }
+        secondary={
+          <>
+            <Button
+              wide
+              onClick={onCreateApp}
+              disabled={isCreateDisabled}
+              mode="strong"
+            >
+              Launch Application
+            </Button>
+            <Spacer size={2 * GU} />
+            <Button wide onClick={() => incrementScreen()}>
+              Set up app security
+            </Button>
+          </>
+        }
+      />
+      <Split
+        primary={
+          <Box title="Available networks">
+            <Table
+              noSideBorders
+              noTopBorders
+              css={`
+                background: transparent;
+              `}
+              header={
+                <>
+                  <TableRow>
+                    <TableHeader title="Network" />
+                    <TableHeader title="Network ID" />
+                    <TableHeader title="Ticker" />
+                    <TableHeader title="Node count" />
+                  </TableRow>
+                </>
+              }
+            >
+              <TableRow>
+                <TableCell>
+                  <p>Ethereum Mainnet</p>
+                </TableCell>
+                <TableCell>
+                  <p>0021</p>
+                </TableCell>
+                <TableCell>
+                  <p>ETH</p>
+                </TableCell>
+                <TableCell>
+                  <p>600</p>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <p>Ethereum Mainnet</p>
+                </TableCell>
+                <TableCell>
+                  <p>0021</p>
+                </TableCell>
+                <TableCell>
+                  <p>ETH</p>
+                </TableCell>
+                <TableCell>
+                  <p>600</p>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <p>Ethereum Mainnet</p>
+                </TableCell>
+                <TableCell>
+                  <p>0021</p>
+                </TableCell>
+                <TableCell>
+                  <p>ETH</p>
+                </TableCell>
+                <TableCell>
+                  <p>600</p>
+                </TableCell>
+              </TableRow>
+            </Table>
           </Box>
         }
         secondary={
@@ -259,87 +413,6 @@ function BasicSetup({ data, decrementScreen, incrementScreen, updateData }) {
           </Box>
         }
       />
-      <Split
-        primary={
-          <Box title="Available networks">
-            <Table
-              noSideBorders
-              noTopBorders
-              css={`
-                background: transparent;
-              `}
-              header={
-                <>
-                  <TableRow>
-                    <TableHeader title="Network" />
-                    <TableHeader title="Network ID" />
-                    <TableHeader title="Ticker" />
-                    <TableHeader title="Node count" />
-                    <TableHeader title="Staked apps" />
-                  </TableRow>
-                </>
-              }
-            >
-              <TableRow>
-                <TableCell>
-                  <p>Ethereum Mainnet</p>
-                </TableCell>
-                <TableCell>
-                  <p>0021</p>
-                </TableCell>
-                <TableCell>
-                  <p>ETH</p>
-                </TableCell>
-                <TableCell>
-                  <p>600</p>
-                </TableCell>
-                <TableCell>
-                  <p>1400</p>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <p>Ethereum Mainnet</p>
-                </TableCell>
-                <TableCell>
-                  <p>0021</p>
-                </TableCell>
-                <TableCell>
-                  <p>ETH</p>
-                </TableCell>
-                <TableCell>
-                  <p>600</p>
-                </TableCell>
-                <TableCell>
-                  <p>1400</p>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <p>Ethereum Mainnet</p>
-                </TableCell>
-                <TableCell>
-                  <p>0021</p>
-                </TableCell>
-                <TableCell>
-                  <p>ETH</p>
-                </TableCell>
-                <TableCell>
-                  <p>600</p>
-                </TableCell>
-                <TableCell>
-                  <p>1400</p>
-                </TableCell>
-              </TableRow>
-            </Table>
-          </Box>
-        }
-        secondary={
-          <Button wide onClick={() => incrementScreen()}>
-            Set up app security
-          </Button>
-        }
-      />
     </>
   );
 }
@@ -351,7 +424,7 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
   const stringifiedData = JSON.stringify(data);
 
   const setWhitelistedUserAgent = useCallback(() => {
-    const whitelistedUserAgents = data?.whitelistedUserAgents ?? [];
+    const whitelistedUserAgents = data.whitelistedUserAgents ?? [];
 
     updateData({
       type: "UPDATE_WHITELISTED_USER_AGENTS",
@@ -361,7 +434,7 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
   }, [stringifiedData, updateData, userAgent]);
 
   const setWhitelistedOrigin = useCallback(() => {
-    const whitelistedOrigins = data?.whitelistedOrigins ?? [];
+    const whitelistedOrigins = data.whitelistedOrigins ?? [];
 
     updateData({
       type: "UPDATE_WHITELISTED_ORIGINS",
@@ -436,11 +509,11 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
                 </Help>
               </div>
               <Switch
-                checked={data?.requirePrivateSecret ?? false}
+                checked={data.secretKeyRequired ?? false}
                 onChange={() =>
                   updateData({
-                    type: "UPDATE_REQUIRE_PRIVATE_SECRET",
-                    payload: !data?.requirePrivateSecret,
+                    type: "UPDATE_REQUIRE_SECRET_KEY",
+                    payload: !data.secretKeyRequired,
                   })
                 }
               />
@@ -477,7 +550,7 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
             }
           `}
         >
-          {data?.whitelistedUserAgents?.map((agent) => (
+          {data.whitelistUserAgents.map((agent) => (
             <li key={agent}>
               <TextCopy
                 onCopy={() => log("killao")}
@@ -518,7 +591,7 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
             }
           `}
         >
-          {data?.whitelistedOrigins?.map((origin) => (
+          {data.whitelistOrigins.map((origin) => (
             <li key={origin}>
               <TextCopy
                 onCopy={() => log("killao")}
@@ -532,5 +605,30 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
         </ul>
       </Box>
     </>
+  );
+}
+
+function Box({ children, title, ...props }) {
+  return (
+    <div
+      css={`
+        background: #1b2331;
+        padding: ${2 * GU}px ${4 * GU}px;
+        padding-bottom: ${4 * GU}px;
+        border-radius: ${RADIUS / 2}px;
+      `}
+      {...props}
+    >
+      {title && (
+        <h3
+          css={`
+            ${textStyle("title3")}
+          `}
+        >
+          {title}
+        </h3>
+      )}
+      {children}
+    </div>
   );
 }

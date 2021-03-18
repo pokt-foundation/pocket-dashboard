@@ -8,8 +8,8 @@ import { springs, GU } from "ui/style";
 import FocusVisible from "ui/FocusVisible/FocusVisible";
 
 const BORDER = 1;
-const WRAPPER_WIDTH = 8 * GU;
-const WRAPPER_HEIGHT = 3.6 * GU;
+const WRAPPER_WIDTH = 5 * GU;
+const WRAPPER_HEIGHT = 2.25 * GU;
 
 function Switch({ checked, disabled, onChange }) {
   const theme = useTheme();

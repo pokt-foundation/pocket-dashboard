@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { animated, useSpring } from "react-spring";
+import { gql, request as gqlRequest } from "graphql-request";
 import "styled-components/macro";
 import {
   Button,
@@ -17,6 +18,7 @@ import {
   GU,
   RADIUS,
 } from "ui";
+import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
 
 const ENDPOINT_URL =
@@ -29,6 +31,64 @@ const LABELS = ["", "", "", "", "", ""];
 const LINES_2 = [{ id: 1, values: [0.1, 0.8, 0.4, 1] }];
 
 const LABELS_2 = ["4h", "2h", "1h", "30m"];
+
+const TOTAL_RELAYS_AND_AVG_LATENCY_QUERY = gql`
+  query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY(
+    $_eq: String = "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
+    $_gte: timestamptz = "2021-03-08T00:00:00+00:00"
+  ) {
+    relay_apps_daily_aggregate(
+      where: {
+        app_pub_key: { _eq: $_eq }
+        bucket: { _gte: $_gte }
+        elapsed_time: { _lt: "1" }
+      }
+      order_by: { bucket: desc }
+    ) {
+      aggregate {
+        sum {
+          total_relays
+        }
+        avg {
+          elapsed_time
+        }
+      }
+    }
+  }
+`;
+
+const LAST_RELAYS_SENT = gql`
+  query LAST_RELAYS_SENT(
+    $_eq: String = "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
+  ) {
+    relay(where: { app_pub_key: { _eq: $_eq } }, limit: 20) {
+      bytes
+      method
+      service_node
+      result
+      timestamp
+    }
+  }
+`;
+
+const DAILY_RELAYS_QUERY = gql`
+  query DAILY_RELAYS_QUERY(
+    $_eq: String = "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
+  ) {
+    relay_apps_daily(
+      where: {
+        app_pub_key: { _eq: $_eq }
+        bucket: { _gte: "2021-03-08T00:00:00" }
+      }
+      order_by: { bucket: desc }
+    ) {
+      total_relays
+      bucket
+      elapsed_time
+      result
+    }
+  }
+`;
 
 export default function MyApp() {
   const props = useSpring({ number: 100, from: { number: 0 } });
@@ -337,31 +397,6 @@ export default function MyApp() {
         />
       )}
     />
-  );
-}
-
-function Box({ children, title, ...props }) {
-  return (
-    <div
-      css={`
-        background: #1b2331;
-        padding: ${2 * GU}px ${4 * GU}px;
-        border-radius: ${RADIUS / 2}px;
-      `}
-      {...props}
-    >
-      {title && (
-        <h3
-          css={`
-            ${textStyle("title3")}
-            margin-bottom: ${5 * GU}px;
-          `}
-        >
-          {title}
-        </h3>
-      )}
-      {children}
-    </div>
   );
 }
 
