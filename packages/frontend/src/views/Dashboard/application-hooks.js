@@ -108,8 +108,6 @@ export function useUserApplications() {
         withCredentials: true,
       });
 
-      console.log(data);
-
       const userApps = data.map(({ name, _id, ...rest }) => ({
         appName: name,
         appId: _id,

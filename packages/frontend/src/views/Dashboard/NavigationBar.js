@@ -1,8 +1,27 @@
 import React from "react";
+import { useMutation } from "react-query";
 import "styled-components/macro";
 import { textStyle, GU } from "ui";
+import env from "environment";
+import axios from "axios";
 
 export default function NavigationBar() {
+  const { mutate } = useMutation(async function logout() {
+    const path = `${env("BACKEND_URL")}/api/users/logout`;
+
+    try {
+      await axios.post(
+        path,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+    } catch (err) {
+      console.log("err", err);
+    }
+  });
+
   return (
     <nav
       css={`
@@ -34,7 +53,7 @@ export default function NavigationBar() {
       >
         <li>Support</li>
         <li>Community</li>
-        <li>Get an endpoint</li>
+        <li onClick={mutate}>Logout</li>
       </ul>
     </nav>
   );

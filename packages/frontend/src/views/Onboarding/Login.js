@@ -27,10 +27,16 @@ export default function Login() {
     e.preventDefault();
     try {
       const path = `${env("BACKEND_URL")}/api/users/login`;
-      const res = await axios.post(path, {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        path,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (res.status === 200 || res.status === 204) {
         history.push({
@@ -39,7 +45,7 @@ export default function Login() {
       }
     } catch (err) {
       // TODO: Set err on UI AND send to sentry.
-      const { errors } = err.response.data;
+      const { errors } = err?.response?.data;
 
       setErrors(() => [...errors]);
     }

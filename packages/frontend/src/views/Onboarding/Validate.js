@@ -16,27 +16,25 @@ export default function Login() {
   const token = new URLSearchParams(search).get("token");
   const email = new URLSearchParams(search).get("email");
 
-  const isLoading = false;
-  const isSuccess = true;
-  // const { isError, isLoading, isSuccess, mutate } = useMutation(
-  //   async function validate() {
-  //     try {
-  //       const path = `${env("BACKEND_URL")}/api/users/validate-user`;
+  const { isError, isLoading, isSuccess, mutate } = useMutation(
+    async function validate() {
+      try {
+        const path = `${env("BACKEND_URL")}/api/users/validate-user`;
 
-  //       await axios.post(path, {
-  //         plainToken: token,
-  //         email,
-  //       });
-  //     } catch (err) {
-  //       // TODO: Set err on UI AND send to sentry.
-  //       console.log(Object.entries(err));
-  //     }
-  //   }
-  // );
+        await axios.post(path, {
+          plainToken: token,
+          email,
+        });
+      } catch (err) {
+        // TODO: Set err on UI AND send to sentry.
+        console.log(Object.entries(err));
+      }
+    }
+  );
 
-  // useEffect(() => {
-  //   mutate();
-  // }, []);
+  useEffect(() => {
+    mutate();
+  }, []);
 
   return (
     <div
@@ -97,6 +95,16 @@ export default function Login() {
               log in
             </RouterLink>
             .
+          </p>
+        )}
+        {isError && (
+          <p
+            css={`
+              ${textStyle("body2")}
+            `}
+          >
+            Something went wrong while validating your email. Contact support if
+            this issue persists.
           </p>
         )}
       </main>
