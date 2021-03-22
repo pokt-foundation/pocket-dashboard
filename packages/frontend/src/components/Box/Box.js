@@ -2,12 +2,15 @@ import React from "react";
 import "styled-components/macro";
 import { textStyle, GU, RADIUS } from "ui";
 
-export default function Box({ children, title, className, ...props }) {
+const DEFAULT_PADDING = 2 * GU;
+
+export default function Box({ children, title, className, padding, ...props }) {
   return (
     <div
       css={`
+        position: relative;
         background: #1b2331;
-        padding: ${2 * GU}px ${2 * GU}px;
+        padding: ${padding[0]}px ${padding[1]}px ${padding[2]}px ${padding[3]}px;
         border-radius: ${RADIUS * 2}px;
       `}
       className={className}
@@ -27,3 +30,7 @@ export default function Box({ children, title, className, ...props }) {
     </div>
   );
 }
+
+Box.defaultProps = {
+  padding: Array(4).fill(DEFAULT_PADDING),
+};

@@ -34,7 +34,7 @@ export default function Login() {
 
       if (res.status === 200 || res.status === 204) {
         history.push({
-          pathname: "/dashboard/home",
+          pathname: "/home",
         });
       }
     } catch (err) {

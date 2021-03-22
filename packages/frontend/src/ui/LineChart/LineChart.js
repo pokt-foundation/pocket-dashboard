@@ -93,8 +93,12 @@ function LineChart({
   );
 
   const getLabelPosition = useCallback((index, length) => {
-    if (index === 0) return "start";
-    if (index === length - 1) return "end";
+    if (index === 0) {
+      return "start";
+    }
+    if (index === length - 1) {
+      return "end";
+    }
     return "middle";
   }, []);
 
@@ -102,18 +106,6 @@ function LineChart({
     label && totalCount > 0 ? [...Array(totalCount).keys()].map(label) : null;
 
   const chartHeight = height - (labels ? LABELS_HEIGHT : 0);
-
-  const rectangle = (
-    <rect
-      width={width}
-      height={chartHeight}
-      rx="3"
-      ry="3"
-      fill="#ffffff"
-      strokeWidth="1"
-      stroke={borderColor}
-    />
-  );
 
   return (
     <Spring

@@ -3,8 +3,11 @@ import "styled-components/macro";
 import { Spacer, GU } from "ui";
 import NavigationBar from "views/Dashboard/NavigationBar";
 import MenuPanel from "components/MenuPanel/MenuPanel";
+import { useUserApplications } from "views/Dashboard/application-hooks";
 
 export default function DashboardView({ children }) {
+  const { isAppsLoading, appsData } = useUserApplications();
+
   return (
     <div
       css={`
@@ -16,7 +19,7 @@ export default function DashboardView({ children }) {
         color: white;
       `}
     >
-      <MenuPanel />
+      <MenuPanel appsLoading={isAppsLoading} userApps={appsData} />
       <main
         css={`
           height: auto;

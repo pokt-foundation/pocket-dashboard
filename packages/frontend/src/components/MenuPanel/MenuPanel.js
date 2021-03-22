@@ -8,10 +8,6 @@ import { ButtonBase, Spacer, useTheme, springs, GU, RADIUS } from "ui";
 import ButtonIcon from "components/MenuPanel/ButtonIcon.png";
 import PocketLogo from "assets/pnlogo.png";
 
-// Zapper.fi
-// TODO: Remove this
-const TEST_APP_ID = "5f62b485be3591c4dea85667";
-
 const CHILD_INSTANCE_HEIGHT = 4 * GU;
 
 const MENU_ROUTES = [
@@ -49,14 +45,7 @@ function useActiveRouteName() {
   };
 }
 
-export default function MenuPanel({
-  userApps = [
-    {
-      appName: "Ethers.js 1",
-      appId: TEST_APP_ID,
-    },
-  ],
-}) {
+export default function MenuPanel({ appsLoading = true, userApps = [] }) {
   const theme = useTheme();
   const { within } = useViewport();
   const { activeId } = useActiveRouteName();
@@ -64,7 +53,6 @@ export default function MenuPanel({
   const compactMode = within(-1, "medium");
 
   const instanceGroups = useMemo(() => {
-    // Compose
     const groups = [[MENU_ROUTES[0]]];
 
     groups.push([MENU_ROUTES[1]]);
@@ -94,12 +82,13 @@ export default function MenuPanel({
         <MenuPanelGroup
           active={isActive}
           activeIndex={activeIndex}
+          appsLoading={appsLoading}
           instances={group}
           key={group[0].id}
         />
       );
     },
-    [activeId]
+    [activeId, appsLoading]
   );
 
   return (
@@ -132,7 +121,7 @@ export default function MenuPanel({
   );
 }
 
-function MenuPanelGroup({ active, activeIndex, instances }) {
+function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
   const { openProgress } = useSpring({
     to: { openProgress: Number(active) },
     config: springs.smooth,
