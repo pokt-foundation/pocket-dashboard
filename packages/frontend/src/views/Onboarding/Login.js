@@ -170,7 +170,7 @@ export default function Login() {
           </ul>
           <RouterLink
             to={{
-              pathname: "/dashboard/forgotpassword",
+              pathname: "/forgotpassword",
             }}
             component={Link}
             external={false}
@@ -199,7 +199,7 @@ export default function Login() {
             Don't have an account?{" "}
             <RouterLink
               to={{
-                pathname: "/dashboard/signup",
+                pathname: "/signup",
               }}
               component={Link}
               external={false}

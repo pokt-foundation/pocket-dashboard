@@ -1,16 +1,17 @@
 import mail from "@sendgrid/mail";
 import client from "@sendgrid/client";
+import env from "environment";
 
 /**
  * For more information go to: https://github.com/sendgrid/sendgrid-nodejs
  */
-export class SendGridEmailProvider {
+export default class SendgridEmailService {
   /**
    * @param {string} apiKey API Key from SendGrid.
    */
-  constructor(apiKey) {
-    mail.setApiKey(apiKey);
-    client.setApiKey(apiKey);
+  constructor() {
+    mail.setApiKey(env("email").api_key);
+    client.setApiKey(env("email").api_key);
 
     this.__apiVersion = "v3";
   }

@@ -10,7 +10,7 @@ const tokenSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: 900, // ms
+      expires: 3600, // s
     },
     token: String,
     type: String,
@@ -19,8 +19,11 @@ const tokenSchema = new Schema(
       required: true,
       ref: "User",
     },
+    email: String,
   },
   { collection: "Tokens" }
 );
 
 const TokenModel = model("Token", tokenSchema);
+
+export default TokenModel;

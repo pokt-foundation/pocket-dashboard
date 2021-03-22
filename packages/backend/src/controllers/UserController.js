@@ -6,6 +6,8 @@ import Token, { TOKEN_TYPES } from "models/Token";
 import User from "models/User";
 import HttpError from "errors/http-error";
 import passport from "lib/passport-local";
+import SendgridEmailService from "services/SendGridEmailService";
+import env from "environment";
 
 const DEFAULT_PROVIDER = "EMAIL";
 const SALT_ROUNDS = 10;
@@ -92,6 +94,7 @@ router.post(
       }
 
       if (!user) {
+        console.log("what?", user, err);
         return next(
           HttpError.BAD_REQUEST({
             message: "Incorrect email or password",
@@ -100,6 +103,43 @@ router.post(
       }
 
       // TODO: Send validation email
+      const staleToken = await Token.findOne({ userId: user._id });
+
+      if (staleToken) {
+        await staleToken.deleteOne();
+      }
+
+      const validationToken = crypto.randomBytes(32).toString("hex");
+      const hashedValidationToken = await bcrypt.hash(
+        validationToken,
+        SALT_ROUNDS
+      );
+
+      const userValidationToken = new Token({
+        userId: user._id,
+        email: user.email,
+        token: hashedValidationToken,
+        type: TOKEN_TYPES.verification,
+        createdAt: Date.now(),
+      });
+
+      await userValidationToken.save();
+
+      const validationLink = `http://localhost:3000/#/validate?token=${validationToken}&email=${user.email}`;
+
+      const emailService = new SendgridEmailService();
+      const emailRes = await emailService.sendEmailWithTemplate(
+        env("email").template_ids.SignUp,
+        user.email,
+        env("email").from_email,
+        {
+          user_email: user.email,
+          verify_link: validationLink,
+        }
+      );
+
+      console.log(emailRes);
+
       return res.status(204).send();
     })(req, res, next);
   })
@@ -119,50 +159,10 @@ router.post(
   })
 );
 
-/**
- * Send signup email
- */
-router.post(
-  "/send-signup-email",
-  asyncMiddleware(async (req, res) => {
-    const { email, validationRoute } = req.body;
-
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      throw HttpError.BAD_REQUEST({ message: "User does not exist" });
-    }
-
-    // TODO: First check if there's an active token, and delete it
-    const staleToken = await Token.findOne({ userId: user._id });
-
-    if (staleToken) {
-      await staleToken.deleteOne();
-    }
-    // TODO: Make validation token
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const hashedResetToken = await bcrypt.hash(resetToken, SALT_ROUNDS);
-
-    const userResetToken = new Token({
-      userId: user._id,
-      token: hashedResetToken,
-      type: TOKEN_TYPES.verification,
-      createdAt: Date.now(),
-    });
-
-    await userResetToken.save();
-
-    const validationLink = `${validationRoute}/?token=${resetToken}&email=${email}`;
-    // TODO: Send email with link
-
-    return res.status(204).send();
-  })
-);
-
 router.post(
   "/send-reset-email",
   asyncMiddleware(async (req, res) => {
-    const { email, resetRoute } = req.body;
+    const { email } = req.body;
 
     const user = await User.findOne({ email });
 
@@ -182,6 +182,7 @@ router.post(
 
     const userResetToken = new Token({
       userId: user._id,
+      email: email,
       token: hashedResetToken,
       type: TOKEN_TYPES.reset,
       createdAt: Date.now(),
@@ -223,7 +224,7 @@ router.post(
     });
 
     if (!storedToken) {
-      throw HttpError.BAD_REQUEST({ message: "Token is not valid" });
+      throw HttpError.BAD_REQUEST({ message: "Token has expired" });
     }
 
     const isTokenMatching = await bcrypt.compare(plainToken, storedToken);
@@ -255,30 +256,33 @@ router.post(
 
     if (!plainToken || !email) {
       throw HttpError.BAD_REQUEST({
-        message: "Missing required fields in body",
+        errors: [{ id: "MISSING_FIELDS", message: "Invalid request" }],
       });
     }
 
     const storedToken = await Token.findOne({
-      email,
-      type: TOKEN_TYPES.TOKEN_VERIFICATION,
+      $and: [{ email }, { type: TOKEN_TYPES.verification }],
     });
 
     if (!storedToken) {
-      throw HttpError.BAD_REQUEST({ message: "Token is not valid" });
+      throw HttpError.BAD_REQUEST({
+        errors: [{ id: "EXPIRED_TOKEN", message: "Token has expired" }],
+      });
     }
 
-    const isTokenMatching = await bcrypt.compare(plainToken, storedToken);
+    const isTokenMatching = await bcrypt.compare(plainToken, storedToken.token);
 
     if (!isTokenMatching) {
-      throw HttpError.BAD_REQUEST({ message: "Token is not matching" });
+      throw HttpError.BAD_REQUEST({
+        errors: [{ id: "INVALID_TOKEN", message: "Token is invalid" }],
+      });
     }
 
     await User.updateOne(
       {
-        email,
+        email: email,
       },
-      { $set: { verified: true } },
+      { $set: { validated: true } },
       { new: true }
     );
 

@@ -11,6 +11,7 @@ import MyApp from "views/Dashboard/ApplicationDetail/ApplicationDetail";
 import NewPassword from "views/Onboarding/NewPassword";
 import Login from "views/Onboarding/Login";
 import Signup from "views/Onboarding/Signup";
+import Validate from "views/Onboarding/Validate";
 
 export default function DashboardRoutes() {
   const { path } = useRouteMatch();
@@ -50,6 +51,9 @@ export default function DashboardRoutes() {
         </Route>
         <Route exact path={`/login`}>
           <Login />
+        </Route>
+        <Route exact path={`/validate`}>
+          <Validate />
         </Route>
         <Route exact path={`/forgotpassword`}>
           <ForgotPassword />

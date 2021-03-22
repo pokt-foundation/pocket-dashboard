@@ -16,12 +16,7 @@ export const ENV_VARS = {
       api_key: process.env.EMAIL_API_KEY,
       from_email: process.env.EMAIL_FROM,
       template_ids: {
-        SignUp: "d-7c3bdbf20cb842eebc2ee076078b2f69",
-        EmailChanged: "d-7c3bdbf20cb842eebc2ee076078b2f69",
-        PasswordChanged: "d-de0b42109c4f48b98ea27203c59fc233",
-        CreateOrImportApp: "d-b24fb0e9349f402bb173d1b370875e54",
-        AppDeleted: "d-7dbd41a3f2d447c68669a3ccfad91d69",
-        PasswordReset: "d-4e4ea689c9d1446581aa086bbc409fdd",
+        SignUp: "d-23cc7c71b2d54b26bd09889f72fe0dc9",
       },
     };
   },
