@@ -22,7 +22,7 @@ router.get(
   "",
   asyncMiddleware(async (req, res) => {
     const id = req.user._id;
-    const application = await Application.findOne({
+    const application = await Application.find({
       status: APPLICATION_STATUSES.READY,
       user: id,
     });
@@ -30,6 +30,29 @@ router.get(
     if (!application) {
       throw HttpError.NOT_FOUND({
         errors: [{ message: "User does not have an active application" }],
+      });
+    }
+
+    res.status(200).send(application);
+  })
+);
+
+router.get(
+  "/:applicationId",
+  asyncMiddleware(async (req, res) => {
+    const userId = req.user._id;
+    const { applicationId } = req.params;
+    const application = await Application.findById(applicationId);
+
+    if (!application) {
+      throw HttpError.NOT_FOUND({
+        errors: [{ message: "User does not have an active application" }],
+      });
+    }
+
+    if (application.user.toString() !== userId.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [{ message: "User does not have access to this application" }],
       });
     }
 

@@ -1,7 +1,8 @@
 import React from "react";
 import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
 import { useViewport } from "use-viewport";
-import "styled-components/macro";
+import { keyframes } from "styled-components/macro";
+import { useTheme } from "ui";
 import Create from "views/Dashboard/Create/Create";
 import Dashboard from "views/Dashboard/Dashboard";
 import NetworkStatus from "views/Dashboard/Network/NetworkStatus";
@@ -10,6 +11,7 @@ import MyApp from "views/Dashboard/ApplicationDetail/ApplicationDetail";
 import NewPassword from "views/Onboarding/NewPassword";
 import Login from "views/Onboarding/Login";
 import Signup from "views/Onboarding/Signup";
+import Validate from "views/Onboarding/Validate";
 
 export default function DashboardRoutes() {
   const { path } = useRouteMatch();
@@ -50,6 +52,9 @@ export default function DashboardRoutes() {
         <Route exact path={`/login`}>
           <Login />
         </Route>
+        <Route exact path={`/validate`}>
+          <Validate />
+        </Route>
         <Route exact path={`/forgotpassword`}>
           <ForgotPassword />
         </Route>
@@ -60,14 +65,11 @@ export default function DashboardRoutes() {
           <Route exact path={`/home`}>
             <NetworkStatus />
           </Route>
-          <Route exact path={`/apps`}>
-            <Redirect to="/create" />
+          <Route exact path={`/app/:appId`}>
+            <MyApp />
           </Route>
           <Route exact path={`/create`}>
             <Create />
-          </Route>
-          <Route exact path={`/app/:appId`}>
-            <MyApp />
           </Route>
         </Dashboard>
       </Switch>

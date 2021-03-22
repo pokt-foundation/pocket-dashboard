@@ -55,34 +55,6 @@ userSchema.statics.verifyCaptcha = function verifyCaptcha(token) {
   );
 };
 
-userSchema.statics.generateNewSessionTokens = function generateNewSessionTokens(
-  userId,
-  userEmail
-) {
-  const payload = { id: userId, email: userEmail };
-
-  const accessToken = jwt.sign(
-    {
-      data: payload,
-    },
-    env("auth").secret_key,
-    { expiresIn: env("auth").expiration }
-  );
-
-  const refreshToken = jwt.sign(
-    {
-      data: payload,
-    },
-    env("auth").secret_key,
-    { expiresIn: env("auth").refresh_expiration }
-  );
-
-  return {
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-  };
-};
-
 userSchema.methods.generateVerificationToken = function generateVerificationToken() {
   const token = jwt.sign({ id: this._id }, env("auth").private_secret, {
     expiresIn: "10d",

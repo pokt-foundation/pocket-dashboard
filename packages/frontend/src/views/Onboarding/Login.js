@@ -27,19 +27,25 @@ export default function Login() {
     e.preventDefault();
     try {
       const path = `${env("BACKEND_URL")}/api/users/login`;
-      const res = await axios.post(path, {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        path,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (res.status === 200 || res.status === 204) {
         history.push({
-          pathname: "/dashboard/home",
+          pathname: "/home",
         });
       }
     } catch (err) {
       // TODO: Set err on UI AND send to sentry.
-      const { errors } = err.response.data;
+      const { errors } = err?.response?.data;
 
       setErrors(() => [...errors]);
     }
@@ -170,7 +176,7 @@ export default function Login() {
           </ul>
           <RouterLink
             to={{
-              pathname: "/dashboard/forgotpassword",
+              pathname: "/forgotpassword",
             }}
             component={Link}
             external={false}
@@ -199,7 +205,7 @@ export default function Login() {
             Don't have an account?{" "}
             <RouterLink
               to={{
-                pathname: "/dashboard/signup",
+                pathname: "/signup",
               }}
               component={Link}
               external={false}

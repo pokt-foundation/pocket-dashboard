@@ -12,7 +12,6 @@ export const authenticate = (req, res, next) => {
     }
 
     if (!user) {
-      console.log(err, user);
       return next(
         HttpError.UNAUTHORIZED({
           errors: [{ id: "UNAUTHORIZED", message: "Unauthorized" }],

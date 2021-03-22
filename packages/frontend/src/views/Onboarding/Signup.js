@@ -10,11 +10,13 @@ import {
   Field,
   CheckBox,
   Link,
+  Spacer,
   TextInput,
   textStyle,
   useTheme,
   GU,
   RADIUS,
+  Info,
 } from "ui";
 import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
 import env from "environment";
@@ -27,31 +29,28 @@ export default function Login() {
   const [checked, setChecked] = useState(false);
   const theme = useTheme();
   const { within } = useViewport();
-  const history = useHistory();
 
   const compactMode = within(-1, "medium");
 
-  const { isError, isLoading, mutate } = useMutation(async function signup(e) {
-    e.preventDefault();
-    try {
-      const path = `${env("BACKEND_URL")}/api/users/signup`;
-      const res = await axios.post(path, {
-        email,
-        password,
-      });
+  const { isError, isLoading, isSuccess, mutate } = useMutation(
+    async function signup(e) {
+      console.log(e);
+      e.preventDefault();
+      try {
+        const path = `${env("BACKEND_URL")}/api/users/signup`;
 
-      if (res.status === 200 || res.status === 204) {
-        history.push({
-          pathname: "/dashboard/login",
+        await axios.post(path, {
+          email,
+          password,
         });
-      }
-    } catch (err) {
-      // TODO: Set err on UI AND send to sentry.
-      const { errors } = err.response.data;
+      } catch (err) {
+        // TODO: Set err on UI AND send to sentry.
+        const { errors = [] } = err?.response?.data;
 
-      setErrors(() => [...errors]);
+        setErrors(() => [...errors]);
+      }
     }
-  });
+  );
 
   const onCheckChange = useCallback((e) => setChecked(e), []);
   const onEmailChange = useCallback((e) => setEmail(e.target.value), []);
@@ -272,6 +271,29 @@ export default function Login() {
             Sign up
           </Button>
         </form>
+        {isSuccess && !isError && (
+          <Info>
+            <p
+              css={`
+                ${textStyle("body3")}
+              `}
+            >
+              You're almost there!{" "}
+              <span role="img" aria-label="Rocket Emoji">
+                🚀
+              </span>
+            </p>
+            <Spacer size={1 * GU} />
+            <p
+              css={`
+                ${textStyle("body3")}
+              `}
+            >
+              We've sent a verification email to {email}. Go and check it before
+              it expires!
+            </p>
+          </Info>
+        )}
       </main>
     </div>
   );

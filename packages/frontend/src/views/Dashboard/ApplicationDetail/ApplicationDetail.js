@@ -1,407 +1,90 @@
 import React from "react";
-import styled from "styled-components";
-import { animated, useSpring } from "react-spring";
-import { gql, request as gqlRequest } from "graphql-request";
 import "styled-components/macro";
+import { Spacer, textStyle, GU } from "ui";
+import AnimatedLogo from "components/AnimatedLogo/AnimatedLogo";
+import AppInfo from "views/Dashboard/ApplicationDetail/AppInfo";
 import {
-  Button,
-  CircleGraph,
-  LineChart,
-  MultiCircleGraph,
-  Split,
-  TextCopy,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
-  textStyle,
-  GU,
-  RADIUS,
-} from "ui";
-import Box from "components/Box/Box";
-import FloatUp from "components/FloatUp/FloatUp";
+  useActiveApplication,
+  useAvgSessionRelayCount,
+  useDailyRelayCount,
+  useLatestRelays,
+  useSucessfulWeeklyRelays,
+  useWeeklyAppRelaysInfo,
+} from "views/Dashboard/application-hooks";
 
-const ENDPOINT_URL =
-  "https://aion-32.gateway.pokt.network/v1/60010a10eea5fb002e5bc536";
-const APP_ID = "60010a10eea5fb002e5bc536";
+export default function ApplicationDetail() {
+  const { appData, isAppLoading } = useActiveApplication();
+  const { isWeeklyAppRelaysLoading, weeklyRelaysData } = useWeeklyAppRelaysInfo(
+    // appData?.freeTierApplicationAccount?.publicKey
+    // One of Zapper.fi's apps for testing
+    "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
+  );
+  const {
+    isSuccesfulWeeklyRelaysLoading,
+    successfulWeeklyRelaysData,
+  } = useSucessfulWeeklyRelays(
+    // appData?.freeTierApplicationAccount?.publicKey
+    // One of Zapper.fi's apps for testing
+    "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
+  );
+  const { isDailyRelayCountLoading, dailyRelayCountData } = useDailyRelayCount(
+    // appData?.freeTierApplicationAccount?.publicKey
+    // One of Zapper.fi's apps for testing
+    "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
+  );
+  const {
+    isAvgSessionRelayCountLoading,
+    avgSessionRelayCount,
+  } = useAvgSessionRelayCount(
+    // appData?.freeTierApplicationAccount?.publicKey
+    // One of Zapper.fi's apps for testing
+    "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
+  );
+  const { isLatestRelaysLoading, latestRelayData } = useLatestRelays(
+    // appData?.freeTierApplicationAccount?.publicKey
+    // One of Zapper.fi's apps for testing
+    "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a",
+    0
+  );
 
-const LINES = [{ id: 1, values: [0.1, 0.8, 0.4, 1, 0.5, 0.2] }];
-const LABELS = ["", "", "", "", "", ""];
+  const appLoading =
+    isAppLoading ||
+    isWeeklyAppRelaysLoading ||
+    isSuccesfulWeeklyRelaysLoading ||
+    isDailyRelayCountLoading ||
+    isAvgSessionRelayCountLoading ||
+    isLatestRelaysLoading;
 
-const LINES_2 = [{ id: 1, values: [0.1, 0.8, 0.4, 1] }];
-
-const LABELS_2 = ["4h", "2h", "1h", "30m"];
-
-const TOTAL_RELAYS_AND_AVG_LATENCY_QUERY = gql`
-  query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY(
-    $_eq: String = "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
-    $_gte: timestamptz = "2021-03-08T00:00:00+00:00"
-  ) {
-    relay_apps_daily_aggregate(
-      where: {
-        app_pub_key: { _eq: $_eq }
-        bucket: { _gte: $_gte }
-        elapsed_time: { _lt: "1" }
-      }
-      order_by: { bucket: desc }
-    ) {
-      aggregate {
-        sum {
-          total_relays
-        }
-        avg {
-          elapsed_time
-        }
-      }
-    }
-  }
-`;
-
-const LAST_RELAYS_SENT = gql`
-  query LAST_RELAYS_SENT(
-    $_eq: String = "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
-  ) {
-    relay(where: { app_pub_key: { _eq: $_eq } }, limit: 20) {
-      bytes
-      method
-      service_node
-      result
-      timestamp
-    }
-  }
-`;
-
-const DAILY_RELAYS_QUERY = gql`
-  query DAILY_RELAYS_QUERY(
-    $_eq: String = "1b74bc3a4f61583159ca9a4702687d68bb478321f278e08e686db318befca21a"
-  ) {
-    relay_apps_daily(
-      where: {
-        app_pub_key: { _eq: $_eq }
-        bucket: { _gte: "2021-03-08T00:00:00" }
-      }
-      order_by: { bucket: desc }
-    ) {
-      total_relays
-      bucket
-      elapsed_time
-      result
-    }
-  }
-`;
-
-export default function MyApp() {
-  const props = useSpring({ number: 100, from: { number: 0 } });
-
-  return (
-    <FloatUp
-      content={() => (
-        <Split
-          primary={
-            <>
-              <Box
-                title="Endpoint"
-                css={`
-                  padding-bottom: ${4 * GU}px;
-                `}
-              >
-                <TextCopy
-                  value={ENDPOINT_URL}
-                  css={`
-                    width: 100%;
-                  `}
-                />
-              </Box>
-              <Spacer />
-              <Split
-                css={`
-                  padding-bottom: 0px;
-                `}
-                primary={
-                  <div
-                    css={`
-                      width: 100%;
-                      min-height: ${48 * GU}px;
-                      display: grid;
-                      grid-template-columns: 40% 1fr;
-                      background: #1b2331;
-                      border-radius: ${RADIUS / 2}px;
-                    `}
-                  >
-                    <div
-                      css={`
-                        grid-column-start: 1;
-                        grid-column-end: 2;
-                        background: white;
-                        border-radius: ${RADIUS / 2}px 0 0 ${RADIUS / 2}px;
-                        color: black;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                      `}
-                    >
-                      <animated.span
-                        css={`
-                          ${textStyle("title1")}
-                        `}
-                      >
-                        {props.number.interpolate((x) => `${x.toFixed(1)}%`)}
-                      </animated.span>
-                    </div>
-                    <div
-                      css={`
-                        grid-column-start: 2;
-                        grid-column-end: 3;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                      `}
-                    >
-                      <h3
-                        css={`
-                          ${textStyle("title4")}
-                          margin-bottom: ${3 * GU}px;
-                          padding-left: ${1 * GU}px;
-                        `}
-                      >
-                        Success rate
-                      </h3>
-                      <LineChart
-                        lines={LINES}
-                        label={(index) => LABELS[index]}
-                        backgroundFill="#1B2331"
-                        height={150}
-                        color={() => `#ffffff`}
-                        borderColor={`rgba(0,0,0,0)`}
-                      />
-                    </div>
-                  </div>
-                }
-                secondary={
-                  <Box
-                    title="News"
-                    css={`
-                      min-height: ${48 * GU}px;
-                    `}
-                  />
-                }
-              />
-              <Spacer />
-              <Box title="Bandwith Usage">
-                <div
-                  css={`
-                    display: flex;
-                    align-items: center;
-                    span {
-                      margin: ${1 * GU}px;
-                    }
-                  `}
-                >
-                  <span
-                    css={`
-                      display: inline-block;
-                      background: #ffffff;
-                      border-radius: 50%;
-                      width: 16px;
-                      height: 16px;
-                    `}
-                  />{" "}
-                  245,000
-                </div>
-                <LineChart
-                  lines={LINES_2}
-                  label={(index) => LABELS_2[index]}
-                  backgroundFill="#1B2331"
-                  height={150}
-                  color={() => `#ffffff`}
-                  width="100%"
-                  borderColor={`rgba(0,0,0,0)`}
-                />
-              </Box>
-              <Spacer />
-              <Box
-                title="Request Breakdown"
-                css={`
-                  padding-bottom: ${4 * GU}px;
-                `}
-              >
-                <div
-                  css={`
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                  `}
-                >
-                  <div>
-                    <MultiCircleGraph
-                      values={[0.25, 0.5, 0.25, 0.4, 0.3]}
-                      size={150}
-                    />
-                  </div>
-                  <Table
-                    noSideBorders
-                    noTopBorders
-                    css={`
-                      background: transparent;
-                    `}
-                    header={
-                      <>
-                        <TableRow>
-                          <TableHeader title="Request type" />
-                          <TableHeader title="Amount of data" />
-                        </TableRow>
-                      </>
-                    }
-                  >
-                    <TableRow>
-                      <TableCell>
-                        <p>eth_call</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>100kb</p>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <p>eth_call</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>100kb</p>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <p>eth_call</p>
-                      </TableCell>
-                      <TableCell>
-                        <p>100kb</p>
-                      </TableCell>
-                    </TableRow>
-                  </Table>
-                </div>
-              </Box>
-            </>
-          }
-          secondary={
-            <>
-              <Box
-                css={`
-                  min-height: ${26 * GU}px;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                `}
-              >
-                <ul
-                  css={`
-                    list-style: none;
-                    height: 100%;
-                    width: 100%;
-                    li {
-                      display: flex;
-                      justify-content: space-between;
-                      ${textStyle("body1")}
-                    }
-                    li:not(:last-child) {
-                      margin-bottom: ${6 * GU}px;
-                    }
-                  `}
-                >
-                  <li>
-                    Status: <span>Staked</span>
-                  </li>
-                  <li>
-                    Amount: <span>2,000,000 POKT</span>
-                  </li>
-                </ul>
-              </Box>
-              <Spacer />
-              <Button wide>Switch chains</Button>
-              <Spacer />
-              <Box
-                title="Max relays per day"
-                css={`
-                  padding-bottom: ${4 * GU}px;
-                `}
-              >
-                <CircleGraph
-                  color="white"
-                  size={30 * GU}
-                  strokeWidth={10}
-                  value={0.74}
-                />
-              </Box>
-              <Spacer />
-              <Box
-                css={`
-                  padding-bottom: ${4 * GU}px;
-                  div:not(:last-child) {
-                    margin-bottom: ${2 * GU}px;
-                  }
-                `}
-              >
-                <div
-                  css={`
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                  `}
-                >
-                  <h3
-                    css={`
-                      ${textStyle("body1")};
-                      margin-bottom: ${2 * GU}px;
-                    `}
-                  >
-                    Gateway ID
-                  </h3>
-                  <TextCopy value={APP_ID} />
-                </div>
-                <div
-                  css={`
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                  `}
-                >
-                  <h3
-                    css={`
-                      ${textStyle("body1")};
-                      margin-bottom: ${2 * GU}px;
-                    `}
-                  >
-                    App Secret
-                  </h3>
-                  <TextCopy value={APP_ID} />
-                </div>
-                <div
-                  css={`
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                  `}
-                >
-                  <h3
-                    css={`
-                      ${textStyle("body1")};
-                      margin-bottom: ${2 * GU}px;
-                    `}
-                  >
-                    App public key
-                  </h3>
-                  <TextCopy value={APP_ID} />
-                </div>
-              </Box>
-            </>
-          }
-        />
-      )}
+  return appLoading ? (
+    <div
+      css={`
+        width: 100%;
+        /* TODO: This is leaky. remove */
+        height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      `}
+    >
+      <AnimatedLogo />
+      <Spacer size={2 * GU} />
+      <p
+        css={`
+          ${textStyle("body2")}
+        `}
+      >
+        Loading application...
+      </p>
+    </div>
+  ) : (
+    <AppInfo
+      appData={appData}
+      weeklyRelayData={weeklyRelaysData}
+      successfulRelayData={successfulWeeklyRelaysData}
+      dailyRelayData={dailyRelayCountData}
+      avgSessionRelayCount={avgSessionRelayCount}
+      latestRelaysData={latestRelayData}
     />
   );
 }
-
-const Spacer = styled.span`
-  display: block;
-  width: 100%;
-  height: ${6 * GU}px;
-`;
