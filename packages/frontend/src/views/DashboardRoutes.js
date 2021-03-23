@@ -19,8 +19,6 @@ export default function DashboardRoutes() {
 
   const compactMode = within(-1, "medium");
 
-  console.log(path, "path");
-
   return (
     <div
       css={`

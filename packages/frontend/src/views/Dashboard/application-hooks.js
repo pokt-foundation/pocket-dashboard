@@ -100,6 +100,7 @@ export function useUserApplications() {
     isLoading: isAppsLoading,
     isError: isAppsError,
     data: appsData,
+    refetch: refetchUserApps,
   } = useQuery("user/applications", async function getUserApplications() {
     const path = `${env("BACKEND_URL")}/api/applications`;
 
@@ -125,6 +126,7 @@ export function useUserApplications() {
     appsData,
     isAppsError,
     isAppsLoading,
+    refetchUserApps,
   };
 }
 
