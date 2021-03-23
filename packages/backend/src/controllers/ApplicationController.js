@@ -130,12 +130,10 @@ router.post(
           ],
         });
       }
-      // TODO: Send application creation email
+      res.status(200).send(application);
     } catch (err) {
       throw HttpError.INTERNAL_SERVER_ERROR(err);
     }
-
-    res.status(204).send();
   })
 );
 

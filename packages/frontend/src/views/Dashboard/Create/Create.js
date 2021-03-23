@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useMutation, useQuery } from "react-query";
+import { useHistory } from "react-router-dom";
 import { animated, useTransition } from "react-spring";
+import { useMutation, useQuery } from "react-query";
 import axios from "axios";
 import "styled-components/macro";
 import {
@@ -20,9 +21,10 @@ import {
   springs,
   textStyle,
   GU,
-  RADIUS,
 } from "ui";
+import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
+import { useUserApplications } from "views/Dashboard/application-hooks";
 import { log } from "lib/utils";
 import env from "environment";
 
@@ -124,6 +126,7 @@ function useConfigureState() {
 }
 
 export default function Create() {
+  const history = useHistory();
   const {
     appConfigData,
     decrementScreenIndex,
@@ -139,6 +142,7 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData;
+  const { refetchUserApps, appsData } = useUserApplications();
 
   const {
     isLoading: isChainsLoading,
@@ -165,6 +169,7 @@ export default function Create() {
   const {
     isError: isCreateError,
     isLoading: isCreateLoading,
+    isSuccess: isCreateSuccess,
     mutate,
   } = useMutation(async function createApp() {
     try {
@@ -186,13 +191,25 @@ export default function Create() {
         }
       );
 
-      console.log(res);
+      await refetchUserApps();
+
+      history.push({
+        pathname: `/app/${res.data._id}`,
+      });
 
       return res;
     } catch (err) {
       // TODO: Catch error with Sentry
     }
   });
+
+  useEffect(() => {
+    if (appsData?.length) {
+      const [userApp] = appsData;
+
+      history.push(`/app/${userApp.appId}`);
+    }
+  }, [appsData, history]);
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,
@@ -225,6 +242,7 @@ export default function Create() {
       isChainsLoading ||
       isCreateError ||
       isCreateLoading ||
+      isCreateSuccess ||
       !appName ||
       !selectedNetwork,
     [
@@ -234,12 +252,14 @@ export default function Create() {
       isChainsLoading,
       isCreateError,
       isCreateLoading,
+      isCreateSuccess,
     ]
   );
 
   return (
     <FloatUp
-      loading={false}
+      fallback={() => <p>Loading...</p>}
+      loading={isChainsLoading}
       content={() => (
         <div
           css={`
@@ -265,6 +285,7 @@ export default function Create() {
                 onCreateApp={mutate}
                 isCreateDisabled={isCreateDisabled}
                 updateData={updateAppConfigData}
+                chains={chains}
               />
             </animated.div>
           ))}
@@ -280,31 +301,75 @@ function BasicSetup({
   isCreateDisabled,
   onCreateApp,
   updateData,
+  chains,
 }) {
+  const onSwitchClick = useCallback(
+    (chainId) => {
+      if (data.selectedNetwork && data.selectedNetwork === chainId) {
+        updateData({ type: "UPDATE_SELECTED_NETWORK", payload: "" });
+      } else {
+        updateData({ type: "UPDATE_SELECTED_NETWORK", payload: chainId });
+      }
+    },
+    [data, updateData]
+  );
+
   return (
     <>
       <Split
         primary={
-          <Box
-            title="App name"
-            css={`
-              h3 {
-                margin-bottom: ${3 * GU}px;
-              }
-            `}
-          >
-            <TextInput
-              value={data.appName ?? ""}
-              onChange={(e) =>
-                updateData({
-                  type: "UPDATE_APP_NAME",
-                  payload: e.target.value,
-                })
-              }
-              placeholder="New App Name"
-              wide
-            />
-          </Box>
+          <>
+            <Box title="App name">
+              <TextInput
+                value={data.appName ?? ""}
+                onChange={(e) =>
+                  updateData({
+                    type: "UPDATE_APP_NAME",
+                    payload: e.target.value,
+                  })
+                }
+                placeholder="New App Name"
+                wide
+              />
+            </Box>
+            <Spacer size={2 * GU} />
+            <Box title="Available networks">
+              <Table
+                noSideBorders
+                noTopBorders
+                css={`
+                  background: transparent;
+                `}
+                header={
+                  <>
+                    <TableRow>
+                      <TableHeader title="Selected" />
+                      <TableHeader title="Network" />
+                      <TableHeader title="Ticker" />
+                      <TableHeader title="Chain ID" />
+                    </TableRow>
+                  </>
+                }
+              >
+                {chains.map(
+                  ({ description, id, ticker, isAvailableForStaking }) => (
+                    <TableRow key={id}>
+                      <TableCell>
+                        <Switch
+                          onChange={() => onSwitchClick(id)}
+                          checked={data.selectedNetwork === id}
+                          disabled={isAvailableForStaking}
+                        />
+                      </TableCell>
+                      <TableCell>{description}</TableCell>
+                      <TableCell>{ticker}</TableCell>
+                      <TableCell>{id}</TableCell>
+                    </TableRow>
+                  )
+                )}
+              </Table>
+            </Box>
+          </>
         }
         secondary={
           <>
@@ -320,104 +385,37 @@ function BasicSetup({
             <Button wide onClick={() => incrementScreen()}>
               Set up app security
             </Button>
+            <Spacer size={2 * GU} />
+            <Box title="Free-tier info">
+              <ul
+                css={`
+                  list-style: none;
+                  height: 100%;
+                  li {
+                    display: flex;
+                    justify-content: space-between;
+                  }
+                  li:not(:last-child) {
+                    margin-bottom: ${2 * GU}px;
+                  }
+                `}
+              >
+                <li>
+                  Amount of POKT: <span>25,000</span>
+                </li>
+                <li>
+                  Max relays per day: <span>1M</span>
+                </li>
+              </ul>
+            </Box>
           </>
-        }
-      />
-      <Split
-        primary={
-          <Box title="Available networks">
-            <Table
-              noSideBorders
-              noTopBorders
-              css={`
-                background: transparent;
-              `}
-              header={
-                <>
-                  <TableRow>
-                    <TableHeader title="Network" />
-                    <TableHeader title="Network ID" />
-                    <TableHeader title="Ticker" />
-                    <TableHeader title="Node count" />
-                  </TableRow>
-                </>
-              }
-            >
-              <TableRow>
-                <TableCell>
-                  <p>Ethereum Mainnet</p>
-                </TableCell>
-                <TableCell>
-                  <p>0021</p>
-                </TableCell>
-                <TableCell>
-                  <p>ETH</p>
-                </TableCell>
-                <TableCell>
-                  <p>600</p>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <p>Ethereum Mainnet</p>
-                </TableCell>
-                <TableCell>
-                  <p>0021</p>
-                </TableCell>
-                <TableCell>
-                  <p>ETH</p>
-                </TableCell>
-                <TableCell>
-                  <p>600</p>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <p>Ethereum Mainnet</p>
-                </TableCell>
-                <TableCell>
-                  <p>0021</p>
-                </TableCell>
-                <TableCell>
-                  <p>ETH</p>
-                </TableCell>
-                <TableCell>
-                  <p>600</p>
-                </TableCell>
-              </TableRow>
-            </Table>
-          </Box>
-        }
-        secondary={
-          <Box title="Free-tier info">
-            <ul
-              css={`
-                list-style: none;
-                height: 100%;
-                li {
-                  display: flex;
-                  justify-content: space-between;
-                }
-                li:not(:last-child) {
-                  margin-bottom: ${4 * GU}px;
-                }
-              `}
-            >
-              <li>
-                Amount of POKT: <span>25,000</span>
-              </li>
-              <li>
-                Max relays per day: <span>1M</span>
-              </li>
-            </ul>
-          </Box>
         }
       />
     </>
   );
 }
 
-function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
+function SecuritySetup({ data, decrementScreen, updateData }) {
   const [userAgent, setUserAgent] = useState("");
   const [origin, setOrigin] = useState("");
 
@@ -455,30 +453,17 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
               `}
             >
               To maximize security for your application, you may add an
-              additional private secret key or whitelist user agents and
-              origins. For more information take a look Pocket Gateway Docs.
-            </p>
-            <p
-              css={`
-                ${textStyle("body2")}
-              `}
-            >
-              Activate Private Secret to project secret for all requests
+              additional secret key and/or whitelist user agents and origins.
+              For more information take a look at the Pocket Gateway Docs.
             </p>
           </Box>
         }
         secondary={
-          <div
-            css={`
-              display: flex;
-              flex-direction: column;
-              height: 100%;
-              justify-content: space-between;
-            `}
-          >
+          <>
             <Button wide onClick={() => decrementScreen()}>
-              Back to basic setup
+              Go back
             </Button>
+            <Spacer size={2 * GU} />
             <Box
               css={`
                 display: flex;
@@ -497,15 +482,16 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
                 <h3
                   css={`
                     ${textStyle("body2")}
-                    margin-right: ${1 * GU}px;
                   `}
                 >
-                  Private Secret Required
+                  Secret key required
                 </h3>
+                <Spacer size={1 * GU} />
                 <Help hint="What is this?">
                   Turn this on if you wanna have an "extra" layer of security
-                  for all of your requests. You'll have to send a secret
-                  password with each request that we will verify.
+                  for all of your requests. You'll have to send a password with
+                  each request that we will verify. You'll have access to this
+                  key once you create the application.
                 </Help>
               </div>
               <Switch
@@ -518,9 +504,10 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
                 }
               />
             </Box>
-          </div>
+          </>
         }
       />
+      <Spacer size={2 * GU} />
       <Box
         title="Whitelisted user-agents"
         css={`
@@ -605,30 +592,5 @@ function SecuritySetup({ data, decrementScreen, incrementScreen, updateData }) {
         </ul>
       </Box>
     </>
-  );
-}
-
-function Box({ children, title, ...props }) {
-  return (
-    <div
-      css={`
-        background: #1b2331;
-        padding: ${2 * GU}px ${4 * GU}px;
-        padding-bottom: ${4 * GU}px;
-        border-radius: ${RADIUS / 2}px;
-      `}
-      {...props}
-    >
-      {title && (
-        <h3
-          css={`
-            ${textStyle("title3")}
-          `}
-        >
-          {title}
-        </h3>
-      )}
-      {children}
-    </div>
   );
 }
