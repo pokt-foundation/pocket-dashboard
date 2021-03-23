@@ -17,6 +17,7 @@ export const ENV_VARS = {
       from_email: process.env.EMAIL_FROM,
       template_ids: {
         SignUp: "d-23cc7c71b2d54b26bd09889f72fe0dc9",
+        ResetPassword: "d-a54f3a2f7f784545bb3d3f0106a40a87",
       },
     };
   },

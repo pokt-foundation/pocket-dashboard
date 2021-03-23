@@ -1,9 +1,13 @@
 import React, { useCallback, useState } from "react";
+import { useMutation } from "react-query";
+import axios from "axios";
 import "styled-components/macro";
 import {
   Button,
   Field,
   Link,
+  Info,
+  Spacer,
   TextInput,
   textStyle,
   useTheme,
@@ -11,10 +15,25 @@ import {
   RADIUS,
 } from "ui";
 import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
+import env from "environment";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const theme = useTheme();
+
+  const { isLoading, isSuccess, mutate } = useMutation(
+    async function sendResetEmail() {
+      const path = `${env("BACKEND_URL")}/api/users/send-reset-email`;
+
+      try {
+        await axios.post(path, {
+          email,
+        });
+      } catch (err) {
+        console.log(Object.entries(err), "rip");
+      }
+    }
+  );
 
   const onEmailChange = useCallback((e) => setEmail(e.target.value), []);
 
@@ -68,15 +87,25 @@ export default function ForgotPassword() {
             margin-bottom: ${6 * GU}px;
           `}
         >
-          <TextInput wide value={email} onChange={onEmailChange} type="email" />
+          <TextInput
+            wide
+            value={email}
+            onChange={onEmailChange}
+            type="email"
+            disabled={isLoading || isSuccess}
+          />
         </Field>
         <Button
           css={`
             margin-bottom: ${2 * GU}px;
           `}
+          disabled={isLoading || isSuccess}
+          onClick={mutate}
         >
           Send email
         </Button>
+        <Spacer size={1 * GU} />
+        {isSuccess && <Info>We've sent an email!</Info>}
       </main>
     </div>
   );
