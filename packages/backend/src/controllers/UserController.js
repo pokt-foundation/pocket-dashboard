@@ -210,11 +210,16 @@ router.post(
     const user = await User.findOne({ email });
 
     if (!user) {
-      throw HttpError.BAD_REQUEST({ message: "User does not exist" });
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          { id: "EMAIL_DOES_NOT_EXIST", message: "Email does not exist" },
+        ],
+      });
     }
 
-    // TODO: First check if there's an active token, and delete it
-    const staleToken = await Token.findOne({ userId: user._id });
+    const staleToken = await Token.findOne({
+      $and: [{ email }, { type: TOKEN_TYPES.reset }],
+    });
 
     if (staleToken) {
       await staleToken.deleteOne();
@@ -232,9 +237,24 @@ router.post(
     });
 
     await userResetToken.save();
+    console.log("here??");
+    const resetLink = `http://localhost:3000/#/newpassword?token=${resetToken}&email=${user.email}`;
 
-    // TODO: Send email with link
+    const emailService = new SendgridEmailService();
 
+    try {
+      await emailService.sendEmailWithTemplate(
+        env("email").template_ids.ResetPassword,
+        user.email,
+        env("email").from_email,
+        {
+          user_email: user.email,
+          reset_link: resetLink,
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
     return res.status(204).send();
   })
 );
@@ -253,26 +273,33 @@ router.post(
     const isPasswordValid = await User.validatePassword(password1);
 
     if (!isPasswordValid) {
-      throw HttpError.BAD_REQUEST({ message: "Password is not secure enough" });
+      throw HttpError.BAD_REQUEST({
+        errors: [{ message: "Password is not secure enough" }],
+      });
     }
 
     if (password1 !== password2) {
-      throw HttpError.BAD_REQUEST({ message: "Passwords don't match" });
+      throw HttpError.BAD_REQUEST({
+        errors: [{ message: "Passwords don't match" }],
+      });
     }
 
     const storedToken = await Token.findOne({
-      email,
-      type: TOKEN_TYPES.TOKEN_RESET,
+      $and: [{ email }, { type: TOKEN_TYPES.reset }],
     });
 
     if (!storedToken) {
-      throw HttpError.BAD_REQUEST({ message: "Token has expired" });
+      throw HttpError.BAD_REQUEST({
+        errors: [{ message: "Token has expired" }],
+      });
     }
 
-    const isTokenMatching = await bcrypt.compare(plainToken, storedToken);
+    const isTokenMatching = await bcrypt.compare(plainToken, storedToken.token);
 
     if (!isTokenMatching) {
-      throw HttpError.BAD_REQUEST({ message: "Token is not matching" });
+      throw HttpError.BAD_REQUEST({
+        errors: [{ message: "Token is not matching" }],
+      });
     }
 
     const newHashedPassword = await bcrypt.hash(password1, SALT_ROUNDS);
