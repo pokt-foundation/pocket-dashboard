@@ -9,11 +9,7 @@ import env from "environment";
 const TOTAL_RELAYS_AND_AVG_LATENCY_QUERY = gql`
   query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY($_eq: String, $_gte: timestamptz) {
     relay_apps_daily_aggregate(
-      where: {
-        app_pub_key: { _eq: $_eq }
-        bucket: { _gte: $_gte }
-        elapsed_time: { _lt: "1" }
-      }
+      where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
       order_by: { bucket: desc }
     ) {
       aggregate {
@@ -34,7 +30,6 @@ const WEEKLY_SUCCESSFUL_RELAYS_QUERY = gql`
       where: {
         app_pub_key: { _eq: $_eq }
         bucket: { _gte: $_gte }
-        elapsed_time: { _lt: "3" }
         result: { _eq: "200" }
       }
       order_by: { bucket: desc }

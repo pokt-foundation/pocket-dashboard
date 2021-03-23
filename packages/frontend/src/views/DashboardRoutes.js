@@ -63,7 +63,7 @@ export default function DashboardRoutes() {
           <Route exact path={`/home`}>
             <NetworkStatus />
           </Route>
-          <Route exact path={`/app/:appId`}>
+          <Route path={`/app/:appId`}>
             <MyApp />
           </Route>
           <Route exact path={`/create`}>

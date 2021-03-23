@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useHistory, useRouteMatch } from "react-router";
 import { animated, useSpring } from "react-spring";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
@@ -18,6 +19,7 @@ import {
   RADIUS,
   ButtonBase,
 } from "ui";
+import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
 import { prefixFromChainId } from "lib/chain-utils";
@@ -61,14 +63,16 @@ export default function AppDetail({
   successfulRelayData,
   weeklyRelayData,
 }) {
+  const history = useHistory();
+  const { url } = useRouteMatch();
   const { within } = useViewport();
 
   const compactMode = within(-1, "medium");
 
   const successRate = useMemo(
     () =>
-      weeklyRelayData.weeklyAppRelays /
-      successfulRelayData.successfulWeeklyRelays,
+      successfulRelayData.successfulWeeklyRelays /
+      weeklyRelayData.weeklyAppRelays,
     [weeklyRelayData, successfulRelayData]
   );
 
@@ -94,7 +98,11 @@ export default function AppDetail({
                   grid-column-gap: ${2 * GU}px;
                 `}
               >
-                <SuccessRate successRate={successRate} />
+                <SuccessRate
+                  successRate={successRate}
+                  appId={appData._id}
+                  totalRequests={weeklyRelayData.weeklyAppRelays}
+                />
                 <AvgLatency avgLatency={successfulRelayData.avgLatency} />
               </div>
               <Spacer size={2 * GU} />
@@ -109,13 +117,21 @@ export default function AppDetail({
           }
           secondary={
             <>
-              <Button mode="strong" wide>
+              <Button
+                mode="strong"
+                wide
+                onClick={() => history.push(`${url}/chains`)}
+              >
                 Switch chains
               </Button>
               <Spacer size={2 * GU} />
-              <Button wide>App Security</Button>
+              <Button wide onClick={() => history.push(`${url}/security`)}>
+                App Security
+              </Button>
               <Spacer size={2 * GU} />
-              <Button wide>Notifications</Button>
+              <Button wide onClick={() => history.push(`${url}/notifications`)}>
+                Notifications
+              </Button>
               <Spacer size={2 * GU} />
               <AppStatus />
               <Spacer size={2 * GU} />
@@ -145,9 +161,11 @@ function EndpointDetails({ chainId, appId }) {
   );
 }
 
-function SuccessRate({ successRate, totalRequests }) {
+function SuccessRate({ appId, successRate, totalRequests }) {
+  const history = useHistory();
+  const { url } = useRouteMatch();
   const numberProps = useSpring({
-    number: Math.max(successRate * 100, 100),
+    number: Math.min(successRate * 100, 100),
     from: { number: 0 },
   });
   const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } });
@@ -176,7 +194,7 @@ function SuccessRate({ successRate, totalRequests }) {
             ${textStyle("title1")}
           `}
         >
-          {numberProps.number.interpolate((x) => `${x.toFixed(1)}%`)}
+          {numberProps.number.interpolate((x) => `${x.toFixed(2)}%`)}
         </animated.h2>
         <animated.div
           css={`
@@ -236,7 +254,7 @@ function SuccessRate({ successRate, totalRequests }) {
               ${textStyle("title3")}
             `}
           >
-            34,456
+            {Intl.NumberFormat().format(totalRequests)}
           </h4>
         </div>
       </div>
@@ -251,6 +269,7 @@ function SuccessRate({ successRate, totalRequests }) {
           border-radius: 0 0 ${RADIUS}px ${RADIUS}px;
           color: #31a1d2;
         `}
+        onClick={() => history.push(`${url}/success-details`)}
       >
         More Details
       </ButtonBase>
@@ -380,41 +399,6 @@ function LatestRequests({ latestRequests }) {
           ))}
         </Table>
       </div>
-    </Box>
-  );
-}
-
-function AppStatus() {
-  return (
-    <Box
-      css={`
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      `}
-    >
-      <ul
-        css={`
-          list-style: none;
-          height: 100%;
-          width: 100%;
-          li {
-            display: flex;
-            justify-content: space-between;
-            ${textStyle("body1")}
-          }
-          li:not(:last-child) {
-            margin-bottom: ${6 * GU}px;
-          }
-        `}
-      >
-        <li>
-          Status: <span>Staked</span>
-        </li>
-        <li>
-          Amount: <span>2,000,000 POKT</span>
-        </li>
-      </ul>
     </Box>
   );
 }
