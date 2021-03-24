@@ -9,11 +9,7 @@ import env from "environment";
 const TOTAL_RELAYS_AND_AVG_LATENCY_QUERY = gql`
   query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY($_eq: String, $_gte: timestamptz) {
     relay_apps_daily_aggregate(
-      where: {
-        app_pub_key: { _eq: $_eq }
-        bucket: { _gte: $_gte }
-        elapsed_time: { _lt: "1" }
-      }
+      where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
       order_by: { bucket: desc }
     ) {
       aggregate {
@@ -34,7 +30,6 @@ const WEEKLY_SUCCESSFUL_RELAYS_QUERY = gql`
       where: {
         app_pub_key: { _eq: $_eq }
         bucket: { _gte: $_gte }
-        elapsed_time: { _lt: "3" }
         result: { _eq: "200" }
       }
       order_by: { bucket: desc }
@@ -150,8 +145,6 @@ export function useActiveApplication() {
         const { data } = await axios.get(path, {
           withCredentials: true,
         });
-
-        console.log(data);
 
         return data;
       } catch (err) {
@@ -381,8 +374,6 @@ export function useAvgSessionRelayCount(appPubKey) {
           },
         } = res;
 
-        console.log(avgRelaysPerSession);
-
         return { avgRelaysPerSession };
       } catch (err) {
         console.log(err, "rip");
@@ -418,7 +409,6 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
 
         const { relay: latestRelays } = res;
 
-        console.log(latestRelays);
         return { latestRelays };
       } catch (err) {
         console.log(err, "rip");
