@@ -116,7 +116,9 @@ router.post(
             user.email
           );
 
-          const validationLink = `http://localhost:3000/#/validate?token=${validationToken}&email=${user.email}`;
+          const validationLink = `${env(
+            "frontend_url"
+          )}/#/validate?token=${validationToken}&email=${user.email}`;
 
           const emailService = new SendgridEmailService();
 
@@ -169,7 +171,9 @@ router.post(
         user.email
       );
 
-      const validationLink = `http://localhost:3000/#/validate?token=${validationToken}&email=${user.email}`;
+      const validationLink = `${env(
+        "frontend_url"
+      )}/#/validate?token=${validationToken}&email=${user.email}`;
 
       const emailService = new SendgridEmailService();
 
@@ -238,7 +242,9 @@ router.post(
 
     await userResetToken.save();
     console.log("here??");
-    const resetLink = `http://localhost:3000/#/newpassword?token=${resetToken}&email=${user.email}`;
+    const resetLink = `${env(
+      "frontend_url"
+    )}/#/newpassword?token=${resetToken}&email=${user.email}`;
 
     const emailService = new SendgridEmailService();
 

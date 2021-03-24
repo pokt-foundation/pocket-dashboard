@@ -1,9 +1,12 @@
-const TEST_CHAINS = {
+const TEST_ONLY_CHAINS = {
   POCKET_TESTNET: {
     ticker: "POKT",
     id: "0002",
     limit: 3,
   },
+};
+
+const TEST_CHAINS = {
   ETHEREUM_ROPSTEN_FULL: {
     ticker: "ETH",
     id: "0023",
@@ -57,7 +60,7 @@ const MAIN_CHAINS = {
 let chains = {};
 
 if (process.env.NODE_ENV === "development") {
-  chains = { ...TEST_CHAINS };
+  chains = { ...TEST_CHAINS, ...TEST_ONLY_CHAINS };
 }
 
 if (process.env.NODE_ENV === "production") {

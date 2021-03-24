@@ -9,8 +9,9 @@
   "author": "Pocket Foundation",
   "license": "MIT",
   "scripts": {
-    "build": "babel ./src --out-dir ./dist --source-maps --copy-files",
+    "build": "babel ./src --out-dir ./build --source-maps --copy-files",
     "start": "NODE_ENV=development nodemon --ignore ./dist --exec babel-node ./src/index.js",
+    "start:prod": "NODE_ENV=production yarn build && node ./build",
     "test": "mocha test",
     "test:services": "mocha test/services",
     "test:providers": "mocha test/providers",
