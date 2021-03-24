@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { WORKERS } from "workers/config";
-import Logger from "@pokt-network/pocket-dashboard-shared/helpers/logger";
+import Logger from "@pokt-foundation/pocket-dashboard-shared/helpers/logger";
 
 const ONE_SECOND = 1000;
 

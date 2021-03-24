@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.8.4",
-    "@pokt-network/pocket-dashboard-shared": "^1.0.0",
+    "@pokt-foundation/pocket-dashboard-shared": "^0.0.3-alpha.0",
     "@pokt-network/pocket-js": "^0.6.6-rc",
     "@sendgrid/client": "^7.4.2",
     "@sendgrid/mail": "^7.4.2",
@@ -95,5 +95,5 @@
     "sinon": "^9.0.1",
     "subpackage": "^1.1.0"
   },
-  "gitHead": "a047be492d6fdb2af082f1ce23bda71f58cab9ce"
+  "gitHead": "814e139fd8a2f9fb1dec17e97e40ce0fb5add160"
 }
