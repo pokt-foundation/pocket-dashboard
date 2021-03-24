@@ -140,8 +140,7 @@ router.post(
 router.put(
   "/:applicationId",
   asyncMiddleware(async (req, res) => {
-    /** @type {{name:string, owner:string, url:string, contactEmail:string, user:string, description:string, icon:string}} */
-    const data = req.body;
+    const { gatewaySettings } = req.body;
 
     /** @type {{applicationId:string}} */
     const { applicationId } = req.params;
@@ -153,29 +152,24 @@ router.put(
         throw HttpError.BAD_REQUEST({ message: "Application not found" });
       }
 
-      // TODO: find user by the authorization header and verify if it belongs to him
       const userId = req.user._id;
 
-      if (application.user !== userId) {
+      if (application.user.toString() !== userId.toString()) {
         throw HttpError.BAD_REQUEST({
           message: "Application does not belong to user",
         });
       }
 
+      application.gatewaySettings = gatewaySettings;
+      await application.save();
+
       // lodash's merge mutates the target object passed in.
       // This is what we want, as we don't want to lose any of the mongoose functionality
       // while at the same time updating the model itself
-      const mutatedApplication = merge(application, data);
-      const savedApplication = await mutatedApplication.save();
-
-      if (!savedApplication) {
-        throw new Error("There was an error while updating to the DB");
-      }
+      res.status(204).send();
     } catch (err) {
       throw HttpError.INTERNAL_SERVER_ERROR(err);
     }
-
-    res.status(204).send();
   })
 );
 

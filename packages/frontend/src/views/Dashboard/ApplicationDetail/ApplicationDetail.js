@@ -4,6 +4,8 @@ import "styled-components/macro";
 import { Spacer, textStyle, GU } from "ui";
 import AnimatedLogo from "components/AnimatedLogo/AnimatedLogo";
 import AppInfo from "views/Dashboard/ApplicationDetail/AppInfo";
+import Notifications from "views/Dashboard/ApplicationDetail/Notifications";
+import Security from "views/Dashboard/ApplicationDetail/Security";
 import SuccessDetails from "views/Dashboard/ApplicationDetail/SuccessDetails";
 import {
   useActiveApplication,
@@ -58,8 +60,6 @@ export default function ApplicationDetail() {
     isAvgSessionRelayCountLoading ||
     isLatestRelaysLoading;
 
-  console.log(appData, "hah");
-
   return appLoading ? (
     <div
       css={`
@@ -95,7 +95,14 @@ export default function ApplicationDetail() {
         />
       </Route>
       <Route path={`${path}/security`}>
-        <h1>Security setup!</h1>
+        <Security
+          appData={appData}
+          weeklyRelayData={weeklyRelaysData}
+          successfulRelayData={successfulWeeklyRelaysData}
+          dailyRelayData={dailyRelayCountData}
+          avgSessionRelayCount={avgSessionRelayCount}
+          latestRelaysData={latestRelayData}
+        />
       </Route>
       <Route path={`${path}/success-details`}>
         <SuccessDetails
@@ -108,7 +115,14 @@ export default function ApplicationDetail() {
         />
       </Route>
       <Route path={`${path}/notifications`}>
-        <h1>Notifications</h1>
+        <Notifications
+          appData={appData}
+          weeklyRelayData={weeklyRelaysData}
+          successfulRelayData={successfulWeeklyRelaysData}
+          dailyRelayData={dailyRelayCountData}
+          avgSessionRelayCount={avgSessionRelayCount}
+          latestRelaysData={latestRelayData}
+        />
       </Route>
       <Route path={`${path}/chains`}>
         <h1>Chains</h1>

@@ -41,7 +41,6 @@ function formatDailyRelaysForGraphing(dailyRelays) {
     },
   ];
 
-  console.log(lines.values, dailyRelays.reverse());
   return {
     labels,
     lines,

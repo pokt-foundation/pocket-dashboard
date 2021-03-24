@@ -55,8 +55,6 @@ export function useNetworkSummary() {
         withCredentials: true,
       });
 
-      console.log(summary);
-
       return summary;
     } catch (err) {
       console.log("?", err);

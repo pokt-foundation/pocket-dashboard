@@ -33,7 +33,7 @@ const applicationSchema = new Schema(
     gatewaySettings: {
       secretKey: String,
       secretKeyRequired: Boolean,
-      whilelistOrigins: [],
+      whitelistOrigins: [],
       whitelistUserAgents: [],
     },
     createdAt: {

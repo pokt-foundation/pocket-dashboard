@@ -146,8 +146,6 @@ export function useActiveApplication() {
           withCredentials: true,
         });
 
-        console.log(data);
-
         return data;
       } catch (err) {
         console.log(err);
@@ -376,8 +374,6 @@ export function useAvgSessionRelayCount(appPubKey) {
           },
         } = res;
 
-        console.log(avgRelaysPerSession);
-
         return { avgRelaysPerSession };
       } catch (err) {
         console.log(err, "rip");
@@ -413,7 +409,6 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
 
         const { relay: latestRelays } = res;
 
-        console.log(latestRelays);
         return { latestRelays };
       } catch (err) {
         console.log(err, "rip");
