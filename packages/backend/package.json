@@ -1,5 +1,5 @@
 {
-  "name": "@pokt-network/pocket-dashboard-backend",
+  "name": "@pokt-foundation/pocket-dashboard-backend",
   "version": "0.0.2-alpha.0",
   "description": "Pocket dashboard",
   "private": false,
@@ -95,5 +95,5 @@
     "sinon": "^9.0.1",
     "subpackage": "^1.1.0"
   },
-  "gitHead": "26c5c777a2aefb12563303333b24a25d0fd9efa3"
+  "gitHead": "a047be492d6fdb2af082f1ce23bda71f58cab9ce"
 }
