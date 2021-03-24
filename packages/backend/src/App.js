@@ -7,6 +7,9 @@ import { errorHandler } from "helpers/utils";
 import notFoundMiddleware from "middlewares/not-found";
 import { configureRoutes } from "routes";
 import { connect } from "db";
+import env from "environment";
+
+const PORT = process.env.PORT || 4200;
 
 const app = express();
 
@@ -20,8 +23,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(
   cors({
-    // TODO: Configure this to depend on prod/dev
-    origin: "http://localhost:3000",
+    origin: env("prod") ? env("frontend_url") : "http://localhost:3000",
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
     credentials: true,
     exposedHeaders: ["Authorization"],
@@ -33,8 +35,6 @@ passport.initialize();
 configureRoutes(app);
 app.use(notFoundMiddleware());
 app.use(errorHandler(app));
-
-const PORT = process.env.PORT || 4200;
 
 export const startServer = async () => {
   try {

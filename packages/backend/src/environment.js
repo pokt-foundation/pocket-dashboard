@@ -2,6 +2,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const ENV_VARS = {
+  prod() {
+    return process.env.NODE_ENV === "production";
+  },
+  frontend_url() {
+    return process.env.FRONTEND_URL || "http://localhost:3000";
+  },
   auth() {
     return {
       public_secret: process.env.JWT_PUBLIC_SECRET.replace(/\\n/gm, "\n"),
@@ -43,12 +49,6 @@ export const ENV_VARS = {
   },
   pocket_network() {
     return {
-      jobs: {
-        database_url: process.env.POCKET_NETWORK_SERVICE_WORKER_DATABASE_URL,
-        delayed_time:
-          process.env.POCKET_NETWORK_SERVICE_WORKER_DELAYED_START_TIME,
-        attempts: process.env.POCKET_NETWORK_SERVICE_WORKER_ATTEMPTS,
-      },
       aat_version: process.env.POCKET_NETWORK_AAT_VERSION,
       transaction_fee: process.env.POCKET_NETWORK_TRANSACTION_FEE,
       chain_id: process.env.POCKET_NETWORK_CHAIN_ID,
