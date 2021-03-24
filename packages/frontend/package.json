@@ -3,6 +3,7 @@
   "version": "0.0.1-alpha.0",
   "description": "Pocket dashboard",
   "homepage": "./",
+  "private": false,
   "repository": {
     "url": "https://github.com/pokt-network/pocket-dashboard",
     "type": "git"
@@ -96,5 +97,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "gitHead": "26c5c777a2aefb12563303333b24a25d0fd9efa3"
 }

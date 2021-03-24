@@ -11,6 +11,7 @@
     "lerna": "^3.22.1"
   },
   "scripts": {
-    "init:db": "sh scripts/init-db.sh"
+    "init:db": "sh scripts/init-db.sh",
+    "prepare": "lerna run build"
   }
 }

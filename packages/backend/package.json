@@ -2,6 +2,7 @@
   "name": "@pokt-network/pocket-dashboard-backend",
   "version": "0.0.1-alpha.0",
   "description": "Pocket dashboard",
+  "private": false,
   "repository": {
     "url": "https://github.com/pokt-foundation/pocket-dashboard",
     "type": "git"
@@ -93,5 +94,6 @@
     "prettier": "^2.2.1",
     "sinon": "^9.0.1",
     "subpackage": "^1.1.0"
-  }
+  },
+  "gitHead": "26c5c777a2aefb12563303333b24a25d0fd9efa3"
 }

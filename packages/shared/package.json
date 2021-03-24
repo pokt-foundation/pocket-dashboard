@@ -3,10 +3,12 @@
   "version": "0.0.1-alpha.0",
   "author": "Pocket Foundation",
   "license": "MIT",
+  "private": false,
   "dependencies": {
     "axios": "^0.21.1",
     "chalk": "^4.1.0",
     "dotenv": "^8.2.0",
     "graphql-request": "^3.4.0"
-  }
+  },
+  "gitHead": "26c5c777a2aefb12563303333b24a25d0fd9efa3"
 }
