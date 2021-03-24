@@ -59,7 +59,7 @@ export default function Security({
       const path = `${env("BACKEND_URL")}/api/applications/${appData._id}`;
 
       try {
-        const res = await axios.put(
+        await axios.put(
           path,
           {
             gatewaySettings: {
