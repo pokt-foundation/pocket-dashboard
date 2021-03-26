@@ -1,5 +1,10 @@
 import { startServer } from "app";
 import { startWorkers } from "workers";
+import env from "environment";
 
 startServer();
-startWorkers();
+if (env("enable_workers")) {
+  startWorkers();
+} else {
+  console.log("--- WORKERS NOT ENABLED ---");
+}
