@@ -3,15 +3,13 @@ import { Link as RouterLink, useLocation } from "react-router-dom";
 import { useMutation } from "react-query";
 import axios from "axios";
 import "styled-components/macro";
-import { useViewport } from "use-viewport";
-import { Link, textStyle, useTheme, GU, RADIUS, Info } from "ui";
+import { Link, textStyle, useTheme, GU, RADIUS } from "ui";
 import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
 import env from "environment";
 
 export default function Login() {
   const theme = useTheme();
   const { search } = useLocation();
-  const { within } = useViewport();
 
   const token = new URLSearchParams(search).get("token");
   const email = new URLSearchParams(search).get("email");
@@ -34,7 +32,7 @@ export default function Login() {
 
   useEffect(() => {
     mutate();
-  }, []);
+  }, [mutate]);
 
   return (
     <div

@@ -1,8 +1,6 @@
 import React from "react";
-import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import { useViewport } from "use-viewport";
-import { keyframes } from "styled-components/macro";
-import { useTheme } from "ui";
 import Create from "views/Dashboard/Create/Create";
 import Dashboard from "views/Dashboard/Dashboard";
 import NetworkStatus from "views/Dashboard/Network/NetworkStatus";
@@ -14,7 +12,6 @@ import Signup from "views/Onboarding/Signup";
 import Validate from "views/Onboarding/Validate";
 
 export default function DashboardRoutes() {
-  const { path } = useRouteMatch();
   const { within } = useViewport();
 
   const compactMode = within(-1, "medium");
