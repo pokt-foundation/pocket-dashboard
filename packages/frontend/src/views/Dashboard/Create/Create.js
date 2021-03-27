@@ -142,7 +142,7 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData;
-  const { refetchUserApps } = useUserApplications();
+  const { refetchUserApps, appsData } = useUserApplications();
 
   const {
     isLoading: isChainsLoading,
@@ -203,13 +203,13 @@ export default function Create() {
     }
   });
 
-  // useEffect(() => {
-  //   if (appsData?.length) {
-  //     const [userApp] = appsData;
+  useEffect(() => {
+    if (appsData?.length) {
+      const [userApp] = appsData;
 
-  //     history.push(`/app/${userApp.appId}`);
-  //   }
-  // }, [appsData, history]);
+      history.push(`/app/${userApp.appId}`);
+    }
+  }, [appsData, history]);
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,
