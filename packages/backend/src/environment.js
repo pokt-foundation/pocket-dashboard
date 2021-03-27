@@ -13,8 +13,10 @@ export const ENV_VARS = {
   },
   auth() {
     return {
-      public_secret: process.env.JWT_PUBLIC_SECRET.replace(/\\n/gm, "\n"),
-      private_secret: process.env.JWT_PRIVATE_SECRET.replace(/\\n/gm, "\n"),
+      public_secret:
+        process.env.JWT_PUBLIC_SECRET?.replace(/\\n/gm, "\n") ?? "",
+      private_secret:
+        process.env.JWT_PRIVATE_SECRET?.replace(/\\n/gm, "\n") ?? "",
       secret_key: process.env.JWT_SECRET_KEY,
       expiration: process.env.JWT_EXPIRATION,
       refresh_expiration: process.env.JWT_REFRESH_EXPIRATION,
