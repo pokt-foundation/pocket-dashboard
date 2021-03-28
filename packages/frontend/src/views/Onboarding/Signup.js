@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { useMutation } from "react-query";
 import axios from "axios";
 import { isEmail, isStrongPassword } from "validator";

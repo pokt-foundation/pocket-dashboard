@@ -22,8 +22,7 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 function formatDailyRelaysForGraphing(dailyRelays) {
   const labels = dailyRelays
     .map(({ bucket }) => bucket.split("T")[0])
-    .map((bucket) => DAYS[new Date(bucket).getUTCDay()])
-    .reverse();
+    .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
 
   const highestDailyAmount = dailyRelays.reduce(
     (highest, { total_relays: totalRelays }) => Math.max(highest, totalRelays),
@@ -33,11 +32,9 @@ function formatDailyRelaysForGraphing(dailyRelays) {
   const lines = [
     {
       id: 1,
-      values: dailyRelays
-        .reverse()
-        .map(({ total_relays: totalRelays }) =>
-          norm(totalRelays, 0, highestDailyAmount)
-        ),
+      values: dailyRelays.map(({ total_relays: totalRelays }) =>
+        norm(totalRelays, 0, highestDailyAmount)
+      ),
     },
   ];
 

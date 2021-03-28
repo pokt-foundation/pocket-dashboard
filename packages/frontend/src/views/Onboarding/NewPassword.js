@@ -28,7 +28,7 @@ export default function NewPassword() {
   const token = new URLSearchParams(search).get("token");
   const email = new URLSearchParams(search).get("email");
 
-  const { isLoading, isError, isSuccess, mutate } = useMutation(
+  const { isLoading, isError, mutate } = useMutation(
     async function sendResetEmail() {
       const path = `${env("BACKEND_URL")}/api/users/reset-password`;
 

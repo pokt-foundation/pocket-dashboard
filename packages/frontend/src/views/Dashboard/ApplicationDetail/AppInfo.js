@@ -27,13 +27,14 @@ import { norm } from "lib/math-utils";
 
 const APP_ID = "60010a10eea5fb002e5bc536";
 
+const ONE_MILLION = 800000;
+
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function formatDailyRelaysForGraphing(dailyRelays) {
   const labels = dailyRelays
     .map(({ bucket }) => bucket.split("T")[0])
-    .map((bucket) => DAYS[new Date(bucket).getUTCDay()])
-    .reverse();
+    .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
 
   const highestDailyAmount = dailyRelays.reduce(
     (highest, { dailyRelays }) => Math.max(highest, dailyRelays),
@@ -43,11 +44,13 @@ function formatDailyRelaysForGraphing(dailyRelays) {
   const lines = [
     {
       id: 1,
-      values: dailyRelays
-        .reverse()
-        .map(({ dailyRelays }) => norm(dailyRelays, 0, highestDailyAmount)),
+      values: dailyRelays.map(({ dailyRelays }) =>
+        norm(dailyRelays, 0, ONE_MILLION)
+      ),
     },
   ];
+
+  console.log(lines, highestDailyAmount);
 
   return {
     labels,
@@ -301,8 +304,6 @@ function AvgLatency({ avgLatency }) {
   );
 }
 
-const ONE_MILLION = 1000000;
-
 function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   return (
     <Box>
@@ -354,7 +355,8 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
           lines={chartLines}
           label={(i) => chartLabels[i]}
           height={200}
-          width="100%"
+          color={() => "#fafafa"}
+          renderCheckpoints
         />
       </div>
     </Box>

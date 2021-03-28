@@ -1,10 +1,16 @@
 import axios from "axios";
 import * as dayjs from "dayjs";
 import * as dayJsutcPlugin from "dayjs/plugin/utc";
-import { gql, request as gqlRequest } from "graphql-request";
+import { GraphQLClient, gql } from "graphql-request";
 import { useParams } from "react-router";
 import { useQuery } from "react-query";
 import env from "environment";
+
+const gqlClient = new GraphQLClient(env("HASURA_URL"), {
+  headers: {
+    "x-hasura-admin-secret": env("HASURA_SECRET"),
+  },
+});
 
 const TOTAL_RELAYS_AND_AVG_LATENCY_QUERY = gql`
   query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY($_eq: String, $_gte: timestamptz) {
@@ -181,8 +187,7 @@ export function useWeeklyAppRelaysInfo(appPubKey = "") {
       }-${sevenDaysAgo.date()}T00:00:00+00:00`;
 
       try {
-        const res = await gqlRequest(
-          env("HASURA_URL"),
+        const res = await gqlClient.request(
           TOTAL_RELAYS_AND_AVG_LATENCY_QUERY,
           {
             _eq: appPubKey,
@@ -234,14 +239,10 @@ export function useSucessfulWeeklyRelays(appPubKey) {
       }-${sevenDaysAgo.date()}T00:00:00+00:00`;
 
       try {
-        const res = await gqlRequest(
-          env("HASURA_URL"),
-          WEEKLY_SUCCESSFUL_RELAYS_QUERY,
-          {
-            _eq: appPubKey,
-            _gte: formattedTimestamp,
-          }
-        );
+        const res = await gqlClient.request(WEEKLY_SUCCESSFUL_RELAYS_QUERY, {
+          _eq: appPubKey,
+          _gte: formattedTimestamp,
+        });
 
         const {
           relay_apps_daily_aggregate: {
@@ -287,14 +288,10 @@ export function useDailyRelayCount(appPubKey) {
       }-${sevenDaysAgo.date()}T00:00:00+00:00`;
 
       try {
-        const res = await gqlRequest(
-          env("HASURA_URL"),
-          DAILY_APP_RELAYS_QUERY,
-          {
-            _eq: appPubKey,
-            _gte: formattedTimestamp,
-          }
-        );
+        const res = await gqlClient.request(DAILY_APP_RELAYS_QUERY, {
+          _eq: appPubKey,
+          _gte: formattedTimestamp,
+        });
 
         const { relay_apps_daily: rawDailyRelays } = res;
 
@@ -322,7 +319,7 @@ export function useDailyRelayCount(appPubKey) {
           processedDailyRelays.push({ bucket, dailyRelays: dailyRelayCount });
         }
 
-        return processedDailyRelays;
+        return processedDailyRelays.reverse();
       } catch (err) {
         console.log(err, "rip");
       }
@@ -357,14 +354,10 @@ export function useAvgSessionRelayCount(appPubKey) {
       }-${sevenDaysAgo.date()}T00:00:00+00:00`;
 
       try {
-        const res = await gqlRequest(
-          env("HASURA_URL"),
-          AVG_SESSION_RELAY_COUNT_QUERY,
-          {
-            _eq: appPubKey,
-            _gte: formattedTimestamp,
-          }
-        );
+        const res = await gqlClient.request(AVG_SESSION_RELAY_COUNT_QUERY, {
+          _eq: appPubKey,
+          _gte: formattedTimestamp,
+        });
 
         const {
           relay_apps_hourly_aggregate: {
@@ -401,7 +394,7 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
       }
 
       try {
-        const res = await gqlRequest(env("HASURA_URL"), LATEST_RELAYS_QUERY, {
+        const res = await gqlClient.request(LATEST_RELAYS_QUERY, {
           _eq: appPubKey,
           limit,
           offset: page,

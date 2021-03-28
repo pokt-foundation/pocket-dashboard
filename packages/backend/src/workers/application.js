@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { PocketAAT } from "@pokt-network/pocket-js";
 import PreStakedApp from "models/PreStakedApp";
-import { CHAINS } from "workers/utils";
+import { chains } from "workers/config";
 import {
   createAppStakeTx,
   createUnlockedAccount,
@@ -11,7 +11,6 @@ import {
 } from "lib/pocket";
 import { APPLICATION_STATUSES } from "application-statuses";
 import env from "environment";
-// TODO: Add Sentry, logger
 
 const FREE_TIER_STAKE_AMOUNT = 24950100000n;
 
@@ -113,10 +112,11 @@ async function defundApplication(app) {
 }
 
 export async function fillAppPool(ctx) {
-  const totalPoolSize = Object.values(CHAINS).reduce(
+  const totalPoolSize = Object.values(chains).reduce(
     (prev, { limit }) => prev + limit,
     0
   );
+
   const appPool = await PreStakedApp.find();
 
   ctx.logger.log(
@@ -154,7 +154,7 @@ export async function stakeAppPool(ctx) {
   }
 
   // fill the allocation count with the default from all chains
-  for (const [, { id, limit }] of Object.entries(CHAINS)) {
+  for (const [, { id, limit }] of Object.entries(chains)) {
     appAllocationCount.set(id, limit);
   }
 

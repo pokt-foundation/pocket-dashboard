@@ -75,7 +75,7 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
 
   const renderInstanceGroup = useCallback(
     (group) => {
-      const activeIndex = group.findIndex(({ id }) => id === activeId);
+      const activeIndex = group.findIndex(({ id }) => activeId.includes(id));
       const isActive = activeIndex !== -1;
 
       return (
@@ -123,6 +123,7 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
 
 function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
   const { openProgress } = useSpring({
+    from: { openProgress: Number(appsLoading) },
     to: { openProgress: Number(active) },
     config: springs.smooth,
   });

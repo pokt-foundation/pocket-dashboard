@@ -54,32 +54,30 @@ export default function Security({
     console.log(appData, "wue");
   }, [appData]);
 
-  const { isLoading, isError, isSuccess, mutate } = useMutation(
-    async function updateApplicationSettings() {
-      const path = `${env("BACKEND_URL")}/api/applications/${appData._id}`;
+  const { mutate } = useMutation(async function updateApplicationSettings() {
+    const path = `${env("BACKEND_URL")}/api/applications/${appData._id}`;
 
-      try {
-        await axios.put(
-          path,
-          {
-            gatewaySettings: {
-              whitelistOrigins: origins,
-              whitelistUserAgents: userAgents,
-              secretKeyRequired,
-            },
+    try {
+      await axios.put(
+        path,
+        {
+          gatewaySettings: {
+            whitelistOrigins: origins,
+            whitelistUserAgents: userAgents,
+            secretKeyRequired,
           },
-          {
-            withCredentials: true,
-          }
-        );
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-        history.goBack();
-      } catch (err) {
-        // TODO: Log with sentry
-        console.log("err", err);
-      }
+      history.goBack();
+    } catch (err) {
+      // TODO: Log with sentry
+      console.log("err", err);
     }
-  );
+  });
 
   const onSecretKeyRequiredChange = useCallback(() => {
     setSecretKeyRequired((r) => !r);
