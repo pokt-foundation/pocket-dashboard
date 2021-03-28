@@ -5,7 +5,9 @@ import { authenticate } from "middlewares/passport-auth";
 import Application from "models/Application";
 import ApplicationPool from "models/PreStakedApp";
 import HttpError from "errors/http-error";
+import SendgridEmailService from "services/SendGridEmailService";
 import { APPLICATION_STATUSES } from "application-statuses";
+import env from "environment";
 
 const DEFAULT_GATEWAY_SETTINGS = {
   secretKey: "",
@@ -174,7 +176,7 @@ router.put(
 );
 
 router.post(
-  "/switch-chains/:applicationId",
+  "/switch/:applicationId",
   asyncMiddleware(async (req, res) => {
     const { chain } = req.body;
     const { applicationId } = req.params;
@@ -193,6 +195,18 @@ router.post(
 
       if (!oldApplication) {
         throw new Error("Cannot find application");
+      }
+
+      if (oldApplication.user.toString() !== req.user._id.toString()) {
+        console.log(oldApplication._id.toString(), req.user._id.toString());
+        throw HttpError.FORBIDDEN({
+          errors: [
+            {
+              id: "FOREIGN_APPLICATION",
+              message: "Application does not belong to user",
+            },
+          ],
+        });
       }
 
       // TODO: Check if at least a week has passed since the last status update.
@@ -222,11 +236,72 @@ router.post(
       });
 
       await newReplacementApplication.save();
+      res.status(200).send(newReplacementApplication);
     } catch (err) {
       throw HttpError.INTERNAL_SERVER_ERROR(err);
     }
+  })
+);
 
-    res.status(204).send();
+router.put(
+  "/notifications/:applicationId",
+  asyncMiddleware(async (req, res) => {
+    const { applicationId } = req.params;
+    const { quarter, half, threeQuarters, full } = req.body;
+
+    const application = await Application.findById(applicationId);
+
+    if (!application) {
+      throw new HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: "NONEXISTENT_APPLICATION",
+            message: "This application does not exist",
+          },
+        ],
+      });
+    }
+
+    if (application.user.toString() !== req.user._id.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [
+          {
+            id: "FOREIGN_APPLICATION",
+            message: "Application does not belong to user",
+          },
+        ],
+      });
+    }
+
+    const emailService = new SendgridEmailService();
+    const isSignedUp = application.notificationSettings.signedUp;
+    const hasOptedOut = !(quarter || half || threeQuarters || full);
+
+    application.notificationSettings = {
+      signedUp: hasOptedOut ? false : true,
+      quarter,
+      half,
+      threeQuarters,
+      full,
+    };
+
+    await application.save();
+
+    if (!isSignedUp) {
+      emailService.sendEmailWithTemplate(
+        env("email").template_ids.NotificationSignup,
+        req.user.email,
+        env("email").from_email
+      );
+    } else {
+      emailService.sendEmailWithTemplate(
+        env("email").template_ids.NotificationChanges,
+        req.user.email,
+        env("email").from_email
+      );
+    }
+
+    return res.status(204).send();
   })
 );
 

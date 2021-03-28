@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
+import { useMutation } from "react-query";
+import axios from "axios";
 import { useViewport } from "use-viewport";
 import Styled from "styled-components/macro";
 import {
@@ -14,6 +16,7 @@ import {
 } from "ui";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
+import env from "environment";
 
 const MAX_RELAYS = 1000000;
 
@@ -24,23 +27,44 @@ const DEFAULT_PERCENTAGES = {
   full: false,
 };
 
-export default function Notifications({
-  appData,
-  weeklyRelayData,
-  successfulRelayData,
-  dailyRelayData,
-  avgSessionRelayCount,
-  latestRelaysData,
-}) {
+export default function Notifications({ appData, dailyRelayData }) {
   const [chosenPercentages, setChosenPercentages] = useState(
-    DEFAULT_PERCENTAGES
+    appData?.notificationSettings ?? DEFAULT_PERCENTAGES
   );
+  const [hasChanged, setHasChanged] = useState(false);
   const history = useHistory();
   const { within } = useViewport();
+  const { appId } = useParams();
+  const { isLoading: isNotificationsLoading, mutate } = useMutation(
+    async function updateNotificationSettings() {
+      const path = `${env(
+        "BACKEND_URL"
+      )}/api/applications/notifications/${appId}`;
+
+      const { quarter, half, threeQuarters, full } = chosenPercentages;
+
+      try {
+        await axios.put(
+          path,
+          {
+            quarter,
+            half,
+            threeQuarters,
+            full,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+
+        setHasChanged(false);
+      } catch (err) {
+        console.log("??", Object.entries(err));
+      }
+    }
+  );
 
   const compactMode = within(-1, "medium");
-
-  const { avgRelaysPerSession } = avgSessionRelayCount;
 
   const highestDailyAmount = useMemo(
     () =>
@@ -60,14 +84,27 @@ export default function Notifications({
     [dailyRelayData]
   );
 
+  const totalDailyRelays = useMemo(
+    () =>
+      dailyRelayData.reduce((sum, { dailyRelays }) => sum + dailyRelays, 0) /
+      dailyRelayData.length,
+    [dailyRelayData]
+  );
+
   const onChosePercentageChange = useCallback(
     (chosenPercentage) => {
+      setHasChanged(true);
       setChosenPercentages({
         ...chosenPercentages,
         [chosenPercentage]: !chosenPercentages[chosenPercentage],
       });
     },
     [chosenPercentages]
+  );
+
+  const isSubmitDisabled = useMemo(
+    () => isNotificationsLoading || !hasChanged,
+    [hasChanged, isNotificationsLoading]
   );
 
   return (
@@ -107,7 +144,7 @@ export default function Notifications({
                       ${textStyle("title2")}
                     `}
                   >
-                    Bandwith usage
+                    Daily bandwith usage
                   </h2>
                   {compactMode && <Spacer size={1 * GU} />}
                   <h3>Max relays per day: 1M</h3>
@@ -116,7 +153,7 @@ export default function Notifications({
                 <Inline>
                   <GraphContainer>
                     <CircleGraph
-                      value={avgRelaysPerSession / MAX_RELAYS}
+                      value={totalDailyRelays / MAX_RELAYS}
                       size={125}
                     />
                     <Spacer size={2 * GU} />
@@ -131,7 +168,10 @@ export default function Notifications({
                           ${textStyle("title3")}
                         `}
                       >
-                        {Intl.NumberFormat().format(avgRelaysPerSession)} Relays
+                        {Intl.NumberFormat().format(
+                          totalDailyRelays.toFixed(0)
+                        )}{" "}
+                        Relays
                         <span
                           css={`
                             display: block;
@@ -211,7 +251,12 @@ export default function Notifications({
           }
           secondary={
             <>
-              <Button wide mode="strong" onClick={() => history.goBack()}>
+              <Button
+                wide
+                mode="strong"
+                onClick={mutate}
+                disabled={isSubmitDisabled}
+              >
                 Save changes
               </Button>
               <Spacer size={2 * GU} />

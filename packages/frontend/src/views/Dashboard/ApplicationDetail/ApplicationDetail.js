@@ -4,6 +4,7 @@ import "styled-components/macro";
 import { Spacer, textStyle, GU } from "ui";
 import AnimatedLogo from "components/AnimatedLogo/AnimatedLogo";
 import AppInfo from "views/Dashboard/ApplicationDetail/AppInfo";
+import Chains from "views/Dashboard/ApplicationDetail/Chains";
 import Notifications from "views/Dashboard/ApplicationDetail/Notifications";
 import Security from "views/Dashboard/ApplicationDetail/Security";
 import SuccessDetails from "views/Dashboard/ApplicationDetail/SuccessDetails";
@@ -15,40 +16,45 @@ import {
   useSucessfulWeeklyRelays,
   useWeeklyAppRelaysInfo,
 } from "views/Dashboard/application-hooks";
+import env from "environment";
+
+// Ethers.js
+const TEST_APP_PUB_KEY =
+  "2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74";
 
 export default function ApplicationDetail() {
   const { path } = useRouteMatch();
   const { appData, isAppLoading } = useActiveApplication();
   const { isWeeklyAppRelaysLoading, weeklyRelaysData } = useWeeklyAppRelaysInfo(
-    // appData?.freeTierApplicationAccount?.publicKey
-    // One of ethers's apps for testing
-    "2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74"
+    env("PROD")
+      ? appData?.freeTierApplicationAccount?.publicKey
+      : TEST_APP_PUB_KEY
   );
   const {
     isSuccesfulWeeklyRelaysLoading,
     successfulWeeklyRelaysData,
   } = useSucessfulWeeklyRelays(
-    // appData?.freeTierApplicationAccount?.publicKey
-    // One of ethers's apps for testing
-    "2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74"
+    env("PROD")
+      ? appData?.freeTierApplicationAccount?.publicKey
+      : TEST_APP_PUB_KEY
   );
   const { isDailyRelayCountLoading, dailyRelayCountData } = useDailyRelayCount(
-    // appData?.freeTierApplicationAccount?.publicKey
-    // One of ethers's apps for testing
-    "2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74"
+    env("PROD")
+      ? appData?.freeTierApplicationAccount?.publicKey
+      : TEST_APP_PUB_KEY
   );
   const {
     isAvgSessionRelayCountLoading,
     avgSessionRelayCount,
   } = useAvgSessionRelayCount(
-    // appData?.freeTierApplicationAccount?.publicKey
-    // One of ethers's apps for testing
-    "2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74"
+    env("PROD")
+      ? appData?.freeTierApplicationAccount?.publicKey
+      : TEST_APP_PUB_KEY
   );
   const { isLatestRelaysLoading, latestRelayData } = useLatestRelays(
-    // appData?.freeTierApplicationAccount?.publicKey
-    // One of ethers's apps for testing
-    "2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74",
+    env("PROD")
+      ? appData?.freeTierApplicationAccount?.publicKey
+      : TEST_APP_PUB_KEY,
     0
   );
 
@@ -125,7 +131,7 @@ export default function ApplicationDetail() {
         />
       </Route>
       <Route path={`${path}/chains`}>
-        <h1>Chains</h1>
+        <Chains appData={appData} />
       </Route>
     </Switch>
   );
