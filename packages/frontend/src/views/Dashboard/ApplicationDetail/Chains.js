@@ -24,61 +24,58 @@ export default function BasicSetup({ appData }) {
   const history = useHistory();
   const { appId } = useParams();
   const { refetchUserApps } = useUserApplications();
-  const {
-    isLoading: isChainsLoading,
-    isError: isChainsError,
-    data: chains,
-  } = useQuery("/network/chains", async function getNetworkChains() {
-    const path = `${env("BACKEND_URL")}/api/network/chains`;
+  const { isLoading: isChainsLoading, data: chains } = useQuery(
+    "/network/chains",
+    async function getNetworkChains() {
+      const path = `${env("BACKEND_URL")}/api/network/chains`;
 
-    try {
-      const res = await axios.get(path, {
-        withCredentials: true,
-      });
-
-      const {
-        data: { chains },
-      } = res;
-
-      return chains;
-    } catch (err) {
-      console.log("?", err);
-    }
-  });
-  const {
-    isLoading: isSwitchLoading,
-    isError: isSwitchError,
-    mutate,
-  } = useMutation(async function switchChains() {
-    console.log(selectedChain, appId);
-    const path = `${env("BACKEND_URL")}/api/applications/switch/${appId}`;
-
-    try {
-      console.log(path);
-
-      const res = await axios.post(
-        path,
-        {
-          chain: selectedChain,
-        },
-        {
+      try {
+        const res = await axios.get(path, {
           withCredentials: true,
-        }
-      );
+        });
 
-      console.log(res);
+        const {
+          data: { chains },
+        } = res;
 
-      const {
-        data: { _id },
-      } = res;
-
-      await refetchUserApps();
-
-      history.push(`/app/${_id}`);
-    } catch (err) {
-      console.log("??", Object.entries(err));
+        return chains;
+      } catch (err) {
+        console.log("?", err);
+      }
     }
-  });
+  );
+  const { isLoading: isSwitchLoading, mutate } = useMutation(
+    async function switchChains() {
+      console.log(selectedChain, appId);
+      const path = `${env("BACKEND_URL")}/api/applications/switch/${appId}`;
+
+      try {
+        console.log(path);
+
+        const res = await axios.post(
+          path,
+          {
+            chain: selectedChain,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+
+        console.log(res);
+
+        const {
+          data: { _id },
+        } = res;
+
+        await refetchUserApps();
+
+        history.push(`/app/${_id}`);
+      } catch (err) {
+        console.log("??", Object.entries(err));
+      }
+    }
+  );
   const onSwitchClick = useCallback(
     (id) => {
       setSelectedChain(id === selectedChain ? "" : id);
