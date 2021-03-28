@@ -29,6 +29,8 @@ export const ENV_VARS = {
       template_ids: {
         SignUp: "d-23cc7c71b2d54b26bd09889f72fe0dc9",
         ResetPassword: "d-a54f3a2f7f784545bb3d3f0106a40a87",
+        NotificationSignup: "d-dc357971402d472b9576bf4d33f90100",
+        NotificationChanges: "d-6c17da8231bc4165b91298ea8745c117",
       },
     };
   },
