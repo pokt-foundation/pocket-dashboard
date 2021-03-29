@@ -25,7 +25,7 @@ import FloatUp from "components/FloatUp/FloatUp";
 import { prefixFromChainId } from "lib/chain-utils";
 import { norm } from "lib/math-utils";
 
-const ONE_MILLION = 800000;
+const ONE_MILLION = 1000000;
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -33,11 +33,6 @@ function formatDailyRelaysForGraphing(dailyRelays) {
   const labels = dailyRelays
     .map(({ bucket }) => bucket.split("T")[0])
     .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
-
-  const highestDailyAmount = dailyRelays.reduce(
-    (highest, { dailyRelays }) => Math.max(highest, dailyRelays),
-    0
-  );
 
   const lines = [
     {
