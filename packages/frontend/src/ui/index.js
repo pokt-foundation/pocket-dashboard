@@ -20,6 +20,7 @@ import Table from "ui/Table/Table";
 import TableCell from "ui/Table/TableCell";
 import TableHeader from "ui/Table/TableHeader";
 import TableRow from "ui/Table/TableRow";
+import Tag from "ui/Tag/Tag";
 import TextCopy from "ui/TextCopy/TextCopy";
 import TextInput from "ui/TextInput/TextInput";
 
@@ -47,6 +48,7 @@ export {
   TableCell,
   TableHeader,
   TableRow,
+  Tag,
   TextCopy,
   TextInput,
 };

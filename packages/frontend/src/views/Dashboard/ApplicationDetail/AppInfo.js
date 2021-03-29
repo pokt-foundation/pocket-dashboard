@@ -356,7 +356,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
           lines={chartLines}
           label={(i) => chartLabels[i]}
           height={200}
-          color={() => "#fafafa"}
+          color={() => "#31A1D2"}
           renderCheckpoints
         />
       </div>

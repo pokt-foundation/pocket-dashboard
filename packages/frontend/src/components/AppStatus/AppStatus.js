@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import TokenAmount from "token-amount";
 import "styled-components/macro";
 import Box from "components/Box/Box";
-import { Spacer, textStyle, GU } from "ui";
+import { Spacer, Tag, textStyle, GU } from "ui";
 import { getStakingStatus } from "lib/pocket-utils";
 
 export default function AppStatus({ appOnChainStatus }) {
@@ -31,7 +31,12 @@ export default function AppStatus({ appOnChainStatus }) {
         `}
       >
         <li>
-          Status: <span>{stakingStatus}</span>
+          Status:{" "}
+          <span>
+            <Tag mode="new" uppercase={false}>
+              {stakingStatus}
+            </Tag>
+          </span>
         </li>
         <Spacer size={2 * GU} />
         <li>
