@@ -167,8 +167,6 @@ export function useNetworkSuccessRate() {
         sevenDaysAgo.month() + 1
       }-${sevenDaysAgo.date()}T00:00:00+00:00`;
 
-      console.log(env("HASURA_SECRET"));
-
       const res = await gqlClient.request(SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY, {
         _gte: formattedTimestamp,
       });
