@@ -11,9 +11,10 @@ import SuccessDetails from "views/Dashboard/ApplicationDetail/SuccessDetails";
 import {
   useActiveApplication,
   useAppOnChainStatus,
-  useAvgSessionRelayCount,
+  useCurrentSessionRelayCount,
   useDailyRelayCount,
   useLatestRelays,
+  usePreviousSuccessfulRelays,
   useSucessfulWeeklyRelays,
   useWeeklyAppRelaysInfo,
 } from "views/Dashboard/application-hooks";
@@ -51,9 +52,9 @@ export default function ApplicationDetail() {
       : TEST_APP_PUB_KEY
   );
   const {
-    isAvgSessionRelayCountLoading,
-    avgSessionRelayCount,
-  } = useAvgSessionRelayCount(
+    isCurrentSessionRelaysLoading,
+    currentSessionRelayCount,
+  } = useCurrentSessionRelayCount(
     env("PROD")
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
@@ -64,14 +65,24 @@ export default function ApplicationDetail() {
       : TEST_APP_PUB_KEY,
     0
   );
+  const {
+    isPreviousSuccessfulRelaysLoading,
+    previousSucessfulRelaysData,
+  } = usePreviousSuccessfulRelays(
+    env("PROD")
+      ? appData?.freeTierApplicationAccount?.publicKey
+      : TEST_APP_PUB_KEY,
+    0
+  );
 
   const appLoading =
     isAppLoading ||
     isAppOnChainLoading ||
+    isPreviousSuccessfulRelaysLoading ||
     isWeeklyAppRelaysLoading ||
     isSuccesfulWeeklyRelaysLoading ||
     isDailyRelayCountLoading ||
-    isAvgSessionRelayCountLoading ||
+    isCurrentSessionRelaysLoading ||
     isLatestRelaysLoading;
 
   return appLoading ? (
@@ -102,44 +113,30 @@ export default function ApplicationDetail() {
         <AppInfo
           appData={appData}
           appOnChainData={appOnChainData}
-          weeklyRelayData={weeklyRelaysData}
-          successfulRelayData={successfulWeeklyRelaysData}
+          currentSessionRelays={currentSessionRelayCount}
           dailyRelayData={dailyRelayCountData}
-          avgSessionRelayCount={avgSessionRelayCount}
           latestRelaysData={latestRelayData}
+          previousSuccessfulRelays={previousSucessfulRelaysData}
+          successfulRelayData={successfulWeeklyRelaysData}
+          weeklyRelayData={weeklyRelaysData}
         />
       </Route>
       <Route path={`${path}/security`}>
         <Security
           appData={appData}
-          weeklyRelayData={weeklyRelaysData}
-          successfulRelayData={successfulWeeklyRelaysData}
-          dailyRelayData={dailyRelayCountData}
-          avgSessionRelayCount={avgSessionRelayCount}
-          latestRelaysData={latestRelayData}
           refetchActiveAppData={refetchActiveAppData}
         />
       </Route>
       <Route path={`${path}/success-details`}>
         <SuccessDetails
-          appData={appData}
           appOnChainData={appOnChainData}
           weeklyRelayData={weeklyRelaysData}
           successfulRelayData={successfulWeeklyRelaysData}
-          dailyRelayData={dailyRelayCountData}
-          avgSessionRelayCount={avgSessionRelayCount}
           latestRelaysData={latestRelayData}
         />
       </Route>
       <Route path={`${path}/notifications`}>
-        <Notifications
-          appData={appData}
-          weeklyRelayData={weeklyRelaysData}
-          successfulRelayData={successfulWeeklyRelaysData}
-          dailyRelayData={dailyRelayCountData}
-          avgSessionRelayCount={avgSessionRelayCount}
-          latestRelaysData={latestRelayData}
-        />
+        <Notifications appData={appData} dailyRelayData={dailyRelayCountData} />
       </Route>
       <Route path={`${path}/chains`}>
         <Chains appData={appData} />

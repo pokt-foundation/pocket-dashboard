@@ -22,11 +22,9 @@ import FloatUp from "components/FloatUp/FloatUp";
 
 export default function SuccessDetails({
   appOnChainData,
-  weeklyRelayData,
-  successfulRelayData,
-  dailyRelayData,
-  avgSessionRelayCount,
   latestRelaysData,
+  successfulRelayData,
+  weeklyRelayData,
 }) {
   const [activeKey, setActiveKey] = useState("successful");
   const history = useHistory();
