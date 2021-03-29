@@ -2,7 +2,7 @@ import React, { useCallback, useImperativeHandle, useRef } from "react";
 import PropTypes from "prop-types";
 import "styled-components/macro";
 import { IconCopy } from "ui/icons";
-import { GU, RADIUS, textStyle } from "ui/style";
+import { GU, textStyle } from "ui/style";
 import { useTheme } from "ui/theme";
 import { noop, warn } from "ui/utils";
 import TextInput from "ui/TextInput/TextInput";

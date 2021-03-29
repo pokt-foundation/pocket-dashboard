@@ -18,7 +18,6 @@ import {
   GU,
 } from "ui";
 import Box from "components/Box/Box";
-import { log } from "lib/utils";
 import FloatUp from "components/FloatUp/FloatUp";
 import env from "environment";
 

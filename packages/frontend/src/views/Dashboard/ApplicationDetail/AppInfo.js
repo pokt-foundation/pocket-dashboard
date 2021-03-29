@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useHistory, useRouteMatch } from "react-router";
 import { animated, useSpring } from "react-spring";
 import { useViewport } from "use-viewport";

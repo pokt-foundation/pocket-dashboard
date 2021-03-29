@@ -142,7 +142,7 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData;
-  const { refetchUserApps, appsData } = useUserApplications();
+  const { refetchUserApps } = useUserApplications();
 
   const {
     isLoading: isChainsLoading,
