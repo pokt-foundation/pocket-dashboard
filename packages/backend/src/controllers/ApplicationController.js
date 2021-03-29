@@ -1,11 +1,12 @@
 import express from "express";
-import merge from "lodash.merge";
+import crypto from "crypto";
 import asyncMiddleware from "middlewares/async";
 import { authenticate } from "middlewares/passport-auth";
 import Application from "models/Application";
 import ApplicationPool from "models/PreStakedApp";
 import HttpError from "errors/http-error";
 import SendgridEmailService from "services/SendGridEmailService";
+import { getApp } from "lib/pocket";
 import { APPLICATION_STATUSES } from "application-statuses";
 import env from "environment";
 
@@ -62,6 +63,31 @@ router.get(
   })
 );
 
+router.get(
+  "/status/:applicationId",
+  asyncMiddleware(async (req, res) => {
+    const userId = req.user._id;
+    const { applicationId } = req.params;
+    const application = await Application.findById(applicationId);
+
+    if (!application) {
+      throw HttpError.NOT_FOUND({
+        errors: [{ message: "User does not have an active application" }],
+      });
+    }
+
+    if (application.user.toString() !== userId.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [{ message: "User does not have access to this application" }],
+      });
+    }
+
+    const app = await getApp(application.freeTierApplicationAccount.address);
+
+    res.status(200).send(app);
+  })
+);
+
 router.post(
   "",
   asyncMiddleware(async (req, res) => {
@@ -115,7 +141,10 @@ router.post(
         freeTier: true,
         freeTierApplicationAccount: preStakedApp.freeTierApplicationAccount,
         gatewayAAT: preStakedApp.gatewayAAT,
-        gatewaySettings,
+        gatewaySettings: {
+          ...gatewaySettings,
+          secretKey: crypto.randomBytes(16).toString("hex"),
+        },
       });
 
       await application.save();

@@ -25,8 +25,6 @@ import FloatUp from "components/FloatUp/FloatUp";
 import { prefixFromChainId } from "lib/chain-utils";
 import { norm } from "lib/math-utils";
 
-const APP_ID = "60010a10eea5fb002e5bc536";
-
 const ONE_MILLION = 800000;
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -58,8 +56,9 @@ function formatDailyRelaysForGraphing(dailyRelays) {
   };
 }
 
-export default function AppDetail({
+export default function AppInfo({
   appData,
+  appOnChainData,
   avgSessionRelayCount,
   dailyRelayData,
   latestRelaysData,
@@ -136,9 +135,13 @@ export default function AppDetail({
                 Notifications
               </Button>
               <Spacer size={2 * GU} />
-              <AppStatus />
+              <AppStatus appOnChainStatus={appOnChainData} />
               <Spacer size={2 * GU} />
-              <AppInfo />
+              <AppDetails
+                id={appData._id}
+                pubkey={appData.freeTierApplicationAccount.publicKey}
+                secret={appData.freeTierApplicationAccount?.secretKey ?? ""}
+              />
             </>
           }
         />
@@ -405,7 +408,7 @@ function LatestRequests({ latestRequests }) {
   );
 }
 
-function AppInfo() {
+function AppDetails({ id, pubkey, secret }) {
   return (
     <Box
       css={`
@@ -430,24 +433,7 @@ function AppInfo() {
         >
           Gateway ID
         </h3>
-        <TextCopy value={APP_ID} />
-      </div>
-      <div
-        css={`
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-        `}
-      >
-        <h3
-          css={`
-            ${textStyle("body1")};
-            margin-bottom: ${2 * GU}px;
-          `}
-        >
-          App Secret
-        </h3>
-        <TextCopy value={APP_ID} />
+        <TextCopy value={id} />
       </div>
       <div
         css={`
@@ -464,8 +450,27 @@ function AppInfo() {
         >
           App public key
         </h3>
-        <TextCopy value={APP_ID} />
+        <TextCopy value={pubkey} />
       </div>
+      {secret && (
+        <div
+          css={`
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+          `}
+        >
+          <h3
+            css={`
+              ${textStyle("body1")};
+              margin-bottom: ${2 * GU}px;
+            `}
+          >
+            App Secret
+          </h3>
+          <TextCopy value={secret} />
+        </div>
+      )}
     </Box>
   );
 }

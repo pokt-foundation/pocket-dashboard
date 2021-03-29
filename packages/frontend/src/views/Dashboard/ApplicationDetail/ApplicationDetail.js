@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route, useRouteMatch } from "react-router";
+import { Switch, Route, useParams, useRouteMatch } from "react-router";
 import "styled-components/macro";
 import { Spacer, textStyle, GU } from "ui";
 import AnimatedLogo from "components/AnimatedLogo/AnimatedLogo";
@@ -10,6 +10,7 @@ import Security from "views/Dashboard/ApplicationDetail/Security";
 import SuccessDetails from "views/Dashboard/ApplicationDetail/SuccessDetails";
 import {
   useActiveApplication,
+  useAppOnChainStatus,
   useAvgSessionRelayCount,
   useDailyRelayCount,
   useLatestRelays,
@@ -23,8 +24,14 @@ const TEST_APP_PUB_KEY =
   "2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74";
 
 export default function ApplicationDetail() {
+  const { appId } = useParams();
   const { path } = useRouteMatch();
-  const { appData, isAppLoading } = useActiveApplication();
+  const {
+    appData,
+    isAppLoading,
+    refetchActiveAppData,
+  } = useActiveApplication();
+  const { appOnChainData, isAppOnChainLoading } = useAppOnChainStatus(appId);
   const { isWeeklyAppRelaysLoading, weeklyRelaysData } = useWeeklyAppRelaysInfo(
     env("PROD")
       ? appData?.freeTierApplicationAccount?.publicKey
@@ -60,6 +67,7 @@ export default function ApplicationDetail() {
 
   const appLoading =
     isAppLoading ||
+    isAppOnChainLoading ||
     isWeeklyAppRelaysLoading ||
     isSuccesfulWeeklyRelaysLoading ||
     isDailyRelayCountLoading ||
@@ -93,6 +101,7 @@ export default function ApplicationDetail() {
       <Route exact path={path}>
         <AppInfo
           appData={appData}
+          appOnChainData={appOnChainData}
           weeklyRelayData={weeklyRelaysData}
           successfulRelayData={successfulWeeklyRelaysData}
           dailyRelayData={dailyRelayCountData}
@@ -108,11 +117,13 @@ export default function ApplicationDetail() {
           dailyRelayData={dailyRelayCountData}
           avgSessionRelayCount={avgSessionRelayCount}
           latestRelaysData={latestRelayData}
+          refetchActiveAppData={refetchActiveAppData}
         />
       </Route>
       <Route path={`${path}/success-details`}>
         <SuccessDetails
           appData={appData}
+          appOnChainData={appOnChainData}
           weeklyRelayData={weeklyRelaysData}
           successfulRelayData={successfulWeeklyRelaysData}
           dailyRelayData={dailyRelayCountData}
