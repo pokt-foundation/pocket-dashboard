@@ -417,3 +417,36 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
     latestRelayData,
   };
 }
+
+export function useAppOnChainStatus(appId) {
+  const {
+    isLoading: isAppOnChainLoading,
+    isError: isAppOnChainError,
+    data: appOnChainData,
+  } = useQuery(
+    `user/applications/${appId}/onchaindata`,
+    async function getOnChainAppData() {
+      if (!appId) {
+        return null;
+      }
+
+      const path = `${env("BACKEND_URL")}/api/applications/status/${appId}`;
+
+      try {
+        const { data } = await axios.get(path, {
+          withCredentials: true,
+        });
+
+        return data;
+      } catch (err) {
+        console.log(Object.entries(err), "rip");
+      }
+    }
+  );
+
+  return {
+    appOnChainData,
+    isAppOnChainError,
+    isAppOnChainLoading,
+  };
+}
