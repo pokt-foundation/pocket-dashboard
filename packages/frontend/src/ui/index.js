@@ -1,8 +1,10 @@
 import AppWrapper from "ui/AppWrapper/AppWrapper";
 import Button from "ui/Button/Button";
+import ButtonIcon from "ui/Button/ButtonIcon";
 import ButtonBase from "ui/ButtonBase/ButtonBase";
 import CheckBox from "ui/CheckBox/CheckBox";
 import CircleGraph from "ui/CircleGraph/CircleGraph";
+import DiscButton from "ui/DiscButton/DiscButton";
 import Field from "ui/Field/Field";
 import Help from "ui/Help/Help";
 import Info from "ui/Info/Info";
@@ -25,9 +27,11 @@ import TextInput from "ui/TextInput/TextInput";
 export {
   AppWrapper,
   Button,
+  ButtonIcon,
   ButtonBase,
   CheckBox,
   CircleGraph,
+  DiscButton,
   Field,
   Help,
   Info,

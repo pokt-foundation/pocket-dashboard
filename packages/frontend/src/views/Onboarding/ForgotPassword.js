@@ -22,7 +22,7 @@ export default function ForgotPassword() {
   const theme = useTheme();
 
   const { isLoading, isSuccess, mutate } = useMutation(
-    async function sendResetEmail() {
+    async function sendResetEmail(e) {
       const path = `${env("BACKEND_URL")}/api/users/send-reset-email`;
 
       try {
@@ -100,7 +100,7 @@ export default function ForgotPassword() {
             margin-bottom: ${2 * GU}px;
           `}
           disabled={isLoading || isSuccess}
-          onClick={mutate}
+          onClick={(e) => mutate(e)}
         >
           Send email
         </Button>

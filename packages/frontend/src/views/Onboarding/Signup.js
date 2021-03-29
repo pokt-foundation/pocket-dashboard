@@ -262,7 +262,7 @@ export default function Login() {
           <Button
             type="submit"
             disabled={isSubmitDisabled}
-            onClick={mutate}
+            onClick={(e) => mutate(e)}
             css={`
               margin-bottom: ${2 * GU}px;
             `}

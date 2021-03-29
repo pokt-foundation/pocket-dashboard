@@ -1,18 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { warnOnce } from "ui/utils";
 import { GU } from "ui/style";
 import Button from "ui/Button/Button";
 import ButtonBase from "ui/ButtonBase/ButtonBase";
 
 function ButtonIcon({ label, children, mode, ...props }) {
-  if (mode !== undefined) {
-    warnOnce(
-      "ButtonIcon:mode",
-      "ButtonIcon: the mode prop is deprecated. Please use Button with the icon prop instead."
-    );
-  }
-
   if (mode === "button") {
     return <Button label={label} icon={children} display="icon" {...props} />;
   }
