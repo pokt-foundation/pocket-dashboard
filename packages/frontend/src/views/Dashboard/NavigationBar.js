@@ -1,10 +1,9 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useMutation } from "react-query";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import {
-  Button,
   ButtonBase,
   ButtonIcon,
   IconCog,
