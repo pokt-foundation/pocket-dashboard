@@ -22,6 +22,7 @@ import {
 import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
+import SuccessIndicator from "views/Dashboard/ApplicationDetail/SuccessIndicator";
 import { prefixFromChainId } from "lib/chain-utils";
 import { norm } from "lib/math-utils";
 
@@ -52,9 +53,10 @@ function formatDailyRelaysForGraphing(dailyRelays) {
 export default function AppInfo({
   appData,
   appOnChainData,
-  avgSessionRelayCount,
+  currentSessionRelays,
   dailyRelayData,
   latestRelaysData,
+  previousSuccessfulRelays,
   successfulRelayData,
   weeklyRelayData,
 }) {
@@ -64,11 +66,24 @@ export default function AppInfo({
 
   const compactMode = within(-1, "medium");
 
+  console.log(previousSuccessfulRelays);
+
   const successRate = useMemo(
     () =>
       successfulRelayData.successfulWeeklyRelays /
       weeklyRelayData.weeklyAppRelays,
     [weeklyRelayData, successfulRelayData]
+  );
+  const previousSuccessRate = useMemo(
+    () =>
+      previousSuccessfulRelays.successfulWeeklyRelays /
+      previousSuccessfulRelays.previousTotalRelays,
+    [previousSuccessfulRelays]
+  );
+
+  console.log(
+    "dann!",
+    ((successRate - previousSuccessRate) / successRate) * 100
   );
 
   const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
@@ -94,8 +109,9 @@ export default function AppInfo({
                 `}
               >
                 <SuccessRate
-                  successRate={successRate}
                   appId={appData._id}
+                  previousSuccessRate={previousSuccessRate}
+                  successRate={successRate}
                   totalRequests={weeklyRelayData.weeklyAppRelays}
                 />
                 <AvgLatency avgLatency={successfulRelayData.avgLatency} />
@@ -104,7 +120,7 @@ export default function AppInfo({
               <UsageTrends
                 chartLabels={usageLabels}
                 chartLines={usageLines}
-                sessionRelays={avgSessionRelayCount.avgRelaysPerSession}
+                sessionRelays={currentSessionRelays}
               />
               <Spacer size={2 * GU} />
               <LatestRequests latestRequests={latestRelaysData.latestRelays} />
@@ -160,7 +176,12 @@ function EndpointDetails({ chainId, appId }) {
   );
 }
 
-function SuccessRate({ appId, successRate, totalRequests }) {
+function SuccessRate({
+  appId,
+  previousSuccessRate,
+  successRate,
+  totalRequests,
+}) {
   const history = useHistory();
   const { url } = useRouteMatch();
   const numberProps = useSpring({
@@ -168,6 +189,14 @@ function SuccessRate({ appId, successRate, totalRequests }) {
     from: { number: 0 },
   });
   const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } });
+
+  const successRateDelta = useMemo(
+    () =>
+      (((successRate - previousSuccessRate) / successRate) * 100).toFixed(2),
+    [previousSuccessRate, successRate]
+  );
+
+  const mode = successRateDelta > 0 ? "positive" : "negative";
 
   return (
     <Box
@@ -230,7 +259,31 @@ function SuccessRate({ appId, successRate, totalRequests }) {
           >
             Success Rate
           </h3>
-          <div>4%</div>
+          <div
+            css={`
+              display: flex;
+              flex-direction: column;
+              align-items: flex-end;
+            `}
+          >
+            <div
+              css={`
+                display: flex;
+                align-items: center;
+              `}
+            >
+              <SuccessIndicator mode={mode} />
+              <Spacer size={GU / 2} />
+              <span>{Math.abs(successRateDelta)}%</span>
+            </div>
+            <p
+              css={`
+                ${textStyle("body4")}
+              `}
+            >
+              Last 7 days
+            </p>
+          </div>
         </div>
         <Spacer size={1 * GU} />
         <div
@@ -343,7 +396,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
                 ${textStyle("body3")}
               `}
             >
-              Relays per session
+              Relays this session
             </span>
           </h4>
         </div>

@@ -6,6 +6,8 @@ import { useParams } from "react-router";
 import { useQuery } from "react-query";
 import env from "environment";
 
+const BUCKETS_PER_HOUR = 2;
+
 const gqlClient = new GraphQLClient(env("HASURA_URL"), {
   headers: {
     "x-hasura-admin-secret": env("HASURA_SECRET"),
@@ -16,6 +18,31 @@ const TOTAL_RELAYS_AND_AVG_LATENCY_QUERY = gql`
   query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY($_eq: String, $_gte: timestamptz) {
     relay_apps_daily_aggregate(
       where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
+      order_by: { bucket: desc }
+    ) {
+      aggregate {
+        sum {
+          total_relays
+        }
+        avg {
+          elapsed_time
+        }
+      }
+    }
+  }
+`;
+
+const TOTAL_RANGED_RELAYS_QUERY = gql`
+  query TOTAL_RANGED_RELAYS_QUERY(
+    $_eq: String
+    $_gte: timestamptz
+    $_lte: timestamptz
+  ) {
+    relay_apps_daily_aggregate(
+      where: {
+        app_pub_key: { _eq: $_eq }
+        bucket: { _gte: $_gte, _lte: $_lte }
+      }
       order_by: { bucket: desc }
     ) {
       aggregate {
@@ -52,6 +79,29 @@ const WEEKLY_SUCCESSFUL_RELAYS_QUERY = gql`
   }
 `;
 
+const WEEKLY_RANGED_SUCCESSFUL_RELAYS = gql`
+  query SUCCESSFUL_WEEKLY_RELAYS(
+    $_eq: String
+    $_gte: timestamptz
+    $_lte: timestamptz
+  ) {
+    relay_apps_daily_aggregate(
+      where: {
+        app_pub_key: { _eq: $_eq }
+        bucket: { _gte: $_gte, _lte: $_lte }
+        result: { _eq: "200" }
+      }
+      order_by: { bucket: desc }
+    ) {
+      aggregate {
+        sum {
+          total_relays
+        }
+      }
+    }
+  }
+`;
+
 const DAILY_APP_RELAYS_QUERY = gql`
   query DAILY_RELAYS_QUERY($_eq: String, $_gte: timestamptz) {
     relay_apps_daily(
@@ -64,17 +114,15 @@ const DAILY_APP_RELAYS_QUERY = gql`
   }
 `;
 
-const AVG_SESSION_RELAY_COUNT_QUERY = gql`
-  query AVG_SESSION_RELAY_COUNT($_eq: String, $_gte: timestamptz) {
-    relay_apps_hourly_aggregate(
+const LAST_SESSION_RELAYS_QUERY = gql`
+  query LAST_SESSION_RELAYS($_eq: String, $_gte: timestamptz) {
+    relay_app_hourly(
       where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
-      order_by: { bucket: asc }
+      order_by: { bucket: desc }
+      limit: ${BUCKETS_PER_HOUR} 
     ) {
-      aggregate {
-        avg {
-          total_relays
-        }
-      }
+      bucket
+      total_relays
     }
   }
 `;
@@ -335,11 +383,11 @@ export function useDailyRelayCount(appPubKey) {
   };
 }
 
-export function useAvgSessionRelayCount(appPubKey) {
+export function useCurrentSessionRelayCount(appPubKey) {
   const {
-    isLoading: isAvgSessionRelayCountLoading,
-    isError: isAvgSessionRelayCountError,
-    data: avgSessionRelayCount,
+    isLoading: isCurrentSessionRelaysLoading,
+    isError: isCurrentSessionRelaysError,
+    data: currentSessionRelayCount,
   } = useQuery(
     `user/applications/${appPubKey}/avg-session-count`,
     async function getWeeklyAppRelaysInfo() {
@@ -349,27 +397,26 @@ export function useAvgSessionRelayCount(appPubKey) {
 
       dayjs.extend(dayJsutcPlugin);
 
-      const sevenDaysAgo = dayjs.utc().subtract(7, "day");
+      const today = dayjs.utc();
 
-      const formattedTimestamp = `${sevenDaysAgo.year()}-0${
-        sevenDaysAgo.month() + 1
-      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+      const formattedTimestamp = `${today.year()}-0${
+        today.month() + 1
+      }-${today.date()}T00:00:00+00:00`;
 
       try {
-        const res = await gqlClient.request(AVG_SESSION_RELAY_COUNT_QUERY, {
+        const res = await gqlClient.request(LAST_SESSION_RELAYS_QUERY, {
           _eq: appPubKey,
           _gte: formattedTimestamp,
         });
+        const { relay_app_hourly: hourlyRelays } = res;
 
-        const {
-          relay_apps_hourly_aggregate: {
-            aggregate: {
-              avg: { total_relays: avgRelaysPerSession },
-            },
-          },
-        } = res;
+        const totalSessionRelays = hourlyRelays.reduce(
+          (total, { total_relays: totalRelays }) => total + totalRelays,
+          0
+        );
 
-        return { avgRelaysPerSession };
+        console.log(totalSessionRelays);
+        return totalSessionRelays;
       } catch (err) {
         console.log(err, "rip");
       }
@@ -377,9 +424,9 @@ export function useAvgSessionRelayCount(appPubKey) {
   );
 
   return {
-    isAvgSessionRelayCountLoading,
-    isAvgSessionRelayCountError,
-    avgSessionRelayCount,
+    isCurrentSessionRelaysLoading,
+    isCurrentSessionRelaysError,
+    currentSessionRelayCount,
   };
 }
 
@@ -448,5 +495,75 @@ export function useAppOnChainStatus(appId) {
     appOnChainData,
     isAppOnChainError,
     isAppOnChainLoading,
+  };
+}
+
+export function usePreviousSuccessfulRelays(appPubKey) {
+  const {
+    isLoading: isPreviousSuccessfulRelaysLoading,
+    isError: isPreviousSuccessfulRelaysError,
+    data: previousSucessfulRelaysData,
+  } = useQuery(
+    `user/applications/${appPubKey}/sucessful-ranged-weekly-relays`,
+    async function getWeeklyAppRelaysInfo() {
+      if (!appPubKey) {
+        return null;
+      }
+
+      dayjs.extend(dayJsutcPlugin);
+
+      const fourteenDaysAgo = dayjs.utc().subtract(14, "day");
+      const sevenDaysAgo = dayjs.utc().subtract(7, "days");
+
+      const fourteenDaysAgoTimestamp = `${fourteenDaysAgo.year()}-0${
+        fourteenDaysAgo.month() + 1
+      }-${fourteenDaysAgo.date()}T00:00:00+00:00`;
+
+      const sevenDaysAgoTimestamp = `${sevenDaysAgo.year()}-0${
+        sevenDaysAgo.month() + 1
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+
+      try {
+        const res = await gqlClient.request(WEEKLY_RANGED_SUCCESSFUL_RELAYS, {
+          _eq: appPubKey,
+          _gte: fourteenDaysAgoTimestamp,
+          _lte: sevenDaysAgoTimestamp,
+        });
+        const totalRelaysRes = await gqlClient.request(
+          TOTAL_RANGED_RELAYS_QUERY,
+          {
+            _eq: appPubKey,
+            _gte: fourteenDaysAgoTimestamp,
+            _lte: sevenDaysAgoTimestamp,
+          }
+        );
+
+        const {
+          relay_apps_daily_aggregate: {
+            aggregate: {
+              sum: { total_relays: successfulWeeklyRelays },
+            },
+          },
+        } = res;
+
+        const {
+          relay_apps_daily_aggregate: {
+            aggregate: {
+              sum: { total_relays: previousTotalRelays },
+            },
+          },
+        } = totalRelaysRes;
+
+        return { previousTotalRelays, successfulWeeklyRelays };
+      } catch (err) {
+        console.log(err, "rip");
+      }
+    }
+  );
+
+  return {
+    isPreviousSuccessfulRelaysLoading,
+    isPreviousSuccessfulRelaysError,
+    previousSucessfulRelaysData,
   };
 }
