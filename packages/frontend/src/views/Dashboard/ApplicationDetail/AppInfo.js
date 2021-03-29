@@ -48,8 +48,6 @@ function formatDailyRelaysForGraphing(dailyRelays) {
     },
   ];
 
-  console.log(lines, highestDailyAmount);
-
   return {
     labels,
     lines,
@@ -140,7 +138,7 @@ export default function AppInfo({
               <AppDetails
                 id={appData._id}
                 pubkey={appData.freeTierApplicationAccount.publicKey}
-                secret={appData.freeTierApplicationAccount?.secretKey ?? ""}
+                secret={appData.gatewaySettings?.secretKey ?? ""}
               />
             </>
           }
@@ -409,6 +407,7 @@ function LatestRequests({ latestRequests }) {
 }
 
 function AppDetails({ id, pubkey, secret }) {
+  console.log(secret);
   return (
     <Box
       css={`

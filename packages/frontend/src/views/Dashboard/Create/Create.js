@@ -358,7 +358,7 @@ function BasicSetup({
                         <Switch
                           onChange={() => onSwitchClick(id)}
                           checked={data.selectedNetwork === id}
-                          disabled={isAvailableForStaking}
+                          disabled={!isAvailableForStaking}
                         />
                       </TableCell>
                       <TableCell>{description}</TableCell>

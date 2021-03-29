@@ -53,6 +53,7 @@ export default function Security({ appData, refetchActiveAppData }) {
 
       return [...currentOrigins, ...filteredStateOrigins];
     });
+    setSecretKeyRequired(appData.gatewaySettings.secretKeyRequired);
   }, [appData]);
 
   const { mutate } = useMutation(async function updateApplicationSettings() {
