@@ -138,6 +138,7 @@ export function useActiveApplication() {
     isLoading: isAppLoading,
     isError: isAppError,
     data: appData,
+    refetch: refetchActiveAppData,
   } = useQuery(
     `user/applications/${appId ?? "NO_APPLICATION"}`,
     async function getActiveApplication() {
@@ -163,6 +164,7 @@ export function useActiveApplication() {
     appData,
     isAppError,
     isAppLoading,
+    refetchActiveAppData,
   };
 }
 

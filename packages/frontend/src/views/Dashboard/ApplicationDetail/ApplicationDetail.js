@@ -24,7 +24,11 @@ const TEST_APP_PUB_KEY =
 
 export default function ApplicationDetail() {
   const { path } = useRouteMatch();
-  const { appData, isAppLoading } = useActiveApplication();
+  const {
+    appData,
+    isAppLoading,
+    refetchActiveAppData,
+  } = useActiveApplication();
   const { isWeeklyAppRelaysLoading, weeklyRelaysData } = useWeeklyAppRelaysInfo(
     env("PROD")
       ? appData?.freeTierApplicationAccount?.publicKey
@@ -108,6 +112,7 @@ export default function ApplicationDetail() {
           dailyRelayData={dailyRelayCountData}
           avgSessionRelayCount={avgSessionRelayCount}
           latestRelaysData={latestRelayData}
+          refetchActiveAppData={refetchActiveAppData}
         />
       </Route>
       <Route path={`${path}/success-details`}>

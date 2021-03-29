@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useHistory, useRouteMatch } from "react-router";
 import { animated, useSpring } from "react-spring";
 import { useViewport } from "use-viewport";
@@ -58,7 +58,7 @@ function formatDailyRelaysForGraphing(dailyRelays) {
   };
 }
 
-export default function AppDetail({
+export default function AppInfo({
   appData,
   avgSessionRelayCount,
   dailyRelayData,
@@ -138,7 +138,7 @@ export default function AppDetail({
               <Spacer size={2 * GU} />
               <AppStatus />
               <Spacer size={2 * GU} />
-              <AppInfo />
+              <AppDetails />
             </>
           }
         />
@@ -405,7 +405,7 @@ function LatestRequests({ latestRequests }) {
   );
 }
 
-function AppInfo() {
+function AppDetails() {
   return (
     <Box
       css={`
