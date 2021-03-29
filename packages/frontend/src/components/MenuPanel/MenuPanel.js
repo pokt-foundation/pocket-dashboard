@@ -5,19 +5,20 @@ import { animated, useSpring } from "react-spring";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import { ButtonBase, Spacer, useTheme, springs, GU, RADIUS } from "ui";
-import ButtonIcon from "components/MenuPanel/ButtonIcon.png";
+import IconApp from "components/MenuPanel/IconApp";
+import IconNetwork from "components/MenuPanel/IconNetwork";
 import PocketLogo from "assets/pnlogo.png";
 
 const CHILD_INSTANCE_HEIGHT = 4 * GU;
 
 const MENU_ROUTES = [
   {
-    icon: ButtonIcon,
+    icon: IconNetwork,
     id: "/home",
     label: "Network",
   },
   {
-    icon: ButtonIcon,
+    icon: IconApp,
     id: "/apps",
     label: "My Apps",
   },
@@ -177,7 +178,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
         }}
       />
       <MenuPanelButton
-        active={activeIndex === 0}
+        active={active}
         instance={primaryInstance}
         onClick={handleInstanceClick}
       />
@@ -225,6 +226,8 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
 function MenuPanelButton({ active, instance, onClick, ...props }) {
   const theme = useTheme();
 
+  const InstanceIcon = instance.icon;
+
   return (
     <ButtonBase
       css={`
@@ -252,7 +255,8 @@ function MenuPanelButton({ active, instance, onClick, ...props }) {
           }
         `}
       >
-        <img src={instance.icon} alt={`${instance.label} icon`} />
+        <InstanceIcon color={active ? theme.accent : "black"} />
+        <Spacer size={1 * GU} />
         {instance.label}
       </div>
     </ButtonBase>
