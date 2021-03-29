@@ -46,12 +46,9 @@ export default function BasicSetup({ appData }) {
   );
   const { isLoading: isSwitchLoading, mutate } = useMutation(
     async function switchChains() {
-      console.log(selectedChain, appId);
       const path = `${env("BACKEND_URL")}/api/applications/switch/${appId}`;
 
       try {
-        console.log(path);
-
         const res = await axios.post(
           path,
           {
@@ -61,8 +58,6 @@ export default function BasicSetup({ appData }) {
             withCredentials: true,
           }
         );
-
-        console.log(res);
 
         const {
           data: { _id },

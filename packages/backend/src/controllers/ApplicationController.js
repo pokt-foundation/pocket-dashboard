@@ -143,9 +143,12 @@ router.post(
         gatewayAAT: preStakedApp.gatewayAAT,
         gatewaySettings: {
           ...gatewaySettings,
-          secretKey: crypto.randomBytes(16).toString("hex"),
         },
       });
+
+      application.gatewaySettings.secretKey = crypto
+        .randomBytes(16)
+        .toString("hex");
 
       await application.save();
 
@@ -227,7 +230,6 @@ router.post(
       }
 
       if (oldApplication.user.toString() !== req.user._id.toString()) {
-        console.log(oldApplication._id.toString(), req.user._id.toString());
         throw HttpError.FORBIDDEN({
           errors: [
             {
