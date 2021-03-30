@@ -1,69 +1,69 @@
 {
-  "ipcMode": null,
-  "executionRoleArn": "arn:aws:iam::059424750518:role/ecsTaskExecutionRole",
-  "containerDefinitions": [
-    {
-      "dnsSearchDomains": null,
-      "environmentFiles": null,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "secretOptions": null,
-        "options": {
-          "awslogs-group": "/ecs/dashboard",
-          "awslogs-region": "eu-west-1",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "entryPoint": [],
-      "portMappings": [
-        {
-          "hostPort": 4200,
-          "protocol": "tcp",
-          "containerPort": 4200
-        }
-      ],
-      "environment": [],
-      "command": [],
-      "linuxParameters": null,
-      "cpu": 0,
-      "resourceRequirements": null,
-      "ulimits": null,
-      "dnsServers": null,
-      "mountPoints": [],
-      "workingDirectory": null,
-      "dockerSecurityOptions": null,
-      "memory": null,
-      "memoryReservation": 512,
-      "volumesFrom": [],
-      "stopTimeout": null,
-      "image": "059424750518.dkr.ecr.eu-west-1.amazonaws.com/dashboard:latest",
-      "startTimeout": null,
-      "firelensConfiguration": null,
-      "dependsOn": null,
-      "disableNetorking": null,
-      "interactive": null,
-      "healthCheck": null,
-      "essential": true,
-      "links": [],
-      "hostname": null,
-      "extraHosts": null,
-      "pseudoTerminal": null,
-      "user": null,
-      "readonlyRootFilesystem": null,
-      "dockerLabels": null,
-      "systemControls": null,
-      "privileged": null,
-      "name": "dashboard"
-    }
-  ],
-  "placementConstraints": [],
-  "memory": "512",
-  "taskRoleArn": null,
-  "family": "dashboard",
-  "pidMode": null,
-  "networkMode": "awsvpc",
-  "cpu": "256",
-  "inferenceAccelerators": null,
-  "proxyConfiguration": null,
-  "volumes": []
+	"ipcMode": null,
+	"executionRoleArn": "arn:aws:iam::059424750518:role/ecsTaskExecutionRole",
+	"containerDefinitions": [
+	  {
+		"dnsSearchDomains": null,
+		"environmentFiles": null,
+		"logConfiguration": {
+		  "logDriver": "awslogs",
+		  "secretOptions": null,
+		  "options": {
+			"awslogs-group": "/ecs/dashboard",
+			"awslogs-region": "eu-west-1",
+			"awslogs-stream-prefix": "ecs"
+		  }
+		},
+		"entryPoint": [],
+		"portMappings": [
+		  {
+			"hostPort": 4200,
+			"protocol": "tcp",
+			"containerPort": 4200
+		  }
+    ],
+    "environment": [],
+		"command": [],
+		"linuxParameters": null,
+		"cpu": 0,
+		"resourceRequirements": null,
+		"ulimits": null,
+		"dnsServers": null,
+		"mountPoints": [],
+		"workingDirectory": null,
+		"dockerSecurityOptions": null,
+		"memory": null,
+		"memoryReservation": 512,
+		"volumesFrom": [],
+		"stopTimeout": null,
+		"image": "059424750518.dkr.ecr.eu-west-1.amazonaws.com/dashboard:latest",
+		"startTimeout": null,
+		"firelensConfiguration": null,
+		"dependsOn": null,
+		"disableNetworking": null,
+		"interactive": null,
+		"healthCheck": null,
+		"essential": true,
+		"links": [],
+		"hostname": null,
+		"extraHosts": null,
+		"pseudoTerminal": null,
+		"user": null,
+		"readonlyRootFilesystem": null,
+		"dockerLabels": null,
+		"systemControls": null,
+		"privileged": null,
+		"name": "dashboard"
+	  }
+	],
+	"placementConstraints": [],
+	"memory": "512",
+	"taskRoleArn": null,
+	"family": "dashboard",
+	"pidMode": null,
+	"networkMode": "awsvpc",
+	"cpu": "256",
+	"inferenceAccelerators": null,
+	"proxyConfiguration": null,
+	"volumes": []
 }
