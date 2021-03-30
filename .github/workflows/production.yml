@@ -108,7 +108,7 @@ jobs:
           envkey_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PRODUCTION_ACCESS_KEY_ID }}
           envkey_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PRODUCTION_SECRET_ACCESS_KEY }}
           envkey_AWS_S3_FTS_BUCKET: ${{ secrets.AWS_PRODUCTION_S3_FTS_BUCKET }}
-          envkey_AWS_REGION: us-west-2
+          envkey_AWS_REGION: eu-west-1
           envkey_DATABASE_NAME: gateway
           envkey_POCKET_NETWORK_MAX_DISPATCHER: 7
           envkey_POCKET_NETWORK_REQUEST_TIMEOUT: 60000

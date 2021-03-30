@@ -1,4 +1,4 @@
-import { startServer } from "app";
+import { startServer } from "App";
 import { startWorkers } from "workers";
 import env from "environment";
 
