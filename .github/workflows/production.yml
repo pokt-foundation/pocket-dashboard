@@ -2,64 +2,9 @@ name: Production Deployment
 
 on:
   push:
-    branches: [master]
+    branches: [mvp]
 
 jobs:
-  build:
-    name: Frontend
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.15.0]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: yarn
-        working-directory: packages/frontend
-        run: yarn
-      - name: Production build
-        working-directory: packages/frontend
-        env:
-          GENERATE_SOURCEMAP: false
-          PUBLIC_URL: https://dashboard.pokt.network
-          REACT_APP_BACKEND_URL: https://api.dashboard.pokt.network:4200
-          REACT_APP_POCKET_NETWORK_MAX_DISPATCHER: 10
-          REACT_APP_POCKET_NETWORK_MAX_SESSIONS: 24
-          REACT_APP_POCKET_NETWORK_REQUEST_TIMEOUT: 60000
-          REACT_APP_POCKET_NETWORK_DISPATCHERS: https://node1.dashboard.mainnet.pokt.network
-          REACT_APP_POCKET_NETWORK_TX_FEE: 10000
-          REACT_APP_POCKET_NETWORK_CHAIN_ID: mainnet
-          REACT_APP_POCKET_FREE_TIER_STAKE_AMOUNT: 25000000000
-          REACT_APP_STAKE_DEFAULT_STATUS: Unstaked
-          REACT_APP_DEFAULT_MAX_RELAYS_PER_DAY: 801000
-          REACT_APP_SECURE_LS_SECRET: ${{ secrets.REACT_APP_SECURE_LS_SECRET }}
-          REACT_APP_PAYMENT_DEFAULT_CLIENT_ID: ${{ secrets.PAYMENT_PRODUCTION_DEFAULT_CLIENT_ID }}
-          REACT_APP_RECAPTCHA_CLIENT_KEY: ${{ secrets.REACT_APP_RECAPTCHA_CLIENT_KEY }}
-          REACT_APP_POCKET_NETWORK_GATEWAY_CLIENT_PUB_KEY: ${{ secrets.POCKET_NETWORK_PRODUCTION_CLIENT_PUB_KEY }}
-          REACT_APP_POCKET_NETWORK_AAT_VERSION: 0.0.1
-          REACT_APP_SESSION_LENGTH: 3600
-          REACT_APP_POKT_USD_MARKET_PRICE: ${{ secrets.POKT_USD_MARKET_PRICE }}
-        run: yarn build:prod
-      - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read --delete
-        env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: 'packages/frontend/build'
-      - name: Clear CloudFront Cache
-        uses: awact/cloudfront-action@master
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          DISTRIBUTION_ID: ${{ secrets.AWS_PRODUCTION_DISTRIBUTION_ID }}
   deploy:
     name: Backend
     runs-on: ubuntu-latest
