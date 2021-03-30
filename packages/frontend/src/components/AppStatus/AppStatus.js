@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useMemo } from "react";
+import TokenAmount from "token-amount";
 import "styled-components/macro";
 import Box from "components/Box/Box";
-import { Spacer, textStyle, GU } from "ui";
+import { Spacer, Tag, textStyle, GU } from "ui";
+import { getStakingStatus } from "lib/pocket-utils";
 
-export default function AppStatus() {
+export default function AppStatus({ appOnChainStatus }) {
+  const { status, staked_tokens: stakedTokens } = appOnChainStatus;
+
+  const stakingStatus = useMemo(() => getStakingStatus(status), [status]);
+
   return (
     <Box
       css={`
@@ -25,11 +31,21 @@ export default function AppStatus() {
         `}
       >
         <li>
-          Status: <span>Staked</span>
+          Status:{" "}
+          <span>
+            <Tag mode="new" uppercase={false}>
+              {stakingStatus}
+            </Tag>
+          </span>
         </li>
         <Spacer size={2 * GU} />
         <li>
-          Amount: <span>2,000,000 POKT</span>
+          Amount:{" "}
+          <span>
+            {TokenAmount.format(stakedTokens, 6, {
+              symbol: "POKT",
+            })}
+          </span>
         </li>
         <Spacer size={2 * GU} />
         <li>

@@ -142,7 +142,7 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData;
-  const { refetchUserApps, appsData } = useUserApplications();
+  const { refetchUserApps } = useUserApplications();
 
   const {
     isLoading: isChainsLoading,
@@ -358,7 +358,7 @@ function BasicSetup({
                         <Switch
                           onChange={() => onSwitchClick(id)}
                           checked={data.selectedNetwork === id}
-                          disabled={isAvailableForStaking}
+                          disabled={!isAvailableForStaking}
                         />
                       </TableCell>
                       <TableCell>{description}</TableCell>
@@ -421,6 +421,38 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
 
   const stringifiedData = JSON.stringify(data);
 
+  const onWhitelistedUserAgentDelete = useCallback(
+    (userAgent) => {
+      const whitelistedUserAgents = data.whitelistedUserAgents ?? [];
+
+      const filteredWhitelistedUserAgents = whitelistedUserAgents.filter(
+        (u) => u !== userAgent
+      );
+
+      updateData({
+        type: "UPDATE_WHITELISTED_USER_AGENTS",
+        payload: filteredWhitelistedUserAgents,
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updateData]
+  );
+  const onWhitelistedOriginDelete = useCallback(
+    (origin) => {
+      const whitelistedOrigins = data.whitelistedOrigins ?? [];
+
+      const filteredWhitelistedOrigins = whitelistedOrigins.filter(
+        (o) => o !== origin
+      );
+
+      updateData({
+        type: "UPDATE_WHITELISTED_ORIGINS",
+        payload: filteredWhitelistedOrigins,
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [updateData]
+  );
   const setWhitelistedUserAgent = useCallback(() => {
     const whitelistedUserAgents = data.whitelistedUserAgents ?? [];
 
@@ -430,7 +462,6 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringifiedData, updateData, userAgent]);
-
   const setWhitelistedOrigin = useCallback(() => {
     const whitelistedOrigins = data.whitelistedOrigins ?? [];
 
@@ -540,7 +571,7 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
           {data.whitelistUserAgents.map((agent) => (
             <li key={agent}>
               <TextCopy
-                onCopy={() => log("killao")}
+                onCopy={() => onWhitelistedUserAgentDelete(agent)}
                 value={agent}
                 css={`
                   width: 100%;
@@ -581,7 +612,7 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
           {data.whitelistOrigins.map((origin) => (
             <li key={origin}>
               <TextCopy
-                onCopy={() => log("killao")}
+                onCopy={() => onWhitelistedOriginDelete(origin)}
                 value={origin}
                 css={`
                   width: 100%;

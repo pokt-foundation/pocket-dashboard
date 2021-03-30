@@ -1,8 +1,10 @@
 import AppWrapper from "ui/AppWrapper/AppWrapper";
 import Button from "ui/Button/Button";
+import ButtonIcon from "ui/Button/ButtonIcon";
 import ButtonBase from "ui/ButtonBase/ButtonBase";
 import CheckBox from "ui/CheckBox/CheckBox";
 import CircleGraph from "ui/CircleGraph/CircleGraph";
+import DiscButton from "ui/DiscButton/DiscButton";
 import Field from "ui/Field/Field";
 import Help from "ui/Help/Help";
 import Info from "ui/Info/Info";
@@ -18,6 +20,7 @@ import Table from "ui/Table/Table";
 import TableCell from "ui/Table/TableCell";
 import TableHeader from "ui/Table/TableHeader";
 import TableRow from "ui/Table/TableRow";
+import Tag from "ui/Tag/Tag";
 import TextCopy from "ui/TextCopy/TextCopy";
 import TextInput from "ui/TextInput/TextInput";
 
@@ -25,9 +28,11 @@ import TextInput from "ui/TextInput/TextInput";
 export {
   AppWrapper,
   Button,
+  ButtonIcon,
   ButtonBase,
   CheckBox,
   CircleGraph,
+  DiscButton,
   Field,
   Help,
   Info,
@@ -43,6 +48,7 @@ export {
   TableCell,
   TableHeader,
   TableRow,
+  Tag,
   TextCopy,
   TextInput,
 };

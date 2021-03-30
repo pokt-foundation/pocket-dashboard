@@ -22,30 +22,25 @@ import {
 import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
+import SuccessIndicator from "views/Dashboard/ApplicationDetail/SuccessIndicator";
 import { prefixFromChainId } from "lib/chain-utils";
 import { norm } from "lib/math-utils";
 
-const APP_ID = "60010a10eea5fb002e5bc536";
+const ONE_MILLION = 1000000;
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function formatDailyRelaysForGraphing(dailyRelays) {
   const labels = dailyRelays
     .map(({ bucket }) => bucket.split("T")[0])
-    .map((bucket) => DAYS[new Date(bucket).getUTCDay()])
-    .reverse();
-
-  const highestDailyAmount = dailyRelays.reduce(
-    (highest, { dailyRelays }) => Math.max(highest, dailyRelays),
-    0
-  );
+    .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
 
   const lines = [
     {
       id: 1,
-      values: dailyRelays
-        .reverse()
-        .map(({ dailyRelays }) => norm(dailyRelays, 0, highestDailyAmount)),
+      values: dailyRelays.map(({ dailyRelays }) =>
+        norm(dailyRelays, 0, ONE_MILLION)
+      ),
     },
   ];
 
@@ -55,11 +50,13 @@ function formatDailyRelaysForGraphing(dailyRelays) {
   };
 }
 
-export default function AppDetail({
+export default function AppInfo({
   appData,
-  avgSessionRelayCount,
+  appOnChainData,
+  currentSessionRelays,
   dailyRelayData,
   latestRelaysData,
+  previousSuccessfulRelays,
   successfulRelayData,
   weeklyRelayData,
 }) {
@@ -69,11 +66,24 @@ export default function AppDetail({
 
   const compactMode = within(-1, "medium");
 
+  console.log(previousSuccessfulRelays);
+
   const successRate = useMemo(
     () =>
       successfulRelayData.successfulWeeklyRelays /
       weeklyRelayData.weeklyAppRelays,
     [weeklyRelayData, successfulRelayData]
+  );
+  const previousSuccessRate = useMemo(
+    () =>
+      previousSuccessfulRelays.successfulWeeklyRelays /
+      previousSuccessfulRelays.previousTotalRelays,
+    [previousSuccessfulRelays]
+  );
+
+  console.log(
+    "dann!",
+    ((successRate - previousSuccessRate) / successRate) * 100
   );
 
   const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
@@ -99,8 +109,9 @@ export default function AppDetail({
                 `}
               >
                 <SuccessRate
-                  successRate={successRate}
                   appId={appData._id}
+                  previousSuccessRate={previousSuccessRate}
+                  successRate={successRate}
                   totalRequests={weeklyRelayData.weeklyAppRelays}
                 />
                 <AvgLatency avgLatency={successfulRelayData.avgLatency} />
@@ -109,7 +120,7 @@ export default function AppDetail({
               <UsageTrends
                 chartLabels={usageLabels}
                 chartLines={usageLines}
-                sessionRelays={avgSessionRelayCount.avgRelaysPerSession}
+                sessionRelays={currentSessionRelays}
               />
               <Spacer size={2 * GU} />
               <LatestRequests latestRequests={latestRelaysData.latestRelays} />
@@ -133,9 +144,13 @@ export default function AppDetail({
                 Notifications
               </Button>
               <Spacer size={2 * GU} />
-              <AppStatus />
+              <AppStatus appOnChainStatus={appOnChainData} />
               <Spacer size={2 * GU} />
-              <AppInfo />
+              <AppDetails
+                id={appData._id}
+                pubkey={appData.freeTierApplicationAccount.publicKey}
+                secret={appData.gatewaySettings?.secretKey ?? ""}
+              />
             </>
           }
         />
@@ -161,7 +176,12 @@ function EndpointDetails({ chainId, appId }) {
   );
 }
 
-function SuccessRate({ appId, successRate, totalRequests }) {
+function SuccessRate({
+  appId,
+  previousSuccessRate,
+  successRate,
+  totalRequests,
+}) {
   const history = useHistory();
   const { url } = useRouteMatch();
   const numberProps = useSpring({
@@ -169,6 +189,14 @@ function SuccessRate({ appId, successRate, totalRequests }) {
     from: { number: 0 },
   });
   const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } });
+
+  const successRateDelta = useMemo(
+    () =>
+      (((successRate - previousSuccessRate) / successRate) * 100).toFixed(2),
+    [previousSuccessRate, successRate]
+  );
+
+  const mode = successRateDelta > 0 ? "positive" : "negative";
 
   return (
     <Box
@@ -231,7 +259,31 @@ function SuccessRate({ appId, successRate, totalRequests }) {
           >
             Success Rate
           </h3>
-          <div>4%</div>
+          <div
+            css={`
+              display: flex;
+              flex-direction: column;
+              align-items: flex-end;
+            `}
+          >
+            <div
+              css={`
+                display: flex;
+                align-items: center;
+              `}
+            >
+              <SuccessIndicator mode={mode} />
+              <Spacer size={GU / 2} />
+              <span>{Math.abs(successRateDelta)}%</span>
+            </div>
+            <p
+              css={`
+                ${textStyle("body4")}
+              `}
+            >
+              Last 7 days
+            </p>
+          </div>
         </div>
         <Spacer size={1 * GU} />
         <div
@@ -301,8 +353,6 @@ function AvgLatency({ avgLatency }) {
   );
 }
 
-const ONE_MILLION = 1000000;
-
 function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   return (
     <Box>
@@ -346,7 +396,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
                 ${textStyle("body3")}
               `}
             >
-              Relays per session
+              Relays this session
             </span>
           </h4>
         </div>
@@ -354,7 +404,8 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
           lines={chartLines}
           label={(i) => chartLabels[i]}
           height={200}
-          width="100%"
+          color={() => "#31A1D2"}
+          renderCheckpoints
         />
       </div>
     </Box>
@@ -403,7 +454,8 @@ function LatestRequests({ latestRequests }) {
   );
 }
 
-function AppInfo() {
+function AppDetails({ id, pubkey, secret }) {
+  console.log(secret);
   return (
     <Box
       css={`
@@ -428,24 +480,7 @@ function AppInfo() {
         >
           Gateway ID
         </h3>
-        <TextCopy value={APP_ID} />
-      </div>
-      <div
-        css={`
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-        `}
-      >
-        <h3
-          css={`
-            ${textStyle("body1")};
-            margin-bottom: ${2 * GU}px;
-          `}
-        >
-          App Secret
-        </h3>
-        <TextCopy value={APP_ID} />
+        <TextCopy value={id} />
       </div>
       <div
         css={`
@@ -462,8 +497,27 @@ function AppInfo() {
         >
           App public key
         </h3>
-        <TextCopy value={APP_ID} />
+        <TextCopy value={pubkey} />
       </div>
+      {secret && (
+        <div
+          css={`
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+          `}
+        >
+          <h3
+            css={`
+              ${textStyle("body1")};
+              margin-bottom: ${2 * GU}px;
+            `}
+          >
+            App Secret
+          </h3>
+          <TextCopy value={secret} />
+        </div>
+      )}
     </Box>
   );
 }

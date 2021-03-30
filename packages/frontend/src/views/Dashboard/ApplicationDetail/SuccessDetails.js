@@ -21,12 +21,10 @@ import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
 
 export default function SuccessDetails({
-  appData,
-  weeklyRelayData,
-  successfulRelayData,
-  dailyRelayData,
-  avgSessionRelayCount,
+  appOnChainData,
   latestRelaysData,
+  successfulRelayData,
+  weeklyRelayData,
 }) {
   const [activeKey, setActiveKey] = useState("successful");
   const history = useHistory();
@@ -225,7 +223,7 @@ export default function SuccessDetails({
                 Back to application
               </Button>
               <Spacer size={2 * GU} />
-              <AppStatus />
+              <AppStatus appOnChainStatus={appOnChainData} />
             </>
           }
         />

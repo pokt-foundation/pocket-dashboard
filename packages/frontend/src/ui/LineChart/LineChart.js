@@ -8,7 +8,7 @@ import React, {
 import { Spring } from "react-spring/renderprops";
 import "styled-components/macro";
 import PropTypes from "ui/prop-types";
-import { springs } from "ui/style";
+import { GU, springs } from "ui/style";
 import { unselectable } from "ui";
 
 const LABELS_HEIGHT = 30;
@@ -40,6 +40,8 @@ function useMeasuredWidth() {
   return [measuredWidth, onRef];
 }
 
+const OFFSET = 50;
+
 function LineChart({
   animDelay,
   borderColor,
@@ -51,6 +53,7 @@ function LineChart({
   lines: linesProps,
   renderCheckpoints,
   reset,
+  scales,
   springConfig,
   total,
   width: widthProps,
@@ -118,7 +121,7 @@ function LineChart({
       {({ progress }) => (
         <svg
           ref={onSvgRef}
-          viewBox={`0 0 ${width} ${height}`}
+          viewBox={`0 0 ${width + OFFSET} ${height}`}
           width={widthProps || "auto"}
           height="auto"
           css="display: block"
@@ -130,7 +133,9 @@ function LineChart({
                 d={`
                   ${[...new Array(totalCount - 1)].reduce(
                     (path, _, index) =>
-                      `${path} M ${getX(index)},${chartHeight} l 0,-8`,
+                      `${path} M ${getX(index)},${
+                        !index ? 0 : chartHeight
+                      } l 0,-8`,
                     ""
                   )}
                 `}
@@ -138,45 +143,46 @@ function LineChart({
                 strokeWidth="1"
               />
             )}
-            {lines.map((line, lineIndex) => (
-              <g key={`line-plot-${line.id || lineIndex}`}>
-                <path
-                  d={`
+            {lines.map((line, lineIndex) => {
+              return (
+                <g key={`line-plot-${line.id || lineIndex}`}>
+                  <path
+                    d={`
                     M
                     ${getX(0)},
                     ${getY(line.values[0], progress, chartHeight)}
 
                     ${line.values
                       .slice(1)
-                      .map(
-                        (val, index) =>
-                          `L
+                      .map((val, index) => {
+                        return `L
                            ${getX((index + 1) * progress)},
-                           ${getY(val, progress, chartHeight)}
-                          `
-                      )
+                           ${getY(val, progress, chartHeight, index)}
+                          `;
+                      })
                       .join("")}
                   `}
-                  fill="transparent"
-                  stroke={line.color || color(lineIndex, { lines })}
-                  strokeWidth="2"
-                />
-                {renderCheckpoints &&
-                  line.values
-                    .slice(1, -1)
-                    .map((val, index) => (
-                      <circle
-                        key={index}
-                        cx={getX(index + 1) * progress}
-                        cy={getY(val, progress, chartHeight)}
-                        r={dotRadius}
-                        fill="white"
-                        stroke={line.color || color(lineIndex, { lines })}
-                        strokeWidth="1"
-                      />
-                    ))}
-              </g>
-            ))}
+                    fill="transparent"
+                    stroke={line.color || color(lineIndex, { lines })}
+                    strokeWidth="2"
+                  />
+                  {renderCheckpoints &&
+                    line.values
+                      .slice(1, -1)
+                      .map((val, index) => (
+                        <circle
+                          key={index}
+                          cx={getX(index + 1) * progress}
+                          cy={getY(val, progress, chartHeight)}
+                          r={dotRadius}
+                          fill="white"
+                          stroke={line.color || color(lineIndex, { lines })}
+                          strokeWidth="1"
+                        />
+                      ))}
+                </g>
+              );
+            })}
           </g>
           {labels && (
             <g transform={`translate(0,${chartHeight})`}>
@@ -199,6 +205,26 @@ function LineChart({
               ))}
             </g>
           )}
+          <g>
+            {scales &&
+              scales.map((label, index) => (
+                <text
+                  key={index}
+                  x={width + OFFSET / 2}
+                  y={getY((index + 1) / 5, 1, chartHeight) + GU}
+                  textAnchor={getLabelPosition(index, labels.length)}
+                  fill={labelColor}
+                  css={`
+                    alignment-baseline: middle;
+                    font-size: 12px;
+                    font-weight: 300;
+                    ${unselectable};
+                  `}
+                >
+                  {label}
+                </text>
+              ))}
+          </g>
         </svg>
       )}
     </Spring>
@@ -226,6 +252,7 @@ LineChart.propTypes = {
     ])
   ),
   label: PropTypes.oneOfType([PropTypes.func, PropTypes._null]),
+  scales: PropTypes.arrayOf(PropTypes.string),
   renderCheckpoints: PropTypes.bool,
   reset: PropTypes.bool,
   color: PropTypes.func,

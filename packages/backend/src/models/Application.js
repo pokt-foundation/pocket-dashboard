@@ -36,6 +36,13 @@ const applicationSchema = new Schema(
       whitelistOrigins: [],
       whitelistUserAgents: [],
     },
+    notificationSettings: {
+      signedUp: Boolean,
+      quarter: Boolean,
+      half: Boolean,
+      threeQuarters: Boolean,
+      full: Boolean,
+    },
     createdAt: {
       type: Date,
       default: new Date(Date.now()),

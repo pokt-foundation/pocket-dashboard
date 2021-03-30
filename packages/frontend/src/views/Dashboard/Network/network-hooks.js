@@ -1,9 +1,15 @@
 import axios from "axios";
 import * as dayjs from "dayjs";
 import * as dayJsutcPlugin from "dayjs/plugin/utc";
-import { request as gqlRequest, gql } from "graphql-request";
+import { GraphQLClient, gql } from "graphql-request";
 import { useQuery } from "react-query";
 import env from "environment";
+
+const gqlClient = new GraphQLClient(env("HASURA_URL"), {
+  headers: {
+    "x-hasura-admin-secret": env("HASURA_SECRET"),
+  },
+});
 
 const RELAY_APPS_QUERY = gql`
   query DAILY_RELAYS_QUERY {
@@ -105,7 +111,7 @@ export function useTotalWeeklyRelays() {
     data: relayData,
   } = useQuery("network/weekly-relays", async function getWeeklyRelays() {
     try {
-      const res = await gqlRequest(env("HASURA_URL"), RELAY_APPS_QUERY);
+      const res = await gqlClient.request(RELAY_APPS_QUERY);
 
       dayjs.extend(dayJsutcPlugin);
 
@@ -115,8 +121,7 @@ export function useTotalWeeklyRelays() {
         sevenDaysAgo.month() + 1
       }-${sevenDaysAgo.date()}T00:00:00+00:00`;
 
-      const totalWeeklyRelaysRes = await gqlRequest(
-        env("HASURA_URL"),
+      const totalWeeklyRelaysRes = await gqlClient.request(
         WEEKLY_RELAY_COUNT_QUERY,
         {
           _gte: formattedTimestamp,
@@ -132,7 +137,9 @@ export function useTotalWeeklyRelays() {
       } = totalWeeklyRelaysRes;
       const { relays_daily: dailyRelays } = res;
 
-      return { dailyRelays, totalWeeklyRelays };
+      const processedDailyRelays = dailyRelays.reverse();
+
+      return { dailyRelays: processedDailyRelays, totalWeeklyRelays };
     } catch (err) {
       console.log(err, "rip");
     }
@@ -160,13 +167,9 @@ export function useNetworkSuccessRate() {
         sevenDaysAgo.month() + 1
       }-${sevenDaysAgo.date()}T00:00:00+00:00`;
 
-      const res = await gqlRequest(
-        env("HASURA_URL"),
-        SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY,
-        {
-          _gte: formattedTimestamp,
-        }
-      );
+      const res = await gqlClient.request(SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY, {
+        _gte: formattedTimestamp,
+      });
 
       const {
         relay_apps_hourly_aggregate: {

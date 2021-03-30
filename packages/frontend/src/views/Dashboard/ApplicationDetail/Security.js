@@ -7,6 +7,7 @@ import {
   Button,
   ButtonBase,
   IconPlus,
+  IconCross,
   Help,
   Spacer,
   Split,
@@ -17,22 +18,10 @@ import {
   GU,
 } from "ui";
 import Box from "components/Box/Box";
-import { log } from "lib/utils";
 import FloatUp from "components/FloatUp/FloatUp";
 import env from "environment";
 
-const DEFAULT_CONFIGURE_STATE = {
-  whitelistUserAgents: [],
-  whitelistOrigins: [],
-  secretKeyRequired: false,
-};
-
-export default function Security({
-  appData,
-  data = DEFAULT_CONFIGURE_STATE,
-  decrementScreen,
-  updateData,
-}) {
+export default function Security({ appData, refetchActiveAppData }) {
   const [origin, setOrigin] = useState("");
   const [origins, setOrigins] = useState([]);
   const [secretKeyRequired, setSecretKeyRequired] = useState(false);
@@ -41,45 +30,58 @@ export default function Security({
   const history = useHistory();
 
   useEffect(() => {
-    setOrigins((origins) => {
-      return appData.gatewaySettings.whitelistOrigins.length
-        ? [...appData?.gatewaySettings?.whitelistOrigins, ...origins]
-        : [...origins];
+    setUserAgents((agents) => {
+      const currentUserAgents = appData.gatewaySettings.whitelistUserAgents
+        .length
+        ? [...appData.gatewaySettings.whitelistUserAgents]
+        : [];
+
+      const filteredStateUserAgents = agents.filter(
+        (a) => !currentUserAgents.includes(a)
+      );
+
+      return [...currentUserAgents, ...filteredStateUserAgents];
     });
-    setUserAgents((agents) =>
-      appData?.gatewaySettings?.whitelistOrigins.length
-        ? [...appData?.gatewaySettings?.whitelistUserAgents, ...agents]
-        : [...agents]
-    );
-    console.log(appData, "wue");
+    setOrigins((origins) => {
+      const currentOrigins = appData.gatewaySettings.whitelistOrigins.length
+        ? [...appData.gatewaySettings.whitelistOrigins]
+        : [];
+
+      const filteredStateOrigins = origins.filter(
+        (o) => !currentOrigins.includes(o)
+      );
+
+      return [...currentOrigins, ...filteredStateOrigins];
+    });
+    setSecretKeyRequired(appData.gatewaySettings.secretKeyRequired);
   }, [appData]);
 
-  const { isLoading, isError, isSuccess, mutate } = useMutation(
-    async function updateApplicationSettings() {
-      const path = `${env("BACKEND_URL")}/api/applications/${appData._id}`;
+  const { mutate } = useMutation(async function updateApplicationSettings() {
+    const path = `${env("BACKEND_URL")}/api/applications/${appData._id}`;
 
-      try {
-        await axios.put(
-          path,
-          {
-            gatewaySettings: {
-              whitelistOrigins: origins,
-              whitelistUserAgents: userAgents,
-              secretKeyRequired,
-            },
+    try {
+      await axios.put(
+        path,
+        {
+          gatewaySettings: {
+            whitelistOrigins: origins,
+            whitelistUserAgents: userAgents,
+            secretKeyRequired,
           },
-          {
-            withCredentials: true,
-          }
-        );
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-        history.goBack();
-      } catch (err) {
-        // TODO: Log with sentry
-        console.log("err", err);
-      }
+      await refetchActiveAppData();
+
+      history.goBack();
+    } catch (err) {
+      // TODO: Log with sentry
+      console.log("err", err);
     }
-  );
+  });
 
   const onSecretKeyRequiredChange = useCallback(() => {
     setSecretKeyRequired((r) => !r);
@@ -88,11 +90,18 @@ export default function Security({
     setUserAgents((userAgents) => [...userAgents, userAgent]);
     setUserAgent("");
   }, [userAgent]);
-
   const setWhitelistedOrigin = useCallback(() => {
     setOrigins((origins) => [...origins, origin]);
     setOrigin("");
   }, [origin]);
+  const onDeleteUserAgentClick = useCallback((userAgent) => {
+    setUserAgents((userAgents) => [
+      ...userAgents.filter((u) => u !== userAgent),
+    ]);
+  }, []);
+  const onDeleteOriginClick = useCallback((origin) => {
+    setOrigins((origins) => [...origins.filter((o) => o !== origin)]);
+  }, []);
 
   return (
     <FloatUp
@@ -198,11 +207,13 @@ export default function Security({
                 }
               `}
             >
-              {userAgents.map((agent) => (
+              {userAgents.map((agent, index) => (
                 <li key={agent}>
                   <TextCopy
-                    onCopy={() => log("killao")}
+                    key={`${agent}/${index}`}
+                    onCopy={() => onDeleteUserAgentClick(agent)}
                     value={agent}
+                    adornment={<IconCross />}
                     css={`
                       width: 100%;
                     `}
@@ -239,10 +250,11 @@ export default function Security({
                 }
               `}
             >
-              {origins.map((origin) => (
+              {origins.map((origin, index) => (
                 <li key={origin}>
                   <TextCopy
-                    onCopy={() => log("killao")}
+                    key={`${origin}/${index}`}
+                    onCopy={() => onDeleteOriginClick(origin)}
                     value={origin}
                     css={`
                       width: 100%;

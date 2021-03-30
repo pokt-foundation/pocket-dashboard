@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { useMutation } from "react-query";
 import axios from "axios";
 import { isEmail, isStrongPassword } from "validator";
@@ -263,7 +262,7 @@ export default function Login() {
           <Button
             type="submit"
             disabled={isSubmitDisabled}
-            onClick={mutate}
+            onClick={(e) => mutate(e)}
             css={`
               margin-bottom: ${2 * GU}px;
             `}
