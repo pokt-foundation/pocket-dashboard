@@ -41,6 +41,8 @@ jobs:
           envkey_JWT_SECRET_KEY: ${{ secrets.JWT_PRODUCTION_SECRET_KEY }}
           envkey_JWT_EXPIRATION: 5m
           envkey_JWT_REFRESH_EXPIRATION: 10m
+          envkey_JWT_PRIVATE_SECRET: ${{ secrets.JWT_PRIVATE_SECRET }}
+          envkey_JWT_PUBLIC_SECRET: ${{ secrets.JWT_PUBLIC_SECRET }}
           #envkey_AUTH_PROVIDER_GITHUB_CLIENT_ID: ${{ secrets.AUTH_PROVIDER_GITHUB_CLIENT_ID }}
           #envkey_AUTH_PROVIDER_GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_PROVIDER_GITHUB_CLIENT_SECRET }}
           #envkey_AUTH_PROVIDER_GOOGLE_CLIENT_ID: ${{ secrets.AUTH_PROVIDER_GOOGLE_CLIENT_ID }}
