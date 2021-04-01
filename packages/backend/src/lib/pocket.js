@@ -62,55 +62,6 @@ function getHttpRPCProvider() {
   return new HttpRpcProvider(new URL(httpProviderNode));
 }
 
-async function getPocketRPCProvider() {
-  const chain = POCKET_NETWORK_CONFIGURATION.chain_hash;
-  const clientPubKeyHex = POCKET_NETWORK_CONFIGURATION.client_pub_key;
-  const clientPrivateKey = POCKET_NETWORK_CONFIGURATION.client_priv_key;
-  const clientPassphrase = POCKET_NETWORK_CONFIGURATION.client_passphrase;
-  const appPublicKey = POCKET_NETWORK_CONFIGURATION.app_pub_key;
-  const appSignature = POCKET_NETWORK_CONFIGURATION.app_signature;
-
-  const pocket = new Pocket(
-    getPocketDispatchers(),
-    undefined,
-    POCKET_CONFIGURATION
-  );
-
-  const clientAccountOrError = await pocket.keybase.importAccount(
-    Buffer.from(clientPrivateKey, "hex"),
-    clientPassphrase
-  );
-
-  if (typeGuard(clientAccountOrError, Error)) {
-    throw clientAccountOrError;
-  }
-
-  const unlockOrError = await pocket.keybase.unlockAccount(
-    clientAccountOrError.addressHex,
-    clientPassphrase,
-    0
-  );
-
-  if (typeGuard(unlockOrError, Error)) {
-    throw clientAccountOrError;
-  }
-
-  const aat = new PocketAAT(
-    POCKET_NETWORK_CONFIGURATION.aat_version,
-    clientPubKeyHex,
-    appPublicKey,
-    appSignature
-  );
-  const pocketRpcProvider = new PocketRpcProvider(
-    pocket,
-    aat,
-    chain,
-    POCKET_NETWORK_CONFIGURATION.enable_consensus_relay
-  );
-
-  return pocketRpcProvider;
-}
-
 /**
  * @returns {HttpRpcProvider | PocketRpcProvider} RPC Provider.
  */
@@ -119,8 +70,6 @@ async function getRPCProvider() {
 
   if (providerType.toLowerCase() === "http") {
     return getHttpRPCProvider();
-  } else if (providerType.toLowerCase() === "pocket") {
-    return await getPocketRPCProvider();
   } else {
     // Default to HTTP RPC Provider
     return getHttpRPCProvider();
