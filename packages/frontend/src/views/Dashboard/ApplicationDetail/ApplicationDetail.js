@@ -88,6 +88,7 @@ export default function ApplicationDetail() {
   return appLoading ? (
     <div
       css={`
+        position: relative;
         width: 100%;
         /* TODO: This is leaky. fix up with a permanent component */
         height: 60vh;
