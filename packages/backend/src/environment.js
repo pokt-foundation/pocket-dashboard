@@ -38,6 +38,8 @@ export const ENV_VARS = {
     return {
       default: {
         url: process.env.DATABASE_URL,
+        db_user: process.env.DATABASE_USER,
+        db_password: process.env.DATABASE_PASSWORD,
         db_name: process.env.DATABASE_NAME,
         db_encryption_key: process.env.DATABASE_ENCRYPTION_KEY,
         options: {
