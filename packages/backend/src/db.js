@@ -15,6 +15,7 @@ function composeMongoUrl(production = false) {
 
 export const connect = (url = composeMongoUrl(env("prod")), opts = {}) => {
   console.log(url);
+
   return mongoose.connect(`${url}`, {
     ...opts,
     useNewUrlParser: true,
