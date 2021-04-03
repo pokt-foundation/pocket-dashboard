@@ -112,6 +112,7 @@ passport.use(
 
       return done(null, user);
     } catch (err) {
+      console.log(err);
       return done({ statusCode: 400, message: err.message });
     }
   })
