@@ -123,7 +123,7 @@ export async function fillAppPool(ctx) {
     `fillAppPool(): pool size limit ${totalPoolSize}, pool size ${appPool?.length}`
   );
 
-  if (totalPoolSize === appPool?.length) {
+  if (totalPoolSize <= appPool?.length) {
     ctx.logger.log("fillAppPool(): No need to fill the pool.");
   }
 
