@@ -30,7 +30,7 @@ const ONE_MILLION = 1000000;
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-function formatDailyRelaysForGraphing(dailyRelays) {
+function formatDailyRelaysForGraphing(dailyRelays = []) {
   const labels = dailyRelays
     .map(({ bucket }) => bucket.split("T")[0])
     .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
@@ -66,25 +66,18 @@ export default function AppInfo({
 
   const compactMode = within(-1, "medium");
 
-  console.log(previousSuccessfulRelays);
-
-  const successRate = useMemo(
-    () =>
-      successfulRelayData.successfulWeeklyRelays /
-      weeklyRelayData.weeklyAppRelays,
-    [weeklyRelayData, successfulRelayData]
-  );
-  const previousSuccessRate = useMemo(
-    () =>
-      previousSuccessfulRelays.successfulWeeklyRelays /
-      previousSuccessfulRelays.previousTotalRelays,
-    [previousSuccessfulRelays]
-  );
-
-  console.log(
-    "dann!",
-    ((successRate - previousSuccessRate) / successRate) * 100
-  );
+  const successRate = useMemo(() => {
+    return weeklyRelayData.weeklyAppRelays === 0
+      ? 0
+      : successfulRelayData.successfulWeeklyRelays /
+          weeklyRelayData.weeklyAppRelays;
+  }, [weeklyRelayData, successfulRelayData]);
+  const previousSuccessRate = useMemo(() => {
+    return previousSuccessfulRelays.previousTotalRelays === 0
+      ? 0
+      : previousSuccessfulRelays.successfulWeeklyRelays /
+          previousSuccessfulRelays.previousTotalRelays;
+  }, [previousSuccessfulRelays]);
 
   const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
     () => formatDailyRelaysForGraphing(dailyRelayData),
@@ -178,7 +171,7 @@ function EndpointDetails({ chainId, appId }) {
 
 function SuccessRate({
   appId,
-  previousSuccessRate,
+  previousSuccessRate = 0,
   successRate,
   totalRequests,
 }) {
@@ -189,10 +182,8 @@ function SuccessRate({
     from: { number: 0 },
   });
   const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } });
-
   const successRateDelta = useMemo(
-    () =>
-      (((successRate - previousSuccessRate) / successRate) * 100).toFixed(2),
+    () => (((successRate - previousSuccessRate) / 1) * 100).toFixed(2),
     [previousSuccessRate, successRate]
   );
 
@@ -354,6 +345,10 @@ function AvgLatency({ avgLatency }) {
 }
 
 function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
+  const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
+    chartLines,
+  ]);
+
   return (
     <Box>
       <div
@@ -400,13 +395,31 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
             </span>
           </h4>
         </div>
-        <LineChart
-          lines={chartLines}
-          label={(i) => chartLabels[i]}
-          height={200}
-          color={() => "#31A1D2"}
-          renderCheckpoints
-        />
+        {isChartLinesEmpty ? (
+          <div
+            css={`
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            `}
+          >
+            <h3
+              css={`
+                ${textStyle("body3")}
+              `}
+            >
+              No data to show.
+            </h3>
+          </div>
+        ) : (
+          <LineChart
+            lines={chartLines}
+            label={(i) => chartLabels[i]}
+            height={200}
+            color={() => "#31A1D2"}
+            renderCheckpoints
+          />
+        )}
       </div>
     </Box>
   );
@@ -438,6 +451,7 @@ function LatestRequests({ latestRequests }) {
               <TableRow>
                 <TableHeader title="Request type" />
                 <TableHeader title="Amount of data" />
+                <TableHeader title="Result" />
               </TableRow>
             </>
           }
@@ -446,6 +460,7 @@ function LatestRequests({ latestRequests }) {
             <TableRow>
               <TableCell>{method}</TableCell>
               <TableCell>{bytes}</TableCell>
+              <TableCell>{result}</TableCell>
             </TableRow>
           ))}
         </Table>
@@ -455,7 +470,6 @@ function LatestRequests({ latestRequests }) {
 }
 
 function AppDetails({ id, pubkey, secret }) {
-  console.log(secret);
   return (
     <Box
       css={`

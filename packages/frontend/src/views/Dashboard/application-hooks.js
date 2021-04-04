@@ -254,7 +254,10 @@ export function useWeeklyAppRelaysInfo(appPubKey = "") {
           },
         } = res;
 
-        return { avgLatency, weeklyAppRelays };
+        return {
+          avgLatency: avgLatency ?? 0,
+          weeklyAppRelays: weeklyAppRelays ?? 0,
+        };
       } catch (err) {
         console.log(err, "rip");
       }
@@ -303,7 +306,10 @@ export function useSucessfulWeeklyRelays(appPubKey) {
           },
         } = res;
 
-        return { avgLatency, successfulWeeklyRelays };
+        return {
+          avgLatency: avgLatency ?? 0,
+          successfulWeeklyRelays: successfulWeeklyRelays ?? 0,
+        };
       } catch (err) {
         console.log(err, "rip");
       }
@@ -343,7 +349,7 @@ export function useDailyRelayCount(appPubKey) {
           _gte: formattedTimestamp,
         });
 
-        const { relay_apps_daily: rawDailyRelays } = res;
+        const { relay_apps_daily: rawDailyRelays = [] } = res;
 
         const dailyRelays = new Map();
 
@@ -415,8 +421,7 @@ export function useCurrentSessionRelayCount(appPubKey) {
           0
         );
 
-        console.log(totalSessionRelays);
-        return totalSessionRelays;
+        return totalSessionRelays ?? 0;
       } catch (err) {
         console.log(err, "rip");
       }
@@ -451,7 +456,7 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
 
         const { relay: latestRelays } = res;
 
-        return { latestRelays };
+        return { latestRelays: latestRelays ?? [] };
       } catch (err) {
         console.log(err, "rip");
       }
@@ -541,7 +546,7 @@ export function usePreviousSuccessfulRelays(appPubKey) {
         const {
           relay_apps_daily_aggregate: {
             aggregate: {
-              sum: { total_relays: successfulWeeklyRelays },
+              sum: { total_relays: successfulWeeklyRelays = 0 },
             },
           },
         } = res;
@@ -549,12 +554,15 @@ export function usePreviousSuccessfulRelays(appPubKey) {
         const {
           relay_apps_daily_aggregate: {
             aggregate: {
-              sum: { total_relays: previousTotalRelays },
+              sum: { total_relays: previousTotalRelays = 0 },
             },
           },
         } = totalRelaysRes;
 
-        return { previousTotalRelays, successfulWeeklyRelays };
+        return {
+          previousTotalRelays: previousTotalRelays ?? 0,
+          successfulWeeklyRelays: successfulWeeklyRelays ?? 0,
+        };
       } catch (err) {
         console.log(err, "rip");
       }
