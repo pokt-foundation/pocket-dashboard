@@ -2,64 +2,9 @@ name: Production Deployment
 
 on:
   push:
-    branches: [master]
+    branches: [mvp]
 
 jobs:
-  build:
-    name: Frontend
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.15.0]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: yarn
-        working-directory: packages/frontend
-        run: yarn
-      - name: Production build
-        working-directory: packages/frontend
-        env:
-          GENERATE_SOURCEMAP: false
-          PUBLIC_URL: https://dashboard.pokt.network
-          REACT_APP_BACKEND_URL: https://api.dashboard.pokt.network:4200
-          REACT_APP_POCKET_NETWORK_MAX_DISPATCHER: 10
-          REACT_APP_POCKET_NETWORK_MAX_SESSIONS: 24
-          REACT_APP_POCKET_NETWORK_REQUEST_TIMEOUT: 60000
-          REACT_APP_POCKET_NETWORK_DISPATCHERS: https://node1.dashboard.mainnet.pokt.network
-          REACT_APP_POCKET_NETWORK_TX_FEE: 10000
-          REACT_APP_POCKET_NETWORK_CHAIN_ID: mainnet
-          REACT_APP_POCKET_FREE_TIER_STAKE_AMOUNT: 25000000000
-          REACT_APP_STAKE_DEFAULT_STATUS: Unstaked
-          REACT_APP_DEFAULT_MAX_RELAYS_PER_DAY: 801000
-          REACT_APP_SECURE_LS_SECRET: ${{ secrets.REACT_APP_SECURE_LS_SECRET }}
-          REACT_APP_PAYMENT_DEFAULT_CLIENT_ID: ${{ secrets.PAYMENT_PRODUCTION_DEFAULT_CLIENT_ID }}
-          REACT_APP_RECAPTCHA_CLIENT_KEY: ${{ secrets.REACT_APP_RECAPTCHA_CLIENT_KEY }}
-          REACT_APP_POCKET_NETWORK_GATEWAY_CLIENT_PUB_KEY: ${{ secrets.POCKET_NETWORK_PRODUCTION_CLIENT_PUB_KEY }}
-          REACT_APP_POCKET_NETWORK_AAT_VERSION: 0.0.1
-          REACT_APP_SESSION_LENGTH: 3600
-          REACT_APP_POKT_USD_MARKET_PRICE: ${{ secrets.POKT_USD_MARKET_PRICE }}
-        run: yarn build:prod
-      - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read --delete
-        env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: 'packages/frontend/build'
-      - name: Clear CloudFront Cache
-        uses: awact/cloudfront-action@master
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          DISTRIBUTION_ID: ${{ secrets.AWS_PRODUCTION_DISTRIBUTION_ID }}
   deploy:
     name: Backend
     runs-on: ubuntu-latest
@@ -83,19 +28,25 @@ jobs:
         uses: SpicyPizza/create-envfile@v1
         with:
           envkey_DATABASE_URL: ${{ secrets.MONGO_PRODUCTION_DATABASE_URL }}
+          envkey_DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          envkey_DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          envkey_FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          envkey_ENABLE_WORKERS: ${{ secrets.ENABLE_WORKERS }}
           envkey_DATABASE_ENCRYPTION_KEY: ${{ secrets.DATABASE_PRODUCTION_ENCRYPTION_KEY }}
-          envkey_POCKET_NETWORK_MAIN_FUND_ACCOUNT: ${{ secrets.POCKET_NETWORK_PRODUCTION_MAIN_FUND_ACCOUNT }}
-          envkey_POCKET_NETWORK_MAIN_FUND_ADDRESS: ${{ secrets.POCKET_NETWORK_PRODUCTION_MAIN_FUND_ADDRESS }}
-          envkey_POCKET_NETWORK_FREE_TIER_FUND_ACCOUNT: ${{ secrets.POCKET_NETWORK_PRODUCTION_FREE_TIER_FUND_ACCOUNT }}
-          envkey_POCKET_NETWORK_FREE_TIER_FUND_ADDRESS: ${{ secrets.POCKET_NETWORK_PRODUCTION_FREE_TIER_FUND_ADDRESS }}
-          envkey_POCKET_NETWORK_CLIENT_PUB_KEY: ${{ secrets.POCKET_NETWORK_PRODUCTION_CLIENT_PUB_KEY }}
-          envkey_POCKET_NETWORK_CLIENT_PRIV_KEY: ${{ secrets.POCKET_NETWORK_PRODUCTION_CLIENT_PRIV_KEY }}
-          envkey_POCKET_NETWORK_CLIENT_PASSPHRASE: ${{ secrets.POCKET_NETWORK_PRODUCTION_CLIENT_PASSPHRASE }}
-          envkey_POCKET_NETWORK_APP_PUB_KEY: ${{ secrets.POCKET_NETWORK_PRODUCTION_APP_PUB_KEY }}
-          envkey_POCKET_NETWORK_APP_SIGNATURE: ${{ secrets.POCKET_NETWORK_PRODUCTION_APP_SIGNATURE }}
-          envkey_JWT_SECRET_KEY: ${{ secrets.JWT_PRODUCTION_SECRET_KEY }}
-          envkey_JWT_EXPIRATION: 5m
-          envkey_JWT_REFRESH_EXPIRATION: 10m
+          #envkey_POCKET_NETWORK_MAIN_FUND_ACCOUNT: ${{ secrets.POCKET_NETWORK_PRODUCTION_MAIN_FUND_ACCOUNT }}
+          #envkey_POCKET_NETWORK_MAIN_FUND_ADDRESS: ${{ secrets.POCKET_NETWORK_PRODUCTION_MAIN_FUND_ADDRESS }}
+          envkey_POCKET_NETWORK_FREE_TIER_FUND_ACCOUNT: ${{ secrets.POCKET_NETWORK_FREE_TIER_FUND_ACCOUNT }}
+          envkey_POCKET_NETWORK_FREE_TIER_FUND_ADDRESS: ${{ secrets.POCKET_NETWORK_FREE_TIER_FUND_ADDRESS }}
+          envkey_POCKET_NETWORK_CLIENT_PUB_KEY: ${{ secrets.POCKET_NETWORK_CLIENT_PUB_KEY }}
+          envkey_POCKET_NETWORK_CLIENT_PRIV_KEY: ${{ secrets.POCKET_NETWORK_CLIENT_PRIV_KEY }}
+          #envkey_POCKET_NETWORK_CLIENT_PASSPHRASE: ${{ secrets.POCKET_NETWORK_PRODUCTION_CLIENT_PASSPHRASE }}
+          #envkey_POCKET_NETWORK_APP_PUB_KEY: ${{ secrets.POCKET_NETWORK_PRODUCTION_APP_PUB_KEY }}
+          #envkey_POCKET_NETWORK_APP_SIGNATURE: ${{ secrets.POCKET_NETWORK_PRODUCTION_APP_SIGNATURE }}
+          envkey_JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          #envkey_JWT_EXPIRATION: 5m
+          #envkey_JWT_REFRESH_EXPIRATION: 10m
+          envkey_JWT_PRIVATE_SECRET: ${{ secrets.JWT_PRIVATE_SECRET }}
+          envkey_JWT_PUBLIC_SECRET: ${{ secrets.JWT_PUBLIC_SECRET }}
           #envkey_AUTH_PROVIDER_GITHUB_CLIENT_ID: ${{ secrets.AUTH_PROVIDER_GITHUB_CLIENT_ID }}
           #envkey_AUTH_PROVIDER_GITHUB_CLIENT_SECRET: ${{ secrets.AUTH_PROVIDER_GITHUB_CLIENT_SECRET }}
           #envkey_AUTH_PROVIDER_GOOGLE_CLIENT_ID: ${{ secrets.AUTH_PROVIDER_GOOGLE_CLIENT_ID }}
@@ -163,6 +114,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: dashboard-service
+          service: dashboard
           cluster: dashboard
           wait-for-service-stability: true
