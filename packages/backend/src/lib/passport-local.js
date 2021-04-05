@@ -46,6 +46,21 @@ passport.use(
         );
       }
 
+      if (!user.v2) {
+        return done(
+          HttpError.BAD_REQUEST({
+            errors: [
+              {
+                id: "OUTDATED_USER",
+                message:
+                  "Your user has not been migrated to use the new dashboard.",
+              },
+            ],
+          }),
+          null
+        );
+      }
+
       const isPasswordValid = await user.comparePassword(password);
 
       if (!isPasswordValid) {
