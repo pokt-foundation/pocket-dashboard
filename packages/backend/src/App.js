@@ -29,6 +29,8 @@ app.use(
       if (whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
+        console.log("didnt find origin", origin);
+
         callback(
           new Error({
             errors: [{ id: "UNAUTHORIZED", message: "Blocked by CORS" }],
