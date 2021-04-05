@@ -34,7 +34,7 @@ export default function ApplicationDetail() {
   } = useActiveApplication();
   const { appOnChainData, isAppOnChainLoading } = useAppOnChainStatus(appId);
   const { isWeeklyAppRelaysLoading, weeklyRelaysData } = useWeeklyAppRelaysInfo(
-    env("PROD")
+    !env("USE_TEST_APP")
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
   );
@@ -42,12 +42,12 @@ export default function ApplicationDetail() {
     isSuccesfulWeeklyRelaysLoading,
     successfulWeeklyRelaysData,
   } = useSucessfulWeeklyRelays(
-    env("PROD")
+    !env("USE_TEST_APP")
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
   );
   const { isDailyRelayCountLoading, dailyRelayCountData } = useDailyRelayCount(
-    env("PROD")
+    !env("USE_TEST_APP")
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
   );
@@ -55,12 +55,12 @@ export default function ApplicationDetail() {
     isCurrentSessionRelaysLoading,
     currentSessionRelayCount,
   } = useCurrentSessionRelayCount(
-    env("PROD")
+    !env("USE_TEST_APP")
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
   );
   const { isLatestRelaysLoading, latestRelayData } = useLatestRelays(
-    env("PROD")
+    !env("USE_TEST_APP")
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY,
     0
@@ -69,7 +69,7 @@ export default function ApplicationDetail() {
     isPreviousSuccessfulRelaysLoading,
     previousSucessfulRelaysData,
   } = usePreviousSuccessfulRelays(
-    env("PROD")
+    !env("USE_TEST_APP")
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY,
     0
@@ -88,6 +88,7 @@ export default function ApplicationDetail() {
   return appLoading ? (
     <div
       css={`
+        position: relative;
         width: 100%;
         /* TODO: This is leaky. fix up with a permanent component */
         height: 60vh;

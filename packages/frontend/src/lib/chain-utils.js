@@ -1,8 +1,9 @@
 const CHAIN_ID_PREFIXES = new Map([
   ["0002", "testnet"],
   ["0020", "eth-goerli"],
-  ["0023", "eth-ropsten"],
+  ["0021", "eth-mainnet"],
   ["0022", "eth-rinkeby"],
+  ["0023", "eth-ropsten"],
 ]);
 
 export function prefixFromChainId(chainId) {
