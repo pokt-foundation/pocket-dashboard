@@ -17,6 +17,9 @@ const ENV_VARS = {
   PROD() {
     return process.env.NODE_ENV === "production";
   },
+  USE_TEST_APP() {
+    return Boolean(process.env.REACT_APP_USE_TEST_APP) ?? false;
+  },
   SENTRY_DSN() {
     return process.env.REACT_APP_SENTRY_DSN?.trim() ?? "";
   },

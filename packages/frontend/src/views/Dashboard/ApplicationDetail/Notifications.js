@@ -77,19 +77,23 @@ export default function Notifications({ appData, dailyRelayData }) {
 
   const lowestDailyAmount = useMemo(
     () =>
-      dailyRelayData.reduce(
-        (lowest, { dailyRelays }) => Math.min(lowest, dailyRelays),
-        Number.POSITIVE_INFINITY
-      ),
+      dailyRelayData.length === 0
+        ? 0
+        : dailyRelayData.reduce(
+            (lowest, { dailyRelays }) => Math.min(lowest, dailyRelays),
+            Number.POSITIVE_INFINITY
+          ),
     [dailyRelayData]
   );
 
-  const totalDailyRelays = useMemo(
-    () =>
-      dailyRelayData.reduce((sum, { dailyRelays }) => sum + dailyRelays, 0) /
-      dailyRelayData.length,
-    [dailyRelayData]
-  );
+  const totalDailyRelays = useMemo(() => {
+    return dailyRelayData.length === 0
+      ? 0
+      : dailyRelayData.reduce(
+          (sum, { dailyRelays = 0 }) => sum + dailyRelays,
+          0
+        ) / dailyRelayData.length;
+  }, [dailyRelayData]);
 
   const onChosePercentageChange = useCallback(
     (chosenPercentage) => {

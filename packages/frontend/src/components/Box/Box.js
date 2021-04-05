@@ -1,15 +1,17 @@
 import React from "react";
 import "styled-components/macro";
-import { textStyle, GU, RADIUS } from "ui";
+import { useTheme, textStyle, GU, RADIUS } from "ui";
 
 const DEFAULT_PADDING = 2 * GU;
 
 export default function Box({ children, title, className, padding, ...props }) {
+  const theme = useTheme();
+
   return (
     <div
       css={`
         position: relative;
-        background: #1b2331;
+        background: ${theme.surface};
         padding: ${padding[0]}px ${padding[1]}px ${padding[2]}px ${padding[3]}px;
         border-radius: ${RADIUS * 2}px;
       `}
