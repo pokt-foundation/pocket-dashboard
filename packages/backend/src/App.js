@@ -23,7 +23,19 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: env("prod") ? env("frontend_url") : "http://localhost:3000",
+    origin: function (origin, callback) {
+      const whitelist = env("ALLOWED_DOMAINS");
+
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(
+          new Error({
+            errors: [{ id: "UNAUTHORIZED", message: "Blocked by CORS" }],
+          })
+        );
+      }
+    },
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
     credentials: true,
     exposedHeaders: ["Authorization"],

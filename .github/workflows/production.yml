@@ -31,6 +31,7 @@ jobs:
           envkey_DATABASE_USER: ${{ secrets.DATABASE_USER }}
           envkey_DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           envkey_FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          envkey_ALLOWED_DOMAINS: ${{ secrets.ALLOWED_DOMAINS }}
           envkey_ENABLE_WORKERS: ${{ secrets.ENABLE_WORKERS }}
           envkey_DATABASE_ENCRYPTION_KEY: ${{ secrets.DATABASE_PRODUCTION_ENCRYPTION_KEY }}
           #envkey_POCKET_NETWORK_MAIN_FUND_ACCOUNT: ${{ secrets.POCKET_NETWORK_PRODUCTION_MAIN_FUND_ACCOUNT }}

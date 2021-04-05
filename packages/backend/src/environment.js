@@ -8,6 +8,9 @@ export const ENV_VARS = {
   frontend_url() {
     return process.env.FRONTEND_URL || "http://localhost:3000";
   },
+  ALLOWED_DOMAINS() {
+    return process.env.ALLOWED_DOMAINS?.split(",") ?? ["http://localhost:3000"];
+  },
   enable_workers() {
     return Boolean(process.env.ENABLE_WORKERS) || false;
   },
