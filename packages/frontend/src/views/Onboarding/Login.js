@@ -23,8 +23,7 @@ export default function Login() {
   const theme = useTheme();
   const history = useHistory();
 
-  const { isError, isLoading, mutate } = useMutation(async function login(e) {
-    e.preventDefault();
+  const { isLoading, mutate } = useMutation(async function login(e) {
     try {
       const path = `${env("BACKEND_URL")}/api/users/login`;
       const res = await axios.post(
@@ -83,10 +82,10 @@ export default function Login() {
     }
   }, [errors, password]);
 
-  const isSubmitDisabled = useMemo(
-    () => isLoading || isError || errors.length > 0,
-    [errors, isError, isLoading]
-  );
+  const isSubmitDisabled = useMemo(() => isLoading || errors.length > 0, [
+    errors,
+    isLoading,
+  ]);
 
   return (
     <div
@@ -190,7 +189,10 @@ export default function Login() {
           <Button
             type="submit"
             disabled={isSubmitDisabled}
-            onClick={(e) => mutate(e)}
+            onClick={(e) => {
+              e.preventDefault();
+              mutate();
+            }}
             css={`
               margin-bottom: ${2 * GU}px;
             `}

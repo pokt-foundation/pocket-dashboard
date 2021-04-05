@@ -14,13 +14,17 @@ function composeMongoUrl(production = false) {
 }
 
 export const connect = (url = composeMongoUrl(env("prod")), opts = {}) => {
-  console.log(url);
+  const userSettings = env("prod")
+    ? {
+        user: env("persistence").default.db_user,
+        pass: env("persistence").default.db_password,
+      }
+    : {};
 
   return mongoose.connect(`${url}`, {
     ...opts,
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    user: env("persistence").default.db_user,
-    pass: env("persistence").default.db_password,
+    ...userSettings,
   });
 };

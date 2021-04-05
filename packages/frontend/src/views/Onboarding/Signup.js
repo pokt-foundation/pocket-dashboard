@@ -32,9 +32,7 @@ export default function Login() {
   const compactMode = within(-1, "medium");
 
   const { isError, isLoading, isSuccess, mutate } = useMutation(
-    async function signup(e) {
-      console.log(e);
-      e.preventDefault();
+    async function signup() {
       try {
         const path = `${env("BACKEND_URL")}/api/users/signup`;
 
@@ -43,10 +41,11 @@ export default function Login() {
           password,
         });
       } catch (err) {
-        // TODO: Set err on UI AND send to sentry.
         const { errors = [] } = err?.response?.data;
 
         setErrors(() => [...errors]);
+
+        throw new Error(errors);
       }
     }
   );
@@ -262,7 +261,10 @@ export default function Login() {
           <Button
             type="submit"
             disabled={isSubmitDisabled}
-            onClick={(e) => mutate(e)}
+            onClick={(e) => {
+              e.preventDefault();
+              mutate();
+            }}
             css={`
               margin-bottom: ${2 * GU}px;
             `}

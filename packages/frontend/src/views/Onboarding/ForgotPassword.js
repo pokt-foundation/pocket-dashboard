@@ -30,7 +30,7 @@ export default function ForgotPassword() {
           email,
         });
       } catch (err) {
-        console.log(Object.entries(err), "rip");
+        throw new Error(err);
       }
     }
   );
@@ -105,7 +105,12 @@ export default function ForgotPassword() {
           Send email
         </Button>
         <Spacer size={1 * GU} />
-        {isSuccess && <Info>We've sent an email!</Info>}
+        {isSuccess && (
+          <Info>
+            We've sent an email! Check it out soon, as it will be valid for the
+            next 15 minutes only.
+          </Info>
+        )}
       </main>
     </div>
   );
