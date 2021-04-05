@@ -38,11 +38,11 @@ const TEST_CHAINS = {
 };
 
 const MAIN_CHAINS = {
-  // ETHEREUM_GOERLI_FULL: {
-  //   ticker: "ETH",
-  //   id: "0020",
-  //   limit: 2,
-  // },
+  ETHEREUM_GOERLI_FULL: {
+    ticker: "ETH",
+    id: "0020",
+    limit: 3,
+  },
   // ETHEREUM_KOVAN_FULL: {
   //   ticker: "POA",
   //   id: "0024",
@@ -56,7 +56,7 @@ const MAIN_CHAINS = {
   ETHEREUM_MAINNET_FULL: {
     ticker: "ETH",
     id: "0021",
-    limit: 2,
+    limit: 5,
   },
   // ETHEREUM_XDAI_FULL: {
   //   ticker: "POA",

@@ -12,7 +12,7 @@ import {
 import { APPLICATION_STATUSES } from "application-statuses";
 import env from "environment";
 
-const FREE_TIER_STAKE_AMOUNT = 24950100000n;
+const FREE_TIER_STAKE_AMOUNT = 2495010000n;
 
 async function createApplicationAndFund(ctx) {
   const {
