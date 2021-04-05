@@ -34,11 +34,26 @@ export default function SuccessDetails({
 
   const onSuccessfulClick = useCallback(() => setActiveKey("successful"), []);
   const onFailedClick = useCallback(() => setActiveKey("failed"), []);
-  const successRate = useMemo(
-    () =>
-      successfulRelayData.successfulWeeklyRelays /
-      weeklyRelayData.weeklyAppRelays,
-    [weeklyRelayData, successfulRelayData]
+  const successRate = useMemo(() => {
+    return weeklyRelayData.weeklyAppRelays === 0
+      ? 0
+      : successfulRelayData.successfulWeeklyRelays /
+          weeklyRelayData.weeklyAppRelays;
+  }, [weeklyRelayData, successfulRelayData]);
+  const failureRate = useMemo(() => {
+    return weeklyRelayData.weeklyAppRelays === 0
+      ? 0
+      : (weeklyRelayData.weeklyAppRelays -
+          successfulRelayData.successfulWeeklyRelays) /
+          weeklyRelayData.weeklyAppRelays;
+  }, [successfulRelayData, weeklyRelayData]);
+
+  console.log(
+    successRate,
+    latestRelaysData,
+    successfulRelayData,
+    weeklyRelayData,
+    weeklyRelayData.weeklyAppRelays - successfulRelayData.successfulWeeklyRelays
   );
 
   return (
@@ -128,12 +143,7 @@ export default function SuccessDetails({
                   </Inline>
                   <Inline>
                     <CircleGraph
-                      value={Math.max(
-                        0,
-                        (weeklyRelayData.weeklyAppRelays -
-                          successfulRelayData.successfulWeeklyRelays) /
-                          weeklyRelayData.weeklyAppRelays
-                      )}
+                      value={Math.max(0, failureRate)}
                       size={12 * GU}
                     />
                     <Spacer size={1 * GU} />
