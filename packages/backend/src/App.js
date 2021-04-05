@@ -7,7 +7,6 @@ import { errorHandler } from "helpers/utils";
 import notFoundMiddleware from "middlewares/not-found";
 import { configureRoutes } from "routes";
 import { connect } from "db";
-import env from "environment";
 
 const PORT = process.env.PORT || 4200;
 
@@ -23,21 +22,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: function (origin, callback) {
-      const whitelist = env("ALLOWED_DOMAINS");
-
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.log("didnt find origin", origin);
-
-        callback(
-          new Error({
-            errors: [{ id: "UNAUTHORIZED", message: "Blocked by CORS" }],
-          })
-        );
-      }
-    },
+    origin: ["https://pokt-dashboard.on.fleek.co", "http://localhost:3000"],
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
     credentials: true,
     exposedHeaders: ["Authorization"],
