@@ -95,13 +95,7 @@ function modeStyles(theme, mode, disabled) {
   }
   if (mode === "strong") {
     return {
-      background: `
-        linear-gradient(
-          190deg,
-          ${theme.accentStart} -100%,
-          ${theme.accentEnd} 80%
-        )
-      `,
+      background: theme.accent,
       color: theme.accentContent,
       iconColor: theme.accentContent,
       border: "0",
@@ -130,7 +124,7 @@ function modeStyles(theme, mode, disabled) {
     background: theme.surfaceInteractive,
     color: theme.surfaceContent,
     iconColor: theme.surfaceIcon,
-    border: `1px solid ${theme.border}`,
+    border: `1px solid ${theme.accent}`,
   };
 }
 

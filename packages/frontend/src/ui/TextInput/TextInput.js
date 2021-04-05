@@ -32,8 +32,8 @@ const TextInput = React.forwardRef(
           width: ${({ wide }) => (wide ? "100%" : "auto")};
           height: ${5 * GU}px;
           padding: 0 ${1.5 * GU}px;
-          background: ${theme.surface};
-          border: 1px solid ${theme.border};
+          background: ${theme.surfaceInteractive};
+          border: 1px solid ${theme.accent};
           color: ${theme.surfaceContent};
           border-radius: ${RADIUS}px;
           appearance: none;
@@ -133,7 +133,7 @@ const WrapperTextInput = React.forwardRef(
             display: flex;
             align-items: center;
             justify-content: center;
-            color: ${theme.surfaceContentSecondary};
+            color: ${theme.surfaceIcon};
           `}
         >
           {adornment}

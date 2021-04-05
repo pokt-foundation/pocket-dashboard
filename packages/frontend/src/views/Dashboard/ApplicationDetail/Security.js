@@ -216,6 +216,7 @@ export default function Security({ appData, refetchActiveAppData }) {
                     adornment={<IconCross />}
                     css={`
                       width: 100%;
+                      padding-left: 0;
                     `}
                   />
                 </li>
