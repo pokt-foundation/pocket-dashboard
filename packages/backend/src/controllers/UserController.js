@@ -23,6 +23,7 @@ function createCookieFromToken(user, statusCode, req, res) {
     // Expires in 10 days
     expires: new Date(Date.now() + TEN_DAYS),
     httpOnly: true,
+    sameSite: "none",
     secure: req.secure || req.headers["x-forwarded-proto"] === "https",
   };
 
