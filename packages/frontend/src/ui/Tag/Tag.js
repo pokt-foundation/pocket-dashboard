@@ -28,7 +28,7 @@ function useMode(mode) {
 
   if (mode === MODE_NEW) {
     return {
-      background: theme.tagNewContent,
+      background: theme.positive,
       color: "black",
       size: SIZE_NORMAL,
     };

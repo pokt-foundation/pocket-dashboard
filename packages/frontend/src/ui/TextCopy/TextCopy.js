@@ -89,7 +89,7 @@ const TextCopy = React.memo(
             text-overflow: ellipsis;
             height: ${HEIGHT}px;
             max-width: 100%;
-            border: 1px solid ${theme.border};
+            border: 0px;
             ${adornment
               ? `
                   border-top-left-radius: 0;

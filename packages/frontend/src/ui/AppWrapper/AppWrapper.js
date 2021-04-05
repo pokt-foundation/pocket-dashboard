@@ -10,7 +10,7 @@ export default function AppWrapper({ children }) {
   return (
     <Root.Provider>
       <BaseStyles />
-      <Theme>{children}</Theme>
+      <Theme theme="dark">{children}</Theme>
     </Root.Provider>
   );
 }

@@ -456,8 +456,8 @@ function LatestRequests({ latestRequests }) {
             </>
           }
         >
-          {latestRequests.map(({ bytes, method, result }) => (
-            <TableRow>
+          {latestRequests.map(({ bytes, method, result }, index) => (
+            <TableRow key={index}>
               <TableCell>{method}</TableCell>
               <TableCell>{bytes}</TableCell>
               <TableCell>{result}</TableCell>

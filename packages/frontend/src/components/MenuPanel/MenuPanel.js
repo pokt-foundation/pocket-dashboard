@@ -99,7 +99,7 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
           min-width: ${17 * GU}px;
           height: 100vh;
           padding: ${2 * GU}px 0;
-          background: ${theme.surface};
+          background: ${theme.backgroundInverted};
           border-radius: 0px 20px 20px 0;
           flex-grow: 0;
         `}
@@ -154,7 +154,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
         position: relative;
         width: 100%;
         min-height: ${10 * GU}px;
-        background: ${active ? theme.surfacePressed : "transparent"};
+        background: ${active ? theme.surfacePressedInverted : "transparent"};
         display: flex;
         flex-direction: column;
         align-items: center;
