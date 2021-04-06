@@ -39,9 +39,13 @@ const applicationSchema = new Schema(
     notificationSettings: {
       signedUp: Boolean,
       quarter: Boolean,
+      quarterLastSent: Date,
       half: Boolean,
+      halfLastSent: Date,
       threeQuarters: Boolean,
+      threeQuartersLastSent: Date,
       full: Boolean,
+      fullLastSent: Date,
     },
     createdAt: {
       type: Date,
