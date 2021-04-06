@@ -4,6 +4,7 @@ import {
   unstakeAvailableApps,
 } from "workers/application";
 import { getNetworkStatsCount, getNodeCountForChains } from "workers/network";
+import { sendUsageNotifications } from "workers/notifications";
 import {
   ONE_MINUTES,
   FIVE_MINUTES,
@@ -123,5 +124,11 @@ export const workers = [
     color: "yellow",
     workerFn: (ctx) => getNodeCountForChains(ctx),
     recurrence: SIXTY_MINUTES,
+  },
+  {
+    name: "Usage notification service",
+    color: "blue",
+    workerFn: (ctx) => sendUsageNotifications(ctx),
+    recurrence: FIFTEEN_MINUTES,
   },
 ];

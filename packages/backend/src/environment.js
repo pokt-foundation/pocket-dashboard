@@ -14,6 +14,12 @@ export const ENV_VARS = {
   enable_workers() {
     return Boolean(process.env.ENABLE_WORKERS) || false;
   },
+  HASURA_SECRET() {
+    return process.env.HASURA_ADMIN_SECRET || "";
+  },
+  HASURA_URL() {
+    return process.env.HASURA_URL?.trim() ?? "";
+  },
   auth() {
     return {
       public_secret:
@@ -34,6 +40,7 @@ export const ENV_VARS = {
         ResetPassword: "d-a54f3a2f7f784545bb3d3f0106a40a87",
         NotificationSignup: "d-dc357971402d472b9576bf4d33f90100",
         NotificationChanges: "d-6c17da8231bc4165b91298ea8745c117",
+        NotificationHit: "d-d0d027b3b11f4f74bf0340ccfa12195d",
       },
     };
   },

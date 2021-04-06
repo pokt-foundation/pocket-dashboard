@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: ["https://pokt-dashboard.on.fleek.co", "http://localhost:3000"],
+    origin: ["https://testnet.dashboard.pokt.network", "http://localhost:3000"],
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
     credentials: true,
     exposedHeaders: ["Authorization"],
