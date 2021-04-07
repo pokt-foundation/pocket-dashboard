@@ -169,12 +169,7 @@ function EndpointDetails({ chainId, appId }) {
   );
 }
 
-function SuccessRate({
-  appId,
-  previousSuccessRate = 0,
-  successRate,
-  totalRequests,
-}) {
+function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
   const history = useHistory();
   const { url } = useRouteMatch();
   const numberProps = useSpring({
@@ -263,7 +258,7 @@ function SuccessRate({
                 align-items: center;
               `}
             >
-              <SuccessIndicator mode={mode} />
+              {totalRequests ? <SuccessIndicator mode={mode} /> : ""}
               <Spacer size={GU / 2} />
               <span>{Math.abs(successRateDelta)}%</span>
             </div>
