@@ -25,6 +25,7 @@ import FloatUp from "components/FloatUp/FloatUp";
 import SuccessIndicator from "views/Dashboard/ApplicationDetail/SuccessIndicator";
 import { prefixFromChainId } from "lib/chain-utils";
 import { norm } from "lib/math-utils";
+import { getThresholdsPerStake } from "lib/pocket-utils";
 
 const ONE_MILLION = 1000000;
 
@@ -78,11 +79,13 @@ export default function AppInfo({
       : previousSuccessfulRelays.successfulWeeklyRelays /
           previousSuccessfulRelays.previousTotalRelays;
   }, [previousSuccessfulRelays]);
-
   const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
     () => formatDailyRelaysForGraphing(dailyRelayData),
     [dailyRelayData]
   );
+
+  const { staked_tokens: stakedTokens } = appOnChainData;
+  const { graphThreshold } = getThresholdsPerStake(stakedTokens);
 
   return (
     <FloatUp
@@ -114,6 +117,7 @@ export default function AppInfo({
                 chartLabels={usageLabels}
                 chartLines={usageLines}
                 sessionRelays={currentSessionRelays}
+                threshold={graphThreshold}
               />
               <Spacer size={2 * GU} />
               <LatestRequests latestRequests={latestRelaysData.latestRelays} />
@@ -169,12 +173,7 @@ function EndpointDetails({ chainId, appId }) {
   );
 }
 
-function SuccessRate({
-  appId,
-  previousSuccessRate = 0,
-  successRate,
-  totalRequests,
-}) {
+function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
   const history = useHistory();
   const { url } = useRouteMatch();
   const numberProps = useSpring({
@@ -263,7 +262,7 @@ function SuccessRate({
                 align-items: center;
               `}
             >
-              <SuccessIndicator mode={mode} />
+              {totalRequests ? <SuccessIndicator mode={mode} /> : ""}
               <Spacer size={GU / 2} />
               <span>{Math.abs(successRateDelta)}%</span>
             </div>
@@ -344,7 +343,7 @@ function AvgLatency({ avgLatency }) {
   );
 }
 
-function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
+function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
   const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
     chartLines,
   ]);

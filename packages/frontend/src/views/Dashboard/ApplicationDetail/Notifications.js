@@ -16,6 +16,7 @@ import {
 } from "ui";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
+import { getThresholdsPerStake } from "lib/pocket-utils";
 import env from "environment";
 
 const MAX_RELAYS = 1000000;
@@ -27,7 +28,11 @@ const DEFAULT_PERCENTAGES = {
   full: false,
 };
 
-export default function Notifications({ appData, dailyRelayData }) {
+export default function Notifications({
+  appData,
+  appOnChainData,
+  dailyRelayData,
+}) {
   const [chosenPercentages, setChosenPercentages] = useState(
     appData?.notificationSettings ?? DEFAULT_PERCENTAGES
   );
@@ -111,6 +116,9 @@ export default function Notifications({ appData, dailyRelayData }) {
     [hasChanged, isNotificationsLoading]
   );
 
+  const { staked_tokens: stakedTokens } = appOnChainData;
+  const { legibleMaxRelays } = getThresholdsPerStake(stakedTokens);
+
   return (
     <FloatUp
       loading={false}
@@ -151,7 +159,7 @@ export default function Notifications({ appData, dailyRelayData }) {
                     Daily bandwith usage
                   </h2>
                   {compactMode && <Spacer size={1 * GU} />}
-                  <h3>Max relays per day: 1M</h3>
+                  <h3>Max relays per day: {legibleMaxRelays}</h3>
                 </div>
                 <Spacer size={2 * GU} />
                 <Inline>
@@ -283,24 +291,28 @@ export default function Notifications({ appData, dailyRelayData }) {
                 level="quarter"
                 checked={chosenPercentages.quarter}
                 onChange={() => onChosePercentageChange("quarter")}
+                maxRelays={legibleMaxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="half"
                 checked={chosenPercentages.half}
                 onChange={() => onChosePercentageChange("half")}
+                maxRelays={legibleMaxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="threeQuarters"
                 checked={chosenPercentages.threeQuarters}
                 onChange={() => onChosePercentageChange("threeQuarters")}
+                maxRelays={legibleMaxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="full"
                 checked={chosenPercentages.full}
                 onChange={() => onChosePercentageChange("full")}
+                maxRelays={legibleMaxRelays}
               />
             </>
           }
@@ -310,7 +322,7 @@ export default function Notifications({ appData, dailyRelayData }) {
   );
 }
 
-function NotificationPreference({ level, checked, onChange }) {
+function NotificationPreference({ level, checked, onChange, maxRelays }) {
   const theme = useTheme();
 
   const backgroundColor = useMemo(() => {
@@ -368,7 +380,7 @@ function NotificationPreference({ level, checked, onChange }) {
               ${textStyle("body3")}
             `}
           >
-            of 1M relays
+            of {maxRelays} relays
           </span>
         </h3>
         <Switch checked={checked} onChange={onChange} />
