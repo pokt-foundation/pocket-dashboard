@@ -18,6 +18,7 @@ import {
   GU,
   RADIUS,
   ButtonBase,
+  useToast,
 } from "ui";
 import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
@@ -157,6 +158,7 @@ export default function AppInfo({
 }
 
 function EndpointDetails({ chainId, appId }) {
+  const toast = useToast();
   const endpoint = `https://${prefixFromChainId(
     chainId
   )}.gateway.pokt.network/v1/${appId}`;
@@ -168,6 +170,7 @@ function EndpointDetails({ chainId, appId }) {
         css={`
           width: 100%;
         `}
+        onCopy={() => toast("Endpoint copied to clipboard")}
       />
     </Box>
   );
@@ -469,6 +472,8 @@ function LatestRequests({ latestRequests }) {
 }
 
 function AppDetails({ id, pubkey, secret }) {
+  const toast = useToast();
+
   return (
     <Box
       css={`
@@ -493,7 +498,10 @@ function AppDetails({ id, pubkey, secret }) {
         >
           Gateway ID
         </h3>
-        <TextCopy value={id} />
+        <TextCopy
+          value={id}
+          onCopy={() => toast("Gateway ID copied to clipboard")}
+        />
       </div>
       <div
         css={`
@@ -510,7 +518,10 @@ function AppDetails({ id, pubkey, secret }) {
         >
           App public key
         </h3>
-        <TextCopy value={pubkey} />
+        <TextCopy
+          value={pubkey}
+          onCopy={() => toast("App public key copied to clipboard")}
+        />
       </div>
       {secret && (
         <div
@@ -526,9 +537,12 @@ function AppDetails({ id, pubkey, secret }) {
               margin-bottom: ${2 * GU}px;
             `}
           >
-            App Secret
+            Secret Key
           </h3>
-          <TextCopy value={secret} />
+          <TextCopy
+            value={secret}
+            onCopy={() => toast("Secret key copied to clipboard")}
+          />
         </div>
       )}
     </Box>

@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import PropTypes from "prop-types";
 import { animated, Transition } from "react-spring/renderprops";
+import "styled-components/macro";
 import RootPortal from "../Root/RootPortal";
 import { useViewport } from "use-viewport";
 import { stylingProps } from "../utils";
@@ -213,7 +214,7 @@ const ToastList = React.memo(function ToastList({
                 css={`
                   box-sizing: border-box;
                   position: relative;
-                  width: ${below("medium") ? "100%" : "42ch"};
+                  width: ${below("medium") ? "100%" : "32ch"};
                 `}
               >
                 <div
