@@ -23,6 +23,7 @@ import TableRow from "ui/Table/TableRow";
 import Tag from "ui/Tag/Tag";
 import TextCopy from "ui/TextCopy/TextCopy";
 import TextInput from "ui/TextInput/TextInput";
+import ToastHubProvider, { Toast, useToast } from "ui/ToastHub/ToastHub";
 
 // Export components
 export {
@@ -51,6 +52,9 @@ export {
   Tag,
   TextCopy,
   TextInput,
+  Toast,
+  ToastHubProvider,
+  useToast,
 };
 
 // Theme, utils and style helpers

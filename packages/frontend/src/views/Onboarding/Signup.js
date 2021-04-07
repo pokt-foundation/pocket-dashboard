@@ -31,7 +31,7 @@ export default function Login() {
 
   const compactMode = within(-1, "medium");
 
-  const { isError, isLoading, isSuccess, mutate } = useMutation(
+  const { isError, isLoading, isSuccess, mutate, reset } = useMutation(
     async function signup() {
       try {
         const path = `${env("BACKEND_URL")}/api/users/signup`;
@@ -60,8 +60,9 @@ export default function Login() {
   const onInputFocus = useCallback(() => {
     if (errors.length) {
       setErrors([]);
+      reset();
     }
-  }, [errors]);
+  }, [errors, reset]);
   const onEmailBlur = useCallback(() => {
     if (!email) {
       const emailError = {

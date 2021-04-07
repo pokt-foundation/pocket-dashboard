@@ -1,7 +1,6 @@
 import React from "react";
 import { HashRouter as Router } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { ViewportProvider } from "use-viewport";
 import { AppWrapper } from "ui";
 import DashboardRoutes from "views/DashboardRoutes";
 
@@ -11,11 +10,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppWrapper>
-        <ViewportProvider>
-          <Router>
-            <DashboardRoutes />
-          </Router>
-        </ViewportProvider>
+        <Router>
+          <DashboardRoutes />
+        </Router>
       </AppWrapper>
     </QueryClientProvider>
   );
