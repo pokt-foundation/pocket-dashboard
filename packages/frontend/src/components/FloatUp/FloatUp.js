@@ -30,7 +30,13 @@ export default function FloatUp({
       `}
     >
       {loadingSwapTransitions.map(({ item: loading, key, props }) => (
-        <animated.div style={props} key={key}>
+        <animated.div
+          style={props}
+          key={key}
+          css={`
+            position: relative;
+          `}
+        >
           {loading ? fallback() : content()}
         </animated.div>
       ))}

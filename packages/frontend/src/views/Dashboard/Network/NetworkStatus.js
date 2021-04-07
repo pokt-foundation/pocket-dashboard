@@ -63,32 +63,31 @@ export default function NetworkStatus() {
     [isChainsLoading, isRelaysLoading, isSuccessRateLoading, isSummaryLoading]
   );
 
-  return (
+  return loading ? (
+    <div
+      css={`
+        position: relative;
+        width: 100%;
+        /* TODO: This is leaky. fix up with a permanent component */
+        height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      `}
+    >
+      <AnimatedLogo />
+      <Spacer size={2 * GU} />
+      <p
+        css={`
+          ${textStyle("body2")}
+        `}
+      >
+        Loading network status...
+      </p>
+    </div>
+  ) : (
     <FloatUp
-      loading={loading}
-      fallback={() => (
-        <div
-          css={`
-            width: 100%;
-            /* TODO: This is leaky. fix up with a permanent component */
-            height: 60vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-          `}
-        >
-          <AnimatedLogo />
-          <Spacer size={2 * GU} />
-          <p
-            css={`
-              ${textStyle("body2")}
-            `}
-          >
-            Loading network status...
-          </p>
-        </div>
-      )}
       content={() => (
         <>
           <RelayInfo

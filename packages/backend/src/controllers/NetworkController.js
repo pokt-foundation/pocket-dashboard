@@ -44,6 +44,43 @@ router.get(
 );
 
 router.get(
+  "/stakeable-chains",
+  asyncMiddleware(async (req, res) => {
+    const chains = await Chain.find();
+
+    const existentChains = await Promise.all(
+      chains.map(async function filterChain({ _id }) {
+        const exists = await ApplicationPool.exists({
+          chain: _id,
+        });
+
+        return exists;
+      })
+    );
+    const processedChains = chains.filter((_, i) => existentChains[i]);
+
+    const formattedChains = processedChains.map(function processChain({
+      _id,
+      ticker,
+      network,
+      description,
+      nodeCount,
+    }) {
+      return {
+        id: _id,
+        ticker,
+        network,
+        description,
+        nodeCount,
+        isAvailableForStaking: true,
+      };
+    });
+
+    res.status(200).send({ chains: formattedChains });
+  })
+);
+
+router.get(
   "/summary",
   asyncMiddleware(async (req, res) => {
     const latestNetworkData = await NetworkData.findOne(
