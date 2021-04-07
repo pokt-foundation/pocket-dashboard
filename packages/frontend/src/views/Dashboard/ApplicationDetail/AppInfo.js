@@ -66,8 +66,6 @@ export default function AppInfo({
   const { url } = useRouteMatch();
   const { within } = useViewport();
 
-  console.log(appOnChainData);
-
   const compactMode = within(-1, "medium");
 
   const successRate = useMemo(() => {
