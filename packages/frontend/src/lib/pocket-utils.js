@@ -27,7 +27,7 @@ const THRESHOLDS_PER_STAKE = new Map([
     {
       maxRelays: 100000,
       graphThreshold: 150000,
-      legibleMaxRelays: "1M",
+      legibleMaxRelays: "100K",
     },
   ],
 ]);
