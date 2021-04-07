@@ -125,6 +125,7 @@ export async function fillAppPool(ctx) {
 
   if (totalPoolSize <= appPool?.length) {
     ctx.logger.log("fillAppPool(): No need to fill the pool.");
+    return;
   }
 
   const appsToCreate = totalPoolSize - (appPool?.length ?? 0);
@@ -183,7 +184,9 @@ export async function stakeAppPool(ctx) {
         const chosenApplication = appsToStake.pop();
 
         if (!chosenApplication) {
-          ctx.logger.warn("NOTICE: No more space in the pool for app demand.");
+          ctx.logger.warn(
+            `NOTICE: No more space in the pool for app demand. Tried to stake app ${chosenApplication.freeTierApplicationAccount.address} for chain ${chain}`
+          );
           return;
         }
 
