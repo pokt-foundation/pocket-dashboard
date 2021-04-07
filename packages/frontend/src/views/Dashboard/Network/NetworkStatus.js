@@ -8,6 +8,8 @@ import NetworkInfo from "views/Dashboard/Network/NetworkInfo";
 import {
   useNetworkSuccessRate,
   useTotalWeeklyRelays,
+  useNetworkSummary,
+  useChains,
 } from "views/Dashboard/Network/network-hooks";
 import { norm } from "lib/math-utils";
 
@@ -41,6 +43,8 @@ function formatDailyRelaysForGraphing(dailyRelays) {
 export default function NetworkStatus() {
   const { isRelaysError, isRelaysLoading, relayData } = useTotalWeeklyRelays();
   const { isSuccessRateLoading, successRateData } = useNetworkSuccessRate();
+  const { isSummaryLoading, summaryData } = useNetworkSummary();
+  const { isChainsLoading, chains } = useChains();
 
   const { labels = [], lines = [] } = useMemo(
     () =>
@@ -50,10 +54,14 @@ export default function NetworkStatus() {
     [isRelaysError, isRelaysLoading, relayData]
   );
 
-  const loading = useMemo(() => isSuccessRateLoading || isRelaysLoading, [
-    isSuccessRateLoading,
-    isRelaysLoading,
-  ]);
+  const loading = useMemo(
+    () =>
+      isSuccessRateLoading ||
+      isRelaysLoading ||
+      isSummaryLoading ||
+      isChainsLoading,
+    [isChainsLoading, isRelaysLoading, isSuccessRateLoading, isSummaryLoading]
+  );
 
   return (
     <FloatUp
@@ -90,7 +98,7 @@ export default function NetworkStatus() {
             chartLabels={labels}
           />
           <Spacer size={2 * GU} />
-          <NetworkInfo />
+          <NetworkInfo summaryData={summaryData} chains={chains} />
         </>
       )}
     />
