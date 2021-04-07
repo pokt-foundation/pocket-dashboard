@@ -37,6 +37,8 @@ export function getStakingStatus(status) {
 }
 
 export function getThresholdsPerStake(stake) {
+  console.log(stake);
+
   if (!THRESHOLDS_PER_STAKE.has(stake)) {
     throw new Error("Unknown stake");
   }

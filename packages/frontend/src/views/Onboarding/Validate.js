@@ -26,6 +26,7 @@ export default function Login() {
       } catch (err) {
         // TODO: Set err on UI AND send to sentry.
         console.log(Object.entries(err));
+        throw err;
       }
     }
   );
