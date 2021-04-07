@@ -148,8 +148,8 @@ export default function Create() {
     isLoading: isChainsLoading,
     isError: isChainsError,
     data: chains,
-  } = useQuery("/network/chains", async function getNetworkChains() {
-    const path = `${env("BACKEND_URL")}/api/network/chains`;
+  } = useQuery("/network/stakeable-chains", async function getNetworkChains() {
+    const path = `${env("BACKEND_URL")}/api/network/stakeable-chains`;
 
     try {
       const res = await axios.get(path, {
