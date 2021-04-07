@@ -23,12 +23,12 @@ const TEST_ONLY_CHAINS = {
 const TEST_CHAINS = {
   ETHEREUM_GOERLI_FULL: {
     ticker: "ETH",
-    id: "0020",
+    id: "0026",
     limit: 2,
   },
   ETHEREUM_RINKEBY_FULL: {
     ticker: "ETH",
-    id: "0022",
+    id: "0025",
     limit: 3,
   },
   ETHEREUM_ROPSTEN_FULL: {
@@ -39,11 +39,11 @@ const TEST_CHAINS = {
 };
 
 const MAIN_CHAINS = {
-  ETHEREUM_GOERLI_FULL: {
-    ticker: "ETH",
-    id: "0020",
-    limit: 3,
-  },
+  // ETHEREUM_GOERLI_FULL: {
+  //   ticker: "ETH",
+  //   id: "0026",
+  //   limit: 3,
+  // },
   // ETHEREUM_KOVAN_FULL: {
   //   ticker: "POA",
   //   id: "0024",
@@ -59,16 +59,21 @@ const MAIN_CHAINS = {
     id: "0021",
     limit: 5,
   },
+  ETHEREUM_RINKEBY_FULL: {
+    ticker: "ETH",
+    id: "0025",
+    limit: 3,
+  },
   // ETHEREUM_XDAI_FULL: {
   //   ticker: "POA",
   //   id: "0027",
   //   limit: 3,
   // },
-  // POCKET_MAINNET: {
-  //   ticker: "POKT",
-  //   id: "0001",
-  //   limit: 3,
-  // },
+  POCKET_MAINNET: {
+    ticker: "POKT",
+    id: "0001",
+    limit: 3,
+  },
 };
 
 function getChainsByEnvironment() {
@@ -78,7 +83,6 @@ function getChainsByEnvironment() {
 
   if (process.env.NODE_ENV === "production") {
     return {
-      // ...TEST_CHAINS,
       ...MAIN_CHAINS,
     };
   }
