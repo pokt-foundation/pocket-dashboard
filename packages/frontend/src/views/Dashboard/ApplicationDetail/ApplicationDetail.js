@@ -137,7 +137,11 @@ export default function ApplicationDetail() {
         />
       </Route>
       <Route path={`${path}/notifications`}>
-        <Notifications appData={appData} dailyRelayData={dailyRelayCountData} />
+        <Notifications
+          appData={appData}
+          appOnChainData={appOnChainData}
+          dailyRelayData={dailyRelayCountData}
+        />
       </Route>
       <Route path={`${path}/chains`}>
         <Chains appData={appData} />
