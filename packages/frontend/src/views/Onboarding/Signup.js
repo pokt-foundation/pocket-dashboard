@@ -250,12 +250,21 @@ export default function Login() {
             >
               I Agree to the Pocket Dashboard's{" "}
               <Link
-                href="#"
+                href="https://dashboard.pokt.network/support/terms-of-service"
                 css={`
                   display: inline;
                 `}
               >
-                T. &amp; C. and Privacy Policy
+                T. &amp; C.
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="https://dashboard.pokt.network/support/privacy-policy"
+                css={`
+                  display: inline;
+                `}
+              >
+                Privacy Policy
               </Link>
             </span>
           </label>
