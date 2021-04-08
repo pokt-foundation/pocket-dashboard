@@ -8,6 +8,7 @@ export default function RelayInfo({
   relayData,
   chartLines,
   chartLabels,
+  scales,
   successRateData,
 }) {
   const { within } = useViewport();
@@ -46,13 +47,17 @@ export default function RelayInfo({
               <h5>For the past week</h5>
             </div>
           </div>
+          <Spacer size={1 * GU} />
           <LineChart
-            lines={chartLines}
-            label={(index) => chartLabels[index]}
             backgroundFill="#1B2331"
-            height={240}
-            color={() => `#31A1D2`}
             borderColor={`rgba(0,0,0,0)`}
+            color={() => `#31A1D2`}
+            dotRadius={GU / 1.5}
+            height={240}
+            label={(index) => chartLabels[index]}
+            lines={chartLines}
+            renderCheckpoints
+            scales={scales}
           />
         </Box>
       }
