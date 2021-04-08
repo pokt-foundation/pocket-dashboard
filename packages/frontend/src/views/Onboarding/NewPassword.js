@@ -19,7 +19,9 @@ import env from "environment";
 
 export default function NewPassword() {
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(null);
   const [repeatedPassword, setRepeatedPassword] = useState("");
+  const [repeatedPasswordError, setRepeatedPasswordError] = useState(null);
   const [errors, setErrors] = useState([]);
   const { search } = useLocation();
   const history = useHistory();
@@ -56,7 +58,13 @@ export default function NewPassword() {
     if (errors.length) {
       setErrors([]);
     }
-  }, [errors]);
+    if (passwordError) {
+      setPasswordError(null);
+    }
+    if (repeatedPasswordError) {
+      setRepeatedPasswordError(null);
+    }
+  }, [errors, passwordError, repeatedPasswordError]);
   const onPasswordBlur = useCallback(() => {
     if (!password) {
       const passwordError = {
@@ -64,9 +72,7 @@ export default function NewPassword() {
         message: "Password cannot be empty",
       };
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
-
-      setErrors([...filteredErrors, passwordError]);
+      setPasswordError(passwordError);
     } else if (!isStrongPassword(password)) {
       const passwordError = {
         id: "INVALID_PASSWORD",
@@ -85,6 +91,13 @@ export default function NewPassword() {
         message: "Password cannot be empty",
       };
 
+      setRepeatedPasswordError(passwordError);
+    } else if (!isStrongPassword(repeatedPassword)) {
+      const passwordError = {
+        id: "INVALID_PASSWORD",
+        message: "Password's not strong enough.",
+      };
+
       const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
 
       setErrors([...filteredErrors, passwordError]);
@@ -94,15 +107,18 @@ export default function NewPassword() {
         message: "Passwords don't match",
       };
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
-
-      setErrors([...filteredErrors, passwordError]);
+      setRepeatedPasswordError(passwordError);
     }
   }, [errors, password, repeatedPassword]);
 
   const isSubmitDisabled = useMemo(
-    () => isLoading || isError || errors.length > 0,
-    [errors, isError, isLoading]
+    () =>
+      isLoading ||
+      isError ||
+      errors.length > 0 ||
+      passwordError ||
+      repeatedPasswordError,
+    [errors, isError, isLoading, passwordError, repeatedPasswordError]
   );
 
   return (
@@ -154,6 +170,15 @@ export default function NewPassword() {
             onFocus={onInputFocus}
             type="password"
           />
+          {passwordError && (
+            <p
+              css={`
+                color: ${theme.negative};
+              `}
+            >
+              {passwordError.message}
+            </p>
+          )}
         </Field>
         <Field label="Password confirmation" required>
           <TextInput
@@ -164,6 +189,15 @@ export default function NewPassword() {
             onFocus={onInputFocus}
             type="password"
           />
+          {repeatedPasswordError && (
+            <p
+              css={`
+                color: ${theme.negative};
+              `}
+            >
+              {repeatedPasswordError.message}
+            </p>
+          )}
         </Field>
         <ul
           css={`

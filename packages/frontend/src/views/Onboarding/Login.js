@@ -7,6 +7,7 @@ import {
   Button,
   Field,
   Link,
+  Spacer,
   TextInput,
   textStyle,
   useTheme,
@@ -18,7 +19,9 @@ import env from "environment";
 
 export default function Login() {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(null);
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(null);
   const [errors, setErrors] = useState([]);
   const theme = useTheme();
   const history = useHistory();
@@ -56,7 +59,13 @@ export default function Login() {
     if (errors.length) {
       setErrors([]);
     }
-  }, [errors]);
+    if (emailError) {
+      setEmailError(null);
+    }
+    if (passwordError) {
+      setPasswordError(null);
+    }
+  }, [emailError, errors, passwordError]);
   const onEmailBlur = useCallback(() => {
     if (!email) {
       const emailError = {
@@ -64,11 +73,9 @@ export default function Login() {
         message: "Email cannot be empty",
       };
 
-      const filteredErrors = errors.filter(({ id }) => emailError.id !== id);
-
-      setErrors([...filteredErrors, emailError]);
+      setEmailError(emailError);
     }
-  }, [errors, email]);
+  }, [email]);
   const onPasswordBlur = useCallback(() => {
     if (!password) {
       const passwordError = {
@@ -76,16 +83,14 @@ export default function Login() {
         message: "Password cannot be empty",
       };
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
-
-      setErrors([...filteredErrors, passwordError]);
+      setPasswordError(passwordError);
     }
-  }, [errors, password]);
+  }, [password]);
 
-  const isSubmitDisabled = useMemo(() => isLoading || errors.length > 0, [
-    errors,
-    isLoading,
-  ]);
+  const isSubmitDisabled = useMemo(
+    () => isLoading || errors.length > 0 || emailError || passwordError,
+    [emailError, errors, passwordError, isLoading]
+  );
 
   return (
     <div
@@ -126,13 +131,7 @@ export default function Login() {
             flex-direction: column;
           `}
         >
-          <Field
-            label="Email"
-            required
-            css={`
-              margin-bottom: ${5 * GU}px;
-            `}
-          >
+          <Field label="Email" required>
             <TextInput
               wide
               value={email}
@@ -140,14 +139,18 @@ export default function Login() {
               onFocus={onInputFocus}
               onBlur={onEmailBlur}
             />
+            <Spacer size={GU / 2} />
+            {emailError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {emailError.message}
+              </p>
+            )}
           </Field>
-          <Field
-            label="Password"
-            required
-            css={`
-              margin-bottom: ${6 * GU}px;
-            `}
-          >
+          <Field label="Password" required>
             <TextInput
               wide
               value={password}
@@ -156,7 +159,18 @@ export default function Login() {
               onBlur={onPasswordBlur}
               type="password"
             />
+            <Spacer size={GU / 2} />
+            {passwordError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {passwordError.message}
+              </p>
+            )}
           </Field>
+          <Spacer size={3 * GU} />
           <ul
             css={`
               list-style-type: none;

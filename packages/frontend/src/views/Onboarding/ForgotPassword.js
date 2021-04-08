@@ -78,7 +78,8 @@ export default function ForgotPassword() {
         >
           If the email you specify exists, we'll send an email with instructions
           for resetting your email. Remember you can{" "}
-          <Link href="#">contact us</Link> if you have any issues.
+          <Link href="mailto:dashboard@pokt.network">contact us</Link> if you
+          have any issues.
         </p>
         <Field
           label="Email"
