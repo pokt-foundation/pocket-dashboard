@@ -22,8 +22,11 @@ import env from "environment";
 
 export default function Login() {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(null);
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(null);
   const [repeatedPassword, setRepeatedPassword] = useState("");
+  const [repeatedPasswordError, setRepeatedPasswordError] = useState(null);
   const [errors, setErrors] = useState([]);
   const [checked, setChecked] = useState(false);
   const theme = useTheme();
@@ -62,7 +65,16 @@ export default function Login() {
       setErrors([]);
       reset();
     }
-  }, [errors, reset]);
+    if (emailError) {
+      setEmailError(null);
+    }
+    if (passwordError) {
+      setPasswordError(null);
+    }
+    if (repeatedPasswordError) {
+      setRepeatedPasswordError(null);
+    }
+  }, [emailError, errors, passwordError, repeatedPasswordError, reset]);
   const onEmailBlur = useCallback(() => {
     if (!email) {
       const emailError = {
@@ -70,9 +82,7 @@ export default function Login() {
         message: "Email cannot be empty",
       };
 
-      const filteredErrors = errors.filter(({ id }) => emailError.id !== id);
-
-      setErrors([...filteredErrors, emailError]);
+      setEmailError(emailError);
     }
 
     if (!isEmail(email)) {
@@ -81,11 +91,9 @@ export default function Login() {
         message: "Please enter a valid email.",
       };
 
-      const filteredErrors = errors.filter(({ id }) => emailError.id !== id);
-
-      setErrors([...filteredErrors, emailError]);
+      setEmailError(emailError);
     }
-  }, [errors, email]);
+  }, [email]);
   const onPasswordBlur = useCallback(() => {
     if (!password) {
       const passwordError = {
@@ -93,20 +101,16 @@ export default function Login() {
         message: "Password cannot be empty",
       };
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
-
-      setErrors([...filteredErrors, passwordError]);
+      setPasswordError(passwordError);
     } else if (!isStrongPassword(password)) {
       const passwordError = {
         id: "INVALID_PASSWORD",
         message: "Password's not strong enough.",
       };
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
-
-      setErrors([...filteredErrors, passwordError]);
+      setPasswordError(passwordError);
     }
-  }, [errors, password]);
+  }, [password]);
   const onRepeatedPasswordBlur = useCallback(() => {
     if (!password) {
       const passwordError = {
@@ -114,24 +118,33 @@ export default function Login() {
         message: "Password cannot be empty",
       };
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
-
-      setErrors([...filteredErrors, passwordError]);
+      setRepeatedPasswordError(passwordError);
     } else if (password !== repeatedPassword) {
       const passwordError = {
         id: "NON_MATCHING_PASSWORD",
         message: "Passwords don't match",
       };
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
-
-      setErrors([...filteredErrors, passwordError]);
+      setRepeatedPasswordError(passwordError);
     }
-  }, [errors, password, repeatedPassword]);
+  }, [password, repeatedPassword]);
 
   const isSubmitDisabled = useMemo(
-    () => isLoading || isError || errors.length > 0,
-    [errors, isError, isLoading]
+    () =>
+      isLoading ||
+      isError ||
+      errors.length > 0 ||
+      emailError ||
+      passwordError ||
+      repeatedPasswordError,
+    [
+      emailError,
+      errors,
+      isError,
+      isLoading,
+      passwordError,
+      repeatedPasswordError,
+    ]
   );
 
   return (
@@ -175,13 +188,7 @@ export default function Login() {
             flex-direction: column;
           `}
         >
-          <Field
-            label="Email"
-            required
-            css={`
-              margin-bottom: ${5 * GU}px;
-            `}
-          >
+          <Field label="Email" required>
             <TextInput
               wide
               value={email}
@@ -189,6 +196,15 @@ export default function Login() {
               onChange={onEmailChange}
               onFocus={onInputFocus}
             />
+            {emailError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {emailError.message}
+              </p>
+            )}
           </Field>
           <Field label="Password" required>
             <TextInput
@@ -199,6 +215,15 @@ export default function Login() {
               onFocus={onInputFocus}
               type="password"
             />
+            {passwordError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {passwordError.message}
+              </p>
+            )}
           </Field>
           <Field label="Repeat Password" required>
             <TextInput
@@ -209,6 +234,15 @@ export default function Login() {
               onFocus={onInputFocus}
               type="password"
             />
+            {repeatedPasswordError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {repeatedPasswordError.message}
+              </p>
+            )}
           </Field>
           <ul
             css={`
