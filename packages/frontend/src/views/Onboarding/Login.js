@@ -16,6 +16,7 @@ import {
 } from "ui";
 import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
 import env from "environment";
+import PoktShape from "assets/poktshape.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -95,6 +96,7 @@ export default function Login() {
   return (
     <div
       css={`
+        position: relative;
         width: 100%;
         min-height: 100vh;
         position: relative;
@@ -105,6 +107,19 @@ export default function Login() {
         background: #091828;
       `}
     >
+      <img
+        src={PoktShape}
+        css={`
+          position: absolute;
+          bottom: 0%;
+          right: -5%;
+          width: 50%;
+          max-width: ${80 * GU}px;
+          height: auto;
+          z-index: 1;
+        `}
+        alt="Ball"
+      />
       <OnboardingHeader />
       <div
         css={`
@@ -131,6 +146,8 @@ export default function Login() {
         </div>
         <main
           css={`
+            position: relative;
+            z-index: 2;
             width: 100%;
             height: auto;
             border-radius: ${RADIUS * 2}px;

@@ -6,6 +6,7 @@ import "styled-components/macro";
 import { Link, Spacer, textStyle, useTheme, GU, RADIUS } from "ui";
 import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
 import env from "environment";
+import PoktShape from "assets/poktshape.png";
 
 export default function Login() {
   const theme = useTheme();
@@ -38,6 +39,7 @@ export default function Login() {
   return (
     <div
       css={`
+        position: relative;
         width: 100%;
         min-height: 100vh;
         position: relative;
@@ -48,6 +50,19 @@ export default function Login() {
       `}
     >
       <OnboardingHeader />
+      <img
+        src={PoktShape}
+        css={`
+          position: absolute;
+          bottom: 0%;
+          right: -5%;
+          width: 50%;
+          max-width: ${80 * GU}px;
+          height: auto;
+          z-index: 1;
+        `}
+        alt="Ball"
+      />
       <div
         css={`
           width: 100%;
@@ -72,6 +87,8 @@ export default function Login() {
         </div>
         <main
           css={`
+            position: relative;
+            z-index: 2;
             width: 100%;
             height: auto;
             max-width: ${120 * GU}px;
