@@ -1553,6 +1553,11 @@
   resolved "https://registry.yarnpkg.com/@fontsource/inter/-/inter-4.2.2.tgz#efe97167aac992db3fadf60ea0dd72aacd3e1fc4"
   integrity sha512-lvR1PQe+8FTTd3YRW84KGcgUR8leZ7S3aY+51MQ90MQHI0VQe3cDH6T6jjs1qTm+wPmWfdSVjN8ugvNZpGUnvA==
 
+"@fontsource/manrope@^4.2.2":
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/@fontsource/manrope/-/manrope-4.2.2.tgz#e360e0a201938cc8d62ab57dfa1771bb72e20e0e"
+  integrity sha512-vjZTNoj2L2JZNE0X3sbmNyK0cfT4H+zh4Z37jX0S3CGCHpadW6pLHs3KjQJmWz1qvLvDk2pIykJGmQ4pErA97A==
+
 "@fontsource/source-code-pro@^4.2.1":
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/@fontsource/source-code-pro/-/source-code-pro-4.2.1.tgz#70e3a20341bdc1d0ca50690eecd3be41b5ae0a89"
@@ -8021,6 +8026,11 @@ cyclist@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-1.0.1.tgz#596e9698fd0c80e12038c2b82d6eb1b35b6224d9"
   integrity sha1-WW6WmP0MgOEgOMK4LW6xs1tiJNk=
+
+d3-format@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-2.0.0.tgz#a10bcc0f986c372b729ba447382413aabf5b0767"
+  integrity sha512-Ab3S6XuE/Q+flY96HXT0jOXcM4EAClYFnRGY5zsjRGNy6qCYrQsMffs7cV5Q9xejb35zxW5hf/guKw34kvIKsA==
 
 d@1, d@^1.0.1:
   version "1.0.1"

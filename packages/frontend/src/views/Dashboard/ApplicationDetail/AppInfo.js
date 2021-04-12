@@ -1,24 +1,26 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useHistory, useRouteMatch } from "react-router";
 import { animated, useSpring } from "react-spring";
+import * as dayjs from "dayjs";
+import * as dayJsutcPlugin from "dayjs/plugin/utc";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import {
+  Banner,
   Button,
   CircleGraph,
+  DataView,
   LineChart,
   Spacer,
   Split,
   TextCopy,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
   textStyle,
   GU,
   RADIUS,
   ButtonBase,
+  useTheme,
   useToast,
+  Modal,
 } from "ui";
 import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
@@ -31,6 +33,34 @@ import { getThresholdsPerStake } from "lib/pocket-utils";
 const ONE_MILLION = 1000000;
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const HIGHLIGHT_COLORS = [
+  "#D27E31",
+  "#55B02B",
+  "#BB31D2",
+  "#31ABD2",
+  "#D2CC31",
+];
+
+const FALLBACK_COLOR = "#C4C4C4";
+
+function useUsageColor(usage) {
+  const theme = useTheme();
+
+  if (usage <= 0.25) {
+    return theme.positive;
+  }
+
+  if (usage <= 0.5) {
+    return theme.yellow;
+  }
+
+  if (usage <= 0.75) {
+    return theme.warning;
+  }
+
+  return theme.negative;
+}
 
 function formatDailyRelaysForGraphing(dailyRelays = []) {
   const labels = dailyRelays
@@ -62,6 +92,10 @@ export default function AppInfo({
   successfulRelayData,
   weeklyRelayData,
 }) {
+  const [networkModalVisible, setNetworkModalVisible] = useState(false);
+  const [networkDenialModalVisible, setNetworkDenialModalVisible] = useState(
+    false
+  );
   const history = useHistory();
   const { url } = useRouteMatch();
   const { within } = useViewport();
@@ -88,72 +122,224 @@ export default function AppInfo({
   const { staked_tokens: stakedTokens } = appOnChainData;
   const { graphThreshold } = getThresholdsPerStake(stakedTokens);
 
+  const isSwitchable = useMemo(() => {
+    dayjs.extend(dayJsutcPlugin);
+    const today = dayjs.utc();
+    const appCreationDate = dayjs.utc(appData.createdAt);
+
+    const diff = today.diff(appCreationDate, "day");
+
+    return diff >= 7;
+  }, [appData]);
+
+  const exceedsMaxRelays = useMemo(() => false, []);
+
+  const onCloseNetworkModal = useCallback(
+    () => setNetworkModalVisible(false),
+    []
+  );
+  const onCloseDenialModal = useCallback(
+    () => setNetworkDenialModalVisible(false),
+    []
+  );
+
+  const onOpenModal = useCallback(() => {
+    if (!isSwitchable) {
+      setNetworkDenialModalVisible(true);
+    } else {
+      setNetworkModalVisible(true);
+    }
+  }, [isSwitchable]);
+
+  const onSwitchChains = useCallback(() => {
+    history.push(`${url}/chains`);
+  }, [history, url]);
+
   return (
     <FloatUp
       content={() => (
-        <Split
-          primary={
-            <>
-              <EndpointDetails chainId={appData.chain} appId={appData._id} />
-              <Spacer size={2 * GU} />
-              <div
-                css={`
-                  width: 100%;
-                  height: ${compactMode ? "auto" : "250px"};
-                  display: grid;
-                  grid-template-columns: ${compactMode ? "1fr" : "1fr 1fr"};
-                  grid-column-gap: ${2 * GU}px;
-                `}
-              >
-                <SuccessRate
-                  appId={appData._id}
-                  previousSuccessRate={previousSuccessRate}
-                  successRate={successRate}
-                  totalRequests={weeklyRelayData.weeklyAppRelays}
+        <>
+          <Split
+            primary={
+              <>
+                <EndpointDetails chainId={appData.chain} appId={appData._id} />
+                <Spacer size={2 * GU} />
+                {exceedsMaxRelays && (
+                  <>
+                    <Banner
+                      mode="error"
+                      title="Your application has reached the max limit of relays per day"
+                    >
+                      You should extend your app relays limit to keep the
+                      service according to the demand. Contact our sales team to
+                      find the best solution for you and keep your
+                      onfrastructure running.
+                    </Banner>
+                    <Spacer size={2 * GU} />
+                  </>
+                )}
+                <div
+                  css={`
+                    width: 100%;
+                    height: ${compactMode ? "auto" : "250px"};
+                    display: grid;
+                    grid-template-columns: ${compactMode ? "1fr" : "1fr 1fr"};
+                    grid-column-gap: ${2 * GU}px;
+                  `}
+                >
+                  <SuccessRate
+                    appId={appData._id}
+                    previousSuccessRate={previousSuccessRate}
+                    successRate={successRate}
+                    totalRequests={weeklyRelayData.weeklyAppRelays}
+                  />
+                  <AvgLatency avgLatency={successfulRelayData.avgLatency} />
+                </div>
+                <Spacer size={2 * GU} />
+                <UsageTrends
+                  chartLabels={usageLabels}
+                  chartLines={usageLines}
+                  sessionRelays={currentSessionRelays}
+                  threshold={graphThreshold}
                 />
-                <AvgLatency avgLatency={successfulRelayData.avgLatency} />
-              </div>
-              <Spacer size={2 * GU} />
-              <UsageTrends
-                chartLabels={usageLabels}
-                chartLines={usageLines}
-                sessionRelays={currentSessionRelays}
-                threshold={graphThreshold}
-              />
-              <Spacer size={2 * GU} />
-              <LatestRequests latestRequests={latestRelaysData.latestRelays} />
-            </>
-          }
-          secondary={
-            <>
-              <Button
-                mode="strong"
-                wide
-                onClick={() => history.push(`${url}/chains`)}
-              >
-                Switch chains
-              </Button>
-              <Spacer size={2 * GU} />
-              <Button wide onClick={() => history.push(`${url}/security`)}>
-                App Security
-              </Button>
-              <Spacer size={2 * GU} />
-              <Button wide onClick={() => history.push(`${url}/notifications`)}>
-                Notifications
-              </Button>
-              <Spacer size={2 * GU} />
-              <AppStatus appOnChainStatus={appOnChainData} />
-              <Spacer size={2 * GU} />
-              <AppDetails
-                id={appData._id}
-                pubkey={appData.freeTierApplicationAccount.publicKey}
-                secret={appData.gatewaySettings?.secretKey ?? ""}
-              />
-            </>
-          }
-        />
+                <Spacer size={2 * GU} />
+                <LatestRequests
+                  latestRequests={latestRelaysData.latestRelays}
+                />
+              </>
+            }
+            secondary={
+              <>
+                <Button mode="strong" wide onClick={onOpenModal}>
+                  Switch chains
+                </Button>
+                <Spacer size={2 * GU} />
+                <Button wide onClick={() => history.push(`${url}/security`)}>
+                  App Security
+                </Button>
+                <Spacer size={2 * GU} />
+                <Button
+                  wide
+                  onClick={() => history.push(`${url}/notifications`)}
+                >
+                  Notifications
+                </Button>
+                <Spacer size={2 * GU} />
+                <AppStatus appOnChainStatus={appOnChainData} />
+                <Spacer size={2 * GU} />
+                <AppDetails
+                  id={appData._id}
+                  pubkey={appData.freeTierApplicationAccount.publicKey}
+                  secret={appData.gatewaySettings?.secretKey ?? ""}
+                />
+              </>
+            }
+          />
+          <SwitchInfoModal
+            onClose={onCloseNetworkModal}
+            onSwitch={onSwitchChains}
+            visible={networkModalVisible}
+          />
+          <SwitchDenialModal
+            onClose={onCloseDenialModal}
+            visible={networkDenialModalVisible}
+          />
+        </>
       )}
     />
+  );
+}
+
+function SwitchInfoModal({ onClose, onSwitch, visible }) {
+  const { within } = useViewport();
+
+  const compactMode = within(-1, "medium");
+
+  return (
+    <Modal visible={visible} onClose={onClose}>
+      <div
+        css={`
+          max-width: ${87 * GU}px;
+        `}
+      >
+        <Banner
+          mode="info"
+          title="Free tier applications can only change networks once a week"
+        >
+          If you have already changed the selected network in the last week you
+          won't be able to retake your app until the time is due.
+        </Banner>
+        <Spacer size={3 * GU} />
+        <p
+          css={`
+            ${!compactMode && `text-align: center;`}
+          `}
+        >
+          Do you want to continue?
+        </p>
+        <Spacer size={3 * GU} />
+        <div
+          css={`
+            display: flex;
+            ${compactMode && `flex-direction: column-reverse;`}
+            justify-content: center;
+            align-items: center;
+            padding-left: ${2 * GU}px;
+            padding-right: ${2 * GU}px;
+          `}
+        >
+          <Spacer size={6 * GU} />
+          <Button onClick={onClose} wide>
+            Cancel
+          </Button>
+          <Spacer size={6 * GU} />
+          <Button mode="strong" wide onClick={onSwitch}>
+            Switch chains
+          </Button>
+          <Spacer size={6 * GU} />
+        </div>
+        <Spacer size={4 * GU} />
+      </div>
+    </Modal>
+  );
+}
+
+function SwitchDenialModal({ onClose, visible }) {
+  const { within } = useViewport();
+
+  const compactMode = within(-1, "medium");
+
+  return (
+    <Modal visible={visible} onClose={onClose}>
+      <div
+        css={`
+          max-width: ${87 * GU}px;
+        `}
+      >
+        <Banner mode="warning" title="You've already switched chains this week">
+          Once a week has elapsed you will be able to switch chains again. In
+          the interim, we invite you to join our Discord community.
+        </Banner>
+        <Spacer size={3 * GU} />
+        <div
+          css={`
+            display: flex;
+            ${compactMode && `flex-direction: column-reverse;`}
+            justify-content: center;
+            align-items: center;
+            padding-left: ${2 * GU}px;
+            padding-right: ${2 * GU}px;
+          `}
+        >
+          <Spacer size={6 * GU} />
+          <Button onClick={onClose} wide mode="strong">
+            Cancel
+          </Button>
+          <Spacer size={6 * GU} />
+        </div>
+        <Spacer size={4 * GU} />
+      </div>
+    </Modal>
   );
 }
 
@@ -350,6 +536,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
   const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
     chartLines,
   ]);
+  const usageColor = useUsageColor(sessionRelays / ONE_MILLION);
 
   return (
     <Box>
@@ -378,7 +565,11 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
             Usage Trends
           </h3>
           <Spacer size={2 * GU} />
-          <CircleGraph value={sessionRelays / ONE_MILLION} size={100} />
+          <CircleGraph
+            value={sessionRelays / ONE_MILLION}
+            size={100}
+            color={usageColor}
+          />
           <Spacer size={1 * GU} />
           <h4
             css={`
@@ -428,6 +619,36 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
 }
 
 function LatestRequests({ latestRequests }) {
+  const { within } = useViewport();
+  const [colorsByMethod, countByColor, colorValues] = useMemo(() => {
+    const colorsByMethod = new Map();
+    const countByColor = new Map();
+    let id = 0;
+
+    for (const { method } of latestRequests) {
+      if (!colorsByMethod.has(method)) {
+        colorsByMethod.set(method, HIGHLIGHT_COLORS[id]);
+        if (id < HIGHLIGHT_COLORS.length - 1) {
+          id++;
+        }
+      }
+
+      console.log("setting", colorsByMethod.get(method));
+
+      const methodColor = colorsByMethod.get(method);
+
+      countByColor.has(methodColor)
+        ? countByColor.set(methodColor, countByColor.get(methodColor) + 1)
+        : countByColor.set(methodColor, 1);
+    }
+
+    const colorValues = [...colorsByMethod.values()];
+
+    return [colorsByMethod, countByColor, colorValues];
+  }, [latestRequests]);
+
+  const compactMode = within(-1, "medium");
+
   return (
     <Box
       title="Request Breakdown"
@@ -437,35 +658,70 @@ function LatestRequests({ latestRequests }) {
     >
       <div
         css={`
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          display: grid;
+          grid-template-columns: ${4 * GU}px 1fr;
         `}
       >
-        <Table
-          noSideBorders
-          noTopBorders
+        <div
           css={`
-            background: transparent;
+            width: ${1 * GU}px;
+            height: 100%;
           `}
-          header={
-            <>
-              <TableRow>
-                <TableHeader title="Request type" />
-                <TableHeader title="Amount of data" />
-                <TableHeader title="Result" />
-              </TableRow>
-            </>
-          }
         >
-          {latestRequests.map(({ bytes, method, result }, index) => (
-            <TableRow key={index}>
-              <TableCell>{method}</TableCell>
-              <TableCell>{bytes}</TableCell>
-              <TableCell>{result}</TableCell>
-            </TableRow>
-          ))}
-        </Table>
+          {colorValues.map((val) => {
+            console.log(
+              "percentage",
+              countByColor.get(val) / countByColor.size,
+              countByColor.get(val),
+              val
+            );
+            return (
+              <div
+                css={`
+                  background: ${val};
+                  width: 100%;
+                  height: ${(countByColor.get(val) / latestRequests.length) *
+                  100}%;
+                  box-shadow: ${val} 0px 2px 8px 0px;
+                `}
+              />
+            );
+          })}
+        </div>
+        <DataView
+          mode={compactMode ? "list" : "table"}
+          fields={[
+            "Request Type",
+            "Data transferred",
+            "Result",
+            "Time Elapsed",
+          ]}
+          entries={latestRequests}
+          renderEntry={({
+            bytes,
+            method,
+            result,
+            elapsed_time: elapsedTime,
+          }) => {
+            return [
+              <p>{method}</p>,
+              <p>
+                <div
+                  css={`
+                    display: inline-block;
+                    width: ${1.5 * GU}px;
+                    height: ${1.5 * GU}px;
+                    border-radius: 50% 50%;
+                    background: ${colorsByMethod.get(method) ?? FALLBACK_COLOR};
+                  `}
+                />
+                &nbsp;{bytes}B
+              </p>,
+              <p>{result}</p>,
+              <p>{(elapsedTime * 1000).toFixed(0)}ms</p>,
+            ];
+          }}
+        />
       </div>
     </Box>
   );

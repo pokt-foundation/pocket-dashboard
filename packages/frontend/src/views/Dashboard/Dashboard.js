@@ -37,6 +37,7 @@ export default function DashboardView({ children }) {
         <NavigationBar />
         <Spacer size={5 * GU} />
         {children}
+        <Spacer size={2 * GU} />
       </main>
     </div>
   );

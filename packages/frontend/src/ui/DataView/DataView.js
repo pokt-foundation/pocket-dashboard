@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useMemo, useState } from "react";
 import PropTypes from "prop-types";
+import "styled-components/macro";
 import { noop } from "ui/utils";
 import { textStyle, GU } from "ui/style";
 import { useTheme } from "ui/theme";
@@ -319,7 +320,7 @@ const DataView = React.memo(function DataView({
       {pages > 1 && (
         <div
           css={`
-            border-top: 1px solid ${theme.border};
+            border-top: 1px solid ${theme.tableBorder};
           `}
         >
           <Pagination

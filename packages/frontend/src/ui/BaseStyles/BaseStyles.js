@@ -25,6 +25,16 @@ const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
     box-sizing: border-box;
   }
+
+  *::-webkit-scrollbar { 
+    width: 0 !important 
+  }
+
+  * { 
+    overflow: -moz-scrollbars-none; 
+    -ms-overflow-style: none;
+  }
+
   html {
     -webkit-overflow-scrolling: touch;
   }
@@ -32,7 +42,7 @@ const GlobalStyle = createGlobalStyle`
     height: 0;
     min-height: 100vh;
     color: ${(p) => p.theme.content};
-    font-family: 'Inter', Helvetica, serif;
+    font-family: 'Manrope', Helvetica, serif;
     ${(p) => p.textStyleCss};
   }
   html, body {

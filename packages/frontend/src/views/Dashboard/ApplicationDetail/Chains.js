@@ -3,17 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
 import axios from "axios";
 import "styled-components/macro";
-import {
-  Button,
-  Split,
-  Spacer,
-  Switch,
-  Table,
-  TableRow,
-  TableHeader,
-  TableCell,
-  GU,
-} from "ui";
+import { Button, DataView, Split, Spacer, Switch, useToast, GU } from "ui";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
 import { useUserApplications } from "views/Dashboard/application-hooks";
@@ -23,6 +13,7 @@ export default function BasicSetup({ appData }) {
   const [selectedChain, setSelectedChain] = useState("");
   const history = useHistory();
   const { appId } = useParams();
+  const toast = useToast();
   const { refetchUserApps } = useUserApplications();
   const { isLoading: isChainsLoading, data: chains } = useQuery(
     "/network/chains",
@@ -65,6 +56,7 @@ export default function BasicSetup({ appData }) {
 
         await refetchUserApps();
 
+        toast("Chain successfully switched");
         history.push(`/app/${_id}`);
       } catch (err) {
         console.log("??", Object.entries(err));
@@ -94,42 +86,25 @@ export default function BasicSetup({ appData }) {
           primary={
             <>
               <Box title="Available networks">
-                <Table
-                  noSideBorders
-                  noTopBorders
-                  css={`
-                    background: transparent;
-                  `}
-                  header={
-                    <>
-                      <TableRow>
-                        <TableHeader title="Selected" />
-                        <TableHeader title="Network" />
-                        <TableHeader title="Ticker" />
-                        <TableHeader title="Chain ID" />
-                      </TableRow>
-                    </>
-                  }
-                >
-                  {chains.map(
-                    ({ description, id, ticker, isAvailableForStaking }) => (
-                      <TableRow key={id}>
-                        <TableCell>
-                          <Switch
-                            disabled={
-                              !isAvailableForStaking || activeAppChain === id
-                            }
-                            onChange={() => onSwitchClick(id)}
-                            checked={selectedChain === id}
-                          />
-                        </TableCell>
-                        <TableCell>{description}</TableCell>
-                        <TableCell>{ticker}</TableCell>
-                        <TableCell>{id}</TableCell>
-                      </TableRow>
-                    )
-                  )}
-                </Table>
+                <DataView
+                  fields={["Selected", "Network", "Ticker", "Chain ID"]}
+                  entries={chains}
+                  renderEntry={({
+                    description,
+                    id,
+                    ticker,
+                    isAvailableForStaking,
+                  }) => [
+                    <Switch
+                      disabled={!isAvailableForStaking || activeAppChain === id}
+                      onChange={() => onSwitchClick(id)}
+                      checked={selectedChain === id}
+                    />,
+                    description,
+                    ticker,
+                    id,
+                  ]}
+                />
               </Box>
             </>
           }

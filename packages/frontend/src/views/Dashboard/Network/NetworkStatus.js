@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { format } from "d3-format";
 import "styled-components/macro";
 import { Spacer, textStyle, GU } from "ui";
 import AnimatedLogo from "components/AnimatedLogo/AnimatedLogo";
@@ -34,9 +35,20 @@ function formatDailyRelaysForGraphing(dailyRelays) {
     },
   ];
 
+  const formatSi = format(".2s");
+
+  const scales = [
+    0,
+    formatSi((highestDailyAmount * 0.25).toFixed(0)),
+    formatSi((highestDailyAmount * 0.5).toFixed(0)),
+    formatSi((highestDailyAmount * 0.75).toFixed(0)),
+    formatSi(highestDailyAmount.toFixed(0)),
+  ];
+
   return {
     labels,
     lines,
+    scales,
   };
 }
 
@@ -46,7 +58,7 @@ export default function NetworkStatus() {
   const { isSummaryLoading, summaryData } = useNetworkSummary();
   const { isChainsLoading, chains } = useChains();
 
-  const { labels = [], lines = [] } = useMemo(
+  const { labels = [], lines = [], scales = [] } = useMemo(
     () =>
       isRelaysLoading || isRelaysError || relayData === undefined
         ? {}
@@ -95,6 +107,7 @@ export default function NetworkStatus() {
             successRateData={successRateData}
             chartLines={lines}
             chartLabels={labels}
+            scales={scales}
           />
           <Spacer size={2 * GU} />
           <NetworkInfo summaryData={summaryData} chains={chains} />

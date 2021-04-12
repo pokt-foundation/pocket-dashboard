@@ -165,7 +165,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
           position: absolute;
           left: 0;
           top: 0;
-          width: 3px;
+          width: ${GU / 2}px;
           height: 100%;
           background: ${theme.accent};
           border-radius: ${RADIUS}px;

@@ -6,7 +6,7 @@ import ToastHubProvider from "ui/ToastHub/ToastHub";
 import { Root } from "ui/Root/Root";
 import { Theme } from "ui/theme";
 
-import "@fontsource/inter";
+import "@fontsource/manrope";
 import "@fontsource/source-code-pro";
 
 export default function AppWrapper({ children }) {

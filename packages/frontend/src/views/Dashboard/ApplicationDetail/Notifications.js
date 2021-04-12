@@ -12,6 +12,7 @@ import {
   Switch,
   textStyle,
   useTheme,
+  useToast,
   GU,
 } from "ui";
 import Box from "components/Box/Box";
@@ -28,6 +29,24 @@ const DEFAULT_PERCENTAGES = {
   full: false,
 };
 
+function useUsageColor(usage) {
+  const theme = useTheme();
+
+  if (usage <= 0.25) {
+    return theme.positive;
+  }
+
+  if (usage <= 0.5) {
+    return theme.yellow;
+  }
+
+  if (usage <= 0.75) {
+    return theme.warning;
+  }
+
+  return theme.negative;
+}
+
 export default function Notifications({
   appData,
   appOnChainData,
@@ -39,6 +58,7 @@ export default function Notifications({
   const [hasChanged, setHasChanged] = useState(false);
   const history = useHistory();
   const { within } = useViewport();
+  const toast = useToast();
   const { appId } = useParams();
   const { isLoading: isNotificationsLoading, mutate } = useMutation(
     async function updateNotificationSettings() {
@@ -63,6 +83,8 @@ export default function Notifications({
         );
 
         setHasChanged(false);
+        toast("Notification preferences updated");
+        history.goBack();
       } catch (err) {
         console.log("??", Object.entries(err));
       }
@@ -99,6 +121,10 @@ export default function Notifications({
           0
         ) / dailyRelayData.length;
   }, [dailyRelayData]);
+
+  const averageUsageColor = useUsageColor(totalDailyRelays / MAX_RELAYS);
+  const maxUsageColor = useUsageColor(highestDailyAmount / MAX_RELAYS);
+  const minUsageColor = useUsageColor(lowestDailyAmount / MAX_RELAYS);
 
   const onChosePercentageChange = useCallback(
     (chosenPercentage) => {
@@ -167,6 +193,7 @@ export default function Notifications({
                     <CircleGraph
                       value={totalDailyRelays / MAX_RELAYS}
                       size={125}
+                      color={averageUsageColor}
                     />
                     <Spacer size={2 * GU} />
                     <Stack
@@ -197,7 +224,10 @@ export default function Notifications({
                   </GraphContainer>
                   <Spacer size={2 * GU} />
                   <GraphContainer>
-                    <CircleGraph value={highestDailyAmount / MAX_RELAYS} />
+                    <CircleGraph
+                      value={highestDailyAmount / MAX_RELAYS}
+                      color={maxUsageColor}
+                    />
                     <Spacer size={1 * GU} />
                     <Stack
                       css={`
@@ -224,7 +254,10 @@ export default function Notifications({
                   </GraphContainer>
                   <Spacer size={2 * GU} />
                   <GraphContainer>
-                    <CircleGraph value={lowestDailyAmount / MAX_RELAYS} />
+                    <CircleGraph
+                      value={lowestDailyAmount / MAX_RELAYS}
+                      color={minUsageColor}
+                    />
                     <Spacer size={1 * GU} />
                     <Stack
                       css={`

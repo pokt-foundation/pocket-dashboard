@@ -26,8 +26,8 @@ export default {
   feedbackSurfaceContentSecondary: "#637381",
 
   warning: "#ffa410",
-  warningSurface: "#656569",
-  warningSurfaceContent: "#ffa410",
+  warningSurface: "#816110",
+  warningSurfaceContent: "#D2A531",
 
   info: "#00d2ff",
   infoSurface: "#415279",
@@ -38,7 +38,7 @@ export default {
   helpSurface: "#FFFFFF",
   helpSurfaceContent: "#212B36",
 
-  negative: "#FF6969",
+  negative: "#AE1515",
   negativeContent: "#FFFFFF",
   negativeSurface: "#655c72",
   negativeSurfaceContent: "#ff5454",
@@ -51,6 +51,8 @@ export default {
   badge: "#415279",
   badgeContent: "#ffffff",
   badgePressed: "#4c5d82",
+
+  tableBorder: "#091828",
 
   tagIdentifier: "#564090",
   tagIdentifierContent: "#b6a1ff",

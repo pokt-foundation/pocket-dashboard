@@ -41,7 +41,7 @@ export default function NavigationBar() {
       css={`
         display: flex;
         flex-direction: row;
-        margin-top: ${5 * GU}px;
+        margin-top: ${3 * GU}px;
         align-items: center;
       `}
     >

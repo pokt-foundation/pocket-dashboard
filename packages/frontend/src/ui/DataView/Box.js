@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import "styled-components/macro";
 import { Inside, useInside } from "use-inside";
 import { GU, RADIUS, textStyle } from "ui/style";
 import { useTheme } from "ui/theme";
@@ -23,8 +24,7 @@ function Box({ heading, children, padding, ...props }) {
           position: relative;
           border-radius: ${fullWidth ? 0 : RADIUS}px;
           border-style: solid;
-          border-color: ${theme.border};
-          border-width: ${fullWidth ? "1px 0" : "1px"};
+          border-width: 0px;
           background: ${theme.surface};
           color: ${theme.surfaceContent};
           & + & {
@@ -40,7 +40,7 @@ function Box({ heading, children, padding, ...props }) {
               align-items: center;
               height: ${4 * GU}px;
               padding: 0 ${defaultPadding}px;
-              border-bottom: 1px solid ${theme.border};
+              border-bottom: 1px solid ${theme.tableBorder};
 
               // We pass the text style and color to the heading children, so
               // that a node structure can inherit from it. Most components set

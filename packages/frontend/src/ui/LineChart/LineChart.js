@@ -55,6 +55,7 @@ function LineChart({
   reset,
   scales,
   springConfig,
+  threshold,
   total,
   width: widthProps,
   ...props
@@ -121,13 +122,13 @@ function LineChart({
       {({ progress }) => (
         <svg
           ref={onSvgRef}
-          viewBox={`0 0 ${width + OFFSET} ${height}`}
+          viewBox={`0 0 ${width + OFFSET} ${height + GU}`}
           width={widthProps || "auto"}
           height="auto"
           css="display: block"
           {...props}
         >
-          <g mask="url(#chart-mask)">
+          <g mask="url(#chart-mask)" transform={`translate(0,${GU})`}>
             {totalCount > 0 && (
               <path
                 d={`
@@ -167,9 +168,8 @@ function LineChart({
                     strokeWidth="2"
                   />
                   {renderCheckpoints &&
-                    line.values
-                      .slice(1, -1)
-                      .map((val, index) => (
+                    line.values.slice(1, -1).map((val, index) => {
+                      return (
                         <circle
                           key={index}
                           cx={getX(index + 1) * progress}
@@ -179,7 +179,8 @@ function LineChart({
                           stroke={line.color || color(lineIndex, { lines })}
                           strokeWidth="1"
                         />
-                      ))}
+                      );
+                    })}
                 </g>
               );
             })}
@@ -190,7 +191,7 @@ function LineChart({
                 <text
                   key={index}
                   x={getX(index)}
-                  y={LABELS_HEIGHT / 2}
+                  y={LABELS_HEIGHT}
                   textAnchor={getLabelPosition(index, labels.length)}
                   fill={labelColor}
                   css={`
@@ -205,26 +206,56 @@ function LineChart({
               ))}
             </g>
           )}
-          <g>
+          <g transform={`translate(0,${GU})`}>
             {scales &&
-              scales.map((label, index) => (
-                <text
-                  key={index}
-                  x={width + OFFSET / 2}
-                  y={getY((index + 1) / 5, 1, chartHeight) + GU}
-                  textAnchor={getLabelPosition(index, labels.length)}
-                  fill={labelColor}
-                  css={`
-                    alignment-baseline: middle;
-                    font-size: 12px;
-                    font-weight: 300;
-                    ${unselectable};
-                  `}
-                >
-                  {label}
-                </text>
-              ))}
+              scales.map((label, index) => {
+                const scaleLength = scales.length - 1;
+
+                return (
+                  <text
+                    key={index}
+                    x={width + OFFSET / 2}
+                    y={
+                      chartHeight - (chartHeight / scaleLength) * index + GU / 2
+                    }
+                    textAnchor={getLabelPosition(index, labels.length)}
+                    fill={labelColor}
+                    css={`
+                      alignment-baseline: middle;
+                      font-size: 12px;
+                      font-weight: 300;
+                      ${unselectable};
+                    `}
+                  >
+                    {label}
+                  </text>
+                );
+              })}
           </g>
+          {threshold && (
+            <>
+              <line
+                x1={0}
+                y1={chartHeight / (scales.length - 1) + GU}
+                x2={width}
+                y2={chartHeight / (scales.length - 1) + GU}
+                style={{ stroke: "#952828", strokeWidth: 2 }}
+              />{" "}
+              <defs>
+                <linearGradient id="thresholdFill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="red" stopOpacity="0" />
+                  <stop offset="100%" stop-color="#952828" stopOpacity="30%" />
+                </linearGradient>
+              </defs>
+              <rect
+                x={0}
+                y={0}
+                width={width}
+                height={chartHeight / (scales.length - 1) + GU}
+                fill="url(#thresholdFill)"
+              />
+            </>
+          )}
         </svg>
       )}
     </Spring>
@@ -255,6 +286,7 @@ LineChart.propTypes = {
   scales: PropTypes.arrayOf(PropTypes.string),
   renderCheckpoints: PropTypes.bool,
   reset: PropTypes.bool,
+  threshold: PropTypes.bool,
   color: PropTypes.func,
 };
 
@@ -269,6 +301,8 @@ LineChart.defaultProps = {
   borderColor: "rgba(209, 209, 209, 0.5)",
   labelColor: "white",
   lines: [],
+  scales: [],
+  threshold: false,
   label: (index) => index + 1,
   color: (index, { lines }) =>
     `hsl(${(index * (360 / lines.length) + 40) % 360}, 60%, 70%)`,

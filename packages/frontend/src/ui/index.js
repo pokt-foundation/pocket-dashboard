@@ -1,13 +1,16 @@
 import AppWrapper from "ui/AppWrapper/AppWrapper";
+import Banner from "ui/Banner/Banner";
 import Button from "ui/Button/Button";
 import ButtonIcon from "ui/Button/ButtonIcon";
 import ButtonBase from "ui/ButtonBase/ButtonBase";
 import CheckBox from "ui/CheckBox/CheckBox";
 import CircleGraph from "ui/CircleGraph/CircleGraph";
+import DataView from "ui/DataView/DataView";
 import DiscButton from "ui/DiscButton/DiscButton";
 import Field from "ui/Field/Field";
 import Help from "ui/Help/Help";
 import Info from "ui/Info/Info";
+import Modal from "ui/Modal/Modal";
 import MultiCircleGraph from "ui/MultiCircleGraph/MultiCircleGraph";
 import LineChart from "ui/LineChart/LineChart";
 import Link from "ui/Link/Link";
@@ -28,15 +31,18 @@ import ToastHubProvider, { Toast, useToast } from "ui/ToastHub/ToastHub";
 // Export components
 export {
   AppWrapper,
+  Banner,
   Button,
   ButtonIcon,
   ButtonBase,
   CheckBox,
   CircleGraph,
+  DataView,
   DiscButton,
   Field,
   Help,
   Info,
+  Modal,
   MultiCircleGraph,
   LineChart,
   Link,

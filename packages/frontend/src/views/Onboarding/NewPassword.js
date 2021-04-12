@@ -16,6 +16,7 @@ import {
 } from "ui";
 import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
 import env from "environment";
+import PoktShape from "assets/poktshape.png";
 
 export default function NewPassword() {
   const [password, setPassword] = useState("");
@@ -124,108 +125,139 @@ export default function NewPassword() {
   return (
     <div
       css={`
+        position: relative;
         width: 100%;
         min-height: 100vh;
         position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
-        background: ${theme.background};
+        background: #091828;
       `}
     >
       <OnboardingHeader />
-      <main
+      <img
+        src={PoktShape}
+        css={`
+          position: absolute;
+          bottom: 0%;
+          right: -5%;
+          width: 50%;
+          max-width: ${80 * GU}px;
+          height: auto;
+          z-index: 1;
+        `}
+        alt="Ball"
+      />
+      <div
         css={`
           width: 100%;
-          height: auto;
           max-width: ${120 * GU}px;
-          border-radius: ${RADIUS}px;
-          padding: ${5 * GU}px ${8 * GU}px;
-          border: 1px solid ${theme.border};
-          background: ${theme.surface};
-          display: flex;
-          flex-direction: column;
         `}
       >
-        <h2
+        <div
           css={`
-            ${textStyle("title2")}
-            margin-bottom: ${6 * GU}px;
+            display: flex;
           `}
         >
-          Set your new password
-        </h2>
-        <Field
-          label="Password"
-          required
+          <Spacer size={8 * GU} />
+          <h2
+            css={`
+              ${textStyle("title2")}
+              margin-bottom: ${6 * GU}px;
+              align-self: flex-start;
+            `}
+          >
+            New password
+          </h2>
+        </div>
+        <main
           css={`
-            margin-bottom: ${6 * GU}px;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: auto;
+            max-width: ${120 * GU}px;
+            border-radius: ${RADIUS * 2}px;
+            padding: ${5 * GU}px ${8 * GU}px;
+            background: ${theme.surface};
+            display: flex;
+            flex-direction: column;
           `}
         >
-          <TextInput
-            wide
-            value={password}
-            onChange={onPasswordChange}
-            onBlur={onPasswordBlur}
-            onFocus={onInputFocus}
-            type="password"
-          />
-          {passwordError && (
-            <p
-              css={`
-                color: ${theme.negative};
-              `}
-            >
-              {passwordError.message}
-            </p>
-          )}
-        </Field>
-        <Field label="Password confirmation" required>
-          <TextInput
-            wide
-            value={repeatedPassword}
-            onChange={onRepeatedPasswordChange}
-            onBlur={onRepeatedPasswordBlur}
-            onFocus={onInputFocus}
-            type="password"
-          />
-          {repeatedPasswordError && (
-            <p
-              css={`
-                color: ${theme.negative};
-              `}
-            >
-              {repeatedPasswordError.message}
-            </p>
-          )}
-        </Field>
-        <ul
-          css={`
-            list-style-type: none;
-          `}
-        >
-          {errors.map(({ id, message }) => (
-            <li
-              key={`${id}_${message}`}
-              css={`
-                color: ${theme.negative};
-              `}
-            >
-              {message}
-            </li>
-          ))}
-        </ul>
-        <Spacer size={2 * GU} />
-        <Button
-          css={`
-            margin-bottom: ${2 * GU}px;
-          `}
-          disabled={isSubmitDisabled}
-          onClick={mutate}
-        >
-          Set new password
-        </Button>
-      </main>
+          <Field
+            label="Password"
+            required
+            css={`
+              margin-bottom: ${6 * GU}px;
+            `}
+          >
+            <TextInput
+              wide
+              value={password}
+              onChange={onPasswordChange}
+              onBlur={onPasswordBlur}
+              onFocus={onInputFocus}
+              type="password"
+            />
+            {passwordError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {passwordError.message}
+              </p>
+            )}
+          </Field>
+          <Field label="Password confirmation" required>
+            <TextInput
+              wide
+              value={repeatedPassword}
+              onChange={onRepeatedPasswordChange}
+              onBlur={onRepeatedPasswordBlur}
+              onFocus={onInputFocus}
+              type="password"
+            />
+            {repeatedPasswordError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {repeatedPasswordError.message}
+              </p>
+            )}
+          </Field>
+          <ul
+            css={`
+              list-style-type: none;
+            `}
+          >
+            {errors.map(({ id, message }) => (
+              <li
+                key={`${id}_${message}`}
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {message}
+              </li>
+            ))}
+          </ul>
+          <Spacer size={2 * GU} />
+          <Button
+            css={`
+              margin-bottom: ${2 * GU}px;
+            `}
+            mode="strong"
+            disabled={isSubmitDisabled}
+            onClick={mutate}
+          >
+            Set new password
+          </Button>
+        </main>
+      </div>
     </div>
   );
 }

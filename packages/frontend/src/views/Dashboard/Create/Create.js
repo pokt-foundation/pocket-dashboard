@@ -7,6 +7,7 @@ import "styled-components/macro";
 import {
   Button,
   ButtonBase,
+  DataView,
   Help,
   IconCross,
   IconPlus,
@@ -15,10 +16,6 @@ import {
   Switch,
   TextCopy,
   TextInput,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
   springs,
   textStyle,
   GU,
@@ -143,7 +140,7 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData;
-  const { refetchUserApps } = useUserApplications();
+  const { appsData, refetchUserApps } = useUserApplications();
 
   const {
     isLoading: isChainsLoading,
@@ -204,13 +201,13 @@ export default function Create() {
     }
   });
 
-  // useEffect(() => {
-  //   if (appsData?.length) {
-  //     const [userApp] = appsData;
+  useEffect(() => {
+    if (appsData?.length) {
+      const [userApp] = appsData;
 
-  //     history.push(`/app/${userApp.appId}`);
-  //   }
-  // }, [appsData, history]);
+      history.push(`/app/${userApp.appId}`);
+    }
+  }, [appsData, history]);
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,
@@ -335,40 +332,25 @@ function BasicSetup({
             </Box>
             <Spacer size={2 * GU} />
             <Box title="Available networks">
-              <Table
-                noSideBorders
-                noTopBorders
-                css={`
-                  background: transparent;
-                `}
-                header={
-                  <>
-                    <TableRow>
-                      <TableHeader title="Selected" />
-                      <TableHeader title="Network" />
-                      <TableHeader title="Ticker" />
-                      <TableHeader title="Chain ID" />
-                    </TableRow>
-                  </>
-                }
-              >
-                {chains.map(
-                  ({ description, id, ticker, isAvailableForStaking }) => (
-                    <TableRow key={id}>
-                      <TableCell>
-                        <Switch
-                          onChange={() => onSwitchClick(id)}
-                          checked={data.selectedNetwork === id}
-                          disabled={!isAvailableForStaking}
-                        />
-                      </TableCell>
-                      <TableCell>{description}</TableCell>
-                      <TableCell>{ticker}</TableCell>
-                      <TableCell>{id}</TableCell>
-                    </TableRow>
-                  )
-                )}
-              </Table>
+              <DataView
+                fields={["Selected", "Network", "ID", "Ticker"]}
+                entries={chains}
+                renderEntry={({
+                  description,
+                  id,
+                  ticker,
+                  isAvailableForStaking,
+                }) => [
+                  <Switch
+                    onChange={() => onSwitchClick(id)}
+                    checked={data.selectedNetwork === id}
+                    disabled={!isAvailableForStaking}
+                  />,
+                  description,
+                  id,
+                  ticker,
+                ]}
+              />
             </Box>
           </>
         }

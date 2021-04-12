@@ -4,7 +4,7 @@ import { Transition, animated } from "react-spring/renderprops";
 import "styled-components/macro";
 import { useTheme, springs, textStyle, GU } from "ui";
 import { useLayout } from "../Layout/Layout";
-import Checkbox from "../Checkbox";
+import { CheckBox } from "ui";
 import { ToggleButton } from "./ToggleButton";
 import { OpenedSurfaceBorder } from "./OpenedSurfaceBorder";
 
@@ -96,7 +96,7 @@ function TableView({
         hasAnyActions,
         hasAnyExpansion,
         selectContent: (
-          <Checkbox
+          <CheckBox
             indeterminate={allSelected === 0}
             checked={allSelected > -1}
             onChange={onSelectAll}
@@ -201,10 +201,11 @@ function HeadRow({ cells, selectedCount, renderSelectionCount }) {
                 padding-right: ${index === cells.length - 1
                   ? sidePadding
                   : 0}px;
+                padding-bottom: ${2 * GU}px;
                 text-align: ${cell[1]};
-                ${textStyle("label2")};
-                color: ${theme.surfaceContentSecondary};
-                border-bottom: 1px solid ${theme.border};
+                ${textStyle("body2")};
+                font-weight: 600;
+                border-bottom: 1px solid ${theme.tableBorder};
               `}
               colSpan={selectedCount > 0 && index === 1 ? cells.length - 1 : 1}
             >
@@ -254,7 +255,7 @@ const Entry = React.memo(function Entry({
       <Toggle opened={opened} onToggle={handleToggle} />
     ) : null,
     selectContent: selectable ? (
-      <Checkbox onChange={handleSelectChange} checked={entry.selected} />
+      <CheckBox onChange={handleSelectChange} checked={entry.selected} />
     ) : null,
   });
 
@@ -309,7 +310,7 @@ function EntryRow({ firstRow, cells, selected, rowHeight, mode }) {
               padding-right: ${(!first && (align !== "end" || last)) || compact
                 ? sidePadding
                 : 0}px;
-              border-top: ${firstRow ? "0" : `1px solid ${theme.border}`};
+              border-top: ${firstRow ? "0" : `1px solid ${theme.tableBorder}`};
             `}
           >
             <div
@@ -394,7 +395,7 @@ function EntryExpansion({
                         height: ${expansion.freeLayout
                           ? "auto"
                           : `${rowHeight}px`};
-                        border-top: 1px solid ${theme.border};
+                        border-top: 1px solid ${theme.tableBorder};
                       `}
                     />
                   ))}
@@ -433,7 +434,7 @@ function EntryExpansion({
                         : `${rowHeight}px`};
                       padding-left: ${alignChildOnCell < 1 ? 3 * GU : 0}px;
                       padding-right: ${3 * GU}px;
-                      border-top: 1px solid ${theme.border};
+                      border-top: 1px solid ${theme.tableBorder};
                     `}
                   >
                     {child}

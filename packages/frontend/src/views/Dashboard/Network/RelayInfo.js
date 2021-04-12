@@ -1,15 +1,25 @@
 import React from "react";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
-import { CircleGraph, LineChart, Spacer, Split, textStyle, GU } from "ui";
+import {
+  CircleGraph,
+  LineChart,
+  Spacer,
+  Split,
+  useTheme,
+  textStyle,
+  GU,
+} from "ui";
 import Box from "components/Box/Box";
 
 export default function RelayInfo({
   relayData,
   chartLines,
   chartLabels,
+  scales,
   successRateData,
 }) {
+  const theme = useTheme();
   const { within } = useViewport();
   const compactMode = within(-1, "medium");
 
@@ -46,13 +56,17 @@ export default function RelayInfo({
               <h5>For the past week</h5>
             </div>
           </div>
+          <Spacer size={1 * GU} />
           <LineChart
-            lines={chartLines}
-            label={(index) => chartLabels[index]}
             backgroundFill="#1B2331"
-            height={240}
-            color={() => `#31A1D2`}
             borderColor={`rgba(0,0,0,0)`}
+            color={() => `#31A1D2`}
+            dotRadius={GU / 1.5}
+            height={240}
+            label={(index) => chartLabels[index]}
+            lines={chartLines}
+            renderCheckpoints
+            scales={scales}
           />
         </Box>
       }
@@ -76,6 +90,7 @@ export default function RelayInfo({
                 successRateData.totalSuccessfulWeeklyRelays /
                 relayData.totalWeeklyRelays
               }
+              color={theme.positive}
             />
             <Spacer size={2 * GU} />
             <div>

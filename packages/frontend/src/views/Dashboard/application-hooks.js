@@ -140,6 +140,7 @@ const LATEST_RELAYS_QUERY = gql`
       result
       bytes
       timestamp
+      elapsed_time
     }
   }
 `;

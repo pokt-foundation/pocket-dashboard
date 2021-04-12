@@ -1,9 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
+import "styled-components/macro";
 import { GU } from "ui";
 import { noop } from "ui/utils";
 import { PaginationItem } from "./PaginationItem";
-import { PaginationSeparator } from "./PaginationSeparator";
+import { PaginationSeparator } from "./paginationSeparator";
 
 function paginationItems(pages, selected) {
   const all = [...Array(pages)].map((_, i) => i);
