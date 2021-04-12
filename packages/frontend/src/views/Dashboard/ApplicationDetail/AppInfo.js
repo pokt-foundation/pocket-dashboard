@@ -18,6 +18,7 @@ import {
   GU,
   RADIUS,
   ButtonBase,
+  useTheme,
   useToast,
   Modal,
 } from "ui";
@@ -42,6 +43,24 @@ const HIGHLIGHT_COLORS = [
 ];
 
 const FALLBACK_COLOR = "#C4C4C4";
+
+function useUsageColor(usage) {
+  const theme = useTheme();
+
+  if (usage <= 0.25) {
+    return theme.positive;
+  }
+
+  if (usage <= 0.5) {
+    return theme.yellow;
+  }
+
+  if (usage <= 0.75) {
+    return theme.warning;
+  }
+
+  return theme.negative;
+}
 
 function formatDailyRelaysForGraphing(dailyRelays = []) {
   const labels = dailyRelays
@@ -517,6 +536,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
   const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
     chartLines,
   ]);
+  const usageColor = useUsageColor(sessionRelays / ONE_MILLION);
 
   return (
     <Box>
@@ -545,7 +565,11 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
             Usage Trends
           </h3>
           <Spacer size={2 * GU} />
-          <CircleGraph value={sessionRelays / ONE_MILLION} size={100} />
+          <CircleGraph
+            value={sessionRelays / ONE_MILLION}
+            size={100}
+            color={usageColor}
+          />
           <Spacer size={1 * GU} />
           <h4
             css={`

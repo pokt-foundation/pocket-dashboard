@@ -25,6 +25,7 @@ export default function SuccessDetails({
 }) {
   const [activeKey, setActiveKey] = useState("successful");
   const history = useHistory();
+  const theme = useTheme();
   const { within } = useViewport();
 
   const compactMode = within(-1, "medium");
@@ -44,14 +45,6 @@ export default function SuccessDetails({
           successfulRelayData.successfulWeeklyRelays) /
           weeklyRelayData.weeklyAppRelays;
   }, [successfulRelayData, weeklyRelayData]);
-
-  console.log(
-    successRate,
-    latestRelaysData,
-    successfulRelayData,
-    weeklyRelayData,
-    weeklyRelayData.weeklyAppRelays - successfulRelayData.successfulWeeklyRelays
-  );
 
   return (
     <FloatUp
@@ -109,6 +102,7 @@ export default function SuccessDetails({
                     <CircleGraph
                       value={Math.min(successRate, 1)}
                       size={12 * GU}
+                      color={theme.positive}
                     />
                     <Spacer size={1 * GU} />
                     <div>
@@ -142,6 +136,7 @@ export default function SuccessDetails({
                     <CircleGraph
                       value={Math.max(0, failureRate)}
                       size={12 * GU}
+                      color={theme.negative}
                     />
                     <Spacer size={1 * GU} />
                     <div>
