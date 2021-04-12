@@ -666,9 +666,19 @@ function LatestRequests({ latestRequests }) {
         </div>
         <DataView
           mode={compactMode ? "list" : "table"}
-          fields={["Request Type", "Data transferred", "Result"]}
+          fields={[
+            "Request Type",
+            "Data transferred",
+            "Result",
+            "Time Elapsed",
+          ]}
           entries={latestRequests}
-          renderEntry={({ bytes, method, result }) => {
+          renderEntry={({
+            bytes,
+            method,
+            result,
+            elapsed_time: elapsedTime,
+          }) => {
             return [
               <p>{method}</p>,
               <p>
@@ -684,6 +694,7 @@ function LatestRequests({ latestRequests }) {
                 &nbsp;{bytes}B
               </p>,
               <p>{result}</p>,
+              <p>{(elapsedTime * 1000).toFixed(0)}ms</p>,
             ];
           }}
         />
