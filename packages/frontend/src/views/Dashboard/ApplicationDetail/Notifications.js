@@ -12,6 +12,7 @@ import {
   Switch,
   textStyle,
   useTheme,
+  useToast,
   GU,
 } from "ui";
 import Box from "components/Box/Box";
@@ -57,6 +58,7 @@ export default function Notifications({
   const [hasChanged, setHasChanged] = useState(false);
   const history = useHistory();
   const { within } = useViewport();
+  const toast = useToast();
   const { appId } = useParams();
   const { isLoading: isNotificationsLoading, mutate } = useMutation(
     async function updateNotificationSettings() {
@@ -81,6 +83,8 @@ export default function Notifications({
         );
 
         setHasChanged(false);
+        toast("Notification preferences updated");
+        history.goBack();
       } catch (err) {
         console.log("??", Object.entries(err));
       }

@@ -15,6 +15,7 @@ import {
   TextCopy,
   TextInput,
   textStyle,
+  useToast,
   GU,
 } from "ui";
 import Box from "components/Box/Box";
@@ -28,6 +29,7 @@ export default function Security({ appData, refetchActiveAppData }) {
   const [userAgent, setUserAgent] = useState("");
   const [userAgents, setUserAgents] = useState([]);
   const history = useHistory();
+  const toast = useToast();
 
   useEffect(() => {
     setUserAgents((agents) => {
@@ -76,6 +78,7 @@ export default function Security({ appData, refetchActiveAppData }) {
 
       await refetchActiveAppData();
 
+      toast("Security preferences updated");
       history.goBack();
     } catch (err) {
       // TODO: Log with sentry
@@ -161,13 +164,6 @@ export default function Security({ appData, refetchActiveAppData }) {
                     >
                       Secret key required
                     </h3>
-                    <Spacer size={1 * GU} />
-                    <Help hint="What is this?">
-                      Turn this on if you wanna have an "extra" layer of
-                      security for all of your requests. You'll have to send a
-                      password with each request that we will verify. You'll
-                      have access to this key once you create the application.
-                    </Help>
                   </div>
                   <Switch
                     checked={secretKeyRequired}

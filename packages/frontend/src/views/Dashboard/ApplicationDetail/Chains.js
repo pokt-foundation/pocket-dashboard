@@ -3,7 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "react-query";
 import axios from "axios";
 import "styled-components/macro";
-import { Button, DataView, Split, Spacer, Switch, GU } from "ui";
+import { Button, DataView, Split, Spacer, Switch, useToast, GU } from "ui";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
 import { useUserApplications } from "views/Dashboard/application-hooks";
@@ -13,6 +13,7 @@ export default function BasicSetup({ appData }) {
   const [selectedChain, setSelectedChain] = useState("");
   const history = useHistory();
   const { appId } = useParams();
+  const toast = useToast();
   const { refetchUserApps } = useUserApplications();
   const { isLoading: isChainsLoading, data: chains } = useQuery(
     "/network/chains",
@@ -55,6 +56,7 @@ export default function BasicSetup({ appData }) {
 
         await refetchUserApps();
 
+        toast("Chain successfully switched");
         history.push(`/app/${_id}`);
       } catch (err) {
         console.log("??", Object.entries(err));

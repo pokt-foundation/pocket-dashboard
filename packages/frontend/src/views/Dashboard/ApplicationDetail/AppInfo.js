@@ -332,7 +332,7 @@ function SwitchDenialModal({ onClose, visible }) {
           `}
         >
           <Spacer size={6 * GU} />
-          <Button onClick={onClose} wide>
+          <Button onClick={onClose} wide mode="strong">
             Cancel
           </Button>
           <Spacer size={6 * GU} />
