@@ -4,7 +4,7 @@ import { Transition, animated } from "react-spring/renderprops";
 import "styled-components/macro";
 import { GU, springs, textStyle } from "ui/style";
 import { useTheme } from "ui/theme";
-import Checkbox from "ui";
+import { CheckBox } from "ui";
 import { ToggleButton } from "./ToggleButton";
 import { OpenedSurfaceBorder } from "./OpenedSurfaceBorder";
 
@@ -43,7 +43,7 @@ function ListView({
               padding-right: ${3 * GU}px;
               padding-left: ${(sideSpace ? 6.5 : 3) * GU}px;
               border-bottom: ${Number(index !== entries.length - 1)}px solid
-                ${theme.border};
+                ${theme.tableBorder};
               transition: background 150ms ease-in-out;
               background: ${entry.selected ? theme.surfaceSelected : "none"};
             `}
@@ -114,8 +114,8 @@ function ListView({
                         display: flex;
                         align-items: center;
                         margin: ${2 * GU}px 0 ${1 * GU}px;
-                        color: ${theme.surfaceContentSecondary};
-                        ${textStyle("label2")};
+                        ${textStyle("body2")};
+                        font-weight: 600;
                       `}
                     >
                       {label}
@@ -225,7 +225,7 @@ function Select({ index, selected, onSelect }) {
     [index, onSelect]
   );
 
-  return <Checkbox onChange={change} checked={selected} />;
+  return <CheckBox onChange={change} checked={selected} />;
 }
 
 /* eslint-enable react/prop-types */

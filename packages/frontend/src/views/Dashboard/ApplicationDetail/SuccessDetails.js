@@ -6,12 +6,9 @@ import {
   Button,
   ButtonBase,
   CircleGraph,
+  DataView,
   Spacer,
   Split,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
   textStyle,
   useTheme,
   GU,
@@ -197,33 +194,14 @@ export default function SuccessDetails({
                   </Tab>
                   <Spacer size={2 * GU} />
                 </div>
-                <Spacer size={2 * GU} />
-                <Table
-                  noSideBorders
-                  noTopBorders
-                  css={`
-                    background: transparent;
-                  `}
-                  header={
-                    <>
-                      <TableRow>
-                        <TableHeader title="Request type" />
-                        <TableHeader title="Bytes transferred" />
-                        <TableHeader title="Result" />
-                      </TableRow>
-                    </>
-                  }
-                >
-                  {latestRelaysData.latestRelays.map(
-                    ({ bytes, method, result }) => (
-                      <TableRow>
-                        <TableCell>{method}</TableCell>
-                        <TableCell>{bytes} bytes</TableCell>
-                        <TableCell>{result}</TableCell>
-                      </TableRow>
-                    )
-                  )}
-                </Table>
+                <Spacer size={5 * GU} />
+                <DataView
+                  fields={["Request type", "Bytes transferred", "Result"]}
+                  entries={latestRelaysData.latestRelays}
+                  renderEntry={({ bytes, method, result }) => {
+                    return [<p>{method}</p>, <p>{bytes}B</p>, <p>{result}</p>];
+                  }}
+                />
               </Box>
             </>
           }

@@ -6,14 +6,11 @@ import "styled-components/macro";
 import {
   Button,
   CircleGraph,
+  DataView,
   LineChart,
   Spacer,
   Split,
   TextCopy,
-  Table,
-  TableCell,
-  TableHeader,
-  TableRow,
   textStyle,
   GU,
   RADIUS,
@@ -31,6 +28,16 @@ import { getThresholdsPerStake } from "lib/pocket-utils";
 const ONE_MILLION = 1000000;
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const HIGHLIGHT_COLORS = [
+  "#D27E31",
+  "#55B02B",
+  "#BB31D2",
+  "#31ABD2",
+  "#D2CC31",
+];
+
+const FALLBACK_COLOR = "#C4C4C4";
 
 function formatDailyRelaysForGraphing(dailyRelays = []) {
   const labels = dailyRelays
@@ -428,6 +435,36 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
 }
 
 function LatestRequests({ latestRequests }) {
+  const { within } = useViewport();
+  const [colorsByMethod, countByColor, colorValues] = useMemo(() => {
+    const colorsByMethod = new Map();
+    const countByColor = new Map();
+    let id = 0;
+
+    for (const { method } of latestRequests) {
+      if (!colorsByMethod.has(method)) {
+        colorsByMethod.set(method, HIGHLIGHT_COLORS[id]);
+        if (id < HIGHLIGHT_COLORS.length - 1) {
+          id++;
+        }
+      }
+
+      console.log("setting", colorsByMethod.get(method));
+
+      const methodColor = colorsByMethod.get(method);
+
+      countByColor.has(methodColor)
+        ? countByColor.set(methodColor, countByColor.get(methodColor) + 1)
+        : countByColor.set(methodColor, 1);
+    }
+
+    const colorValues = [...colorsByMethod.values()];
+
+    return [colorsByMethod, countByColor, colorValues];
+  }, [latestRequests]);
+
+  const compactMode = within(-1, "medium");
+
   return (
     <Box
       title="Request Breakdown"
@@ -437,35 +474,59 @@ function LatestRequests({ latestRequests }) {
     >
       <div
         css={`
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          display: grid;
+          grid-template-columns: ${4 * GU}px 1fr;
         `}
       >
-        <Table
-          noSideBorders
-          noTopBorders
+        <div
           css={`
-            background: transparent;
+            width: ${1 * GU}px;
+            height: 100%;
           `}
-          header={
-            <>
-              <TableRow>
-                <TableHeader title="Request type" />
-                <TableHeader title="Amount of data" />
-                <TableHeader title="Result" />
-              </TableRow>
-            </>
-          }
         >
-          {latestRequests.map(({ bytes, method, result }, index) => (
-            <TableRow key={index}>
-              <TableCell>{method}</TableCell>
-              <TableCell>{bytes}</TableCell>
-              <TableCell>{result}</TableCell>
-            </TableRow>
-          ))}
-        </Table>
+          {colorValues.map((val) => {
+            console.log(
+              "percentage",
+              countByColor.get(val) / countByColor.size,
+              countByColor.get(val),
+              val
+            );
+            return (
+              <div
+                css={`
+                  background: ${val};
+                  width: 100%;
+                  height: ${(countByColor.get(val) / latestRequests.length) *
+                  100}%;
+                  box-shadow: ${val} 0px 2px 8px 0px;
+                `}
+              />
+            );
+          })}
+        </div>
+        <DataView
+          mode={compactMode ? "list" : "table"}
+          fields={["Request Type", "Data transferred", "Result"]}
+          entries={latestRequests}
+          renderEntry={({ bytes, method, result }) => {
+            return [
+              <p>{method}</p>,
+              <p>
+                <div
+                  css={`
+                    display: inline-block;
+                    width: ${1.5 * GU}px;
+                    height: ${1.5 * GU}px;
+                    border-radius: 50% 50%;
+                    background: ${colorsByMethod.get(method) ?? FALLBACK_COLOR};
+                  `}
+                />
+                &nbsp;{bytes}B
+              </p>,
+              <p>{result}</p>,
+            ];
+          }}
+        />
       </div>
     </Box>
   );

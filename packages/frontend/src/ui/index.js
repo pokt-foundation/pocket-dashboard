@@ -4,6 +4,7 @@ import ButtonIcon from "ui/Button/ButtonIcon";
 import ButtonBase from "ui/ButtonBase/ButtonBase";
 import CheckBox from "ui/CheckBox/CheckBox";
 import CircleGraph from "ui/CircleGraph/CircleGraph";
+import DataView from "ui/DataView/DataView";
 import DiscButton from "ui/DiscButton/DiscButton";
 import Field from "ui/Field/Field";
 import Help from "ui/Help/Help";
@@ -33,6 +34,7 @@ export {
   ButtonBase,
   CheckBox,
   CircleGraph,
+  DataView,
   DiscButton,
   Field,
   Help,

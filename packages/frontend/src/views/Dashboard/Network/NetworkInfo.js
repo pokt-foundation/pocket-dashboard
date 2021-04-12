@@ -2,7 +2,7 @@ import React from "react";
 import TokenAmount from "token-amount";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
-import { Spacer, Split, Table, TableCell, TableHeader, TableRow, GU } from "ui";
+import { DataView, Spacer, Split, GU } from "ui";
 import Box from "components/Box/Box";
 
 export default function RelayInfo({ chains, summaryData }) {
@@ -22,49 +22,15 @@ export default function RelayInfo({ chains, summaryData }) {
             `}
           `}
         >
-          <Table
-            noSideBorders
-            noTopBorders
-            css={`
-              background: transparent;
-            `}
-            header={
-              <>
-                <TableRow>
-                  <TableHeader title="Network" />
-                  <TableHeader title="Network ID" />
-                  <TableHeader title="Ticker" />
-                  <TableHeader title="Node count" />
-                </TableRow>
-              </>
-            }
-          >
-            {chains.map(
-              ({
-                id,
-                description,
-                ticker,
-                network,
-                nodeCount,
-                isAvailableForStaking,
-              }) => (
-                <TableRow key={id}>
-                  <TableCell>
-                    <p>{description || network}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p>{id}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p>{ticker}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p>{nodeCount}</p>
-                  </TableCell>
-                </TableRow>
-              )
-            )}
-          </Table>
+          <DataView
+            fields={["Network", "ID", "Ticker"]}
+            entries={chains}
+            renderEntry={({ description, id, network, ticker }) => [
+              <p>{description || network}</p>,
+              <p>{id}</p>,
+              <p>{ticker}</p>,
+            ]}
+          />
         </Box>
       }
       secondary={

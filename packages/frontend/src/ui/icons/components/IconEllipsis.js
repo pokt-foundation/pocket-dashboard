@@ -21,4 +21,5 @@ function IconEllipsis({ size, ...props }) {
 }
 
 IconEllipsis.propTypes = IconPropTypes;
+
 export default IconEllipsis;

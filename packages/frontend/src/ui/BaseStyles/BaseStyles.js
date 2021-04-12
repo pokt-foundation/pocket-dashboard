@@ -25,6 +25,16 @@ const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
     box-sizing: border-box;
   }
+
+  *::-webkit-scrollbar { 
+    width: 0 !important 
+  }
+
+  * { 
+    overflow: -moz-scrollbars-none; 
+    -ms-overflow-style: none;
+  }
+
   html {
     -webkit-overflow-scrolling: touch;
   }

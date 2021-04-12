@@ -52,6 +52,8 @@ export default {
   badgeContent: "#ffffff",
   badgePressed: "#4c5d82",
 
+  tableBorder: "#091828",
+
   tagIdentifier: "#564090",
   tagIdentifierContent: "#b6a1ff",
 
