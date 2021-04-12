@@ -8,7 +8,6 @@ import {
   ButtonBase,
   IconPlus,
   IconCross,
-  Help,
   Spacer,
   Split,
   Switch,

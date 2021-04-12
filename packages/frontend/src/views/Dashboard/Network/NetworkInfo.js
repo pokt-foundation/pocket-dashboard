@@ -1,5 +1,4 @@
 import React from "react";
-import TokenAmount from "token-amount";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import { DataView, Spacer, Split, GU } from "ui";
