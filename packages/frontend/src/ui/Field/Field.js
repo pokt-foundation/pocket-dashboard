@@ -41,10 +41,9 @@ function Field({ children, label, required, ...props }) {
               display: flex;
               align-items: center;
               height: ${2 * GU}px;
-              margin-bottom: ${0.5 * GU}px;
-              color: ${theme.surfaceContentSecondary};
+              margin-bottom: ${1 * GU}px;
               white-space: nowrap;
-              ${textStyle("label2")};
+              ${textStyle("body3")};
               ${unselectable};
             `}
           >

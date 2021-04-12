@@ -99,138 +99,156 @@ export default function Login() {
         min-height: 100vh;
         position: relative;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        background: ${theme.background};
+        background: #091828;
       `}
     >
       <OnboardingHeader />
-      <main
+      <div
         css={`
           width: 100%;
-          height: auto;
           max-width: ${120 * GU}px;
-          border-radius: ${RADIUS}px;
-          padding: ${5 * GU}px ${8 * GU}px;
-          border: 1px solid ${theme.border};
-          background: ${theme.surface};
+          height: 100%;
         `}
       >
-        <h2
-          css={`
-            ${textStyle("title2")}
-            margin-bottom: ${6 * GU}px;
-          `}
-        >
-          Welcome back
-        </h2>
-        <form
-          onSubmit={!isSubmitDisabled ? mutate : undefined}
+        <div
           css={`
             display: flex;
-            flex-direction: column;
           `}
         >
-          <Field label="Email" required>
-            <TextInput
-              wide
-              value={email}
-              onChange={onEmailChange}
-              onFocus={onInputFocus}
-              onBlur={onEmailBlur}
-            />
-            <Spacer size={GU / 2} />
-            {emailError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {emailError.message}
-              </p>
-            )}
-          </Field>
-          <Field label="Password" required>
-            <TextInput
-              wide
-              value={password}
-              onChange={onPasswordChange}
-              onFocus={onInputFocus}
-              onBlur={onPasswordBlur}
-              type="password"
-            />
-            <Spacer size={GU / 2} />
-            {passwordError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {passwordError.message}
-              </p>
-            )}
-          </Field>
-          <Spacer size={3 * GU} />
-          <ul
+          <Spacer size={8 * GU} />
+          <h2
             css={`
-              list-style-type: none;
-            `}
-          >
-            {errors.map(({ id, message }) => (
-              <li
-                key={`${id}_${message}`}
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {message}
-              </li>
-            ))}
-          </ul>
-          <RouterLink
-            to={{
-              pathname: "/forgotpassword",
-            }}
-            component={Link}
-            external={false}
-            css={`
-              text-align: left;
+              ${textStyle("title2")}
               margin-bottom: ${6 * GU}px;
+              align-self: flex-start;
             `}
           >
-            Forgot your password?
-          </RouterLink>
-          <Button
-            type="submit"
-            disabled={isSubmitDisabled}
-            onClick={(e) => {
-              e.preventDefault();
-              mutate();
-            }}
+            Welcome back
+          </h2>
+        </div>
+        <main
+          css={`
+            width: 100%;
+            height: auto;
+            border-radius: ${RADIUS * 2}px;
+            padding: ${5 * GU}px ${8 * GU}px;
+            background: ${theme.surface};
+          `}
+        >
+          <form
+            onSubmit={!isSubmitDisabled ? mutate : undefined}
             css={`
-              margin-bottom: ${2 * GU}px;
+              display: flex;
+              flex-direction: column;
             `}
           >
-            Log in
-          </Button>
-          <p
-            css={`
-              text-align: center;
-            `}
-          >
-            Don't have an account?{" "}
+            <Field label="Email" required>
+              <TextInput
+                wide
+                value={email}
+                placeholder="example@pokt.network"
+                onChange={onEmailChange}
+                onFocus={onInputFocus}
+                onBlur={onEmailBlur}
+              />
+              <Spacer size={GU / 2} />
+              {emailError && (
+                <p
+                  css={`
+                    color: ${theme.negative};
+                  `}
+                >
+                  {emailError.message}
+                </p>
+              )}
+            </Field>
+            <Field label="Password" required>
+              <TextInput
+                wide
+                value={password}
+                placeholder="********"
+                onChange={onPasswordChange}
+                onFocus={onInputFocus}
+                onBlur={onPasswordBlur}
+                type="password"
+              />
+              <Spacer size={GU / 2} />
+              {passwordError && (
+                <p
+                  css={`
+                    color: ${theme.negative};
+                  `}
+                >
+                  {passwordError.message}
+                </p>
+              )}
+            </Field>
+            {passwordError && <Spacer size={3 * GU} />}
+            <ul
+              css={`
+                list-style-type: none;
+              `}
+            >
+              {errors.map(({ id, message }) => (
+                <li
+                  key={`${id}_${message}`}
+                  css={`
+                    color: ${theme.negative};
+                  `}
+                >
+                  {message}
+                </li>
+              ))}
+            </ul>
             <RouterLink
               to={{
-                pathname: "/signup",
+                pathname: "/forgotpassword",
               }}
               component={Link}
               external={false}
+              css={`
+                text-align: left;
+                margin-bottom: ${6 * GU}px;
+              `}
             >
-              Get started.
+              Forgot your password?
             </RouterLink>
-          </p>
-        </form>
-      </main>
+            <Button
+              type="submit"
+              mode="strong"
+              disabled={isSubmitDisabled}
+              onClick={(e) => {
+                e.preventDefault();
+                mutate();
+              }}
+              css={`
+                margin-bottom: ${2 * GU}px;
+              `}
+            >
+              Log in
+            </Button>
+            <p
+              css={`
+                text-align: center;
+              `}
+            >
+              Don't have an account?{" "}
+              <RouterLink
+                to={{
+                  pathname: "/signup",
+                }}
+                component={Link}
+                external={false}
+              >
+                Get started.
+              </RouterLink>
+            </p>
+          </form>
+        </main>
+      </div>
     </div>
   );
 }

@@ -156,190 +156,206 @@ export default function Login() {
         display: flex;
         justify-content: center;
         align-items: center;
-        background: ${theme.background};
+        background: #091828;
       `}
     >
       <OnboardingHeader />
-      <main
+      <div
         css={`
           width: 100%;
-          height: auto;
           max-width: ${120 * GU}px;
-          border-radius: ${RADIUS}px;
-          padding: ${5 * GU}px ${8 * GU}px;
-          border: 1px solid ${theme.border};
-          background: ${theme.surface};
-          display: flex;
-          flex-direction: column;
         `}
       >
-        <h2
+        <div
           css={`
-            ${textStyle("title2")}
-            margin-bottom: ${6 * GU}px;
+            display: flex;
           `}
         >
-          Get started
-        </h2>
-        <form
-          onSubmit={!isSubmitDisabled ? mutate : undefined}
+          <Spacer size={8 * GU} />
+          <h2
+            css={`
+              ${textStyle("title2")}
+              margin-bottom: ${6 * GU}px;
+              align-self: flex-start;
+            `}
+          >
+            Get started
+          </h2>
+        </div>
+        <main
           css={`
+            width: 100%;
+            height: auto;
+            max-width: ${120 * GU}px;
+            border-radius: ${RADIUS * 2}px;
+            padding: ${5 * GU}px ${8 * GU}px;
+            background: ${theme.surface};
             display: flex;
             flex-direction: column;
           `}
         >
-          <Field label="Email" required>
-            <TextInput
-              wide
-              value={email}
-              onBlur={onEmailBlur}
-              onChange={onEmailChange}
-              onFocus={onInputFocus}
-            />
-            {emailError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {emailError.message}
-              </p>
-            )}
-          </Field>
-          <Field label="Password" required>
-            <TextInput
-              wide
-              value={password}
-              onBlur={onPasswordBlur}
-              onChange={onPasswordChange}
-              onFocus={onInputFocus}
-              type="password"
-            />
-            {passwordError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {passwordError.message}
-              </p>
-            )}
-          </Field>
-          <Field label="Repeat Password" required>
-            <TextInput
-              wide
-              value={repeatedPassword}
-              onBlur={onRepeatedPasswordBlur}
-              onChange={onRepeatedPasswordChange}
-              onFocus={onInputFocus}
-              type="password"
-            />
-            {repeatedPasswordError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {repeatedPasswordError.message}
-              </p>
-            )}
-          </Field>
-          <ul
+          <form
+            onSubmit={!isSubmitDisabled ? mutate : undefined}
             css={`
-              list-style-type: none;
+              display: flex;
+              flex-direction: column;
             `}
           >
-            {errors.map(({ id, message }) => (
-              <li
-                key={`${id}_${message}`}
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {message}
-              </li>
-            ))}
-          </ul>
-          <label
-            css={`
-              margin-bottom: ${6 * GU}px;
-              ${textStyle("body2")}
-              word-break: ${compactMode ? "break-word" : "break-all"};
-            `}
-          >
-            <CheckBox
-              checked={checked}
-              onChange={onCheckChange}
-              aria-label="I agree to the pocket Dashboard terms and conditions"
+            <Field label="Email" required>
+              <TextInput
+                wide
+                value={email}
+                placeholder="example@pokt.network"
+                onBlur={onEmailBlur}
+                onChange={onEmailChange}
+                onFocus={onInputFocus}
+              />
+              {emailError && (
+                <p
+                  css={`
+                    color: ${theme.negative};
+                  `}
+                >
+                  {emailError.message}
+                </p>
+              )}
+            </Field>
+            <Field label="Password" required>
+              <TextInput
+                wide
+                value={password}
+                onBlur={onPasswordBlur}
+                onChange={onPasswordChange}
+                onFocus={onInputFocus}
+                type="password"
+              />
+              {passwordError && (
+                <p
+                  css={`
+                    color: ${theme.negative};
+                  `}
+                >
+                  {passwordError.message}
+                </p>
+              )}
+            </Field>
+            <Field label="Repeat Password" required>
+              <TextInput
+                wide
+                value={repeatedPassword}
+                onBlur={onRepeatedPasswordBlur}
+                onChange={onRepeatedPasswordChange}
+                onFocus={onInputFocus}
+                type="password"
+              />
+              {repeatedPasswordError && (
+                <p
+                  css={`
+                    color: ${theme.negative};
+                  `}
+                >
+                  {repeatedPasswordError.message}
+                </p>
+              )}
+            </Field>
+            <ul
               css={`
-                display: inline-block;
-              `}
-            />
-            <span
-              css={`
-                padding-top: 5px;
-                vertical-align: bottom;
-                margin-left: ${1 * GU}px;
+                list-style-type: none;
               `}
             >
-              I Agree to the Pocket Dashboard's{" "}
-              <Link
-                href="https://dashboard.pokt.network/support/terms-of-service"
-                css={`
-                  display: inline;
-                `}
-              >
-                T. &amp; C.
-              </Link>{" "}
-              and{" "}
-              <Link
-                href="https://dashboard.pokt.network/support/privacy-policy"
-                css={`
-                  display: inline;
-                `}
-              >
-                Privacy Policy
-              </Link>
-            </span>
-          </label>
-          <Button
-            type="submit"
-            disabled={isSubmitDisabled}
-            onClick={(e) => {
-              e.preventDefault();
-              mutate();
-            }}
-            css={`
-              margin-bottom: ${2 * GU}px;
-            `}
-          >
-            Sign up
-          </Button>
-        </form>
-        {isSuccess && !isError && (
-          <Info>
-            <p
+              {errors.map(({ id, message }) => (
+                <li
+                  key={`${id}_${message}`}
+                  css={`
+                    color: ${theme.negative};
+                  `}
+                >
+                  {message}
+                </li>
+              ))}
+            </ul>
+            <label
               css={`
-                ${textStyle("body3")}
+                margin-bottom: ${6 * GU}px;
+                ${textStyle("body2")}
+                word-break: ${compactMode ? "break-word" : "break-all"};
               `}
             >
-              You're almost there!{" "}
-              <span role="img" aria-label="Rocket Emoji">
-                🚀
+              <CheckBox
+                checked={checked}
+                onChange={onCheckChange}
+                aria-label="I agree to the pocket Dashboard terms and conditions"
+                css={`
+                  display: inline-block;
+                `}
+              />
+              <span
+                css={`
+                  padding-top: 5px;
+                  vertical-align: bottom;
+                  margin-left: ${1 * GU}px;
+                `}
+              >
+                I Agree to the Pocket Dashboard's{" "}
+                <Link
+                  href="https://dashboard.pokt.network/support/terms-of-service"
+                  css={`
+                    display: inline;
+                  `}
+                >
+                  T. &amp; C.
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="https://dashboard.pokt.network/support/privacy-policy"
+                  css={`
+                    display: inline;
+                  `}
+                >
+                  Privacy Policy
+                </Link>
               </span>
-            </p>
-            <Spacer size={1 * GU} />
-            <p
+            </label>
+            <Button
+              type="submit"
+              mode="strong"
+              disabled={isSubmitDisabled}
+              onClick={(e) => {
+                e.preventDefault();
+                mutate();
+              }}
               css={`
-                ${textStyle("body3")}
+                margin-bottom: ${2 * GU}px;
               `}
             >
-              We've sent a verification email to {email}. Go and check it before
-              it expires!
-            </p>
-          </Info>
-        )}
-      </main>
+              Sign up
+            </Button>
+          </form>
+          {isSuccess && !isError && (
+            <Info>
+              <p
+                css={`
+                  ${textStyle("body3")}
+                `}
+              >
+                You're almost there!{" "}
+                <span role="img" aria-label="Rocket Emoji">
+                  🚀
+                </span>
+              </p>
+              <Spacer size={1 * GU} />
+              <p
+                css={`
+                  ${textStyle("body3")}
+                `}
+              >
+                We've sent a verification email to {email}. Go and check it
+                before it expires!
+              </p>
+            </Info>
+          )}
+        </main>
+      </div>
     </div>
   );
 }

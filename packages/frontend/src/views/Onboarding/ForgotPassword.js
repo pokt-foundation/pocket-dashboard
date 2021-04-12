@@ -46,73 +46,88 @@ export default function ForgotPassword() {
         display: flex;
         justify-content: center;
         align-items: center;
-        background: ${theme.background};
+        background: #091828;
       `}
     >
       <OnboardingHeader />
-      <main
+      <div
         css={`
           width: 100%;
-          height: auto;
           max-width: ${120 * GU}px;
-          border-radius: ${RADIUS}px;
-          padding: ${5 * GU}px ${8 * GU}px;
-          border: 1px solid ${theme.border};
-          background: ${theme.surface};
-          display: flex;
-          flex-direction: column;
         `}
       >
-        <h2
+        <div
           css={`
-            ${textStyle("title2")}
-            margin-bottom: ${6 * GU}px;
+            display: flex;
           `}
         >
-          Reset your password
-        </h2>
-        <p
+          <Spacer size={8 * GU} />
+          <h2
+            css={`
+              ${textStyle("title2")}
+              margin-bottom: ${6 * GU}px;
+              align-self: flex-start;
+            `}
+          >
+            New password
+          </h2>
+        </div>
+        <main
           css={`
-            margin-bottom: ${6 * GU}px;
+            width: 100%;
+            height: auto;
+            max-width: ${120 * GU}px;
+            border-radius: ${RADIUS * 2}px;
+            padding: ${5 * GU}px ${8 * GU}px;
+            background: ${theme.surface};
+            display: flex;
+            flex-direction: column;
           `}
         >
-          If the email you specify exists, we'll send an email with instructions
-          for resetting your email. Remember you can{" "}
-          <Link href="mailto:dashboard@pokt.network">contact us</Link> if you
-          have any issues.
-        </p>
-        <Field
-          label="Email"
-          required
-          css={`
-            margin-bottom: ${6 * GU}px;
-          `}
-        >
-          <TextInput
-            wide
-            value={email}
-            onChange={onEmailChange}
-            type="email"
+          <p
+            css={`
+              margin-bottom: ${6 * GU}px;
+            `}
+          >
+            If the email you specify exists, we'll send an email with
+            instructions for resetting your email. Remember you can{" "}
+            <Link href="mailto:dashboard@pokt.network">contact us</Link> if you
+            have any issues.
+          </p>
+          <Field
+            label="Email"
+            required
+            css={`
+              margin-bottom: ${6 * GU}px;
+            `}
+          >
+            <TextInput
+              wide
+              value={email}
+              onChange={onEmailChange}
+              type="email"
+              disabled={isLoading || isSuccess}
+            />
+          </Field>
+          <Button
+            css={`
+              margin-bottom: ${2 * GU}px;
+            `}
+            mode="strong"
             disabled={isLoading || isSuccess}
-          />
-        </Field>
-        <Button
-          css={`
-            margin-bottom: ${2 * GU}px;
-          `}
-          disabled={isLoading || isSuccess}
-          onClick={(e) => mutate(e)}
-        >
-          Send email
-        </Button>
-        <Spacer size={1 * GU} />
-        {isSuccess && (
-          <Info>
-            We've sent an email! Check it out soon, as it will be valid for the
-            next 15 minutes only.
-          </Info>
-        )}
-      </main>
+            onClick={(e) => mutate(e)}
+          >
+            Send email
+          </Button>
+          <Spacer size={1 * GU} />
+          {isSuccess && (
+            <Info>
+              We've sent an email! Check it out soon, as it will be valid for
+              the next 15 minutes only.
+            </Info>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
