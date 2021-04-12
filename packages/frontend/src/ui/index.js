@@ -10,6 +10,7 @@ import DiscButton from "ui/DiscButton/DiscButton";
 import Field from "ui/Field/Field";
 import Help from "ui/Help/Help";
 import Info from "ui/Info/Info";
+import Modal from "ui/Modal/Modal";
 import MultiCircleGraph from "ui/MultiCircleGraph/MultiCircleGraph";
 import LineChart from "ui/LineChart/LineChart";
 import Link from "ui/Link/Link";
@@ -41,6 +42,7 @@ export {
   Field,
   Help,
   Info,
+  Modal,
   MultiCircleGraph,
   LineChart,
   Link,
