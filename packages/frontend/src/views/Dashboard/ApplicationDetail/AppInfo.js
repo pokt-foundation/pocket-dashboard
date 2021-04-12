@@ -62,7 +62,10 @@ function useUsageColor(usage) {
   return theme.negative;
 }
 
-function formatDailyRelaysForGraphing(dailyRelays = []) {
+function formatDailyRelaysForGraphing(
+  dailyRelays = [],
+  upperBound = ONE_MILLION
+) {
   const labels = dailyRelays
     .map(({ bucket }) => bucket.split("T")[0])
     .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
@@ -71,10 +74,12 @@ function formatDailyRelaysForGraphing(dailyRelays = []) {
     {
       id: 1,
       values: dailyRelays.map(({ dailyRelays }) =>
-        norm(dailyRelays, 0, ONE_MILLION)
+        norm(dailyRelays, 0, upperBound)
       ),
     },
   ];
+
+  console.log(lines, dailyRelays, upperBound, "watt");
 
   return {
     labels,
@@ -101,6 +106,8 @@ export default function AppInfo({
   const { within } = useViewport();
 
   const compactMode = within(-1, "medium");
+  const { staked_tokens: stakedTokens } = appOnChainData;
+  const { graphThreshold } = getThresholdsPerStake(stakedTokens);
 
   const successRate = useMemo(() => {
     return weeklyRelayData.weeklyAppRelays === 0
@@ -115,12 +122,9 @@ export default function AppInfo({
           previousSuccessfulRelays.previousTotalRelays;
   }, [previousSuccessfulRelays]);
   const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
-    () => formatDailyRelaysForGraphing(dailyRelayData),
-    [dailyRelayData]
+    () => formatDailyRelaysForGraphing(dailyRelayData, graphThreshold),
+    [dailyRelayData, graphThreshold]
   );
-
-  const { staked_tokens: stakedTokens } = appOnChainData;
-  const { graphThreshold } = getThresholdsPerStake(stakedTokens);
 
   const isSwitchable = useMemo(() => {
     dayjs.extend(dayJsutcPlugin);
@@ -537,6 +541,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
     chartLines,
   ]);
   const usageColor = useUsageColor(sessionRelays / ONE_MILLION);
+  const theme = useTheme();
 
   return (
     <Box>
@@ -608,9 +613,19 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
           <LineChart
             lines={chartLines}
             label={(i) => chartLabels[i]}
-            height={200}
+            height={300}
             color={() => "#31A1D2"}
             renderCheckpoints
+            dotRadius={GU / 1.5}
+            threshold
+            scales={[
+              { label: "0" },
+              { label: "250K" },
+              { label: "500K" },
+              { label: "750K" },
+              { label: "1M", highlightColor: theme.negative },
+              "",
+            ]}
           />
         )}
       </div>
@@ -632,8 +647,6 @@ function LatestRequests({ latestRequests }) {
           id++;
         }
       }
-
-      console.log("setting", colorsByMethod.get(method));
 
       const methodColor = colorsByMethod.get(method);
 
@@ -669,12 +682,6 @@ function LatestRequests({ latestRequests }) {
           `}
         >
           {colorValues.map((val) => {
-            console.log(
-              "percentage",
-              countByColor.get(val) / countByColor.size,
-              countByColor.get(val),
-              val
-            );
             return (
               <div
                 css={`

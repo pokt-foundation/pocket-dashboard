@@ -208,23 +208,28 @@ function LineChart({
           )}
           <g transform={`translate(0,${GU})`}>
             {scales &&
-              scales.map((label, index) => {
+              scales.map(({ label, highlightColor }, index) => {
                 const scaleLength = scales.length - 1;
 
                 return (
                   <text
                     key={index}
-                    x={width + OFFSET / 2}
+                    x={width + OFFSET / 8}
                     y={
                       chartHeight - (chartHeight / scaleLength) * index + GU / 2
                     }
-                    textAnchor={getLabelPosition(index, labels.length)}
-                    fill={labelColor}
+                    textAnchor={getLabelPosition(0, labels.length)}
+                    fill={highlightColor ? highlightColor : labelColor}
                     css={`
                       alignment-baseline: middle;
                       font-size: 12px;
                       font-weight: 300;
                       ${unselectable};
+                      ${highlightColor &&
+                      `
+                        font-weight: 800;
+                        font-size
+                      `}
                     `}
                   >
                     {label}
