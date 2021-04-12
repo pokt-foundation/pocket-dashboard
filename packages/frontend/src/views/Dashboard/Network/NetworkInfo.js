@@ -50,17 +50,15 @@ export default function RelayInfo({ chains, summaryData }) {
             </li>
             <Spacer size={2 * GU} />
             <li>
-              Total nodes staked: <span>{summaryData.nodesStaked}</span>
+              Total nodes staked: <span>{3036}</span>
             </li>
             <Spacer size={2 * GU} />
             <li>
-              Total POKT staked:{" "}
-              <span>{TokenAmount.format(summaryData.poktStaked, 6)}</span>
+              Total POKT staked: <span>{242.99}m</span>
             </li>
           </ul>
         </Box>
       }
-      invert="horizontal"
     />
   );
 }
