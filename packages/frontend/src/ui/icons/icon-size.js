@@ -6,6 +6,7 @@ const ICON_SIZES = new Map([
   ["medium", 3 * GU],
   ["small", 2 * GU],
   ["tiny", 1.75 * GU],
+  ["mini", 1.25 * GU],
 ]);
 
 // Mapping of button size => icon size

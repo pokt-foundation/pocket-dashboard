@@ -4,6 +4,7 @@ import { animated, useSpring } from "react-spring";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import {
+  Banner,
   Button,
   CircleGraph,
   DataView,
@@ -95,6 +96,8 @@ export default function AppInfo({
   const { staked_tokens: stakedTokens } = appOnChainData;
   const { graphThreshold } = getThresholdsPerStake(stakedTokens);
 
+  const exceedsMaxRelays = useMemo(() => false, []);
+
   return (
     <FloatUp
       content={() => (
@@ -103,6 +106,19 @@ export default function AppInfo({
             <>
               <EndpointDetails chainId={appData.chain} appId={appData._id} />
               <Spacer size={2 * GU} />
+              {exceedsMaxRelays && (
+                <>
+                  <Banner
+                    mode="error"
+                    title="Your application has reached the max limit of relays per day"
+                  >
+                    You should extend your app relays limit to keep the service
+                    according to the demand. Contact our sales team to find the
+                    best solution for you and keep your onfrastructure running.
+                  </Banner>
+                  <Spacer size={2 * GU} />
+                </>
+              )}
               <div
                 css={`
                   width: 100%;

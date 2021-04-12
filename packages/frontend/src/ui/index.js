@@ -1,4 +1,5 @@
 import AppWrapper from "ui/AppWrapper/AppWrapper";
+import Banner from "ui/Banner/Banner";
 import Button from "ui/Button/Button";
 import ButtonIcon from "ui/Button/ButtonIcon";
 import ButtonBase from "ui/ButtonBase/ButtonBase";
@@ -29,6 +30,7 @@ import ToastHubProvider, { Toast, useToast } from "ui/ToastHub/ToastHub";
 // Export components
 export {
   AppWrapper,
+  Banner,
   Button,
   ButtonIcon,
   ButtonBase,
