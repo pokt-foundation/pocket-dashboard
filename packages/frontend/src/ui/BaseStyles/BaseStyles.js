@@ -42,7 +42,7 @@ const GlobalStyle = createGlobalStyle`
     height: 0;
     min-height: 100vh;
     color: ${(p) => p.theme.content};
-    font-family: 'Inter', Helvetica, serif;
+    font-family: 'Manrope', Helvetica, serif;
     ${(p) => p.textStyleCss};
   }
   html, body {

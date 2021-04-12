@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@fontsource/inter": "^4.2.1",
+    "@fontsource/manrope": "^4.2.2",
     "@fontsource/source-code-pro": "^4.2.1",
     "@pokt-network/pocket-js": "0.6.3-rc",
     "@sentry/react": "^6.1.0",
