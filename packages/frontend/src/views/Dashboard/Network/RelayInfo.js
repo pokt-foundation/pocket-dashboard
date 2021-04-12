@@ -1,7 +1,15 @@
 import React from "react";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
-import { CircleGraph, LineChart, Spacer, Split, textStyle, GU } from "ui";
+import {
+  CircleGraph,
+  LineChart,
+  Spacer,
+  Split,
+  useTheme,
+  textStyle,
+  GU,
+} from "ui";
 import Box from "components/Box/Box";
 
 export default function RelayInfo({
@@ -11,6 +19,7 @@ export default function RelayInfo({
   scales,
   successRateData,
 }) {
+  const theme = useTheme();
   const { within } = useViewport();
   const compactMode = within(-1, "medium");
 
@@ -81,6 +90,7 @@ export default function RelayInfo({
                 successRateData.totalSuccessfulWeeklyRelays /
                 relayData.totalWeeklyRelays
               }
+              color={theme.positive}
             />
             <Spacer size={2 * GU} />
             <div>
