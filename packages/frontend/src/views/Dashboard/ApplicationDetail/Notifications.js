@@ -183,7 +183,7 @@ export default function Notifications({
                       ${textStyle("title2")}
                     `}
                   >
-                    Daily bandwith usage
+                    Weekly bandwith usage
                   </h2>
                   {compactMode && <Spacer size={1 * GU} />}
                   <h3>Max relays per day: {legibleMaxRelays}</h3>
