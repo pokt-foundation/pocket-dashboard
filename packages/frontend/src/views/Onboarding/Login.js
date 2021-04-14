@@ -124,7 +124,7 @@ export default function Login() {
       <div
         css={`
           width: 100%;
-          max-width: ${120 * GU}px;
+          max-width: ${87 * GU}px;
           height: 100%;
         `}
       >

@@ -1,18 +1,47 @@
 import React from "react";
 import "styled-components/macro";
 import { textStyle, GU } from "ui";
+import PoktLogo from "assets/poktlogo.png";
 
 export default function OnboardingHeader() {
   return (
-    <header
+    <a
+      href="https://pokt.network"
+      rel="noopener _noreferrer"
+      target="blank"
       css={`
-        position: absolute;
-        top: ${2 * GU}px;
-        left: ${3 * GU}px;
-        ${textStyle("title1")}
+        width: 100%;
+        text-decoration: none;
       `}
     >
-      <h1>Pocket Dashboard</h1>
-    </header>
+      <header
+        css={`
+          position: absolute;
+          top: ${2 * GU}px;
+          left: ${3 * GU}px;
+          ${textStyle("title1")}
+          display: flex;
+          justify-content: center;
+        `}
+      >
+        <img
+          src={PoktLogo}
+          alt="Pocket"
+          width={23 * GU}
+          height="auto"
+          css={`
+            max-width: ${23.5 * GU};
+            height: auto;
+          `}
+        />
+        <h1
+          css={`
+            line-height: 1.9;
+          `}
+        >
+          &nbsp; Dashboard
+        </h1>
+      </header>
+    </a>
   );
 }
