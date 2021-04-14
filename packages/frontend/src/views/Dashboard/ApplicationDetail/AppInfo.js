@@ -417,12 +417,36 @@ function SwitchDenialModal({ onClose, visible }) {
 
 function EndpointDetails({ chainId, appId }) {
   const toast = useToast();
-  const endpoint = `https://${prefixFromChainId(
-    chainId
-  )}.gateway.pokt.network/v1/${appId}`;
+  const { prefix, name } = prefixFromChainId(chainId);
+  const endpoint = `https://${prefix}.gateway.pokt.network/v1/${appId}`;
 
   return (
-    <Box title="Endpoint">
+    <Box>
+      <div
+        css={`
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        `}
+      >
+        <h3
+          css={`
+            ${textStyle("title3")}
+            margin-bottom: ${3 * GU}px;
+          `}
+        >
+          Endpoint
+        </h3>
+        <h4
+          css={`
+            ${textStyle("body3")}
+            margin-bottom: ${3 * GU}px;
+          `}
+        >
+          {name}
+        </h4>
+      </div>
       <TextCopy
         value={endpoint}
         css={`
