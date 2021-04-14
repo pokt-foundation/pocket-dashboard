@@ -44,6 +44,7 @@ export default function Login() {
         min-height: 100vh;
         position: relative;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         background: #091828;
@@ -57,7 +58,7 @@ export default function Login() {
           bottom: 0%;
           right: -5%;
           width: 50%;
-          max-width: ${80 * GU}px;
+          max-width: ${120 * GU}px;
           height: auto;
           z-index: 1;
         `}
@@ -66,7 +67,7 @@ export default function Login() {
       <div
         css={`
           width: 100%;
-          max-width: ${120 * GU}px;
+          max-width: ${87 * GU}px;
         `}
       >
         <div

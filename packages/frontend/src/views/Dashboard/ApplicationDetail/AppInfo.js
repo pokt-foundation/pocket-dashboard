@@ -21,6 +21,7 @@ import {
   useTheme,
   useToast,
   Modal,
+  BarChart,
 } from "ui";
 import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
@@ -30,7 +31,9 @@ import { prefixFromChainId } from "lib/chain-utils";
 import { norm } from "lib/math-utils";
 import { getThresholdsPerStake } from "lib/pocket-utils";
 
+const MAX_RELAYS_PER_SESSION = 40000;
 const ONE_MILLION = 1000000;
+const ONE_SECOND = 1; // Data for graphs come in second
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -62,7 +65,10 @@ function useUsageColor(usage) {
   return theme.negative;
 }
 
-function formatDailyRelaysForGraphing(dailyRelays = []) {
+function formatDailyRelaysForGraphing(
+  dailyRelays = [],
+  upperBound = ONE_MILLION
+) {
   const labels = dailyRelays
     .map(({ bucket }) => bucket.split("T")[0])
     .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
@@ -71,7 +77,7 @@ function formatDailyRelaysForGraphing(dailyRelays = []) {
     {
       id: 1,
       values: dailyRelays.map(({ dailyRelays }) =>
-        norm(dailyRelays, 0, ONE_MILLION)
+        norm(dailyRelays, 0, upperBound)
       ),
     },
   ];
@@ -79,6 +85,56 @@ function formatDailyRelaysForGraphing(dailyRelays = []) {
   return {
     labels,
     lines,
+  };
+}
+
+function formatLatencyValuesForGraphing(
+  hourlyLatency = [],
+  upperBound = ONE_SECOND
+) {
+  dayjs.extend(dayJsutcPlugin);
+
+  const labels =
+    hourlyLatency.length > 0
+      ? hourlyLatency
+          .map(({ bucket }) => bucket.split("T")[1])
+          .map((bucket) => bucket.substring(0, 2))
+      : Array(24)
+          .fill("")
+          .map((_, i) => "00");
+
+  while (labels.length < 24) {
+    labels.push("--");
+  }
+
+  const boundedLatencyValues = hourlyLatency.map(({ latency }) =>
+    norm(latency, 0, upperBound)
+  );
+
+  while (boundedLatencyValues.length < 24) {
+    boundedLatencyValues.push(0);
+  }
+
+  const barValues = [
+    {
+      id: 1,
+      values: boundedLatencyValues,
+    },
+  ];
+
+  const scales = [
+    { label: "0ms" },
+    { label: "250ms" },
+    { label: "500ms" },
+    { label: "750ms" },
+    { label: "1000ms", highlightColor: "#AE1515" },
+    { label: "" },
+  ];
+
+  return {
+    barValues,
+    labels,
+    scales,
   };
 }
 
@@ -91,6 +147,7 @@ export default function AppInfo({
   previousSuccessfulRelays,
   successfulRelayData,
   weeklyRelayData,
+  latestLatencyData,
 }) {
   const [networkModalVisible, setNetworkModalVisible] = useState(false);
   const [networkDenialModalVisible, setNetworkDenialModalVisible] = useState(
@@ -101,6 +158,8 @@ export default function AppInfo({
   const { within } = useViewport();
 
   const compactMode = within(-1, "medium");
+  const { staked_tokens: stakedTokens } = appOnChainData;
+  const { graphThreshold } = getThresholdsPerStake(stakedTokens);
 
   const successRate = useMemo(() => {
     return weeklyRelayData.weeklyAppRelays === 0
@@ -114,13 +173,18 @@ export default function AppInfo({
       : previousSuccessfulRelays.successfulWeeklyRelays /
           previousSuccessfulRelays.previousTotalRelays;
   }, [previousSuccessfulRelays]);
-  const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
-    () => formatDailyRelaysForGraphing(dailyRelayData),
-    [dailyRelayData]
-  );
 
-  const { staked_tokens: stakedTokens } = appOnChainData;
-  const { graphThreshold } = getThresholdsPerStake(stakedTokens);
+  const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
+    () => formatDailyRelaysForGraphing(dailyRelayData, graphThreshold),
+    [dailyRelayData, graphThreshold]
+  );
+  const {
+    labels: latencyLabels = [],
+    barValues = [],
+    scales: latencyScales = [],
+  } = useMemo(() => formatLatencyValuesForGraphing(latestLatencyData, 1.25), [
+    latestLatencyData,
+  ]);
 
   const isSwitchable = useMemo(() => {
     dayjs.extend(dayJsutcPlugin);
@@ -193,7 +257,12 @@ export default function AppInfo({
                     successRate={successRate}
                     totalRequests={weeklyRelayData.weeklyAppRelays}
                   />
-                  <AvgLatency avgLatency={successfulRelayData.avgLatency} />
+                  <AvgLatency
+                    avgLatency={successfulRelayData.avgLatency}
+                    chartLines={barValues}
+                    chartLabels={latencyLabels}
+                    chartScales={latencyScales}
+                  />
                 </div>
                 <Spacer size={2 * GU} />
                 <UsageTrends
@@ -508,7 +577,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
   );
 }
 
-function AvgLatency({ avgLatency }) {
+function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
   return (
     <Box>
       <div
@@ -528,18 +597,34 @@ function AvgLatency({ avgLatency }) {
         </h3>
         <p>{(avgLatency * 1000).toFixed(0)}ms</p>
       </div>
+      <div>
+        <BarChart
+          lines={chartLines}
+          label={chartLabels}
+          height={200}
+          color={() => "#31A1D2"}
+          scales={chartScales}
+        />
+      </div>
     </Box>
   );
 }
 
-function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
+function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
     chartLines,
   ]);
   const usageColor = useUsageColor(sessionRelays / ONE_MILLION);
+  const theme = useTheme();
 
   return (
     <Box>
+      <div
+        css={`
+          display: flex;
+          justify-content: space-between;
+        `}
+      ></div>
       <div
         css={`
           width: 100%;
@@ -553,8 +638,9 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
           css={`
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            grid-column: 1;
+            border-right: 1px solid ${theme.background};
           `}
         >
           <h3
@@ -562,18 +648,18 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
               ${textStyle("title3")}
             `}
           >
-            Usage Trends
+            Current usage
           </h3>
           <Spacer size={2 * GU} />
           <CircleGraph
-            value={sessionRelays / ONE_MILLION}
-            size={100}
+            value={sessionRelays / MAX_RELAYS_PER_SESSION}
+            size={125}
             color={usageColor}
           />
-          <Spacer size={1 * GU} />
+          <Spacer size={2 * GU} />
           <h4
             css={`
-              ${textStyle("title4")}
+              ${textStyle("title3")}
               text-align: center;
             `}
           >
@@ -605,13 +691,37 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
             </h3>
           </div>
         ) : (
-          <LineChart
-            lines={chartLines}
-            label={(i) => chartLabels[i]}
-            height={200}
-            color={() => "#31A1D2"}
-            renderCheckpoints
-          />
+          <div
+            css={`
+              grid-column: 2;
+            `}
+          >
+            <h3
+              css={`
+                ${textStyle("title3")}
+                text-align: right;
+              `}
+            >
+              Weekly usage
+            </h3>
+            <LineChart
+              lines={chartLines}
+              label={(i) => chartLabels[i]}
+              height={300}
+              color={() => "#31A1D2"}
+              renderCheckpoints
+              dotRadius={GU / 1.5}
+              threshold
+              scales={[
+                { label: "0" },
+                { label: "250K" },
+                { label: "500K" },
+                { label: "750K" },
+                { label: "1M", highlightColor: theme.negative },
+                "",
+              ]}
+            />
+          </div>
         )}
       </div>
     </Box>
@@ -633,8 +743,6 @@ function LatestRequests({ latestRequests }) {
         }
       }
 
-      console.log("setting", colorsByMethod.get(method));
-
       const methodColor = colorsByMethod.get(method);
 
       countByColor.has(methodColor)
@@ -651,7 +759,7 @@ function LatestRequests({ latestRequests }) {
 
   return (
     <Box
-      title="Request Breakdown"
+      title="Latest requests"
       css={`
         padding-bottom: ${4 * GU}px;
       `}
@@ -669,12 +777,6 @@ function LatestRequests({ latestRequests }) {
           `}
         >
           {colorValues.map((val) => {
-            console.log(
-              "percentage",
-              countByColor.get(val) / countByColor.size,
-              countByColor.get(val),
-              val
-            );
             return (
               <div
                 css={`
@@ -713,6 +815,8 @@ function LatestRequests({ latestRequests }) {
                     height: ${1.5 * GU}px;
                     border-radius: 50% 50%;
                     background: ${colorsByMethod.get(method) ?? FALLBACK_COLOR};
+                    box-shadow: ${colorsByMethod.get(method) ?? FALLBACK_COLOR}
+                      0px 2px 8px 0px;
                   `}
                 />
                 &nbsp;{bytes}B

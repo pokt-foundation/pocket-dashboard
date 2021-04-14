@@ -96,7 +96,7 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
     !compactMode && (
       <div
         css={`
-          min-width: ${17 * GU}px;
+          width: ${17 * GU}px;
           height: 100vh;
           padding: ${2 * GU}px 0;
           background: ${theme.backgroundInverted};
@@ -198,7 +198,12 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
           }}
         >
           {childInstances.map(({ id, label }, index) => (
-            <li key={id}>
+            <li
+              key={id}
+              css={`
+                width: 100%;
+              `}
+            >
               <ButtonBase
                 onClick={() => history.push({ pathname: `${id}` })}
                 css={`
@@ -206,12 +211,21 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
                   align-items: center;
                   border-radius: 0px;
                   text-align: left;
-                  width: 100%;
                   height: ${4 * GU}px;
+                  width: 100%;
                   color: ${activeIndex - 1 === index ? theme.accent : "black"};
                 `}
               >
-                {label}
+                <span
+                  css={`
+                    width: 100%;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                  `}
+                >
+                  {label}
+                </span>
               </ButtonBase>
             </li>
           ))}

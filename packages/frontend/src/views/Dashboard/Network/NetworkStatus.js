@@ -38,11 +38,11 @@ function formatDailyRelaysForGraphing(dailyRelays) {
   const formatSi = format(".2s");
 
   const scales = [
-    0,
-    formatSi((highestDailyAmount * 0.25).toFixed(0)),
-    formatSi((highestDailyAmount * 0.5).toFixed(0)),
-    formatSi((highestDailyAmount * 0.75).toFixed(0)),
-    formatSi(highestDailyAmount.toFixed(0)),
+    { label: 0 },
+    { label: formatSi((highestDailyAmount * 0.25).toFixed(0)) },
+    { label: formatSi((highestDailyAmount * 0.5).toFixed(0)) },
+    { label: formatSi((highestDailyAmount * 0.75).toFixed(0)) },
+    { label: formatSi(highestDailyAmount.toFixed(0)) },
   ];
 
   return {

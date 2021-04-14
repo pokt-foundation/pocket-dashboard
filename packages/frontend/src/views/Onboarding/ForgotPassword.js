@@ -46,6 +46,7 @@ export default function ForgotPassword() {
         min-height: 100vh;
         position: relative;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         background: #091828;
@@ -68,7 +69,7 @@ export default function ForgotPassword() {
       <div
         css={`
           width: 100%;
-          max-width: ${120 * GU}px;
+          max-width: ${87 * GU}px;
         `}
       >
         <div

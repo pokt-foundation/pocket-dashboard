@@ -1,5 +1,6 @@
 import AppWrapper from "ui/AppWrapper/AppWrapper";
 import Banner from "ui/Banner/Banner";
+import BarChart from "ui/BarChart/BarChart";
 import Button from "ui/Button/Button";
 import ButtonIcon from "ui/Button/ButtonIcon";
 import ButtonBase from "ui/ButtonBase/ButtonBase";
@@ -32,6 +33,7 @@ import ToastHubProvider, { Toast, useToast } from "ui/ToastHub/ToastHub";
 export {
   AppWrapper,
   Banner,
+  BarChart,
   Button,
   ButtonIcon,
   ButtonBase,

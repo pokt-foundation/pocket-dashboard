@@ -179,6 +179,7 @@ const DataView = React.memo(function DataView({
   selection,
   status,
   tableRowHeight,
+  totalEntries,
 }) {
   // Only used if `page` is not passed. The pagination supports both a
   // managed and a controlled mode, to provide a better developer experience
@@ -227,7 +228,7 @@ const DataView = React.memo(function DataView({
     entriesPerPage = entries.length;
   }
 
-  const pages = Math.ceil(entries.length / entriesPerPage);
+  const pages = Math.ceil((totalEntries || entries.length) / entriesPerPage);
 
   const displayFrom = entriesPerPage * selectedPage;
   const displayTo = displayFrom + entriesPerPage;
@@ -350,6 +351,7 @@ DataView.propTypes = {
   renderSelectionCount: PropTypes.func,
   selection: PropTypes.array,
   tableRowHeight: PropTypes.number,
+  totalEntries: PropTypes.number,
   status: PropTypes.oneOf([
     "default",
     "empty-filters",

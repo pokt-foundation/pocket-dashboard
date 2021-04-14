@@ -13,6 +13,7 @@ import {
   useAppOnChainStatus,
   useCurrentSessionRelayCount,
   useDailyRelayCount,
+  useLatestLatencyValues,
   useLatestRelays,
   usePreviousSuccessfulRelays,
   useSucessfulWeeklyRelays,
@@ -65,6 +66,11 @@ export default function ApplicationDetail() {
       : TEST_APP_PUB_KEY,
     0
   );
+  const { isLatestLatencyLoading, latestLatencyData } = useLatestLatencyValues(
+    !env("USE_TEST_APP")
+      ? appData?.freeTierApplicationAccount?.publicKey
+      : TEST_APP_PUB_KEY
+  );
   const {
     isPreviousSuccessfulRelaysLoading,
     previousSucessfulRelaysData,
@@ -83,7 +89,8 @@ export default function ApplicationDetail() {
     isSuccesfulWeeklyRelaysLoading ||
     isDailyRelayCountLoading ||
     isCurrentSessionRelaysLoading ||
-    isLatestRelaysLoading;
+    isLatestRelaysLoading ||
+    isLatestLatencyLoading;
 
   return appLoading ? (
     <div
@@ -120,6 +127,7 @@ export default function ApplicationDetail() {
           previousSuccessfulRelays={previousSucessfulRelaysData}
           successfulRelayData={successfulWeeklyRelaysData}
           weeklyRelayData={weeklyRelaysData}
+          latestLatencyData={latestLatencyData}
         />
       </Route>
       <Route path={`${path}/security`}>

@@ -13,6 +13,9 @@ import { unselectable } from "ui";
 
 const LABELS_HEIGHT = 30;
 const WIDTH_DEFAULT = 300;
+const GAP = 0.9;
+
+const FULL_DAY = 24; // hours, equivalent to rectangles drawn
 
 function useMeasuredWidth() {
   const ref = useRef();
@@ -42,7 +45,7 @@ function useMeasuredWidth() {
 
 const OFFSET = 50;
 
-function LineChart({
+function BarChart({
   animDelay,
   borderColor,
   color,
@@ -87,13 +90,11 @@ function LineChart({
     [width, totalCount]
   );
 
-  const getY = useCallback(
-    (percentage, progress, height) => {
-      const padding = dotRadius + 2;
-
-      return height - padding - (height - padding * 2) * percentage * progress;
+  const getRectX = useCallback(
+    (index) => {
+      return (width / FULL_DAY) * index + GU;
     },
-    [dotRadius]
+    [width]
   );
 
   const getLabelPosition = useCallback((index, length) => {
@@ -106,8 +107,7 @@ function LineChart({
     return "middle";
   }, []);
 
-  const labels =
-    label && totalCount > 0 ? [...Array(totalCount).keys()].map(label) : null;
+  const labels = label;
 
   const chartHeight = height - (labels ? LABELS_HEIGHT : 0);
 
@@ -128,7 +128,7 @@ function LineChart({
           css="display: block"
           {...props}
         >
-          <g mask="url(#chart-mask)" transform={`translate(0,${GU})`}>
+          <g mask="url(#chart-mask)" transform={`translate(${-1 * GU},${GU})`}>
             {totalCount > 0 && (
               <path
                 d={`
@@ -141,46 +141,38 @@ function LineChart({
                   )}
                 `}
                 stroke={borderColor}
-                strokeWidth="1"
+                strokeWidth="0"
               />
             )}
             {lines.map((line, lineIndex) => {
               return (
                 <g key={`line-plot-${line.id || lineIndex}`}>
-                  <path
-                    d={`
-                    M
-                    ${getX(0)},
-                    ${getY(line.values[0], progress, chartHeight)}
-
-                    ${line.values
-                      .slice(1)
-                      .map((val, index) => {
-                        return `L
-                           ${getX((index + 1) * progress)},
-                           ${getY(val, progress, chartHeight, index)}
-                          `;
-                      })
-                      .join("")}
-                  `}
-                    fill="transparent"
-                    stroke={line.color || color(lineIndex, { lines })}
-                    strokeWidth="2"
-                  />
-                  {renderCheckpoints &&
-                    line.values.slice(1, -1).map((val, index) => {
-                      return (
-                        <circle
-                          key={index}
-                          cx={getX(index + 1) * progress}
-                          cy={getY(val, progress, chartHeight)}
-                          r={dotRadius}
-                          fill="white"
-                          stroke={line.color || color(lineIndex, { lines })}
-                          strokeWidth="1"
+                  {line.values.map((val, index) => {
+                    return (
+                      <>
+                        <rect
+                          x={getRectX(index)}
+                          y={chartHeight - chartHeight * val * progress}
+                          width={(width / FULL_DAY) * GAP}
+                          height={chartHeight * val * progress}
+                          fill={line.color || color(lineIndex, { lines })}
+                          css={`
+                            opacity: ${val};
+                          `}
                         />
-                      );
-                    })}
+                        <rect
+                          x={getRectX(index)}
+                          y={chartHeight - chartHeight * val - GU / 2}
+                          width={(width / FULL_DAY) * GAP}
+                          height={2}
+                          fill={line.color || color(lineIndex, { lines })}
+                          css={`
+                            opacity: 0.5;
+                          `}
+                        />
+                      </>
+                    );
+                  })}
                 </g>
               );
             })}
@@ -190,15 +182,18 @@ function LineChart({
               {labels.map((label, index) => (
                 <text
                   key={index}
-                  x={getX(index)}
+                  x={(width / FULL_DAY) * index + (index ? GU : 0)}
                   y={LABELS_HEIGHT}
                   textAnchor={getLabelPosition(index, labels.length)}
                   fill={labelColor}
                   css={`
+                    position: relative;
                     alignment-baseline: middle;
-                    font-size: 12px;
+                    font-size: 10px;
                     font-weight: 300;
+                    );
                     ${unselectable};
+                    ${index % 2 !== 0 && `font-size: 6px;`}
                   `}
                 >
                   {label}
@@ -206,7 +201,7 @@ function LineChart({
               ))}
             </g>
           )}
-          <g transform={`translate(0,${GU})`}>
+          <g transform={`translate(${2 * GU},${GU})`}>
             {scales &&
               scales.map(({ label, highlightColor }, index) => {
                 const scaleLength = scales.length - 1;
@@ -214,7 +209,7 @@ function LineChart({
                 return (
                   <text
                     key={index}
-                    x={width + OFFSET / 8}
+                    x={width - OFFSET / 4}
                     y={
                       chartHeight - (chartHeight / scaleLength) * index + GU / 2
                     }
@@ -267,7 +262,7 @@ function LineChart({
   );
 }
 
-LineChart.propTypes = {
+BarChart.propTypes = {
   springConfig: PropTypes._spring,
   total: PropTypes.number,
   width: PropTypes.number,
@@ -295,7 +290,7 @@ LineChart.propTypes = {
   color: PropTypes.func,
 };
 
-LineChart.defaultProps = {
+BarChart.defaultProps = {
   springConfig: springs.lazy,
   total: -1,
   height: 200,
@@ -313,4 +308,4 @@ LineChart.defaultProps = {
     `hsl(${(index * (360 / lines.length) + 40) % 360}, 60%, 70%)`,
 };
 
-export default LineChart;
+export default BarChart;
