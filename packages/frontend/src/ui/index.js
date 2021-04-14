@@ -16,6 +16,7 @@ import MultiCircleGraph from "ui/MultiCircleGraph/MultiCircleGraph";
 import LineChart from "ui/LineChart/LineChart";
 import Link from "ui/Link/Link";
 import LoadingRing from "ui/LoadingRing/LoadingRing";
+import Pagination from "ui/Pagination/Pagination";
 import Popover from "ui/Popover/Popover";
 import Spacer from "ui/Spacer/Spacer";
 import Split from "ui/Split/Split";
@@ -49,6 +50,7 @@ export {
   LineChart,
   Link,
   LoadingRing,
+  Pagination,
   Popover,
   Spacer,
   Split,

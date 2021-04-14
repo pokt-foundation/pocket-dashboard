@@ -60,12 +60,6 @@ export default function ApplicationDetail() {
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
   );
-  const { isLatestRelaysLoading, latestRelayData } = useLatestRelays(
-    !env("USE_TEST_APP")
-      ? appData?.freeTierApplicationAccount?.publicKey
-      : TEST_APP_PUB_KEY,
-    0
-  );
   const { isLatestLatencyLoading, latestLatencyData } = useLatestLatencyValues(
     !env("USE_TEST_APP")
       ? appData?.freeTierApplicationAccount?.publicKey
@@ -77,8 +71,7 @@ export default function ApplicationDetail() {
   } = usePreviousSuccessfulRelays(
     !env("USE_TEST_APP")
       ? appData?.freeTierApplicationAccount?.publicKey
-      : TEST_APP_PUB_KEY,
-    0
+      : TEST_APP_PUB_KEY
   );
 
   const appLoading =
@@ -89,7 +82,6 @@ export default function ApplicationDetail() {
     isSuccesfulWeeklyRelaysLoading ||
     isDailyRelayCountLoading ||
     isCurrentSessionRelaysLoading ||
-    isLatestRelaysLoading ||
     isLatestLatencyLoading;
 
   return appLoading ? (
@@ -123,7 +115,6 @@ export default function ApplicationDetail() {
           appOnChainData={appOnChainData}
           currentSessionRelays={currentSessionRelayCount}
           dailyRelayData={dailyRelayCountData}
-          latestRelaysData={latestRelayData}
           previousSuccessfulRelays={previousSucessfulRelaysData}
           successfulRelayData={successfulWeeklyRelaysData}
           weeklyRelayData={weeklyRelaysData}
@@ -141,7 +132,6 @@ export default function ApplicationDetail() {
           appOnChainData={appOnChainData}
           weeklyRelayData={weeklyRelaysData}
           successfulRelayData={successfulWeeklyRelaysData}
-          latestRelaysData={latestRelayData}
         />
       </Route>
       <Route path={`${path}/notifications`}>

@@ -11,6 +11,7 @@ import {
   CircleGraph,
   DataView,
   LineChart,
+  Pagination,
   Spacer,
   Split,
   TextCopy,
@@ -27,6 +28,7 @@ import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
 import SuccessIndicator from "views/Dashboard/ApplicationDetail/SuccessIndicator";
+import { useLatestRelays } from "views/Dashboard/application-hooks";
 import { prefixFromChainId } from "lib/chain-utils";
 import { norm } from "lib/math-utils";
 import { getThresholdsPerStake } from "lib/pocket-utils";
@@ -143,7 +145,6 @@ export default function AppInfo({
   appOnChainData,
   currentSessionRelays,
   dailyRelayData,
-  latestRelaysData,
   previousSuccessfulRelays,
   successfulRelayData,
   weeklyRelayData,
@@ -159,6 +160,9 @@ export default function AppInfo({
 
   const compactMode = within(-1, "medium");
   const { staked_tokens: stakedTokens } = appOnChainData;
+  const {
+    freeTierApplicationAccount: { publicKey },
+  } = appData;
   const { graphThreshold } = getThresholdsPerStake(stakedTokens);
 
   const successRate = useMemo(() => {
@@ -272,9 +276,7 @@ export default function AppInfo({
                   threshold={graphThreshold}
                 />
                 <Spacer size={2 * GU} />
-                <LatestRequests
-                  latestRequests={latestRelaysData.latestRelays}
-                />
+                <LatestRequests publicKey={publicKey} />
               </>
             }
             secondary={
@@ -728,9 +730,20 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   );
 }
 
-function LatestRequests({ latestRequests }) {
+function LatestRequests({ publicKey }) {
+  const [page, setPage] = useState(0);
   const { within } = useViewport();
+  const { isLatestRelaysLoading, latestRelayData } = useLatestRelays(
+    publicKey,
+    page
+  );
+
+  const onPageChange = useCallback((page) => setPage(page), []);
   const [colorsByMethod, countByColor, colorValues] = useMemo(() => {
+    if (isLatestRelaysLoading) {
+      return [];
+    }
+    const { latestRelays: latestRequests } = latestRelayData;
     const colorsByMethod = new Map();
     const countByColor = new Map();
     let id = 0;
@@ -753,7 +766,7 @@ function LatestRequests({ latestRequests }) {
     const colorValues = [...colorsByMethod.values()];
 
     return [colorsByMethod, countByColor, colorValues];
-  }, [latestRequests]);
+  }, [isLatestRelaysLoading, latestRelayData]);
 
   const compactMode = within(-1, "medium");
 
@@ -776,14 +789,14 @@ function LatestRequests({ latestRequests }) {
             height: 100%;
           `}
         >
-          {colorValues.map((val) => {
+          {colorValues?.map((val) => {
             return (
               <div
                 css={`
                   background: ${val};
                   width: 100%;
-                  height: ${(countByColor.get(val) / latestRequests.length) *
-                  100}%;
+                  height: ${(countByColor.get(val) /
+                    latestRelayData?.latestRelays.length ?? 10) * 100}%;
                   box-shadow: ${val} 0px 2px 8px 0px;
                 `}
               />
@@ -798,7 +811,8 @@ function LatestRequests({ latestRequests }) {
             "Result",
             "Time Elapsed",
           ]}
-          entries={latestRequests}
+          entries={latestRelayData?.latestRelays ?? []}
+          status={isLatestRelaysLoading ? "loading" : "default"}
           renderEntry={({
             bytes,
             method,
@@ -825,6 +839,14 @@ function LatestRequests({ latestRequests }) {
               <p>{(elapsedTime * 1000).toFixed(0)}ms</p>,
             ];
           }}
+        />
+        <Pagination
+          pages={10}
+          selected={page}
+          onChange={onPageChange}
+          css={`
+            grid-column: 2;
+          `}
         />
       </div>
     </Box>
