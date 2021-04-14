@@ -14,7 +14,6 @@ import {
   useCurrentSessionRelayCount,
   useDailyRelayCount,
   useLatestLatencyValues,
-  useLatestRelays,
   usePreviousSuccessfulRelays,
   useSucessfulWeeklyRelays,
   useWeeklyAppRelaysInfo,

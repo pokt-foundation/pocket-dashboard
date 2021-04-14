@@ -36,6 +36,7 @@ import { getThresholdsPerStake } from "lib/pocket-utils";
 const MAX_RELAYS_PER_SESSION = 40000;
 const ONE_MILLION = 1000000;
 const ONE_SECOND = 1; // Data for graphs come in second
+const PER_PAGE = 10;
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -743,7 +744,7 @@ function LatestRequests({ publicKey }) {
     if (isLatestRelaysLoading) {
       return [];
     }
-    const { latestRelays: latestRequests } = latestRelayData;
+    const { latestRelays: latestRequests = [] } = latestRelayData;
     const colorsByMethod = new Map();
     const countByColor = new Map();
     let id = 0;
@@ -770,6 +771,10 @@ function LatestRequests({ publicKey }) {
 
   const compactMode = within(-1, "medium");
 
+  const latestRelays = useMemo(() => {
+    return latestRelayData ? latestRelayData.latestRelays : [];
+  }, [latestRelayData]);
+
   return (
     <Box
       title="Latest requests"
@@ -795,8 +800,7 @@ function LatestRequests({ publicKey }) {
                 css={`
                   background: ${val};
                   width: 100%;
-                  height: ${(countByColor.get(val) /
-                    latestRelayData?.latestRelays.length ?? 10) * 100}%;
+                  height: ${(countByColor.get(val) / PER_PAGE) * 100}%;
                   box-shadow: ${val} 0px 2px 8px 0px;
                 `}
               />
@@ -811,7 +815,7 @@ function LatestRequests({ publicKey }) {
             "Result",
             "Time Elapsed",
           ]}
-          entries={latestRelayData?.latestRelays ?? []}
+          entries={latestRelays}
           status={isLatestRelaysLoading ? "loading" : "default"}
           renderEntry={({
             bytes,
@@ -841,7 +845,7 @@ function LatestRequests({ publicKey }) {
           }}
         />
         <Pagination
-          pages={10}
+          pages={PER_PAGE}
           selected={page}
           onChange={onPageChange}
           css={`
