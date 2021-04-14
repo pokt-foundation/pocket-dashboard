@@ -97,15 +97,6 @@ function BarChart({
     [width]
   );
 
-  const getY = useCallback(
-    (percentage, progress, height) => {
-      const padding = dotRadius + 2;
-
-      return height - padding - (height - padding * 2) * percentage * progress;
-    },
-    [dotRadius]
-  );
-
   const getLabelPosition = useCallback((index, length) => {
     if (index === 0) {
       return "start";
