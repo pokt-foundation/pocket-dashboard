@@ -815,6 +815,8 @@ function LatestRequests({ latestRequests }) {
                     height: ${1.5 * GU}px;
                     border-radius: 50% 50%;
                     background: ${colorsByMethod.get(method) ?? FALLBACK_COLOR};
+                    box-shadow: ${colorsByMethod.get(method) ?? FALLBACK_COLOR}
+                      0px 2px 8px 0px;
                   `}
                 />
                 &nbsp;{bytes}B

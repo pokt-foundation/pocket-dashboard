@@ -1,5 +1,7 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useQuery } from "react-query";
+import { GraphQLClient, gql } from "graphql-request";
 import { useViewport } from "use-viewport";
 import Styled from "styled-components/macro";
 import {
@@ -12,10 +14,59 @@ import {
   textStyle,
   useTheme,
   GU,
+  TextCopy,
 } from "ui";
 import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
+import env from "environment";
+import Pagination from "ui/Pagination/Pagination";
+import { shortenAddress } from "lib/pocket-utils";
+
+const FAILED_RELAYS_KEY = "failedRelays";
+const SUCCESSFUL_CODE = 200;
+const SUCCESSFUL_RELAYS_KEY = "successfulRelays";
+const SKIP_AMOUNT = 10;
+
+const gqlClient = new GraphQLClient(env("HASURA_URL"), {
+  headers: {
+    "x-hasura-admin-secret": env("HASURA_SECRET"),
+  },
+});
+
+const LATEST_SUCCESFUL_QUERIES = gql`
+  query LATEST_FILTERED_RELAYS($_eq: String, $_eq1: numeric, $offset: Int) {
+    relay(
+      limit: 10
+      where: { app_pub_key: { _eq: $_eq }, result: { _eq: $_eq1 } }
+      order_by: { timestamp: desc }
+      offset: $offset
+    ) {
+      method
+      result
+      elapsed_time
+      bytes
+      service_node
+    }
+  }
+`;
+
+const LATEST_FAILING_QUERIES = gql`
+  query LATEST_FILTERED_RELAYS($_eq: String, $_eq1: numeric, $offset: Int) {
+    relay(
+      limit: 10
+      where: { app_pub_key: { _eq: $_eq }, result: { _neq: $_eq1 } }
+      order_by: { timestamp: desc }
+      offset: $offset
+    ) {
+      method
+      result
+      elapsed_time
+      bytes
+      service_node
+    }
+  }
+`;
 
 export default function SuccessDetails({
   appOnChainData,
@@ -23,15 +74,65 @@ export default function SuccessDetails({
   successfulRelayData,
   weeklyRelayData,
 }) {
-  const [activeKey, setActiveKey] = useState("successful");
+  const [page, setPage] = useState(0);
+  const [activeKey, setActiveKey] = useState(SUCCESSFUL_RELAYS_KEY);
   const history = useHistory();
   const theme = useTheme();
   const { within } = useViewport();
 
   const compactMode = within(-1, "medium");
 
-  const onSuccessfulClick = useCallback(() => setActiveKey("successful"), []);
-  const onFailedClick = useCallback(() => setActiveKey("failed"), []);
+  const { public_key: publicKey } = appOnChainData;
+
+  const { isLoading, isError, data } = useQuery(
+    [`user/applications/${publicKey}/success-details`, page],
+    async function getFilteredRelays() {
+      if (!publicKey) {
+        return [];
+      }
+
+      console.log(page);
+
+      try {
+        const { relay: successfulRelays } = await gqlClient.request(
+          LATEST_SUCCESFUL_QUERIES,
+          {
+            _eq: publicKey,
+            _eq1: SUCCESSFUL_CODE,
+            offset: page * SKIP_AMOUNT,
+          }
+        );
+
+        const { relay: failedRelays } = await gqlClient.request(
+          LATEST_FAILING_QUERIES,
+          {
+            _eq: publicKey,
+            _eq1: SUCCESSFUL_CODE,
+            offset: page * SKIP_AMOUNT,
+          }
+        );
+
+        console.log(successfulRelays, failedRelays, "boom");
+
+        return { successfulRelays, failedRelays };
+      } catch (err) {
+        console.log(Object.entries(err));
+      }
+    },
+    {
+      keepPreviousData: true,
+    }
+  );
+
+  useEffect(() => {
+    console.log(isLoading, isError, data, "stuff");
+  }, [isLoading, isError, data]);
+
+  const onSuccessfulClick = useCallback(
+    () => setActiveKey(SUCCESSFUL_RELAYS_KEY),
+    []
+  );
+  const onFailedClick = useCallback(() => setActiveKey(FAILED_RELAYS_KEY), []);
   const successRate = useMemo(() => {
     return weeklyRelayData.weeklyAppRelays === 0
       ? 0
@@ -45,6 +146,15 @@ export default function SuccessDetails({
           successfulRelayData.successfulWeeklyRelays) /
           weeklyRelayData.weeklyAppRelays;
   }, [successfulRelayData, weeklyRelayData]);
+  const onPageChange = useCallback((page) => setPage(page), []);
+
+  const displayData = useMemo(() => {
+    if (activeKey === SUCCESSFUL_RELAYS_KEY) {
+      return data?.successfulRelays ?? [];
+    } else {
+      return data?.failedRelays ?? [];
+    }
+  }, [activeKey, data]);
 
   return (
     <FloatUp
@@ -179,23 +289,68 @@ export default function SuccessDetails({
                 >
                   <Spacer size={2 * GU} />
                   <Tab
-                    active={activeKey === "successful"}
+                    active={activeKey === SUCCESSFUL_RELAYS_KEY}
                     onClick={onSuccessfulClick}
                   >
                     Successful requests
                   </Tab>
-                  <Tab active={activeKey === "failed"} onClick={onFailedClick}>
+                  <Tab
+                    active={activeKey === FAILED_RELAYS_KEY}
+                    onClick={onFailedClick}
+                  >
                     Failed requests
                   </Tab>
                   <Spacer size={2 * GU} />
                 </div>
                 <Spacer size={5 * GU} />
                 <DataView
-                  fields={["Request type", "Bytes transferred", "Result"]}
-                  entries={latestRelaysData.latestRelays}
-                  renderEntry={({ bytes, method, result }) => {
-                    return [<p>{method}</p>, <p>{bytes}B</p>, <p>{result}</p>];
+                  fields={[
+                    "",
+                    "Request type",
+                    "Bytes transferred",
+                    "Service Node",
+                  ]}
+                  entries={displayData}
+                  renderEntry={({
+                    bytes,
+                    method,
+                    service_node: serviceNode,
+                  }) => {
+                    return [
+                      <div
+                        css={`
+                          display: inline-block;
+                          width: ${1.5 * GU}px;
+                          height: ${1.5 * GU}px;
+                          border-radius: 50% 50%;
+                          background: ${activeKey === SUCCESSFUL_RELAYS_KEY
+                            ? theme.positive
+                            : theme.negative};
+                          box-shadow: ${activeKey === SUCCESSFUL_RELAYS_KEY
+                              ? theme.positive
+                              : theme.negative}
+                            0px 2px 8px 0px;
+                        `}
+                      />,
+                      <p>{method}</p>,
+                      <p>{bytes}B</p>,
+                      <TextCopy
+                        value={shortenAddress(serviceNode, 16)}
+                        css={`
+                          width: 100%;
+                          > div > input {
+                            background: transparent;
+                          }
+                        `}
+                      />,
+                    ];
                   }}
+                  status={isLoading ? "loading" : "default"}
+                />
+                <Pagination
+                  pages={10}
+                  selected={page}
+                  onChange={onPageChange}
                 />
               </Box>
             </>
@@ -233,6 +388,7 @@ function Tab({ active, children, onClick }) {
           background: #091828;
           border-top: 2px solid ${theme.accent};
           color: white;
+          transition: all 0.080s ease-in;
         `}
       `}
     >
