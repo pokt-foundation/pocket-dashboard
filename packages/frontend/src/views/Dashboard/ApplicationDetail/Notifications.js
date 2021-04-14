@@ -21,6 +21,7 @@ import { getThresholdsPerStake } from "lib/pocket-utils";
 import env from "environment";
 
 const MAX_RELAYS = 1000000;
+const GRAPH_SIZE = 130;
 
 const DEFAULT_PERCENTAGES = {
   quarter: false,
@@ -192,7 +193,7 @@ export default function Notifications({
                   <GraphContainer>
                     <CircleGraph
                       value={totalDailyRelays / MAX_RELAYS}
-                      size={125}
+                      size={GRAPH_SIZE}
                       color={averageUsageColor}
                     />
                     <Spacer size={2 * GU} />
@@ -204,21 +205,21 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("title3")}
+                          ${textStyle("body2")}
                         `}
                       >
-                        {Intl.NumberFormat().format(
-                          totalDailyRelays.toFixed(0)
-                        )}{" "}
-                        Relays
                         <span
                           css={`
                             display: block;
-                            ${textStyle("title4")}
+                            ${textStyle("title3")}
                           `}
                         >
                           Average usage
                         </span>
+                        {Intl.NumberFormat().format(
+                          totalDailyRelays.toFixed(0)
+                        )}{" "}
+                        Relays
                       </h3>
                     </Stack>
                   </GraphContainer>
@@ -226,6 +227,7 @@ export default function Notifications({
                   <GraphContainer>
                     <CircleGraph
                       value={highestDailyAmount / MAX_RELAYS}
+                      size={GRAPH_SIZE}
                       color={maxUsageColor}
                     />
                     <Spacer size={1 * GU} />
@@ -237,18 +239,18 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("title4")}
+                          ${textStyle("body2")}
                         `}
                       >
-                        {Intl.NumberFormat().format(highestDailyAmount)} Relays
                         <span
                           css={`
                             display: block;
-                            ${textStyle("body2")}
+                            ${textStyle("title3")}
                           `}
                         >
                           Max usage
                         </span>
+                        {Intl.NumberFormat().format(highestDailyAmount)} Relays
                       </h3>
                     </Stack>
                   </GraphContainer>
@@ -256,6 +258,7 @@ export default function Notifications({
                   <GraphContainer>
                     <CircleGraph
                       value={lowestDailyAmount / MAX_RELAYS}
+                      size={GRAPH_SIZE}
                       color={minUsageColor}
                     />
                     <Spacer size={1 * GU} />
@@ -267,18 +270,18 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("title4")}
+                          ${textStyle("body2")}
                         `}
                       >
-                        {Intl.NumberFormat().format(lowestDailyAmount)} Relays
                         <span
                           css={`
                             display: block;
-                            ${textStyle("body2")}
+                            ${textStyle("title3")}
                           `}
                         >
                           Min usage
                         </span>
+                        {Intl.NumberFormat().format(lowestDailyAmount)} Relays
                       </h3>
                     </Stack>
                   </GraphContainer>

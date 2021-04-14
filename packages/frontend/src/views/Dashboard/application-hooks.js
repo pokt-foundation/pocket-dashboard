@@ -145,6 +145,22 @@ const LATEST_RELAYS_QUERY = gql`
   }
 `;
 
+const LATEST_LATENCY_VALUES_QUERY = gql`
+  query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY($_eq: String, $_gte: timestamptz) {
+    relay_app_hourly(
+      where: {
+        app_pub_key: { _eq: $_eq }
+        bucket: { _gte: $_gte }
+        elapsed_time: { _lte: "3" }
+      }
+      order_by: { bucket: desc }
+    ) {
+      elapsed_time
+      bucket
+    }
+  }
+`;
+
 export function useUserApplications() {
   const {
     isLoading: isAppsLoading,
@@ -574,5 +590,68 @@ export function usePreviousSuccessfulRelays(appPubKey) {
     isPreviousSuccessfulRelaysLoading,
     isPreviousSuccessfulRelaysError,
     previousSucessfulRelaysData,
+  };
+}
+
+export function useLatestLatencyValues(appPubKey) {
+  const {
+    isError: isLatestLatencyError,
+    isLoading: isLatestLatencyLoading,
+    data: latestLatencyData,
+  } = useQuery(
+    `user/applications/${appPubKey}/latest-latency-values`,
+    async function getWeeklyAppRelaysInfo() {
+      if (!appPubKey) {
+        return null;
+      }
+
+      dayjs.extend(dayJsutcPlugin);
+
+      const dayAgo = dayjs.utc().subtract(24, "hour");
+
+      const formattedTimestamp = `${dayAgo.year()}-0${
+        dayAgo.month() + 1
+      }-${dayAgo.date()}T${dayAgo.hour() + 1}:00:00+00:00`;
+
+      try {
+        const res = await gqlClient.request(LATEST_LATENCY_VALUES_QUERY, {
+          _eq: appPubKey,
+          _gte: formattedTimestamp,
+        });
+
+        const { relay_app_hourly: rawHourlyLatency = [] } = res;
+
+        const hourlyLatency = new Map();
+
+        for (const { bucket, elapsed_time: elapsedTime } of rawHourlyLatency) {
+          if (!hourlyLatency.has(bucket)) {
+            hourlyLatency.set(bucket, elapsedTime);
+          } else {
+            const currentCount = hourlyLatency.get(bucket);
+
+            hourlyLatency.set(
+              bucket,
+              (Number(currentCount) + Number(elapsedTime)) / 2
+            );
+          }
+        }
+
+        const processedHourlyLatency = [];
+
+        for (const [bucket, hourlyLatencyAvg] of hourlyLatency.entries()) {
+          processedHourlyLatency.push({ bucket, latency: hourlyLatencyAvg });
+        }
+
+        return processedHourlyLatency.reverse();
+      } catch (err) {
+        console.log(err, "rip");
+      }
+    }
+  );
+
+  return {
+    isLatestLatencyError,
+    isLatestLatencyLoading,
+    latestLatencyData,
   };
 }
