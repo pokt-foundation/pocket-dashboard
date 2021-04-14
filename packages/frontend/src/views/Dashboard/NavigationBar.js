@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import { useMutation } from "react-query";
 import { useViewport } from "use-viewport";
 import "styled-components/macro";
@@ -7,6 +7,7 @@ import {
   ButtonBase,
   ButtonIcon,
   IconCog,
+  Link,
   Popover,
   textStyle,
   useTheme,
@@ -17,7 +18,10 @@ import env from "environment";
 import axios from "axios";
 
 export default function NavigationBar() {
+  const [title, setTitle] = useState("Pocket Dashboard");
   const history = useHistory();
+  const location = useLocation();
+  const theme = useTheme();
   const { mutate: onLogout } = useMutation(async function logout() {
     const path = `${env("BACKEND_URL")}/api/users/logout`;
 
@@ -36,6 +40,17 @@ export default function NavigationBar() {
     }
   });
 
+  useEffect(() => {
+    const { pathname } = location;
+
+    // TODO: Actually sync this with overall app state
+    if (pathname === "/create") {
+      setTitle("Create new application");
+    } else {
+      setTitle("Pocket Dashboard");
+    }
+  }, [location]);
+
   return (
     <nav
       css={`
@@ -45,15 +60,15 @@ export default function NavigationBar() {
         align-items: center;
       `}
     >
-      <span
+      <h1
         css={`
           display: inline-block;
           flex-grow: 1;
           ${textStyle("title1")}
         `}
       >
-        Pocket Dashboard
-      </span>
+        <span>{title}</span>
+      </h1>
       <ul
         css={`
           list-style: none;
@@ -68,8 +83,16 @@ export default function NavigationBar() {
           }
         `}
       >
-        <li>Support</li>
-        <li>Community</li>
+        <li>
+          <Link
+            href="https://discord.com/invite/uYs6Esum3r"
+            css={`
+              color: ${theme.content};
+            `}
+          >
+            Community
+          </Link>
+        </li>
         <li>
           <SettingsButton onLogout={onLogout} />
         </li>
