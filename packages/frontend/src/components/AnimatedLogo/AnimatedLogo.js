@@ -8,8 +8,8 @@ const DONE_TRANSITION_DURATION = 400;
 // That comment above was written by @bpierre,
 // and I can say I found this number in the same way :D
 const DASH_ARRAY = 1100;
-const GRADIENT_COLOR_START = "#2CF4E1";
-const GRADIENT_COLOR_STOP = "#2CB2E1";
+const GRADIENT_COLOR_START = "#31A1D2";
+const GRADIENT_COLOR_STOP = "#31A1D2";
 const ANIM_FUNCTION = "cubic-bezier(0.7, 0, 0.3, 1)";
 const GRADIENT_ID = "loading-screen-logo-gradient";
 
