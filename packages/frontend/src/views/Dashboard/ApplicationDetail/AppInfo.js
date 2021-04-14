@@ -173,11 +173,11 @@ export default function AppInfo({
       : previousSuccessfulRelays.successfulWeeklyRelays /
           previousSuccessfulRelays.previousTotalRelays;
   }, [previousSuccessfulRelays]);
+
   const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
     () => formatDailyRelaysForGraphing(dailyRelayData, graphThreshold),
     [dailyRelayData, graphThreshold]
   );
-
   const {
     labels: latencyLabels = [],
     barValues = [],
@@ -610,12 +610,14 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
   );
 }
 
-function UsageTrends({ chartLabels, chartLines, sessionRelays, threshold }) {
+function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
     chartLines,
   ]);
   const usageColor = useUsageColor(sessionRelays / ONE_MILLION);
   const theme = useTheme();
+
+  console.log(chartLabels, chartLines, "hmmmm");
 
   return (
     <Box>
