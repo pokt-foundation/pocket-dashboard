@@ -275,6 +275,16 @@ export default function Login() {
                   {repeatedPasswordError.message}
                 </p>
               )}
+              <Spacer size={1 * GU} />
+              <p
+                css={`
+                  ${textStyle("body4")}
+                  color: ${theme.surfaceContentSecondary};
+                `}
+              >
+                A good password has at least 8 characters and at least 1
+                alphanumeric symbol.
+              </p>
             </Field>
             <ul
               css={`
