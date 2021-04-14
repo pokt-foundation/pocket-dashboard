@@ -7,6 +7,7 @@ import { useQuery } from "react-query";
 import env from "environment";
 
 const BUCKETS_PER_HOUR = 2;
+const OFFSET = 10;
 
 const gqlClient = new GraphQLClient(env("HASURA_URL"), {
   headers: {
@@ -468,7 +469,7 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
         const res = await gqlClient.request(LATEST_RELAYS_QUERY, {
           _eq: appPubKey,
           limit,
-          offset: page,
+          offset: page * OFFSET,
         });
 
         const { relay: latestRelays } = res;
@@ -477,6 +478,9 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
       } catch (err) {
         console.log(err, "rip");
       }
+    },
+    {
+      keepPreviousData: true,
     }
   );
 
