@@ -617,8 +617,6 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   const usageColor = useUsageColor(sessionRelays / ONE_MILLION);
   const theme = useTheme();
 
-  console.log(chartLabels, chartLines, "hmmmm");
-
   return (
     <Box>
       <div
