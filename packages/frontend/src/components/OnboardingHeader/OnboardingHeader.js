@@ -27,11 +27,10 @@ export default function OnboardingHeader() {
         <img
           src={PoktLogo}
           alt="Pocket"
-          width={23 * GU}
-          height="auto"
+          width="100%"
+          height="66"
           css={`
-            max-width: ${23.5 * GU};
-            height: auto;
+            max-width: ${23.5 * GU}px;
           `}
         />
         <h1
