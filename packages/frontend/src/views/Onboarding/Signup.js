@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useMutation } from "react-query";
 import axios from "axios";
 import { isEmail, isStrongPassword } from "validator";
-import "styled-components/macro";
+import styled from "styled-components/macro";
 import { useViewport } from "use-viewport";
 import {
   Button,
@@ -20,6 +20,11 @@ import {
 import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
 import env from "environment";
 import PoktShape from "assets/poktshape.png";
+
+const InlineLink = styled(Link)`
+  display: inline;
+  vertical-align: bottom;
+`;
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -326,23 +331,13 @@ export default function Login() {
                 `}
               >
                 I Agree to the Pocket Dashboard's{" "}
-                <Link
-                  href="https://dashboard.pokt.network/support/terms-of-service"
-                  css={`
-                    display: inline;
-                  `}
-                >
+                <InlineLink href="https://dashboard.pokt.network/support/terms-of-service">
                   T. &amp; C.
-                </Link>{" "}
+                </InlineLink>{" "}
                 and{" "}
-                <Link
-                  href="https://dashboard.pokt.network/support/privacy-policy"
-                  css={`
-                    display: inline;
-                  `}
-                >
+                <InlineLink href="https://dashboard.pokt.network/support/privacy-policy">
                   Privacy Policy
-                </Link>
+                </InlineLink>
               </span>
             </label>
             <Button
