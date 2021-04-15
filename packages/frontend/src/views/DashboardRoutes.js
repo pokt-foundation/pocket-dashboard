@@ -1,11 +1,14 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import { useViewport } from "use-viewport";
+import { ErrorBoundary } from "@sentry/react";
 import "styled-components/macro";
+import { useTheme } from "ui";
 import Create from "views/Dashboard/Create/Create";
 import Dashboard from "views/Dashboard/Dashboard";
-import NetworkStatus from "views/Dashboard/Network/NetworkStatus";
+import Fallback from "views/Fallback";
 import ForgotPassword from "views/Onboarding/ForgotPassword";
+import NetworkStatus from "views/Dashboard/Network/NetworkStatus";
 import MyApp from "views/Dashboard/ApplicationDetail/ApplicationDetail";
 import NewPassword from "views/Onboarding/NewPassword";
 import Login from "views/Onboarding/Login";
@@ -14,6 +17,7 @@ import Validate from "views/Onboarding/Validate";
 
 export default function DashboardRoutes() {
   const { within } = useViewport();
+  const theme = useTheme();
 
   const compactMode = within(-1, "medium");
 
@@ -30,6 +34,7 @@ export default function DashboardRoutes() {
         min-height: 100vh;
         height: 100%;
         overflow-y: scroll;
+        background: ${theme.background};
         /* We also wanna "trap" any absolute elements so that they don't end up behind the div. */
         display: relative;
         /* ${!compactMode &&
@@ -40,37 +45,42 @@ export default function DashboardRoutes() {
         overflow-x: hidden;
       `}
     >
-      <Switch>
-        <Route exact path={`/`}>
-          <Login />
-        </Route>
-        <Route exact path={`/signup`}>
-          <Signup />
-        </Route>
-        <Route exact path={`/login`}>
-          <Login />
-        </Route>
-        <Route exact path={`/validate`}>
-          <Validate />
-        </Route>
-        <Route exact path={`/forgotpassword`}>
-          <ForgotPassword />
-        </Route>
-        <Route exact path={`/newpassword`}>
-          <NewPassword />
-        </Route>
-        <Dashboard>
-          <Route exact path={`/home`}>
-            <NetworkStatus />
+      <ErrorBoundary fallback={Fallback} showDialog>
+        <Switch>
+          <Route exact path={`/`}>
+            <Login />
           </Route>
-          <Route path={`/app/:appId`}>
-            <MyApp />
+          <Route exact path={`/signup`}>
+            <Signup />
           </Route>
-          <Route exact path={`/create`}>
-            <Create />
+          <Route exact path={`/login`}>
+            <Login />
           </Route>
-        </Dashboard>
-      </Switch>
+          <Route exact path={`/validate`}>
+            <Validate />
+          </Route>
+          <Route exact path={`/forgotpassword`}>
+            <ForgotPassword />
+          </Route>
+          <Route exact path={`/newpassword`}>
+            <NewPassword />
+          </Route>
+          <Route exact path={`/fallback`}>
+            <Fallback />
+          </Route>
+          <Dashboard>
+            <Route exact path={`/home`}>
+              <NetworkStatus />
+            </Route>
+            <Route path={`/app/:appId`}>
+              <MyApp />
+            </Route>
+            <Route exact path={`/create`}>
+              <Create />
+            </Route>
+          </Dashboard>
+        </Switch>
+      </ErrorBoundary>
     </div>
   );
 }
