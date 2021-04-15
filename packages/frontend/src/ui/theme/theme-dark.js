@@ -3,6 +3,7 @@ export default {
   _appearance: "dark",
 
   background: "#00182a",
+  dashboardBackground: "#051829",
   backgroundInverted: "#ffffff",
   border: "#2c3a58",
   overlay: "#28334c",

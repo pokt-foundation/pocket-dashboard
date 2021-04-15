@@ -7,7 +7,7 @@ import "styled-components/macro";
 import { ButtonBase, Spacer, useTheme, springs, GU, RADIUS } from "ui";
 import IconApp from "components/MenuPanel/IconApp";
 import IconNetwork from "components/MenuPanel/IconNetwork";
-import PocketLogo from "assets/pnlogo.png";
+import PocketLogo from "assets/pnlogo.svg";
 
 const CHILD_INSTANCE_HEIGHT = 4 * GU;
 
@@ -96,27 +96,44 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
     !compactMode && (
       <div
         css={`
-          width: ${17 * GU}px;
+          width: ${18 * GU}px;
           height: 100vh;
           padding: ${2 * GU}px 0;
-          background: ${theme.backgroundInverted};
-          border-radius: 0px 20px 20px 0;
           flex-grow: 0;
         `}
       >
-        <ButtonBase
+        <div
           css={`
-            width: 100%;
-            position: relative;
-            &:active {
-              top: 1px;
-            }
+            width: ${17 * GU}px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: ${2 * GU}px 0;
+            background: ${theme.backgroundInverted};
+            border-radius: 0px 20px 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 0;
           `}
         >
-          <img src={PocketLogo} alt="Menu Icon" />
-        </ButtonBase>
-        <Spacer size={5 * GU} />
-        {instanceGroups.map((group) => renderInstanceGroup(group))}
+          <ButtonBase
+            css={`
+              width: ${6 * GU}px;
+              height: ${6 * GU}px;
+              position: relative;
+              justify-self: center;
+              &:active {
+                top: 1px;
+              }
+            `}
+          >
+            <img src={PocketLogo} alt="Menu Icon" />
+          </ButtonBase>
+          <Spacer size={5 * GU} />
+          {instanceGroups.map((group) => renderInstanceGroup(group))}
+        </div>
       </div>
     )
   );
