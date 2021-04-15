@@ -12,7 +12,7 @@ export const ENV_VARS = {
     return process.env.ALLOWED_DOMAINS?.split(",") ?? ["http://localhost:3000"];
   },
   enable_workers() {
-    return Boolean(process.env.ENABLE_WORKERS) || false;
+    return false; //Boolean(process.env.ENABLE_WORKERS) || false;
   },
   HASURA_SECRET() {
     return process.env.HASURA_ADMIN_SECRET || "";
