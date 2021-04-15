@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { PocketAAT } from "@pokt-network/pocket-js";
 import PreStakedApp from "models/PreStakedApp";
-import { chains } from "workers/config";
+import { chains, FREE_TIER_STAKE_AMOUNT } from "workers/config";
 import {
   createAppStakeTx,
   createUnlockedAccount,
@@ -11,8 +11,6 @@ import {
 } from "lib/pocket";
 import { APPLICATION_STATUSES } from "application-statuses";
 import env from "environment";
-
-const FREE_TIER_STAKE_AMOUNT = 2495010000n;
 
 async function createApplicationAndFund(ctx) {
   const {

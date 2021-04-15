@@ -49,15 +49,20 @@ const MAIN_CHAINS = {
   //   id: "0024",
   //   limit: 2,
   // },
-  // ETHEREUM_MAINNET_ARCHIVAL: {
-  //   ticker: "ETH",
-  //   id: "0022",
-  //   limit: 2,
-  // },
+  ETHEREUM_MAINNET_ARCHIVAL: {
+    ticker: "ETH",
+    id: "0022",
+    limit: 3,
+  },
+  FUSE_FULL: {
+    ticker: "FUSE",
+    id: "0005",
+    limit: 1,
+  },
   ETHEREUM_MAINNET_FULL: {
     ticker: "ETH",
     id: "0021",
-    limit: 5,
+    limit: 10,
   },
   ETHEREUM_RINKEBY_FULL: {
     ticker: "ETH",
@@ -72,7 +77,7 @@ const MAIN_CHAINS = {
   POCKET_MAINNET: {
     ticker: "POKT",
     id: "0001",
-    limit: 3,
+    limit: 1,
   },
 };
 
@@ -88,6 +93,7 @@ function getChainsByEnvironment() {
   }
 }
 
+export const FREE_TIER_STAKE_AMOUNT = 24950100000n;
 export const chains = getChainsByEnvironment();
 
 /**
