@@ -5,8 +5,9 @@ import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import {
   ButtonBase,
-  ButtonIcon,
+  DiscButton,
   IconCog,
+  IconPerson,
   Link,
   Popover,
   textStyle,
@@ -114,22 +115,27 @@ function SettingsButton({ onLogout }) {
   return (
     <React.Fragment>
       <div ref={containerRef}>
-        <ButtonIcon
+        <DiscButton
           element="div"
           onClick={handleToggle}
           css={`
             width: ${4.25 * GU}px;
+            height: ${4.25 * GU}px;
+            padding: ${0.5 * GU}px;
+            background: ${theme.backgroundInverted};
             height: 100%;
-            border-radius: 0;
+            border-radius: 50% 50%;
           `}
-          label="Global preferences"
+          label="Preferences"
         >
-          <IconCog
+          <IconPerson
             css={`
-              color: ${theme.hint};
+              color: ${theme.background};
+              width: ${3.25 * GU}px;
+              height: ${3.25 * GU}px;
             `}
           />
-        </ButtonIcon>
+        </DiscButton>
       </div>
       <Popover
         closeOnOpenerFocus
@@ -161,7 +167,7 @@ function SettingsButton({ onLogout }) {
               color: ${theme.surfaceContentSecondary};
             `}
           >
-            Settings
+            Preferences
           </li>
           <Item onClick={() => onLogout()} icon={IconCog} label="Logout" />
         </ul>
@@ -170,7 +176,7 @@ function SettingsButton({ onLogout }) {
   );
 }
 
-function Item({ icon, label, onClick, lastItem }) {
+function Item({ icon, label, onClick }) {
   const theme = useTheme();
 
   return (

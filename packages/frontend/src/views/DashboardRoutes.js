@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import { useViewport } from "use-viewport";
+import "styled-components/macro";
 import Create from "views/Dashboard/Create/Create";
 import Dashboard from "views/Dashboard/Dashboard";
 import NetworkStatus from "views/Dashboard/Network/NetworkStatus";
@@ -27,13 +28,15 @@ export default function DashboardRoutes() {
         */
         min-width: 100vw;
         min-height: 100vh;
+        height: 100%;
+        overflow-y: scroll;
         /* We also wanna "trap" any absolute elements so that they don't end up behind the div. */
         display: relative;
-        ${!compactMode &&
+        /* ${!compactMode &&
         `
           max-width: 100vw;
           max-height: 100vh;
-        `}
+        `} */
         overflow-x: hidden;
       `}
     >
