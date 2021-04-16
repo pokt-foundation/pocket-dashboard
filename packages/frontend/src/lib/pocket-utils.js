@@ -10,6 +10,7 @@ const STAKING_STATUSES_LABELS = {
   2: "Staked",
 };
 
+const TWO_MILLION_RELAYS_STAKE = 50000000000;
 const ONE_MILLION_RELAYS_STAKE = 24950100000;
 const ONE_HUNDRED_THOUSAND_RELAYS_STAKE = 2495010000;
 
@@ -30,6 +31,14 @@ const THRESHOLDS_PER_STAKE = new Map([
       legibleMaxRelays: "100K",
     },
   ],
+  [
+    TWO_MILLION_RELAYS_STAKE,
+    {
+      maxRelays: 2000000,
+      graphThreshold: 2500000,
+      legibleMaxRelays: "2M",
+    },
+  ],
 ]);
 
 export function getStakingStatus(status) {
@@ -37,6 +46,7 @@ export function getStakingStatus(status) {
 }
 
 export function getThresholdsPerStake(stake) {
+  console.log(stake);
   if (!THRESHOLDS_PER_STAKE.has(stake)) {
     throw new Error("Unknown stake");
   }
