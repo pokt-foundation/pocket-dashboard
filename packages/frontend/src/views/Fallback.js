@@ -1,17 +1,15 @@
 import React from "react";
 import "styled-components/macro";
-import { Button, GU, Link, Spacer, textStyle, useTheme } from "ui";
+import { Button, GU, Link, Spacer, textStyle } from "ui";
 import Box from "components/Box/Box";
 
 export default function Fallback() {
-  const theme = useTheme();
-
   return (
     <div
       css={`
         width: 100vw;
         height: 100vh;
-        background: ${theme.background};
+        background: #00182a;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -22,11 +20,13 @@ export default function Fallback() {
         title="An error has ocurred."
         css={`
           max-width: ${87 * GU}px;
+          background: #192332;
         `}
       >
         <p
           css={`
             ${textStyle("body2")}
+            color: #fff;
           `}
         >
           Oh no! Something has gone wrong while you were using our Dashboard.
