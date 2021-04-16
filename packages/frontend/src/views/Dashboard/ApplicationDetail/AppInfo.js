@@ -848,7 +848,7 @@ function LatestRequests({ publicKey }) {
             elapsed_time: elapsedTime,
           }) => {
             return [
-              <p>{method}</p>,
+              <p>{method ? method : "Unknown"}</p>,
               <p>
                 <div
                   css={`
