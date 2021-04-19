@@ -13,6 +13,7 @@ import {
   Split,
   textStyle,
   useTheme,
+  useToast,
   GU,
   TextCopy,
 } from "ui";
@@ -78,6 +79,7 @@ export default function SuccessDetails({
   const [activeKey, setActiveKey] = useState(SUCCESSFUL_RELAYS_KEY);
   const history = useHistory();
   const theme = useTheme();
+  const toast = useToast();
   const { within } = useViewport();
 
   const compactMode = within(-1, "medium");
@@ -336,6 +338,7 @@ export default function SuccessDetails({
                       <p>{bytes}B</p>,
                       <TextCopy
                         value={shortenAddress(serviceNode, 16)}
+                        onCopy={() => toast("Node address copied to cliboard")}
                         css={`
                           width: 100%;
                           > div > input {

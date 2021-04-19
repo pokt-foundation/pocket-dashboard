@@ -192,7 +192,7 @@ export default function Notifications({
                 <Inline>
                   <GraphContainer>
                     <CircleGraph
-                      value={totalDailyRelays / MAX_RELAYS}
+                      value={Math.min(totalDailyRelays / MAX_RELAYS, 1)}
                       size={GRAPH_SIZE}
                       color={averageUsageColor}
                     />
@@ -226,7 +226,7 @@ export default function Notifications({
                   <Spacer size={2 * GU} />
                   <GraphContainer>
                     <CircleGraph
-                      value={highestDailyAmount / MAX_RELAYS}
+                      value={Math.min(highestDailyAmount / MAX_RELAYS, 1)}
                       size={GRAPH_SIZE}
                       color={maxUsageColor}
                     />
