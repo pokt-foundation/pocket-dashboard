@@ -68,6 +68,14 @@ function useUsageColor(usage) {
   return theme.negative;
 }
 
+function useSuccessRateColor(successRate) {
+  if (successRate >= 0.8) {
+    return ["#034200", "#55b02b"];
+  } else {
+    return ["#881d26", "#ff0003"];
+  }
+}
+
 function formatDailyRelaysForGraphing(
   dailyRelays = [],
   upperBound = ONE_MILLION
@@ -164,7 +172,7 @@ export default function AppInfo({
   const {
     freeTierApplicationAccount: { publicKey },
   } = appData;
-  const { graphThreshold } = getThresholdsPerStake(stakedTokens);
+  const { graphThreshold, maxRelays } = getThresholdsPerStake(stakedTokens);
 
   const successRate = useMemo(() => {
     return weeklyRelayData.weeklyAppRelays === 0
@@ -201,7 +209,16 @@ export default function AppInfo({
     return diff >= 7;
   }, [appData]);
 
-  const exceedsMaxRelays = useMemo(() => false, []);
+  const exceedsMaxRelays = useMemo(() => {
+    const todaysRelays = dailyRelayData[dailyRelayData.length - 1];
+    const { dailyRelays = 0 } = todaysRelays;
+
+    return dailyRelays >= maxRelays;
+  }, [dailyRelayData, maxRelays]);
+
+  const exceedsSessionRelays = useMemo(() => {
+    return currentSessionRelays >= MAX_RELAYS_PER_SESSION;
+  }, [currentSessionRelays]);
 
   const onCloseNetworkModal = useCallback(
     () => setNetworkModalVisible(false),
@@ -242,7 +259,21 @@ export default function AppInfo({
                       You should extend your app relays limit to keep the
                       service according to the demand. Contact our sales team to
                       find the best solution for you and keep your
-                      onfrastructure running.
+                      infrastructure running.
+                    </Banner>
+                    <Spacer size={2 * GU} />
+                  </>
+                )}
+                {!exceedsMaxRelays && exceedsSessionRelays && (
+                  <>
+                    <Banner
+                      mode="error"
+                      title="Your application has reached the max limit of relays per session"
+                    >
+                      You should extend your app relays limit to keep the
+                      service according to the demand. Contact our sales team to
+                      find the best solution for you and keep your
+                      infrastructure running.
                     </Banner>
                     <Spacer size={2 * GU} />
                   </>
@@ -465,6 +496,9 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
     number: Math.min(successRate * 100, 100),
     from: { number: 0 },
   });
+  const [primarySuccessColor, secondarySuccessColor] = useSuccessRateColor(
+    successRate
+  );
   const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } });
   const successRateDelta = useMemo(
     () => (((successRate - previousSuccessRate) / 1) * 100).toFixed(2),
@@ -484,7 +518,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
       <div
         css={`
           position: relative;
-          background: #034200;
+          background: ${primarySuccessColor};
           height: ${12 * GU}px;
           border-radius: ${1 * GU}px ${1 * GU}px 0 0;
           display: flex;
@@ -504,7 +538,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
             position: absolute;
             bottom: 0;
             width: 100%;
-            background: #55b02b;
+            background: ${secondarySuccessColor};
           `}
           style={numberIndicatorProps}
         />
@@ -641,7 +675,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
     chartLines,
   ]);
-  const usageColor = useUsageColor(sessionRelays / ONE_MILLION);
+  const usageColor = useUsageColor(sessionRelays / MAX_RELAYS_PER_SESSION);
   const theme = useTheme();
 
   return (
@@ -679,7 +713,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
           </h3>
           <Spacer size={2 * GU} />
           <CircleGraph
-            value={sessionRelays / MAX_RELAYS_PER_SESSION}
+            value={Math.min(1, sessionRelays / MAX_RELAYS_PER_SESSION)}
             size={125}
             color={usageColor}
           />

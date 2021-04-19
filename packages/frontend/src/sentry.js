@@ -6,6 +6,8 @@ export const sentryEnabled = Boolean(env("SENTRY_DSN"));
 
 export default function initializeSentry() {
   if (sentryEnabled) {
+    console.log("SENTRY ENABLED");
+
     initSentry({
       dsn: env("SENTRY_DSN"),
       environment: env("PROD") ? "production" : "development",

@@ -12,11 +12,20 @@ const STAKING_STATUSES_LABELS = {
 
 const TWO_MILLION_RELAYS_STAKE = 50000000000;
 const ONE_MILLION_RELAYS_STAKE = 24950100000;
+const ONE_MILLION_FLAT_RELAYS_STAKE = 25000000000;
 const ONE_HUNDRED_THOUSAND_RELAYS_STAKE = 2495010000;
 
 const THRESHOLDS_PER_STAKE = new Map([
   [
     ONE_MILLION_RELAYS_STAKE,
+    {
+      maxRelays: 1000000,
+      graphThreshold: 1250000,
+      legibleMaxRelays: "1M",
+    },
+  ],
+  [
+    ONE_MILLION_FLAT_RELAYS_STAKE,
     {
       maxRelays: 1000000,
       graphThreshold: 1250000,
@@ -46,7 +55,6 @@ export function getStakingStatus(status) {
 }
 
 export function getThresholdsPerStake(stake) {
-  console.log(stake);
   if (!THRESHOLDS_PER_STAKE.has(stake)) {
     throw new Error("Unknown stake");
   }
@@ -59,9 +67,9 @@ export function getThresholdsPerStake(stake) {
  * characters on both sides of the ellipsis.
  *
  * Examples:
- *   shortenAddress('D19731977931271')    // 0x1973…1271
- *   shortenAddress('A19731977931271', 2) // 0x19…71
- *   shortenAddress('F197319')            // 0x197319 (already short enough)
+ *   shortenAddress('D19731977931271')    // D1973…1271
+ *   shortenAddress('A19731977931271', 2) // A1…71
+ *   shortenAddress('F197319')            // F197319 (already short enough)
  *
  * @param {string} address The address to shorten
  * @param {number} [charsLength=4] The number of characters to change on both sides of the ellipsis
