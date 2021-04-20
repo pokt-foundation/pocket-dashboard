@@ -10,7 +10,6 @@ import passport from "lib/passport-local";
 import SendgridEmailService from "services/SendGridEmailService";
 import env from "environment";
 
-const DEFAULT_PROVIDER = "EMAIL";
 const SALT_ROUNDS = 10;
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
 
@@ -119,7 +118,9 @@ router.post(
 
           const validationLink = `${env(
             "frontend_url"
-          )}/#/validate?token=${validationToken}&email=${user.email}`;
+          )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
+            user.email
+          )}`;
 
           const emailService = new SendgridEmailService();
 
@@ -174,7 +175,9 @@ router.post(
 
       const validationLink = `${env(
         "frontend_url"
-      )}/#/validate?token=${validationToken}&email=${user.email}`;
+      )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
+        user.email
+      )}`;
 
       const emailService = new SendgridEmailService();
 
@@ -212,7 +215,9 @@ router.post(
   asyncMiddleware(async (req, res) => {
     const { email } = req.body;
 
-    const user = await User.findOne({ email });
+    const processedEmail = decodeURIComponent(email);
+
+    const user = await User.findOne({ email: processedEmail });
 
     if (!user) {
       throw HttpError.BAD_REQUEST({
@@ -222,30 +227,23 @@ router.post(
       });
     }
 
-    const staleToken = await Token.findOne({
-      $and: [{ email }, { type: TOKEN_TYPES.reset }],
-    });
-
-    if (staleToken) {
-      await staleToken.deleteOne();
-    }
-    // TODO: Make validation token
     const resetToken = crypto.randomBytes(32).toString("hex");
     const hashedResetToken = await bcrypt.hash(resetToken, SALT_ROUNDS);
 
     const userResetToken = new Token({
       userId: user._id,
-      email: email,
+      email: processedEmail,
       token: hashedResetToken,
       type: TOKEN_TYPES.reset,
       createdAt: Date.now(),
     });
 
     await userResetToken.save();
-    console.log("here??");
     const resetLink = `${env(
       "frontend_url"
-    )}/#/newpassword?token=${resetToken}&email=${user.email}`;
+    )}/#/newpassword?token=${resetToken}&email=${encodeURIComponent(
+      user.email
+    )}`;
 
     const emailService = new SendgridEmailService();
 
@@ -278,6 +276,7 @@ router.post(
     }
 
     const isPasswordValid = await User.validatePassword(password1);
+    const processedEmail = decodeURIComponent(email);
 
     if (!isPasswordValid) {
       throw HttpError.BAD_REQUEST({
@@ -292,7 +291,7 @@ router.post(
     }
 
     const storedToken = await Token.findOne({
-      $and: [{ email }, { type: TOKEN_TYPES.reset }],
+      $and: [{ email: processedEmail }, { type: TOKEN_TYPES.reset }],
     });
 
     if (!storedToken) {
@@ -313,7 +312,7 @@ router.post(
 
     await User.updateOne(
       {
-        email,
+        email: processedEmail,
       },
       { $set: { password: newHashedPassword } },
       { new: true }
@@ -336,8 +335,10 @@ router.post(
       });
     }
 
+    const processedEmail = decodeURIComponent(email);
+
     const storedToken = await Token.findOne({
-      $and: [{ email }, { type: TOKEN_TYPES.verification }],
+      $and: [{ email: processedEmail }, { type: TOKEN_TYPES.verification }],
     });
 
     if (!storedToken) {
@@ -356,7 +357,7 @@ router.post(
 
     await User.updateOne(
       {
-        email: email,
+        email: processedEmail,
       },
       { $set: { validated: true } },
       { new: true }
