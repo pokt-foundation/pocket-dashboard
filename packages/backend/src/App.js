@@ -22,7 +22,11 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: ["https://testnet.dashboard.pokt.network", "http://localhost:3000"],
+    origin: [
+      "https://mainnet.dashboard.pokt.network",
+      "https://testnet.dashboard.pokt.network",
+      "http://localhost:3000",
+    ],
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
     credentials: true,
     exposedHeaders: ["Authorization"],
