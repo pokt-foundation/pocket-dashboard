@@ -210,7 +210,9 @@ export default function AppInfo({
   }, [appData]);
 
   const exceedsMaxRelays = useMemo(() => {
-    const todaysRelays = dailyRelayData[dailyRelayData.length - 1];
+    const todaysRelays = dailyRelayData[dailyRelayData.length - 1] ?? {
+      dailyRelays: 0,
+    };
     const { dailyRelays = 0 } = todaysRelays;
 
     return dailyRelays >= maxRelays;
@@ -370,7 +372,7 @@ function SwitchInfoModal({ onClose, onSwitch, visible }) {
           title="Free tier applications can only change networks once a week"
         >
           If you have already changed the selected network in the last week you
-          won't be able to retake your app until the time is due.
+          won't be able to restake your app until the time is due.
         </Banner>
         <Spacer size={3 * GU} />
         <p
