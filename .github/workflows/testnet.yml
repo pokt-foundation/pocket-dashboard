@@ -156,7 +156,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: packages/backend/ecs-task-definition-testnet.json
+          task-definition: packages/backend/ecs-task-definition-backend.json
           container-name: dashboard-testnet
           image: ${{ steps.build-image.outputs.image }}
 
