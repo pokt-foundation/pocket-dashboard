@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Spring, animated } from "react-spring/renderprops";
 import "styled-components/macro";
 import { useTheme } from "ui/theme";
-import { clamp, warnOnce } from "ui/utils";
+import { clamp } from "ui/utils";
 
 const STROKE_WIDTH = 4;
 const SIZE_DEFAULT = 80;
@@ -34,11 +34,6 @@ function labelCompat(parts) {
     typeof parts === "number" ||
     React.isValidElement(parts)
   ) {
-    warnOnce(
-      "CircleGraph:label:string",
-      "CircleGraph: the function passed to the label should not " +
-        "return a React node anymore: please check the CircleGraph documentation."
-    );
     return { value: String(parts) };
   }
   return parts;

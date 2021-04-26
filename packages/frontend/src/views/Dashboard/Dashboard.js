@@ -44,7 +44,7 @@ export default function DashboardView({ children }) {
           scrollbar-width: none; /* Firefox */
         `}
       >
-        <NavigationBar />
+        <NavigationBar applications={appsData} />
         <Spacer size={5 * GU} />
         {children}
         <Spacer size={2 * GU} />

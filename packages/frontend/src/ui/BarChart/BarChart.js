@@ -282,7 +282,11 @@ BarChart.propTypes = {
       PropTypes.arrayOf(PropTypes.number),
     ])
   ),
-  label: PropTypes.oneOfType([PropTypes.func, PropTypes._null]),
+  label: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes._null,
+    PropTypes.arrayOf("string"),
+  ]),
   scales: PropTypes.arrayOf(PropTypes.string),
   renderCheckpoints: PropTypes.bool,
   reset: PropTypes.bool,
@@ -303,7 +307,6 @@ BarChart.defaultProps = {
   lines: [],
   scales: [],
   threshold: false,
-  label: (index) => index + 1,
   color: (index, { lines }) =>
     `hsl(${(index * (360 / lines.length) + 40) % 360}, 60%, 70%)`,
 };
