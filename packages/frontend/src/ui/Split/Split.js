@@ -18,8 +18,8 @@ function Split({ primary, secondary, invert, secondaryWidth, ...props }) {
       <div
         css={`
           flex-grow: 1;
-          margin-left: ${!oneColumn && inverted ? 2 * GU : 0}px;
-          padding-top: ${oneColumn && inverted ? 2 * GU : 0}px;
+          margin-left: ${!oneColumn && inverted ? 4 * GU : 0}px;
+          padding-top: ${oneColumn && inverted ? 4 * GU : 0}px;
         `}
       >
         {primary}
@@ -37,9 +37,9 @@ function Split({ primary, secondary, invert, secondaryWidth, ...props }) {
             ? secondaryWidth
             : oneColumn
             ? "100%"
-            : `${40 * GU}px`};
-          margin-left: ${!oneColumn && !inverted ? 2 * GU : 0}px;
-          padding-top: ${oneColumn && !inverted ? 2 * GU : 0}px;
+            : `${46 * GU}px`};
+          margin-left: ${!oneColumn && !inverted ? 4 * GU : 0}px;
+          padding-top: ${oneColumn && !inverted ? 4 * GU : 0}px;
         `}
       >
         {secondary}

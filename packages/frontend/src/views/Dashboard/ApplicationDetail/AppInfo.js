@@ -48,6 +48,15 @@ const HIGHLIGHT_COLORS = [
   "#D2CC31",
 ];
 
+const DEFAULT_EMPTY_RELAYS = [
+  {
+    dailyRelays: 0,
+  },
+  {
+    dailyRelays: 0,
+  },
+];
+
 const FALLBACK_COLOR = "#C4C4C4";
 
 function useUsageColor(usage) {
@@ -84,10 +93,17 @@ function formatDailyRelaysForGraphing(
     .map(({ bucket }) => bucket.split("T")[0])
     .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
 
+  const processedDailyRelays =
+    dailyRelays.length === 1
+      ? [...dailyRelays, { dailyRelays: 0 }]
+      : dailyRelays.length === 0
+      ? DEFAULT_EMPTY_RELAYS
+      : dailyRelays;
+
   const lines = [
     {
       id: 1,
-      values: dailyRelays.map(({ dailyRelays }) =>
+      values: processedDailyRelays.map(({ dailyRelays }) =>
         norm(dailyRelays, 0, upperBound)
       ),
     },
@@ -641,6 +657,8 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
 }
 
 function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
+  const theme = useTheme();
+
   return (
     <Box>
       <div
@@ -665,7 +683,7 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
           lines={chartLines}
           label={chartLabels}
           height={200}
-          color={() => "#31A1D2"}
+          color={() => theme.accent}
           scales={chartScales}
         />
       </div>
@@ -674,9 +692,6 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
 }
 
 function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
-  const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
-    chartLines,
-  ]);
   const usageColor = useUsageColor(sessionRelays / MAX_RELAYS_PER_SESSION);
   const theme = useTheme();
 
@@ -737,55 +752,37 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
             </span>
           </h4>
         </div>
-        {isChartLinesEmpty ? (
-          <div
+        <div
+          css={`
+            grid-column: 2;
+          `}
+        >
+          <h3
             css={`
-              display: flex;
-              justify-content: center;
-              align-items: center;
+              ${textStyle("title3")}
+              text-align: right;
             `}
           >
-            <h3
-              css={`
-                ${textStyle("body3")}
-              `}
-            >
-              No data to show.
-            </h3>
-          </div>
-        ) : (
-          <div
-            css={`
-              grid-column: 2;
-            `}
-          >
-            <h3
-              css={`
-                ${textStyle("title3")}
-                text-align: right;
-              `}
-            >
-              Weekly usage
-            </h3>
-            <LineChart
-              lines={chartLines}
-              label={(i) => chartLabels[i]}
-              height={300}
-              color={() => "#31A1D2"}
-              renderCheckpoints
-              dotRadius={GU / 1.5}
-              threshold
-              scales={[
-                { label: "0" },
-                { label: "250K" },
-                { label: "500K" },
-                { label: "750K" },
-                { label: "1M", highlightColor: theme.negative },
-                "",
-              ]}
-            />
-          </div>
-        )}
+            Weekly usage
+          </h3>
+          <LineChart
+            lines={chartLines}
+            label={(i) => chartLabels[i]}
+            height={300}
+            color={() => "#31A1D2"}
+            renderCheckpoints
+            dotRadius={GU / 1.5}
+            threshold
+            scales={[
+              { label: "0" },
+              { label: "250K" },
+              { label: "500K" },
+              { label: "750K" },
+              { label: "1M", highlightColor: theme.negative },
+              "",
+            ]}
+          />
+        </div>
       </div>
     </Box>
   );
