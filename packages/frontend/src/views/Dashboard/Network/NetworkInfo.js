@@ -28,7 +28,7 @@ export default function RelayInfo({ chains, summaryData }) {
         </Box>
       }
       secondary={
-        <Box title="Network stats">
+        <Box title="Network Summary">
           <ul
             css={`
               list-style: none;
@@ -40,15 +40,15 @@ export default function RelayInfo({ chains, summaryData }) {
             `}
           >
             <li>
-              Total apps staked: <span>{summaryData.appsStaked} </span>
+              Total apps staked <span>{summaryData.appsStaked} </span>
             </li>
             <Spacer size={2 * GU} />
             <li>
-              Total nodes staked: <span>{3036}</span>
+              Total nodes staked <span>{3036}</span>
             </li>
             <Spacer size={2 * GU} />
             <li>
-              Total POKT staked: <span>{242.99}m</span>
+              Total POKT staked <span>{242.99}m</span>
             </li>
           </ul>
         </Box>

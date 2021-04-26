@@ -206,7 +206,7 @@ export default function SuccessDetails({
                           ${textStyle("body3")}
                         `}
                       >
-                        during this week
+                        Last 7 days count
                       </span>
                     </h2>
                   </div>
@@ -232,7 +232,7 @@ export default function SuccessDetails({
                             ${textStyle("body3")}
                           `}
                         >
-                          processed requests
+                          Processed requests
                         </span>
                       </h2>
                       <h2
@@ -267,7 +267,7 @@ export default function SuccessDetails({
                             ${textStyle("body3")}
                           `}
                         >
-                          dropped requests
+                          Dropped requests
                         </span>
                       </h2>
                       <h2

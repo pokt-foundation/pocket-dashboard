@@ -10,7 +10,7 @@ import ButtonBase from "../ButtonBase/ButtonBase";
 // See src/icons/icon-size.js for the corresponding icon sizes.
 const SIZE_STYLES = {
   medium: {
-    textStyleName: "body2",
+    textStyleName: "body3",
     height: 5 * GU,
     padding: 3 * GU,
     iconPadding: 2 * GU,
@@ -18,7 +18,7 @@ const SIZE_STYLES = {
     middleSpace: 1 * GU,
   },
   small: {
-    textStyleName: "body2",
+    textStyleName: "body3",
     height: 4 * GU,
     padding: 2 * GU,
     iconPadding: 1.5 * GU,
@@ -26,7 +26,7 @@ const SIZE_STYLES = {
     middleSpace: 1 * GU,
   },
   mini: {
-    textStyleName: "body4",
+    textStyleName: "body3",
     height: 3 * GU,
     padding: 1.5 * GU,
     iconPadding: 1 * GU,

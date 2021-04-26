@@ -7,6 +7,7 @@ import Styled from "styled-components/macro";
 import {
   Button,
   CircleGraph,
+  Link,
   Spacer,
   Split,
   Switch,
@@ -295,6 +296,19 @@ export default function Notifications({
                   These values are calculated on a period of 7 days.
                 </p>
               </Box>
+              <Spacer size={2.5 * GU} />
+              <p
+                css={`
+                  ${textStyle("body3")}
+                `}
+              >
+                If you need more relays for your application or you are looking
+                to stake your own POKT or please{" "}
+                <Link href="https://pocketnetwork.typeform.com/to/UPb0xJhS">
+                  contact us
+                </Link>{" "}
+                and our team will find a solution for you.
+              </p>
             </>
           }
           secondary={
