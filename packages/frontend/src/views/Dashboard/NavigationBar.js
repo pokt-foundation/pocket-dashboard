@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useMutation } from "react-query";
 import { useViewport } from "use-viewport";
@@ -18,10 +18,47 @@ import {
 import env from "environment";
 import axios from "axios";
 
-export default function NavigationBar() {
-  const [title, setTitle] = useState("Pocket Dashboard");
+const DEFAULT_TITLE = "Pocket Dashboard";
+
+function useRouteTitle(applications = []) {
+  const { pathname } = useLocation();
+
+  if (pathname.includes("notifications")) {
+    return "Notifications";
+  }
+
+  if (pathname.includes("success-details")) {
+    return "Request Status Details";
+  }
+
+  if (pathname.includes("security")) {
+    return "App Security";
+  }
+
+  if (pathname.includes("app")) {
+    const title = applications.reduce(
+      (title, { appId, appName }) =>
+        pathname.includes(appId) ? appName : title,
+      DEFAULT_TITLE
+    );
+
+    return title;
+  }
+
+  if (pathname.includes("home")) {
+    return "Network Overview";
+  }
+
+  if (pathname.includes("create")) {
+    return "Application Setup";
+  }
+
+  return DEFAULT_TITLE;
+}
+
+export default function NavigationBar({ applications = [] }) {
   const history = useHistory();
-  const location = useLocation();
+  const title = useRouteTitle(applications);
   const theme = useTheme();
   const { mutate: onLogout } = useMutation(async function logout() {
     const path = `${env("BACKEND_URL")}/api/users/logout`;
@@ -40,17 +77,6 @@ export default function NavigationBar() {
       console.log("err", err);
     }
   });
-
-  useEffect(() => {
-    const { pathname } = location;
-
-    // TODO: Actually sync this with overall app state
-    if (pathname === "/create") {
-      setTitle("Create new application");
-    } else {
-      setTitle("Pocket Dashboard");
-    }
-  }, [location]);
 
   return (
     <nav
@@ -117,6 +143,8 @@ function SettingsButton({ onLogout }) {
       <div ref={containerRef}>
         <DiscButton
           element="div"
+          description="Preferences"
+          label="Preferences"
           onClick={handleToggle}
           css={`
             width: ${4.25 * GU}px;
@@ -126,7 +154,6 @@ function SettingsButton({ onLogout }) {
             height: 100%;
             border-radius: 50% 50%;
           `}
-          label="Preferences"
         >
           <IconPerson
             css={`

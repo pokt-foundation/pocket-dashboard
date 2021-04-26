@@ -851,9 +851,10 @@ function LatestRequests({ publicKey }) {
             height: 100%;
           `}
         >
-          {colorValues?.map((val) => {
+          {colorValues?.map((val, i) => {
             return (
               <div
+                key={i}
                 css={`
                   background: ${val};
                   width: 100%;
@@ -883,7 +884,7 @@ function LatestRequests({ publicKey }) {
             return [
               <p>{method ? method : "Unknown"}</p>,
               <p>
-                <div
+                <span
                   css={`
                     display: inline-block;
                     width: ${1.5 * GU}px;
