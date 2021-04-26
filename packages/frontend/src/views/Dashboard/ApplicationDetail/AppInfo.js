@@ -657,6 +657,8 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
 }
 
 function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
+  const theme = useTheme();
+
   return (
     <Box>
       <div
@@ -681,7 +683,7 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
           lines={chartLines}
           label={chartLabels}
           height={200}
-          color={() => "#31A1D2"}
+          color={() => theme.accent}
           scales={chartScales}
         />
       </div>
@@ -690,9 +692,6 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
 }
 
 function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
-  const isChartLinesEmpty = useMemo(() => chartLines[0].values.length === 0, [
-    chartLines,
-  ]);
   const usageColor = useUsageColor(sessionRelays / MAX_RELAYS_PER_SESSION);
   const theme = useTheme();
 
