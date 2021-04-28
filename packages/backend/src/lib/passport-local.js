@@ -89,7 +89,7 @@ passport.use(
   "signup",
   new Strategy(AUTH_FIELDS, async (req, email, password, done) => {
     try {
-      const processedEmail = decodeURIComponent(email);
+      const processedEmail = email;
       const emailRegistered = await User.findOne({ email: processedEmail });
 
       if (emailRegistered) {

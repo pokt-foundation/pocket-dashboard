@@ -29,7 +29,8 @@ export default function NewPassword() {
   const theme = useTheme();
 
   const token = new URLSearchParams(search).get("token");
-  const email = new URLSearchParams(search).get("email");
+  const rawEmail = new URLSearchParams(search).get("email");
+  const email = decodeURIComponent(rawEmail);
 
   const { isLoading, isError, mutate } = useMutation(
     async function sendResetEmail() {

@@ -215,7 +215,7 @@ router.post(
   asyncMiddleware(async (req, res) => {
     const { email } = req.body;
 
-    const processedEmail = decodeURIComponent(email);
+    const processedEmail = email;
 
     const user = await User.findOne({ email: processedEmail });
 
@@ -276,7 +276,7 @@ router.post(
     }
 
     const isPasswordValid = await User.validatePassword(password1);
-    const processedEmail = decodeURIComponent(email);
+    const processedEmail = email;
 
     if (!isPasswordValid) {
       throw HttpError.BAD_REQUEST({
