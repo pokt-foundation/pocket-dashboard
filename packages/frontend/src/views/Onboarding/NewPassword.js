@@ -237,8 +237,8 @@ export default function NewPassword() {
                 color: ${theme.surfaceContentSecondary};
               `}
             >
-              A good password has at least 8 characters and at least 1
-              alphanumeric symbol.
+              A good password has at least 8 characters, 1 uppercase character,
+              1 number and 1 symbol.
             </p>
           </Field>
           <ul

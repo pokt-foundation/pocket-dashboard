@@ -45,12 +45,8 @@ export default function Login() {
       try {
         const path = `${env("BACKEND_URL")}/api/users/signup`;
 
-        const processedEmail = encodeURIComponent(email);
-
-        console.log(processedEmail, password);
-
         await axios.post(path, {
-          email: processedEmail,
+          email,
           password,
         });
       } catch (err) {
@@ -292,8 +288,8 @@ export default function Login() {
                   color: ${theme.surfaceContentSecondary};
                 `}
               >
-                A good password has at least 8 characters and at least 1
-                alphanumeric symbol.
+                A good password has at least 8 characters, 1 uppercase
+                character, 1 number and 1 symbol.
               </p>
             </Field>
             <ul
