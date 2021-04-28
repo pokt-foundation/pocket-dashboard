@@ -8,12 +8,13 @@ import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
 import env from "environment";
 import PoktShape from "assets/poktshape.png";
 
-export default function Login() {
+export default function Validate() {
   const theme = useTheme();
   const { search } = useLocation();
 
   const token = new URLSearchParams(search).get("token");
-  const email = new URLSearchParams(search).get("email");
+  const rawEmail = new URLSearchParams(search).get("email");
+  const email = decodeURIComponent(rawEmail);
 
   const { isError, isLoading, isSuccess, mutate } = useMutation(
     async function validate() {
@@ -33,6 +34,7 @@ export default function Login() {
   );
 
   useEffect(() => {
+    // TODO: Actually implement exponential back-off retries
     mutate();
   }, [mutate]);
 

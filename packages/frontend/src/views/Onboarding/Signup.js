@@ -45,8 +45,12 @@ export default function Login() {
       try {
         const path = `${env("BACKEND_URL")}/api/users/signup`;
 
+        const processedEmail = encodeURIComponent(email);
+
+        console.log(processedEmail, password);
+
         await axios.post(path, {
-          email,
+          email: processedEmail,
           password,
         });
       } catch (err) {

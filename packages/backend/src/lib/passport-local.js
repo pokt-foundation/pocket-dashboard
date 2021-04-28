@@ -89,7 +89,8 @@ passport.use(
   "signup",
   new Strategy(AUTH_FIELDS, async (req, email, password, done) => {
     try {
-      const emailRegistered = await User.findOne({ email });
+      const processedEmail = email;
+      const emailRegistered = await User.findOne({ email: processedEmail });
 
       if (emailRegistered) {
         return done(
@@ -116,8 +117,8 @@ passport.use(
       const encryptedPassword = await User.encryptPassword(password);
 
       const user = new User({
-        email,
-        username: email,
+        email: processedEmail,
+        username: processedEmail,
         password: encryptedPassword,
         validated: false,
         v2: true,

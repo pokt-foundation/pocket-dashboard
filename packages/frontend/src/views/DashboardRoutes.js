@@ -45,7 +45,7 @@ export default function DashboardRoutes() {
         overflow-x: hidden;
       `}
     >
-      <ErrorBoundary fallback={Fallback} showDialog>
+      <ErrorBoundary fallback={Fallback}>
         <Switch>
           <Route exact path={`/`}>
             <Login />
