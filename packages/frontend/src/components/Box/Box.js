@@ -21,7 +21,7 @@ export default function Box({ children, title, className, padding, ...props }) {
       {title && (
         <h3
           css={`
-            ${textStyle("title3")}
+            ${textStyle("title2")}
             margin-bottom: ${3 * GU}px;
           `}
         >

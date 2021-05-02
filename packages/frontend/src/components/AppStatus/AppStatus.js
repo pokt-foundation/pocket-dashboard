@@ -28,13 +28,22 @@ export default function AppStatus({ appOnChainStatus }) {
             display: flex;
             justify-content: space-between;
             ${textStyle("body1")}
+            font-weight: 600;
+            span {
+              font-weight: 400;
+            }
           }
         `}
       >
         <li>
           Status
           <span>
-            <Tag mode="new" uppercase={false}>
+            <Tag
+              mode="new"
+              uppercase={false}
+              color="white"
+              background="#1A4008"
+            >
               {stakingStatus}
             </Tag>
           </span>

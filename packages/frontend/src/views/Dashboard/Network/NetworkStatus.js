@@ -128,7 +128,7 @@ export default function NetworkStatus() {
                   >
                     <h3
                       css={`
-                        ${textStyle("title3")}
+                        ${textStyle("title2")}
                       `}
                     >
                       Total Relays

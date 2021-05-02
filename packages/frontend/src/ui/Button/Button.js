@@ -223,6 +223,7 @@ function BasicButton({
         min-width: ${minWidth};
         padding: ${padding};
         ${textStyleCss};
+        font-weight: 600;
         ${unselectable};
         background: ${background};
         color: ${color};
