@@ -250,7 +250,7 @@ export default function NetworkStatus() {
                     </li>
                     <Spacer size={2 * GU} />
                     <li>
-                      Nodes staked <span>{3036}</span>
+                      Nodes staked <span>{3456}</span>
                     </li>
                     <Spacer size={2 * GU} />
                     <li>
