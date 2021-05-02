@@ -387,8 +387,15 @@ function SwitchInfoModal({ onClose, onSwitch, visible }) {
           mode="info"
           title="Free tier applications can only change networks once a week"
         >
-          If you have already changed the selected network in the last week you
-          won't be able to restake your app until the time is due.
+          <p>
+            This action will change your endpoint URL, which means you'll need
+            to update it across your apps.
+          </p>
+          <Spacer size={2 * GU} />
+          <p>
+            This endpoint will remain available for 24 hours before it's
+            unstaked.
+          </p>
         </Banner>
         <Spacer size={3 * GU} />
         <p
@@ -849,6 +856,7 @@ function LatestRequests({ publicKey }) {
           css={`
             width: ${1 * GU}px;
             height: 100%;
+            overflow-y: hidden;
           `}
         >
           {colorValues?.map((val, i) => {
