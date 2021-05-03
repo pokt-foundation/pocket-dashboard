@@ -66,7 +66,7 @@ function getSize(size, { uppercase, discMode, iconAndLabel }) {
 
   // normal
   return `
-    min-width: ${2.5 * GU}px;
+    min-width: ${12 * GU}px;
     width: ${discMode ? `${3 * GU}px` : "auto"};
     height: ${3.5 * GU}px;
     padding: ${discMode ? "0" : `0 ${1.5 * GU}px`} ;

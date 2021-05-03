@@ -206,13 +206,14 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("body2")}
+                          ${textStyle("body3")}
                         `}
                       >
                         <span
                           css={`
                             display: block;
                             ${textStyle("title3")}
+                            font-weight: 700;
                           `}
                         >
                           Average usage
@@ -240,13 +241,14 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("body2")}
+                          ${textStyle("body3")}
                         `}
                       >
                         <span
                           css={`
                             display: block;
                             ${textStyle("title3")}
+                            font-weight: 700;
                           `}
                         >
                           Max usage
@@ -271,13 +273,14 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("body2")}
+                          ${textStyle("body3")}
                         `}
                       >
                         <span
                           css={`
                             display: block;
                             ${textStyle("title3")}
+                            font-weight: 700;
                           `}
                         >
                           Min usage

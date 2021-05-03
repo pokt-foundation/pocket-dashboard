@@ -97,7 +97,7 @@ const TextCopy = React.memo(
                   border-left: 0;
                 `
               : ""};
-            ${textStyle(monospace ? "address2" : "body3")};
+            ${textStyle("body3")};
             &:read-only {
               color: ${theme.surfaceContent};
               text-shadow: none;

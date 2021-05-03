@@ -115,6 +115,10 @@ export default function NavigationBar({ applications = [] }) {
             href="https://discord.com/invite/uYs6Esum3r"
             css={`
               color: ${theme.content};
+              text-decoration: none;
+              &:hover {
+                color: ${theme.accent};
+              }
             `}
           >
             Community

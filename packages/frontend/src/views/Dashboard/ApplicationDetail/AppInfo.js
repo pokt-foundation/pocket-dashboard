@@ -387,8 +387,15 @@ function SwitchInfoModal({ onClose, onSwitch, visible }) {
           mode="info"
           title="Free tier applications can only change networks once a week"
         >
-          If you have already changed the selected network in the last week you
-          won't be able to restake your app until the time is due.
+          <p>
+            This action will change your endpoint URL, which means you'll need
+            to update it across your apps.
+          </p>
+          <Spacer size={2 * GU} />
+          <p>
+            This endpoint will remain available for 24 hours before it's
+            unstaked.
+          </p>
         </Banner>
         <Spacer size={3 * GU} />
         <p
@@ -481,7 +488,7 @@ function EndpointDetails({ chainId, appId }) {
       >
         <h3
           css={`
-            ${textStyle("title3")}
+            ${textStyle("title2")}
             margin-bottom: ${3 * GU}px;
           `}
         >
@@ -490,6 +497,7 @@ function EndpointDetails({ chainId, appId }) {
         <h4
           css={`
             ${textStyle("body3")}
+            font-weight: 600;
             margin-bottom: ${3 * GU}px;
           `}
         >
@@ -547,6 +555,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
         <animated.h2
           css={`
             ${textStyle("title1")}
+            font-size: ${6 * GU}px;
           `}
         >
           {numberProps.number.interpolate((x) => `${x.toFixed(2)}%`)}
@@ -581,7 +590,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
         >
           <h3
             css={`
-              ${textStyle("title3")}
+              ${textStyle("title2")}
             `}
           >
             Success Rate
@@ -601,7 +610,13 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
             >
               {totalRequests ? <SuccessIndicator mode={mode} /> : ""}
               <Spacer size={GU / 2} />
-              <span>{Math.abs(successRateDelta)}%</span>
+              <span
+                css={`
+                  font-weight: 700;
+                `}
+              >
+                {Math.abs(successRateDelta)}%
+              </span>
             </div>
             <p
               css={`
@@ -623,7 +638,8 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
         >
           <h3
             css={`
-              ${textStyle("title4")}
+              ${textStyle("title3")}
+              font-weight: 700;
             `}
           >
             Total requests
@@ -666,17 +682,23 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
           width: 100%;
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-end;
         `}
       >
         <h3
           css={`
-            ${textStyle("title3")}
+            ${textStyle("title2")}
           `}
         >
           AVG Latency
         </h3>
-        <p>{(avgLatency * 1000).toFixed(0)}ms</p>
+        <p
+          css={`
+            ${textStyle("body1")}
+          `}
+        >
+          {(avgLatency * 1000).toFixed(0)}ms
+        </p>
       </div>
       <div>
         <BarChart
@@ -723,7 +745,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
         >
           <h3
             css={`
-              ${textStyle("title3")}
+              ${textStyle("title2")}
             `}
           >
             Current usage
@@ -737,7 +759,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
           <Spacer size={2 * GU} />
           <h4
             css={`
-              ${textStyle("title3")}
+              ${textStyle("title2")}
               text-align: center;
             `}
           >
@@ -746,6 +768,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
               css={`
                 display: block;
                 ${textStyle("body3")}
+                font-weight: 700;
               `}
             >
               Relays this session
@@ -759,7 +782,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
         >
           <h3
             css={`
-              ${textStyle("title3")}
+              ${textStyle("title2")}
               text-align: right;
             `}
           >
@@ -849,6 +872,7 @@ function LatestRequests({ publicKey }) {
           css={`
             width: ${1 * GU}px;
             height: 100%;
+            overflow-y: hidden;
           `}
         >
           {colorValues?.map((val, i) => {
@@ -937,6 +961,7 @@ function AppDetails({ id, pubkey, secret }) {
         <h3
           css={`
             ${textStyle("body1")};
+            font-weight: 600;
             margin-bottom: ${2 * GU}px;
           `}
         >
@@ -957,6 +982,7 @@ function AppDetails({ id, pubkey, secret }) {
         <h3
           css={`
             ${textStyle("body1")};
+            font-weight: 600;
             margin-bottom: ${2 * GU}px;
           `}
         >
@@ -978,6 +1004,7 @@ function AppDetails({ id, pubkey, secret }) {
           <h3
             css={`
               ${textStyle("body1")};
+              font-weight: 600;
               margin-bottom: ${2 * GU}px;
             `}
           >

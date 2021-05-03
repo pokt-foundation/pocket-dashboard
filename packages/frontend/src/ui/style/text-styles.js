@@ -2,22 +2,22 @@ import { monospace } from "../utils/font";
 
 const TEXT_STYLES = {
   title1: {
-    size: 32,
-    weight: 600,
+    size: 36,
+    weight: 700,
     lineHeight: 1.5,
   },
   title2: {
-    size: 26,
-    weight: 400,
+    size: 24,
+    weight: 700,
     lineHeight: 1.5,
   },
   title3: {
-    size: 24,
+    size: 18,
     weight: 400,
     lineHeight: 1.5,
   },
   title4: {
-    size: 20,
+    size: 14,
     weight: 400,
     lineHeight: 1.5,
   },

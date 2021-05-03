@@ -187,7 +187,7 @@ export default function SuccessDetails({
                   >
                     <h2
                       css={`
-                        ${textStyle("title2")}
+                        ${textStyle("title1")}
                       `}
                     >
                       {Intl.NumberFormat().format(
@@ -196,7 +196,7 @@ export default function SuccessDetails({
                       <span
                         css={`
                           display: block;
-                          ${textStyle("title4")}
+                          ${textStyle("title3")}
                         `}
                       >
                         Total requests
@@ -220,7 +220,7 @@ export default function SuccessDetails({
                     <div>
                       <h2
                         css={`
-                          ${textStyle("title4")}
+                          ${textStyle("title2")}
                         `}
                       >
                         {Intl.NumberFormat().format(
@@ -254,7 +254,7 @@ export default function SuccessDetails({
                     <div>
                       <h2
                         css={`
-                          ${textStyle("title4")}
+                          ${textStyle("title2")}
                         `}
                       >
                         {Intl.NumberFormat().format(
