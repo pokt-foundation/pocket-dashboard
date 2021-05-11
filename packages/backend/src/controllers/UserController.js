@@ -117,7 +117,7 @@ router.post(
           );
 
           const validationLink = `${env(
-            "frontend_url"
+            "FRONTEND_URL"
           )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
             user.email
           )}`;
@@ -174,7 +174,7 @@ router.post(
       );
 
       const validationLink = `${env(
-        "frontend_url"
+        "FRONTEND_URL"
       )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
         user.email
       )}`;
@@ -240,7 +240,7 @@ router.post(
 
     await userResetToken.save();
     const resetLink = `${env(
-      "frontend_url"
+      "FRONTEND_URL"
     )}/#/newpassword?token=${resetToken}&email=${encodeURIComponent(
       user.email
     )}`;

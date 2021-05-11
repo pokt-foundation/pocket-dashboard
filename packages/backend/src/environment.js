@@ -5,7 +5,7 @@ export const ENV_VARS = {
   prod() {
     return process.env.NODE_ENV === "production";
   },
-  frontend_url() {
+  FRONTEND_URL() {
     return process.env.FRONTEND_URL || "http://localhost:3000";
   },
   ALLOWED_DOMAINS() {
