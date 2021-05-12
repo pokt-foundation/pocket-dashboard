@@ -48,7 +48,7 @@ export default function Login() {
       }
     } catch (err) {
       // TODO: Set err on UI AND send to sentry.
-      const { errors } = err?.response?.data;
+      const { errors = [] } = err?.response?.data;
 
       setErrors(() => [...errors]);
     }

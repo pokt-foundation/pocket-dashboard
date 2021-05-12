@@ -5,7 +5,7 @@ export const ENV_VARS = {
   prod() {
     return process.env.NODE_ENV === "production";
   },
-  frontend_url() {
+  FRONTEND_URL() {
     return process.env.FRONTEND_URL || "http://localhost:3000";
   },
   ALLOWED_DOMAINS() {
@@ -31,18 +31,11 @@ export const ENV_VARS = {
       refresh_expiration: process.env.JWT_REFRESH_EXPIRATION,
     };
   },
-  email() {
-    return {
-      api_key: process.env.EMAIL_API_KEY,
-      from_email: process.env.EMAIL_FROM,
-      template_ids: {
-        SignUp: "d-23cc7c71b2d54b26bd09889f72fe0dc9",
-        ResetPassword: "d-a54f3a2f7f784545bb3d3f0106a40a87",
-        NotificationSignup: "d-dc357971402d472b9576bf4d33f90100",
-        NotificationChanges: "d-6c17da8231bc4165b91298ea8745c117",
-        NotificationHit: "d-d0d027b3b11f4f74bf0340ccfa12195d",
-      },
-    };
+  EMAIL_API_KEY() {
+    return process.env.EMAIL_API_KEY;
+  },
+  EMAIL_FROM() {
+    return process.env.EMAIL_FROM;
   },
   persistence() {
     return {

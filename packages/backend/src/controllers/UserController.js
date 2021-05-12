@@ -7,7 +7,7 @@ import Token, { TOKEN_TYPES } from "models/Token";
 import User from "models/User";
 import HttpError from "errors/http-error";
 import passport from "lib/passport-local";
-import SendgridEmailService from "services/SendGridEmailService";
+import MailgunService from "services/MailgunService";
 import env from "environment";
 
 const SALT_ROUNDS = 10;
@@ -117,22 +117,21 @@ router.post(
           );
 
           const validationLink = `${env(
-            "frontend_url"
+            "FRONTEND_URL"
           )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
             user.email
           )}`;
 
-          const emailService = new SendgridEmailService();
+          const emailService = new MailgunService();
 
-          await emailService.sendEmailWithTemplate(
-            env("email").template_ids.SignUp,
-            user.email,
-            env("email").from_email,
-            {
+          await emailService.send({
+            templateData: {
               user_email: user.email,
               verify_link: validationLink,
-            }
-          );
+            },
+            templateName: "SignUp",
+            toEmail: user.email,
+          });
 
           return next(
             HttpError.BAD_REQUEST({
@@ -163,7 +162,7 @@ router.post(
       if (!user) {
         return next(
           HttpError.BAD_REQUEST({
-            message: "Incorrect email or password",
+            message: "There was an error while creating your account",
           })
         );
       }
@@ -174,22 +173,21 @@ router.post(
       );
 
       const validationLink = `${env(
-        "frontend_url"
+        "FRONTEND_URL"
       )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
         user.email
       )}`;
 
-      const emailService = new SendgridEmailService();
+      const emailService = new MailgunService();
 
-      await emailService.sendEmailWithTemplate(
-        env("email").template_ids.SignUp,
-        user.email,
-        env("email").from_email,
-        {
+      await emailService.send({
+        templateData: {
           user_email: user.email,
           verify_link: validationLink,
-        }
-      );
+        },
+        templateName: "SignUp",
+        toEmail: user.email,
+      });
 
       return res.status(204).send();
     })(req, res, next);
@@ -240,23 +238,22 @@ router.post(
 
     await userResetToken.save();
     const resetLink = `${env(
-      "frontend_url"
+      "FRONTEND_URL"
     )}/#/newpassword?token=${resetToken}&email=${encodeURIComponent(
       user.email
     )}`;
 
-    const emailService = new SendgridEmailService();
+    const emailService = new MailgunService();
 
     try {
-      await emailService.sendEmailWithTemplate(
-        env("email").template_ids.ResetPassword,
-        user.email,
-        env("email").from_email,
-        {
+      await emailService.send({
+        templateData: {
           user_email: user.email,
           reset_link: resetLink,
-        }
-      );
+        },
+        templateName: "PasswordReset",
+        toEmail: user.email,
+      });
     } catch (err) {
       console.log(err);
     }

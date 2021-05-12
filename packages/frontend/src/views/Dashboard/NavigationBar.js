@@ -74,7 +74,7 @@ export default function NavigationBar({ applications = [] }) {
 
       history.push("/login");
     } catch (err) {
-      console.log("err", err);
+      // TODO: Log to sentry
     }
   });
 
