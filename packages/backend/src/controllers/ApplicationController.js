@@ -8,7 +8,6 @@ import HttpError from "errors/http-error";
 import MailgunService from "services/MailgunService";
 import { getApp } from "lib/pocket";
 import { APPLICATION_STATUSES } from "application-statuses";
-import env from "environment";
 
 const DEFAULT_GATEWAY_SETTINGS = {
   secretKey: "",
