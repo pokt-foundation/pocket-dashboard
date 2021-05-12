@@ -34,11 +34,12 @@ module.exports = {
       },
     ],
   },
-  plugins: ["jsdoc", "prettier"],
+  plugins: ["@typescript-eslint", "jsdoc", "prettier"],
   extends: [
     "eslint:recommended",
     "plugin:prettier/recommended",
     "prettier/babel",
+    "plugin:@typescript-eslint/recommended",
   ],
-  parser: "babel-eslint",
+  parser: "@typescript-eslint/parser",
 };
