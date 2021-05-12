@@ -1,6 +1,8 @@
 import HttpStatus from "http-status-codes";
 
 export default class HttpError extends Error {
+  code: any;
+  content: any;
   /**
    * request properties are incorrect
    */

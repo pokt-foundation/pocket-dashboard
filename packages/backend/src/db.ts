@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import env from "environment";
+import env from "@/environment";
 
 const DEV_DB_URL = "mongodb://localhost:27017/gateway-testnet";
 

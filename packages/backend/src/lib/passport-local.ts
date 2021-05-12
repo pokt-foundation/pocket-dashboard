@@ -1,16 +1,15 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
-import User from "models/User";
-import env from "environment";
-import HttpError from "errors/http-error";
+import User from "@/models/User";
+import env from "@/environment";
+import HttpError from "@/errors/http-error";
 
 const AUTH_FIELDS = {
   usernameField: "email",
   passwordField: "password",
   passReqToCallback: true,
 };
-
 const JWT_OPTIONS = {
   secretOrKey: env("auth").public_secret,
   algorithms: ["RS256"],
@@ -21,11 +20,10 @@ function extractTokenFromCookie(req) {
   return req?.cookies?.jwt ?? null;
 }
 
-JWT_OPTIONS.jwtFromRequest = ExtractJwt.fromExtractors([
+(JWT_OPTIONS as any).jwtFromRequest = ExtractJwt.fromExtractors([
   ExtractJwt.fromAuthHeaderAsBearerToken(),
   (req) => extractTokenFromCookie(req),
 ]);
-
 passport.use(
   "login",
   new Strategy(AUTH_FIELDS, async (req, email, password, done) => {
@@ -45,7 +43,6 @@ passport.use(
           null
         );
       }
-
       if (!user.v2) {
         return done(
           HttpError.BAD_REQUEST({
@@ -60,7 +57,6 @@ passport.use(
           null
         );
       }
-
       const isPasswordValid = await user.comparePassword(password);
 
       if (!isPasswordValid) {
@@ -76,7 +72,6 @@ passport.use(
           null
         );
       }
-
       return done(null, user);
     } catch (err) {
       // TODO: Log error to sentry and with a logger
@@ -84,7 +79,6 @@ passport.use(
     }
   })
 );
-
 passport.use(
   "signup",
   new Strategy(AUTH_FIELDS, async (req, email, password, done) => {
@@ -100,7 +94,6 @@ passport.use(
           null
         );
       }
-
       const isPasswordSecure = await User.validatePassword(password);
 
       if (!isPasswordSecure) {
@@ -113,9 +106,7 @@ passport.use(
           null
         );
       }
-
       const encryptedPassword = await User.encryptPassword(password);
-
       const user = new User({
         email: processedEmail,
         username: processedEmail,
@@ -125,7 +116,6 @@ passport.use(
       });
 
       await user.save();
-
       return done(null, user);
     } catch (err) {
       console.log(err);
@@ -133,7 +123,6 @@ passport.use(
     }
   })
 );
-
 passport.use(
   new JwtStrategy(JWT_OPTIONS, (req, jwtPayload, done) => {
     User.findOne({ _id: jwtPayload.id })
@@ -149,5 +138,4 @@ passport.use(
       });
   })
 );
-
 export default passport;

@@ -1,14 +1,14 @@
 import express from "express";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
-import asyncMiddleware from "middlewares/async";
-import { authenticate } from "middlewares/passport-auth";
-import Token, { TOKEN_TYPES } from "models/Token";
-import User from "models/User";
-import HttpError from "errors/http-error";
-import passport from "lib/passport-local";
-import MailgunService from "services/MailgunService";
-import env from "environment";
+import asyncMiddleware from "@/middlewares/async";
+import { authenticate } from "@/middlewares/passport-auth";
+import Token, { TOKEN_TYPES } from "@/models/Token";
+import User from "@/models/User";
+import HttpError from "@/errors/http-error";
+import passport from "@/lib/passport-local";
+import MailgunService from "@/services/MailgunService";
+import env from "@/environment";
 
 const SALT_ROUNDS = 10;
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;

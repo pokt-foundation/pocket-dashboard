@@ -1,16 +1,16 @@
 import crypto from "crypto";
 import { PocketAAT } from "@pokt-network/pocket-js";
-import PreStakedApp from "models/PreStakedApp";
-import { chains, FREE_TIER_STAKE_AMOUNT } from "workers/config";
+import PreStakedApp from "@/models/PreStakedApp";
+import { chains, FREE_TIER_STAKE_AMOUNT } from "@/workers/config";
 import {
   createAppStakeTx,
   createUnlockedAccount,
   getBalance,
   submitRawTransaction,
   transferFromFreeTierFund,
-} from "lib/pocket";
-import { APPLICATION_STATUSES } from "application-statuses";
-import env from "environment";
+} from "@/lib/pocket";
+import { APPLICATION_STATUSES } from "@/application-statuses";
+import env from "@/environment";
 
 async function createApplicationAndFund(ctx) {
   const {
@@ -126,6 +126,7 @@ export async function fillAppPool(ctx) {
     return;
   }
 
+  // @ts-expect-error ts-migrate(2362) FIXME: The left-hand side of an arithmetic operation must... Remove this comment to see the full error message
   const appsToCreate = totalPoolSize - (appPool?.length ?? 0);
 
   ctx.logger.log(`fillAppPool(): creating ${appsToCreate} apps`);
@@ -153,6 +154,7 @@ export async function stakeAppPool(ctx) {
   }
 
   // fill the allocation count with the default from all chains
+  // @ts-expect-error ts-migrate(2339) FIXME: Property 'id' does not exist on type '{}'.
   for (const [, { id, limit }] of Object.entries(chains)) {
     appAllocationCount.set(id, limit);
   }

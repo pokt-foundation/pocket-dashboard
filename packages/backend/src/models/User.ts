@@ -1,16 +1,15 @@
 import { Schema, model } from "mongoose";
 import axios from "axios";
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import isEmail from "validator/lib/isEmail";
 import isStrongPassword from "validator/lib/isStrongPassword";
-import env from "environment";
+import env from "@/environment";
 
-import dotenv from "dotenv";
 dotenv.config();
 
 const SALT_ROUNDS = 10;
-
 const userSchema = new Schema(
   {
     provider: String,
@@ -27,22 +26,18 @@ const userSchema = new Schema(
 userSchema.statics.validateEmail = function validateEmail(email) {
   return isEmail(email);
 };
-
 userSchema.statics.validatePassword = function validatePassword(password) {
   return isStrongPassword(password);
 };
-
 userSchema.statics.encryptPassword = function encryptPassword(password) {
   return bcrypt.hash(password, SALT_ROUNDS);
 };
-
 userSchema.statics.comparePassword = function comparePassword(
   plainPassword,
   userPassword
 ) {
   return bcrypt.compare(plainPassword, userPassword);
 };
-
 userSchema.statics.verifyCaptcha = function verifyCaptcha(token) {
   const secret = env("recaptcha").google_server;
 
@@ -54,7 +49,6 @@ userSchema.statics.verifyCaptcha = function verifyCaptcha(token) {
     `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
   );
 };
-
 userSchema.methods.generateVerificationToken = function generateVerificationToken() {
   const token = jwt.sign({ id: this._id }, env("auth").private_secret, {
     expiresIn: "10d",
@@ -63,11 +57,9 @@ userSchema.methods.generateVerificationToken = function generateVerificationToke
 
   return token;
 };
-
 userSchema.methods.comparePassword = function comparePassword(password) {
-  return bcrypt.compare(password, this.password);
+  return bcrypt.compare(password, (this as any).password);
 };
-
 const User = model("User", userSchema);
 
 export default User;

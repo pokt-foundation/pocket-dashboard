@@ -34,7 +34,17 @@ module.exports = {
       },
     ],
   },
-  plugins: ["@typescript-eslint", "jsdoc", "prettier"],
+  plugins: ["@typescript-eslint", "jsdoc", "prettier", "import"],
+  settings: {
+    "import/resolver": {
+      typescript: {},
+      map: [['@', './src/']]
+    },
+    "import/extensions": [".js", ".jsx", ".ts", ".tsx"],
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"],
+    },
+  },
   extends: [
     "eslint:recommended",
     "plugin:prettier/recommended",
@@ -42,4 +52,8 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
   ],
   parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: "./tsconfig.json",
+    tsconfigRootDir: "./",
+  },
 };

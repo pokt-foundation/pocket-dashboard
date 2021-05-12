@@ -1,6 +1,6 @@
-import { startServer } from "App";
-import { startWorkers } from "workers";
-import env from "environment";
+import { startServer } from "@/App";
+import { startWorkers } from "@/workers/index";
+import env from "@/environment";
 
 startServer();
 

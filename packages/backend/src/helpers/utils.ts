@@ -1,4 +1,5 @@
-import HttpError from "errors/http-error";
+// @ts-expect-error ts-migrate(2307) FIXME: Cannot find module 'errors/http-error' or its corr... Remove this comment to see the full error message
+import HttpError from "@/errors/http-error";
 
 /**
  * @param {{query:object}} request Request.

@@ -2,15 +2,15 @@ import {
   fillAppPool,
   stakeAppPool,
   unstakeAvailableApps,
-} from "workers/application";
-import { getNetworkStatsCount, getNodeCountForChains } from "workers/network";
-import { sendUsageNotifications } from "workers/notifications";
+} from "@/workers/application";
+import { getNetworkStatsCount, getNodeCountForChains } from "@/workers/network";
+import { sendUsageNotifications } from "@/workers/notifications";
 import {
   ONE_MINUTES,
   FIVE_MINUTES,
   FIFTEEN_MINUTES,
   SIXTY_MINUTES,
-} from "workers/utils";
+} from "@/workers/utils";
 
 const TEST_ONLY_CHAINS = {
   POCKET_TESTNET: {

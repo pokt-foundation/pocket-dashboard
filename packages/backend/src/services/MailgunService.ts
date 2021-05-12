@@ -1,5 +1,5 @@
 import mailgun from "mailgun-js";
-import env from "environment";
+import env from "@/environment";
 
 const FROM_EMAIL = "Pocket Dashboard <dashboard@pokt.network>";
 
@@ -37,6 +37,7 @@ const WHITELISTED_TEMPLATES = new Map([
 ]);
 
 export default class MailgunService {
+  mailService: any;
   constructor() {
     this.mailService = mailgun({
       apiKey: env("EMAIL_API_KEY"),

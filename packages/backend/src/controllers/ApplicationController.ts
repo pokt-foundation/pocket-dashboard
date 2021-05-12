@@ -1,13 +1,13 @@
 import express from "express";
 import crypto from "crypto";
-import asyncMiddleware from "middlewares/async";
-import { authenticate } from "middlewares/passport-auth";
-import Application from "models/Application";
-import ApplicationPool from "models/PreStakedApp";
-import HttpError from "errors/http-error";
-import MailgunService from "services/MailgunService";
-import { getApp } from "lib/pocket";
-import { APPLICATION_STATUSES } from "application-statuses";
+import asyncMiddleware from "@/middlewares/async";
+import { authenticate } from "@/middlewares/passport-auth";
+import Application from "@/models/Application";
+import ApplicationPool from "@/models/PreStakedApp";
+import HttpError from "@/errors/http-error";
+import MailgunService from "@/services/MailgunService";
+import { getApp } from "@/lib/pocket";
+import { APPLICATION_STATUSES } from "@/application-statuses";
 
 const DEFAULT_GATEWAY_SETTINGS = {
   secretKey: "",

@@ -3,10 +3,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
 import passport from "passport";
-import { errorHandler } from "helpers/utils";
-import notFoundMiddleware from "middlewares/not-found";
-import { configureRoutes } from "routes";
-import { connect } from "db";
+import { errorHandler } from "@/helpers/utils";
+import notFoundMiddleware from "@/middlewares/not-found";
+import { configureRoutes } from "@/routes";
+import { connect } from "@/db";
 
 const PORT = process.env.PORT || 4200;
 

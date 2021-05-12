@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import { Encryptor, Decryptor } from "strong-cryptor";
 import isEmail from "validator/lib/isEmail";
-import env from "environment";
+import env from "@/environment";
 
 const cryptoKey = env("persistence").default.db_encryption_key;
 const encryptor = new Encryptor({ key: cryptoKey });
@@ -72,10 +72,12 @@ applicationSchema.statics.encryptSensitiveFields = function encryptSensitiveFiel
   privateKey,
   secretKey
 ) {
+  // @ts-expect-error ts-migrate(2365) FIXME: Operator '<=' cannot be applied to types 'boolean'... Remove this comment to see the full error message
   if (!privateKey.length <= MIN_PRIVATE_KEY_LENGTH) {
     throw new Error("Wrong private key length");
   }
 
+  // @ts-expect-error ts-migrate(2365) FIXME: Operator '<=' cannot be applied to types 'boolean'... Remove this comment to see the full error message
   if (!secretKey.length <= MIN_SECRET_KEY_LENGTH) {
     throw new Error("Wrong secret key length");
   }
@@ -93,15 +95,18 @@ applicationSchema.statics.decryptSensitiveFields = function decryptSensitiveFiel
   privateKey,
   secretKey
 ) {
+  // @ts-expect-error ts-migrate(2365) FIXME: Operator '<=' cannot be applied to types 'boolean'... Remove this comment to see the full error message
   if (!privateKey.length <= MIN_PRIVATE_KEY_LENGTH) {
     throw new Error("Wrong private key length");
   }
 
+  // @ts-expect-error ts-migrate(2365) FIXME: Operator '<=' cannot be applied to types 'boolean'... Remove this comment to see the full error message
   if (!secretKey.length <= MIN_SECRET_KEY_LENGTH) {
     throw new Error("Wrong secret key length");
   }
 
   const encryptedPrivateKey = decryptor.decrypt(privateKey);
+  // @ts-expect-error ts-migrate(2551) FIXME: Property 'decrypt' does not exist on type 'Encrypt... Remove this comment to see the full error message
   const encryptedSecretKey = encryptor.decrypt(secretKey);
 
   return {

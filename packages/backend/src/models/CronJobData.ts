@@ -1,11 +1,9 @@
 import { PocketTransaction } from "./Transaction";
-
 export const BOND_STATUS = {
   2: "Staked",
   1: "Unstaking",
   0: "Unstaked",
 };
-
 export const STAKE_STATUS = {
   Staked: "Staked",
   Unstaking: "Unstaking",
@@ -14,7 +12,6 @@ export const STAKE_STATUS = {
   1: "Unstaking",
   0: "Unstaked",
 };
-
 export class CronJobData {
   /**
    * @param {string} id The ID of the entity.
@@ -47,20 +44,23 @@ export class CronJobData {
       nodeUnjailTransactions,
     });
   }
-
   static newInstance(dbArray) {
+    // @ts-expect-error ts-migrate(2554) FIXME: Expected 8 arguments, but got 0.
     const cronJobData = new CronJobData();
     const data = dbArray[0];
 
-    cronJobData.id = data.id;
-    cronJobData.lastHeight = data.lastHeight;
-    cronJobData.pendingTransactions = data.pendingTransactions ?? [];
-    cronJobData.appStakeTransactions = data.appStakeTransactions ?? [];
-    cronJobData.nodeStakeTransactions = data.nodeStakeTransactions ?? [];
-    cronJobData.appUnstakeTransactions = data.appUnstakeTransactions ?? [];
-    cronJobData.nodeUnstakeTransactions = data.nodeUnstakeTransactions ?? [];
-    cronJobData.nodeUnjailTransactions = data.nodeUnjailTransactions ?? [];
-
+    (cronJobData as any).id = data.id;
+    (cronJobData as any).lastHeight = data.lastHeight;
+    (cronJobData as any).pendingTransactions = data.pendingTransactions ?? [];
+    (cronJobData as any).appStakeTransactions = data.appStakeTransactions ?? [];
+    (cronJobData as any).nodeStakeTransactions =
+      data.nodeStakeTransactions ?? [];
+    (cronJobData as any).appUnstakeTransactions =
+      data.appUnstakeTransactions ?? [];
+    (cronJobData as any).nodeUnstakeTransactions =
+      data.nodeUnstakeTransactions ?? [];
+    (cronJobData as any).nodeUnjailTransactions =
+      data.nodeUnjailTransactions ?? [];
     return cronJobData;
   }
 }
