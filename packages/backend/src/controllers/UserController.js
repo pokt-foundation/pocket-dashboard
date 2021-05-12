@@ -9,6 +9,9 @@ import HttpError from "errors/http-error";
 import passport from "lib/passport-local";
 import SendgridEmailService from "services/SendGridEmailService";
 import env from "environment";
+import mailgun from "mailgun-js";
+
+const DOMAIN = "pokt.network";
 
 const SALT_ROUNDS = 10;
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
