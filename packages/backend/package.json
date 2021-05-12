@@ -10,7 +10,7 @@
   "author": "Pocket Foundation",
   "license": "MIT",
   "scripts": {
-    "build": "babel ./src --out-dir ./build --source-maps --copy-files",
+    "build": "babel ./src --out-dir ./build --source-maps --copy-files --extensions '.ts'",
     "start": "NODE_ENV=development nodemon --ignore ./dist --exec babel-node ./src/index.ts --extensions '.ts'",
     "start:prod": " yarn build && NODE_ENV=production node ./build",
     "test": "mocha test",
