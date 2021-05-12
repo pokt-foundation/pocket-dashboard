@@ -163,13 +163,13 @@ export async function sendUsageNotifications(ctx) {
       );
 
       emailService.send({
-        templateName: "NotificationThresholdHit",
-        toEmail: userEmail,
         templateData: {
           app_name: appName,
           app_id: appId.toString(),
           usage: `${totalUsage}%`,
         },
+        templateName: "NotificationThresholdHit",
+        toEmail: userEmail,
       });
 
       application.notificationSettings[

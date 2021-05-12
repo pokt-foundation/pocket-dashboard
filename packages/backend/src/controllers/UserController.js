@@ -125,12 +125,12 @@ router.post(
           const emailService = new MailgunService();
 
           await emailService.send({
-            templateName: "SignUp",
-            toEmail: user.email,
             templateData: {
               user_email: user.email,
               verify_link: validationLink,
             },
+            templateName: "SignUp",
+            toEmail: user.email,
           });
 
           return next(
@@ -181,12 +181,12 @@ router.post(
       const emailService = new MailgunService();
 
       await emailService.send({
-        templateName: "SignUp",
-        toEmail: user.email,
         templateData: {
           user_email: user.email,
           verify_link: validationLink,
         },
+        templateName: "SignUp",
+        toEmail: user.email,
       });
 
       return res.status(204).send();
@@ -247,12 +247,12 @@ router.post(
 
     try {
       await emailService.send({
-        templateName: "PasswordReset",
-        toEmail: user.email,
         templateData: {
           user_email: user.email,
           reset_link: resetLink,
         },
+        templateName: "PasswordReset",
+        toEmail: user.email,
       });
     } catch (err) {
       console.log(err);
