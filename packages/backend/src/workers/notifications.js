@@ -2,7 +2,7 @@
 import dayjs from "dayjs";
 import dayJsutcPlugin from "dayjs/plugin/utc";
 import { gql, GraphQLClient } from "graphql-request";
-import SendgridEmailService from "services/SendGridEmailService";
+import MailgunService from "services/MailgunService";
 import Application from "models/Application";
 import User from "models/User";
 import env from "environment";
@@ -151,7 +151,7 @@ export async function sendUsageNotifications(ctx) {
       }
 
       const { email: userEmail = "" } = user;
-      const emailService = new SendgridEmailService();
+      const emailService = new MailgunService();
 
       const totalUsage = (
         (servedRelays / THRESHOLDS.get("full")) *
@@ -162,16 +162,15 @@ export async function sendUsageNotifications(ctx) {
         `Notifying app ${appName} (ID: ${appId}) from user ${userId} of ${totalUsage}% usage`
       );
 
-      emailService.sendEmailWithTemplate(
-        env("email").template_ids.NotificationHit,
-        userEmail,
-        env("email").from_email,
-        {
+      emailService.send({
+        templateName: "NotificationThresholdHit",
+        toEmail: userEmail,
+        templateData: {
           app_name: appName,
           app_id: appId.toString(),
           usage: `${totalUsage}%`,
-        }
-      );
+        },
+      });
 
       application.notificationSettings[
         `${thresholdKey}${LAST_SENT_SUFFIX}`

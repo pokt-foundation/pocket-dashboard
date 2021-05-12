@@ -7,11 +7,8 @@ import Token, { TOKEN_TYPES } from "models/Token";
 import User from "models/User";
 import HttpError from "errors/http-error";
 import passport from "lib/passport-local";
-import SendgridEmailService from "services/SendGridEmailService";
+import MailgunService from "services/MailgunService";
 import env from "environment";
-import mailgun from "mailgun-js";
-
-const DOMAIN = "pokt.network";
 
 const SALT_ROUNDS = 10;
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
@@ -125,17 +122,16 @@ router.post(
             user.email
           )}`;
 
-          const emailService = new SendgridEmailService();
+          const emailService = new MailgunService();
 
-          await emailService.sendEmailWithTemplate(
-            env("email").template_ids.SignUp,
-            user.email,
-            env("email").from_email,
-            {
+          await emailService.send({
+            templateName: "SignUp",
+            toEmail: user.email,
+            templateData: {
               user_email: user.email,
               verify_link: validationLink,
-            }
-          );
+            },
+          });
 
           return next(
             HttpError.BAD_REQUEST({
@@ -166,7 +162,7 @@ router.post(
       if (!user) {
         return next(
           HttpError.BAD_REQUEST({
-            message: "Incorrect email or password",
+            message: "There was an error while creating your account",
           })
         );
       }
@@ -182,17 +178,16 @@ router.post(
         user.email
       )}`;
 
-      const emailService = new SendgridEmailService();
+      const emailService = new MailgunService();
 
-      await emailService.sendEmailWithTemplate(
-        env("email").template_ids.SignUp,
-        user.email,
-        env("email").from_email,
-        {
+      await emailService.send({
+        templateName: "SignUp",
+        toEmail: user.email,
+        templateData: {
           user_email: user.email,
           verify_link: validationLink,
-        }
-      );
+        },
+      });
 
       return res.status(204).send();
     })(req, res, next);
@@ -248,18 +243,17 @@ router.post(
       user.email
     )}`;
 
-    const emailService = new SendgridEmailService();
+    const emailService = new MailgunService();
 
     try {
-      await emailService.sendEmailWithTemplate(
-        env("email").template_ids.ResetPassword,
-        user.email,
-        env("email").from_email,
-        {
+      await emailService.send({
+        templateName: "PasswordReset",
+        toEmail: user.email,
+        templateData: {
           user_email: user.email,
           reset_link: resetLink,
-        }
-      );
+        },
+      });
     } catch (err) {
       console.log(err);
     }

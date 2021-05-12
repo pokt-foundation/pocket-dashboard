@@ -42,7 +42,7 @@ app.use(errorHandler(app));
 
 export const startServer = async () => {
   try {
-    // await connect();
+    await connect();
     app.listen(PORT, () => {
       console.log(`App listening to ${PORT}....`);
       console.log("Press Ctrl+C to quit.");

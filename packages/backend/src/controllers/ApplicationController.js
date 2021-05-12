@@ -5,7 +5,7 @@ import { authenticate } from "middlewares/passport-auth";
 import Application from "models/Application";
 import ApplicationPool from "models/PreStakedApp";
 import HttpError from "errors/http-error";
-import SendgridEmailService from "services/SendGridEmailService";
+import MailgunService from "services/MailgunService";
 import { getApp } from "lib/pocket";
 import { APPLICATION_STATUSES } from "application-statuses";
 import env from "environment";
@@ -304,7 +304,8 @@ router.put(
       });
     }
 
-    const emailService = new SendgridEmailService();
+    const emailService = new MailgunService();
+
     const isSignedUp = application.notificationSettings.signedUp;
     const hasOptedOut = !(quarter || half || threeQuarters || full);
 
@@ -319,17 +320,15 @@ router.put(
     await application.save();
 
     if (!isSignedUp) {
-      emailService.sendEmailWithTemplate(
-        env("email").template_ids.NotificationSignup,
-        req.user.email,
-        env("email").from_email
-      );
+      emailService.send({
+        templateName: "NotificationSignup",
+        toEmail: req.user.email,
+      });
     } else {
-      emailService.sendEmailWithTemplate(
-        env("email").template_ids.NotificationChanges,
-        req.user.email,
-        env("email").from_email
-      );
+      emailService.send({
+        templateName: "NotificationChange",
+        toEmail: req.user.email,
+      });
     }
 
     return res.status(204).send();
