@@ -2,25 +2,31 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 export const ENV_VARS = {
-  prod() {
+  prod(): boolean {
     return process.env.NODE_ENV === "production";
   },
-  FRONTEND_URL() {
+  FRONTEND_URL(): string {
     return process.env.FRONTEND_URL || "http://localhost:3000";
   },
-  ALLOWED_DOMAINS() {
+  ALLOWED_DOMAINS(): string[] {
     return process.env.ALLOWED_DOMAINS?.split(",") ?? ["http://localhost:3000"];
   },
-  enable_workers() {
+  enable_workers(): boolean {
     return Boolean(process.env.ENABLE_WORKERS) || false;
   },
-  HASURA_SECRET() {
+  HASURA_SECRET(): string {
     return process.env.HASURA_ADMIN_SECRET || "";
   },
-  HASURA_URL() {
+  HASURA_URL(): string {
     return process.env.HASURA_URL?.trim() ?? "";
   },
-  auth() {
+  auth(): {
+    public_secret: string;
+    private_secret: string;
+    secret_key: string;
+    expiration: string;
+    refresh_expiration: string;
+  } {
     return {
       public_secret:
         process.env.JWT_PUBLIC_SECRET?.replace(/\\n/gm, "\n") ?? "",
@@ -31,13 +37,14 @@ export const ENV_VARS = {
       refresh_expiration: process.env.JWT_REFRESH_EXPIRATION,
     };
   },
-  EMAIL_API_KEY() {
-    return process.env.EMAIL_API_KEY;
+  EMAIL_API_KEY(): string {
+    return process.env.EMAIL_API_KEY?.trim() ?? "";
   },
-  EMAIL_FROM() {
+  EMAIL_FROM(): string {
     return process.env.EMAIL_FROM;
   },
-  persistence() {
+  // TODO: Refactor to have better names
+  persistence(): unknown {
     return {
       default: {
         url: process.env.DATABASE_URL,
@@ -59,7 +66,7 @@ export const ENV_VARS = {
       },
     };
   },
-  pocket_network() {
+  pocket_network(): unknown {
     return {
       aat_version: process.env.POCKET_NETWORK_AAT_VERSION,
       transaction_fee: process.env.POCKET_NETWORK_TRANSACTION_FEE,
@@ -83,12 +90,12 @@ export const ENV_VARS = {
       main_fund_address: process.env.POCKET_NETWORK_MAIN_FUND_ADDRESS,
     };
   },
-  recaptcha() {
+  recaptcha(): unknown {
     return {
       google_server: process.env.RECAPTCHA_SERVER_SECRET,
     };
   },
-  aws() {
+  aws(): unknown {
     return {
       access_key_id: process.env.AWS_ACCESS_KEY_ID,
       secret_access_key: process.env.AWS_SECRET_ACCESS_KEY,
@@ -106,6 +113,8 @@ export const ENV_VARS = {
  * @returns {object} object with scoped environment variables
  *
  */
-export default function env(name) {
+export default function env(
+  name: string
+): string | boolean | Record<string, unknown> {
   return ENV_VARS[name]();
 }

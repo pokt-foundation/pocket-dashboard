@@ -40,7 +40,7 @@ configureRoutes(app);
 app.use(notFoundMiddleware());
 app.use(errorHandler(app));
 
-export const startServer = async () => {
+export const startServer = async (): Promise<void> => {
   try {
     await connect();
     app.listen(PORT, () => {
