@@ -90,6 +90,7 @@
     "@types/cors": "^2.8.10",
     "@types/express": "^4.17.11",
     "@types/jsonwebtoken": "^8.5.1",
+    "@types/mailgun-js": "^0.22.11",
     "@types/morgan": "^1.9.2",
     "@types/node": "^15.0.3",
     "@types/passport": "^1.0.6",

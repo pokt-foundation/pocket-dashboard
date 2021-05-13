@@ -1,8 +1,8 @@
 /* global BigInt */
 import { StakingStatus } from "@pokt-network/pocket-js";
-import NetworkData from "@/models/NetworkData";
-import Blockchains from "@/models/Blockchains";
-import { getNodes, getApplications } from "@/lib/pocket";
+import NetworkData from "../models/NetworkData";
+import Blockchains from "../models/Blockchains";
+import { getNodes, getApplications } from "../lib/pocket";
 
 async function getTotalNodesStaked() {
   const stakedNodes = await getNodes(StakingStatus.Staked);

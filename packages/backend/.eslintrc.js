@@ -1,9 +1,33 @@
 module.exports = {
+  root: true,
   env: {
     es6: true,
     mocha: true,
     node: true,
     mongo: true,
+  },
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: "./tsconfig.json",
+    tsconfigRootDir: "./",
+  },
+  plugins: ["@typescript-eslint", "jsdoc", "prettier", "import"],
+  extends: [
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended",
+    "prettier/babel",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+  ],
+  settings: {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"],
+    },
+    "import/resolver": {
+      typescript: {},
+    },
   },
   rules: {
     "no-console": "off",
@@ -20,6 +44,10 @@ module.exports = {
     "object-curly-spacing": ["error", "always"],
     "function-call-argument-newline": ["error", "consistent"],
     "one-var-declaration-per-line": ["error", "always"],
+    "import/no-named-as-default-member": "off",
+    "import/no-named-as-default": "off",
+    "import/default": "off",
+    "import/namespace": "off",
     "padding-line-between-statements": [
       "error",
       {
@@ -33,27 +61,5 @@ module.exports = {
         next: ["const", "let", "var"],
       },
     ],
-  },
-  plugins: ["@typescript-eslint", "jsdoc", "prettier", "import"],
-  settings: {
-    "import/resolver": {
-      typescript: {},
-      map: [['@', './src/']]
-    },
-    "import/extensions": [".js", ".jsx", ".ts", ".tsx"],
-    "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"],
-    },
-  },
-  extends: [
-    "eslint:recommended",
-    "plugin:prettier/recommended",
-    "prettier/babel",
-    "plugin:@typescript-eslint/recommended",
-  ],
-  parser: "@typescript-eslint/parser",
-  parserOptions: {
-    project: "./tsconfig.json",
-    tsconfigRootDir: "./",
   },
 };

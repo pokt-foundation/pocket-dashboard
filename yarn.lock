@@ -4640,6 +4640,14 @@
   resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.1.tgz#459c65fa1867dafe6a8f322c4c51695663cc55e9"
   integrity sha512-5tXH6Bx/kNGd3MgffdmP4dy2Z+G4eaXw0SE81Tq3BNadtnMR5/ySMzX4SLEzHJzSmPNn4HIdpQsBvXMUykr58w==
 
+"@types/mailgun-js@^0.22.11":
+  version "0.22.11"
+  resolved "https://registry.yarnpkg.com/@types/mailgun-js/-/mailgun-js-0.22.11.tgz#d34d0d01bf02fb791cbf3432e9ac5fecd9983044"
+  integrity sha512-aaUVSoWuVE5KpSfg1wkbdgZuMqycZnocBEdX5W39l80wZR+cLOhOHEbvQVLLY40ZhM7+tERRPCR+nVmCyAmE7w==
+  dependencies:
+    "@types/node" "*"
+    form-data "^2.5.0"
+
 "@types/markdown-to-jsx@^6.11.0":
   version "6.11.3"
   resolved "https://registry.yarnpkg.com/@types/markdown-to-jsx/-/markdown-to-jsx-6.11.3.tgz#cdd1619308fecbc8be7e6a26f3751260249b020e"
@@ -10896,7 +10904,7 @@ fork-ts-checker-webpack-plugin@4.1.6, fork-ts-checker-webpack-plugin@^4.1.4:
     tapable "^1.0.0"
     worker-rpc "^0.1.0"
 
-form-data@^2.3.1, form-data@^2.3.3:
+form-data@^2.3.1, form-data@^2.3.3, form-data@^2.5.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.5.1.tgz#f2cbec57b5e59e23716e128fe44d4e5dd23895f4"
   integrity sha512-m21N3WOmEEURgk6B9GLOE4RuWOFf28Lhh9qGYeNlGq4VDXUlJy2th2slBNU8Gp8EzloYZOibZJ7t5ecIrFSjVA==

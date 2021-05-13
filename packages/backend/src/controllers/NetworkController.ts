@@ -1,9 +1,9 @@
 import express from "express";
-import Chain from "@/models/Blockchains";
-import NetworkData from "@/models/NetworkData";
-import ApplicationPool from "@/models/PreStakedApp";
-import asyncMiddleware from "@/middlewares/async";
-import { authenticate } from "@/middlewares/passport-auth";
+import Chain from "../models/Blockchains";
+import NetworkData from "../models/NetworkData";
+import ApplicationPool from "../models/PreStakedApp";
+import asyncMiddleware from "../middlewares/async";
+import { authenticate } from "../middlewares/passport-auth";
 
 const router = express.Router();
 

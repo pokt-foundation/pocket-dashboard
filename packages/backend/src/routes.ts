@@ -1,13 +1,10 @@
-// @ts-expect-error ts-migrate(2307) FIXME: Cannot find module 'controllers/ApplicationControl... Remove this comment to see the full error message
-import Application from "@/controllers/ApplicationController";
-// @ts-expect-error ts-migrate(2307) FIXME: Cannot find module 'controllers/DefaultController'... Remove this comment to see the full error message
-import Index from "@/controllers/DefaultController";
-// @ts-expect-error ts-migrate(2307) FIXME: Cannot find module 'controllers/NetworkController'... Remove this comment to see the full error message
-import Network from "@/controllers/NetworkController";
-// @ts-expect-error ts-migrate(2307) FIXME: Cannot find module 'controllers/UserController' or... Remove this comment to see the full error message
-import User from "@/controllers/UserController";
+import { Application as ExpressApplication } from "express";
+import Application from "./controllers/ApplicationController";
+import Index from "./controllers/DefaultController";
+import Network from "./controllers/NetworkController";
+import User from "./controllers/UserController";
 
-export function configureRoutes(expressApp) {
+export function configureRoutes(expressApp: ExpressApplication): void {
   expressApp.use("/", Index);
 
   expressApp.use("/api/users", User);

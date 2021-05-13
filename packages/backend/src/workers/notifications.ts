@@ -2,10 +2,10 @@
 import dayjs from "dayjs";
 import dayJsutcPlugin from "dayjs/plugin/utc";
 import { gql, GraphQLClient } from "graphql-request";
-import MailgunService from "@/services/MailgunService";
-import Application from "@/models/Application";
-import User from "@/models/User";
-import env from "@/environment";
+import MailgunService from "../services/MailgunService";
+import Application from "../models/Application";
+import User from "../models/User";
+import env from "../environment";
 
 const LAST_SENT_SUFFIX = "LastSent";
 

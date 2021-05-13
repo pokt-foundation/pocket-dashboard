@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import env from "@/environment";
+import env from "./environment";
 
 const DEV_DB_URL = "mongodb://localhost:27017/gateway-testnet";
 
@@ -13,7 +13,10 @@ function composeMongoUrl(production = false) {
     : `${DEV_DB_URL}`;
 }
 
-export const connect = (url = composeMongoUrl(env("prod")), opts = {}) => {
+export const connect = (
+  url = composeMongoUrl(env("prod")),
+  opts = {}
+): Promise<typeof mongoose> => {
   const userSettings = env("prod")
     ? {
         user: env("persistence").default.db_user,

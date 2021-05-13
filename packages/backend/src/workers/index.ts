@@ -1,17 +1,17 @@
 import cron from "node-cron";
 import Logger from "@pokt-foundation/pocket-dashboard-shared/helpers/logger";
-import { workers } from "@/workers/config";
+import { workers } from "./config";
 
 const ONE_SECOND = 1000;
 
-export function startWorkers() {
+export function startWorkers(): void {
   Logger.setDefaults({ silent: false, verbose: true });
   const logger = Logger("dashboard-workers");
 
   for (const { name, color, workerFn, recurrence } of workers) {
     cron.schedule(recurrence, async function handleWorkerProcess() {
       const startTime = Date.now();
-      let endTime;
+      let endTime: number;
       const startInUtc = new Date(startTime).toUTCString();
 
       logger.log(

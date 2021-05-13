@@ -1,9 +1,9 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
-import User from "@/models/User";
-import env from "@/environment";
-import HttpError from "@/errors/http-error";
+import User from "../models/User";
+import env from "../environment";
+import HttpError from "../errors/http-error";
 
 const AUTH_FIELDS = {
   usernameField: "email",

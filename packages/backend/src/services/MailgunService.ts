@@ -1,5 +1,5 @@
 import mailgun from "mailgun-js";
-import env from "@/environment";
+import env from "../environment";
 
 const FROM_EMAIL = "Pocket Dashboard <dashboard@pokt.network>";
 

@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import { Encryptor, Decryptor } from "strong-cryptor";
 import isEmail from "validator/lib/isEmail";
-import env from "@/environment";
+import env from "../environment";
 
 const cryptoKey = env("persistence").default.db_encryption_key;
 const encryptor = new Encryptor({ key: cryptoKey });

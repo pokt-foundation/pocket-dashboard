@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import isEmail from "validator/lib/isEmail";
 import isStrongPassword from "validator/lib/isStrongPassword";
-import env from "@/environment";
+import env from "../environment";
 
 dotenv.config();
 

@@ -1,17 +1,13 @@
 /* global BigInt */
 import {
-  Application,
   Configuration,
   HttpRpcProvider,
-  Node,
   Pocket,
-  PocketRpcProvider,
   RpcError,
   typeGuard,
   UnlockedAccount,
-  PocketAAT,
 } from "@pokt-network/pocket-js";
-import env from "@/environment";
+import env from "../environment";
 
 const POCKET_NETWORK_CONFIGURATION = env("pocket_network");
 const POCKET_CONFIGURATION = new Configuration(

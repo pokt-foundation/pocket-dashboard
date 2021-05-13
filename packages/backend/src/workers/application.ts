@@ -1,16 +1,16 @@
 import crypto from "crypto";
 import { PocketAAT } from "@pokt-network/pocket-js";
-import PreStakedApp from "@/models/PreStakedApp";
-import { chains, FREE_TIER_STAKE_AMOUNT } from "@/workers/config";
+import PreStakedApp from "../models/PreStakedApp";
+import { chains, FREE_TIER_STAKE_AMOUNT } from "./config";
 import {
   createAppStakeTx,
   createUnlockedAccount,
   getBalance,
   submitRawTransaction,
   transferFromFreeTierFund,
-} from "@/lib/pocket";
-import { APPLICATION_STATUSES } from "@/application-statuses";
-import env from "@/environment";
+} from "../lib/pocket";
+import { APPLICATION_STATUSES } from "../application-statuses";
+import env from "../environment";
 
 async function createApplicationAndFund(ctx) {
   const {

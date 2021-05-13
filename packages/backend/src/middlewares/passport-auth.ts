@@ -1,5 +1,5 @@
-import HttpError from "@/errors/http-error";
-import passport from "@/lib/passport-local";
+import HttpError from "../errors/http-error";
+import passport from "../lib/passport-local";
 
 export const authenticate = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user, info) => {
