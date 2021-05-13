@@ -116,6 +116,7 @@ export const workers = [
   {
     name: "App decomissioner",
     color: "green",
+    // @ts-expect-error ts-migrate(2554) FIXME: Expected 0 arguments, but got 1.
     workerFn: (ctx) => unstakeAvailableApps(ctx),
     recurrence: FIFTEEN_MINUTES,
   },

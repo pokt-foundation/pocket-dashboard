@@ -4,7 +4,7 @@ import env from "./environment";
 
 startServer();
 
-if (env("enable_workers")) {
+if (env("ENABLE_WORKERS")) {
   startWorkers();
 } else {
   console.log("--- WORKERS NOT ENABLED ---");

@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import User from "../models/User";
-import env from "../environment";
+import env, { AuthKeys } from "../environment";
 import HttpError from "../errors/http-error";
 
 const AUTH_FIELDS = {
@@ -10,8 +10,9 @@ const AUTH_FIELDS = {
   passwordField: "password",
   passReqToCallback: true,
 };
+
 const JWT_OPTIONS = {
-  secretOrKey: env("auth").public_secret,
+  secretOrKey: (env("AUTH") as AuthKeys).publicSecret,
   algorithms: ["RS256"],
   passReqToCallback: true,
 };
@@ -24,6 +25,7 @@ function extractTokenFromCookie(req) {
   ExtractJwt.fromAuthHeaderAsBearerToken(),
   (req) => extractTokenFromCookie(req),
 ]);
+
 passport.use(
   "login",
   new Strategy(AUTH_FIELDS, async (req, email, password, done) => {
@@ -43,7 +45,7 @@ passport.use(
           null
         );
       }
-      if (!user.v2) {
+      if (!(user as any).v2) {
         return done(
           HttpError.BAD_REQUEST({
             errors: [
@@ -57,7 +59,7 @@ passport.use(
           null
         );
       }
-      const isPasswordValid = await user.comparePassword(password);
+      const isPasswordValid = await (user as any).comparePassword(password);
 
       if (!isPasswordValid) {
         return done(
@@ -79,6 +81,7 @@ passport.use(
     }
   })
 );
+
 passport.use(
   "signup",
   new Strategy(AUTH_FIELDS, async (req, email, password, done) => {
@@ -94,7 +97,7 @@ passport.use(
           null
         );
       }
-      const isPasswordSecure = await User.validatePassword(password);
+      const isPasswordSecure = await (User as any).validatePassword(password);
 
       if (!isPasswordSecure) {
         return done(
@@ -106,7 +109,7 @@ passport.use(
           null
         );
       }
-      const encryptedPassword = await User.encryptPassword(password);
+      const encryptedPassword = await (User as any).encryptPassword(password);
       const user = new User({
         email: processedEmail,
         username: processedEmail,
@@ -123,6 +126,7 @@ passport.use(
     }
   })
 );
+
 passport.use(
   new JwtStrategy(JWT_OPTIONS, (req, jwtPayload, done) => {
     User.findOne({ _id: jwtPayload.id })

@@ -9,15 +9,12 @@ import HttpError from "../errors/http-error";
 import passport from "../lib/passport-local";
 import MailgunService from "../services/MailgunService";
 import env from "../environment";
-
 const SALT_ROUNDS = 10;
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
-
 const router = express.Router();
 
 function createCookieFromToken(user, statusCode, req, res) {
   const token = user.generateVerificationToken();
-
   const cookieOptions = {
     // Expires in 10 days
     expires: new Date(Date.now() + TEN_DAYS),
@@ -27,7 +24,6 @@ function createCookieFromToken(user, statusCode, req, res) {
   };
 
   res.cookie("jwt", token, cookieOptions);
-
   res.status(statusCode).json({
     status: "success",
     token,
@@ -36,10 +32,8 @@ function createCookieFromToken(user, statusCode, req, res) {
     },
   });
 }
-
 function destroyCookie(user, req, res) {
   const token = user.generateVerificationToken();
-
   const cookieOptions = {
     // Expires in 10 days
     expires: new Date(Date.now() - TEN_DAYS),
@@ -48,7 +42,6 @@ function destroyCookie(user, req, res) {
   };
 
   res.cookie("jwt", token, cookieOptions);
-
   res.status(200).json({
     status: "success",
     token,
@@ -57,17 +50,14 @@ function destroyCookie(user, req, res) {
     },
   });
 }
-
 async function createNewVerificationToken(userId, userEmail) {
   const staleToken = await Token.findOne({ userId });
 
   if (staleToken) {
     await staleToken.deleteOne();
   }
-
   const validationToken = crypto.randomBytes(32).toString("hex");
   const hashedValidationToken = await bcrypt.hash(validationToken, SALT_ROUNDS);
-
   const userValidationToken = new Token({
     userId: userId,
     email: userEmail,
@@ -77,10 +67,8 @@ async function createNewVerificationToken(userId, userEmail) {
   });
 
   await userValidationToken.save();
-
   return validationToken;
 }
-
 /**
  * User authentication using username and password.
  */
@@ -96,7 +84,6 @@ router.post(
         if (err) {
           return next(err);
         }
-
         if (!user) {
           return next(
             HttpError.BAD_REQUEST({
@@ -109,19 +96,16 @@ router.post(
             })
           );
         }
-
         if (!user.validated) {
           const validationToken = await createNewVerificationToken(
             user._id,
             user.email
           );
-
           const validationLink = `${env(
             "FRONTEND_URL"
           )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
             user.email
           )}`;
-
           const emailService = new MailgunService();
 
           await emailService.send({
@@ -132,7 +116,6 @@ router.post(
             templateName: "SignUp",
             toEmail: user.email,
           });
-
           return next(
             HttpError.BAD_REQUEST({
               errors: [
@@ -141,13 +124,11 @@ router.post(
             })
           );
         }
-
         createCookieFromToken(user, 200, req, res);
       }
     )(req, res, next);
   })
 );
-
 /**
  * User sign up using email.
  */
@@ -158,7 +139,6 @@ router.post(
       if (err) {
         return next(err);
       }
-
       if (!user) {
         return next(
           HttpError.BAD_REQUEST({
@@ -166,18 +146,15 @@ router.post(
           })
         );
       }
-
       const validationToken = await createNewVerificationToken(
         user._id,
         user.email
       );
-
       const validationLink = `${env(
         "FRONTEND_URL"
       )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
         user.email
       )}`;
-
       const emailService = new MailgunService();
 
       await emailService.send({
@@ -188,12 +165,10 @@ router.post(
         templateName: "SignUp",
         toEmail: user.email,
       });
-
       return res.status(204).send();
     })(req, res, next);
   })
 );
-
 /**
  * Validate captcha token
  */
@@ -202,19 +177,16 @@ router.post(
   asyncMiddleware(async (req, res) => {
     /** @type {{token:string}} */
     const { token } = req.body;
-    const result = await User.verifyCaptcha(token);
+    const result = await (User as any).verifyCaptcha(token);
 
     res.json(result.data);
   })
 );
-
 router.post(
   "/send-reset-email",
   asyncMiddleware(async (req, res) => {
     const { email } = req.body;
-
     const processedEmail = email;
-
     const user = await User.findOne({ email: processedEmail });
 
     if (!user) {
@@ -224,10 +196,8 @@ router.post(
         ],
       });
     }
-
     const resetToken = crypto.randomBytes(32).toString("hex");
     const hashedResetToken = await bcrypt.hash(resetToken, SALT_ROUNDS);
-
     const userResetToken = new Token({
       userId: user._id,
       email: processedEmail,
@@ -240,19 +210,18 @@ router.post(
     const resetLink = `${env(
       "FRONTEND_URL"
     )}/#/newpassword?token=${resetToken}&email=${encodeURIComponent(
-      user.email
+      (user as any).email
     )}`;
-
     const emailService = new MailgunService();
 
     try {
       await emailService.send({
         templateData: {
-          user_email: user.email,
+          user_email: (user as any).email,
           reset_link: resetLink,
         },
         templateName: "PasswordReset",
-        toEmail: user.email,
+        toEmail: (user as any).email,
       });
     } catch (err) {
       console.log(err);
@@ -260,7 +229,6 @@ router.post(
     return res.status(204).send();
   })
 );
-
 router.post(
   "/reset-password",
   asyncMiddleware(async (req, res) => {
@@ -271,8 +239,7 @@ router.post(
         message: "Missing required fields in body",
       });
     }
-
-    const isPasswordValid = await User.validatePassword(password1);
+    const isPasswordValid = await (User as any).validatePassword(password1);
     const processedEmail = email;
 
     if (!isPasswordValid) {
@@ -280,13 +247,11 @@ router.post(
         errors: [{ message: "Password is not secure enough" }],
       });
     }
-
     if (password1 !== password2) {
       throw HttpError.BAD_REQUEST({
         errors: [{ message: "Passwords don't match" }],
       });
     }
-
     const storedToken = await Token.findOne({
       $and: [{ email: processedEmail }, { type: TOKEN_TYPES.reset }],
     });
@@ -296,15 +261,16 @@ router.post(
         errors: [{ message: "Token has expired" }],
       });
     }
-
-    const isTokenMatching = await bcrypt.compare(plainToken, storedToken.token);
+    const isTokenMatching = await bcrypt.compare(
+      plainToken,
+      (storedToken as any).token
+    );
 
     if (!isTokenMatching) {
       throw HttpError.BAD_REQUEST({
         errors: [{ message: "Token is not matching" }],
       });
     }
-
     const newHashedPassword = await bcrypt.hash(password1, SALT_ROUNDS);
 
     await User.updateOne(
@@ -314,13 +280,10 @@ router.post(
       { $set: { password: newHashedPassword } },
       { new: true }
     );
-
     await storedToken.deleteOne();
-
     res.status(204).send();
   })
 );
-
 router.post(
   "/validate-user",
   asyncMiddleware(async (req, res) => {
@@ -331,9 +294,7 @@ router.post(
         errors: [{ id: "MISSING_FIELDS", message: "Invalid request" }],
       });
     }
-
     const processedEmail = decodeURIComponent(email);
-
     const storedToken = await Token.findOne({
       $and: [{ email: processedEmail }, { type: TOKEN_TYPES.verification }],
     });
@@ -343,15 +304,16 @@ router.post(
         errors: [{ id: "EXPIRED_TOKEN", message: "Token has expired" }],
       });
     }
-
-    const isTokenMatching = await bcrypt.compare(plainToken, storedToken.token);
+    const isTokenMatching = await bcrypt.compare(
+      plainToken,
+      (storedToken as any).token
+    );
 
     if (!isTokenMatching) {
       throw HttpError.BAD_REQUEST({
         errors: [{ id: "INVALID_TOKEN", message: "Token is invalid" }],
       });
     }
-
     await User.updateOne(
       {
         email: processedEmail,
@@ -359,15 +321,11 @@ router.post(
       { $set: { validated: true } },
       { new: true }
     );
-
     await storedToken.deleteOne();
-
     res.status(204).send();
   })
 );
-
 router.use(authenticate);
-
 router.post(
   "/logout",
   asyncMiddleware(async (req, res) => {
@@ -376,5 +334,4 @@ router.post(
     destroyCookie(user, req, res);
   })
 );
-
 export default router;

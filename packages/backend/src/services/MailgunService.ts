@@ -40,6 +40,7 @@ export default class MailgunService {
   mailService: any;
   constructor() {
     this.mailService = mailgun({
+      // @ts-expect-error ts-migrate(2322) FIXME: Type 'string | boolean | Record<string, unknown>' ... Remove this comment to see the full error message
       apiKey: env("EMAIL_API_KEY"),
       domain: DOMAIN,
     });

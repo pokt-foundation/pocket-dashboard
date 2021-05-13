@@ -6,9 +6,7 @@ import jwt from "jsonwebtoken";
 import isEmail from "validator/lib/isEmail";
 import isStrongPassword from "validator/lib/isStrongPassword";
 import env from "../environment";
-
 dotenv.config();
-
 const SALT_ROUNDS = 10;
 const userSchema = new Schema(
   {
@@ -38,22 +36,15 @@ userSchema.statics.comparePassword = function comparePassword(
 ) {
   return bcrypt.compare(plainPassword, userPassword);
 };
-userSchema.statics.verifyCaptcha = function verifyCaptcha(token) {
-  const secret = env("recaptcha").google_server;
-
-  /**
-   * Although is a POST request, google requires the data to be sent by query
-   * params, trying to do so in the body will result on an error.
-   */
-  return axios.post(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
-  );
-};
 userSchema.methods.generateVerificationToken = function generateVerificationToken() {
-  const token = jwt.sign({ id: this._id }, env("auth").private_secret, {
-    expiresIn: "10d",
-    algorithm: "RS256",
-  });
+  const token = jwt.sign(
+    { id: this._id },
+    (env("AUTH") as any).private_secret,
+    {
+      expiresIn: "10d",
+      algorithm: "RS256",
+    }
+  );
 
   return token;
 };
