@@ -1,6 +1,7 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Model, Document, Types } from "mongoose";
 import { Encryptor, Decryptor } from "strong-cryptor";
 import isEmail from "validator/lib/isEmail";
+import { IFreeTierApplicationAccount, IGatewayAAT } from "./types";
 import env, { PersistenceKeys } from "../environment";
 
 const MIN_PRIVATE_KEY_LENGTH = 128;
@@ -9,6 +10,39 @@ const MIN_SECRET_KEY_LENGTH = 32;
 const cryptoKey = (env("PERSISTENCE") as PersistenceKeys).dbEncryptionKey;
 const encryptor = new Encryptor({ key: cryptoKey });
 const decryptor = new Decryptor({ key: cryptoKey });
+
+interface IGatewaySettings {
+  secretKey: string;
+  secretKeyRequired: boolean;
+  whitelistOrigins: string[];
+  whitelistuserAgents: string[];
+}
+
+interface INotificationSettings {
+  signedUp: boolean;
+  quarter: boolean;
+  quarterLastSent: Date;
+  half: boolean;
+  halfLastSent: Date;
+  threeQuarters: boolean;
+  threeQuartersLastSent: Date;
+  full: boolean;
+  fullLastSent: Date;
+  createdAt: Date;
+}
+
+export interface IApplication extends Document {
+  chain: string;
+  name: string;
+  user: Types.ObjectId;
+  freeTier: boolean;
+  status: string;
+  lastChangedStatusAt: Date;
+  freeTierApplicationAccount: IFreeTierApplicationAccount;
+  gatewayAAT: IGatewayAAT;
+  gatewaySettings: IGatewaySettings;
+  notificationSettings: INotificationSettings;
+}
 
 const applicationSchema = new Schema(
   {
@@ -102,6 +136,10 @@ applicationSchema.statics.decryptSensitiveFields = function decryptSensitiveFiel
     encryptedSecretKey,
   };
 };
-const ApplicationModel = model("Application", applicationSchema);
+
+const ApplicationModel: Model<IApplication> = model(
+  "Application",
+  applicationSchema
+);
 
 export default ApplicationModel;

@@ -1,14 +1,26 @@
-import { Schema, model } from "mongoose";
-import axios from "axios";
+import { Schema, model, Model, Document } from "mongoose";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import isEmail from "validator/lib/isEmail";
 import isStrongPassword from "validator/lib/isStrongPassword";
-import env from "../environment";
+import env, { AuthKeys } from "../environment";
+
 dotenv.config();
+
 const SALT_ROUNDS = 10;
-const userSchema = new Schema(
+
+export interface IUser extends Document {
+  provider?: string;
+  email: string;
+  username: string;
+  password: string;
+  lastLogin: string;
+  validated: boolean;
+  v2: boolean;
+}
+
+const userSchema = new Schema<IUser>(
   {
     provider: String,
     email: String,
@@ -39,7 +51,7 @@ userSchema.statics.comparePassword = function comparePassword(
 userSchema.methods.generateVerificationToken = function generateVerificationToken() {
   const token = jwt.sign(
     { id: this._id },
-    (env("AUTH") as any).private_secret,
+    (env("AUTH") as AuthKeys).privateSecret,
     {
       expiresIn: "10d",
       algorithm: "RS256",
@@ -48,9 +60,11 @@ userSchema.methods.generateVerificationToken = function generateVerificationToke
 
   return token;
 };
-userSchema.methods.comparePassword = function comparePassword(password) {
-  return bcrypt.compare(password, (this as any).password);
+userSchema.methods.comparePassword = function comparePassword(
+  password: string
+) {
+  return bcrypt.compare(password, (this as IUser).password);
 };
-const User = model("User", userSchema);
+const User: Model<IUser> = model("User", userSchema);
 
 export default User;

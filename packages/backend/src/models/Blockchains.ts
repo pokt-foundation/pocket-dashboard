@@ -1,4 +1,14 @@
-import { Schema, model } from "mongoose";
+import { Schema, Model, model, Document } from "mongoose";
+
+interface IChain extends Document {
+  _id: string;
+  networkID: string;
+  ticker: string;
+  name: string;
+  descrpition: string;
+  hash: string;
+  nodeCount: string;
+}
 
 const chainSchema = new Schema(
   {
@@ -13,6 +23,6 @@ const chainSchema = new Schema(
   { collection: "Blockchains" }
 );
 
-const ChainModel = model("Chain", chainSchema);
+const ChainModel: Model<IChain> = model("Chain", chainSchema);
 
 export default ChainModel;
