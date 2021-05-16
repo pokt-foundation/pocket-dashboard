@@ -1,4 +1,4 @@
-import { fillAppPool, stakeAppPool, unstakeAvailableApps } from "./application";
+import { fillAppPool, stakeAppPool } from "./application";
 import { getNetworkStatsCount, getNodeCountForChains } from "./network";
 import { sendUsageNotifications } from "./notifications";
 import {
@@ -104,38 +104,31 @@ export const workers = [
   {
     name: "App pool filler",
     color: "green",
-    workerFn: (ctx) => fillAppPool(ctx),
+    workerFn: (ctx): Promise<void> => fillAppPool(ctx),
     recurrence: ONE_MINUTES,
   },
   {
     name: "App pool staker",
     color: "green",
-    workerFn: (ctx) => stakeAppPool(ctx),
+    workerFn: (ctx): Promise<void> => stakeAppPool(ctx),
     recurrence: FIVE_MINUTES,
-  },
-  {
-    name: "App decomissioner",
-    color: "green",
-    // @ts-expect-error ts-migrate(2554) FIXME: Expected 0 arguments, but got 1.
-    workerFn: (ctx) => unstakeAvailableApps(ctx),
-    recurrence: FIFTEEN_MINUTES,
   },
   {
     name: "Network stats counter",
     color: "yellow",
-    workerFn: (ctx) => getNetworkStatsCount(ctx),
+    workerFn: (ctx): Promise<void> => getNetworkStatsCount(ctx),
     recurrence: SIXTY_MINUTES,
   },
   {
     name: "Nodes per chain counter",
     color: "yellow",
-    workerFn: (ctx) => getNodeCountForChains(ctx),
+    workerFn: (ctx): Promise<void> => getNodeCountForChains(ctx),
     recurrence: SIXTY_MINUTES,
   },
   {
     name: "Usage notification service",
     color: "blue",
-    workerFn: (ctx) => sendUsageNotifications(ctx),
+    workerFn: (ctx): Promise<void> => sendUsageNotifications(ctx),
     recurrence: FIFTEEN_MINUTES,
   },
 ];

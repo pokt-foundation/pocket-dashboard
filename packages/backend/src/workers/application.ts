@@ -4,7 +4,7 @@ import {
   QueryBalanceResponse,
   RawTxRequest,
 } from "@pokt-network/pocket-js";
-import PreStakedApp from "../models/PreStakedApp";
+import PreStakedApp, { IPreStakedApp } from "../models/PreStakedApp";
 import { chains, FREE_TIER_STAKE_AMOUNT } from "./config";
 import {
   createAppStakeTx,
@@ -16,7 +16,7 @@ import {
 import { APPLICATION_STATUSES } from "../application-statuses";
 import env, { PocketNetworkKeys } from "../environment";
 
-async function createApplicationAndFund(ctx) {
+async function createApplicationAndFund(ctx): Promise<void> {
   const { clientPubKey, aatVersion } = env(
     "POCKET_NETWORK"
   ) as PocketNetworkKeys;
@@ -31,7 +31,7 @@ async function createApplicationAndFund(ctx) {
     freeTierAccount.privateKey.toString("hex")
   );
 
-  const newAppForPool = new PreStakedApp({
+  const newAppForPool: IPreStakedApp = new PreStakedApp({
     status: APPLICATION_STATUSES.AWAITING_FUNDS,
     freeTierApplicationAccount: {
       address: freeTierAccount.addressHex,
@@ -59,14 +59,19 @@ async function createApplicationAndFund(ctx) {
     freeTierAccount.addressHex
   );
 
-  (newAppForPool as any).status = APPLICATION_STATUSES.AWAITING_STAKING;
-  (newAppForPool as any).fundingTxHash = txHash;
+  newAppForPool.status = APPLICATION_STATUSES.AWAITING_STAKING;
+  newAppForPool.fundingTxHash = txHash;
   await newAppForPool.save();
+
   ctx.logger.log(
     `fillAppPool(): sent funds to account ${freeTierAccount.addressHex} on tx ${txHash}`
   );
 }
-async function stakeApplication(ctx, app, chain = "0002") {
+async function stakeApplication(
+  ctx,
+  app: IPreStakedApp,
+  chain = "0002"
+): Promise<void> {
   const { address, passPhrase, privateKey } = app.freeTierApplicationAccount;
   const { balance } = (await getBalance(address)) as QueryBalanceResponse;
 
@@ -100,7 +105,7 @@ async function stakeApplication(ctx, app, chain = "0002") {
   );
 }
 
-export async function fillAppPool(ctx) {
+export async function fillAppPool(ctx): Promise<void> {
   const totalPoolSize = Object.values(chains).reduce(
     (prev, { limit }) => prev + limit,
     0
@@ -127,14 +132,12 @@ export async function fillAppPool(ctx) {
     });
 }
 
-export async function stakeAppPool(ctx) {
+export async function stakeAppPool(ctx): Promise<void> {
   const appPool = await PreStakedApp.find();
-  const appsToStake = appPool.filter(
-    // @ts-expect-error ts-migrate(2339) FIXME: Property 'status' does not exist on type 'Document... Remove this comment to see the full error message
+  const appsToStake: IPreStakedApp[] = appPool.filter(
     ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
   );
   const stakedApps = appPool.filter(
-    // @ts-expect-error ts-migrate(2339) FIXME: Property 'status' does not exist on type 'Document... Remove this comment to see the full error message
     ({ status }) => status === APPLICATION_STATUSES.READY
   );
   const appAllocationCount = new Map();
@@ -148,7 +151,6 @@ export async function stakeAppPool(ctx) {
     appAllocationCount.set(id, limit);
   }
   // Now, remove the excess entries depending on the pool allocation
-  // @ts-expect-error ts-migrate(2339) FIXME: Property 'chain' does not exist on type 'Document<... Remove this comment to see the full error message
   for (const { chain } of stakedApps) {
     if (chain && !appAllocationCount.has(chain)) {
       ctx.logger.warn(
@@ -168,20 +170,16 @@ export async function stakeAppPool(ctx) {
     Array(count)
       .fill(0)
       .map(async () => {
-        const chosenApplication = appsToStake.pop();
+        const chosenApplication: IPreStakedApp = appsToStake.pop();
 
         if (!chosenApplication) {
           ctx.logger.warn(
-            `NOTICE: No more space in the pool for app demand. Tried to stake app ${
-              (chosenApplication as any).freeTierApplicationAccount.address
-            } for chain ${chain}`
+            `NOTICE: No more space in the pool for app demand. Tried to stake app ${chosenApplication.freeTierApplicationAccount.address} for chain ${chain}`
           );
           return;
         }
         ctx.logger.log(
-          `Staking application ${
-            (chosenApplication as any).freeTierApplicationAccount.address
-          } for chain ${chain}`
+          `Staking application ${chosenApplication.freeTierApplicationAccount.address} for chain ${chain}`
         );
         await stakeApplication(ctx, chosenApplication, chain);
       });

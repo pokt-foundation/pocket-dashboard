@@ -3,17 +3,19 @@ import dayjs from "dayjs";
 import dayJsutcPlugin from "dayjs/plugin/utc";
 import { gql, GraphQLClient } from "graphql-request";
 import MailgunService from "../services/MailgunService";
-import Application from "../models/Application";
+import Application, { IApplication } from "../models/Application";
 import User from "../models/User";
 import env from "../environment";
+
 const LAST_SENT_SUFFIX = "LastSent";
-// @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
+
 const THRESHOLDS = new Map([
   ["quarter", 25000],
   ["half", 50000],
-  ["threeQuarters"],
+  ["threeQuarters", 75000],
   ["full", 100000],
 ]);
+
 const DAILY_RELAYS_QUERY = gql`
   query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY($_eq: String, $_gte: timestamptz) {
     relay_apps_daily(
@@ -26,14 +28,14 @@ const DAILY_RELAYS_QUERY = gql`
     }
   }
 `;
-// @ts-expect-error ts-migrate(2345) FIXME: Argument of type 'string | boolean | Record<string... Remove this comment to see the full error message
-const gqlClient = new GraphQLClient(env("HASURA_URL"), {
+
+const gqlClient = new GraphQLClient(env("HASURA_URL") as string, {
   headers: {
-    "x-hasura-admin-secret": env("HASURA_SECRET"),
+    "x-hasura-admin-secret": env("HASURA_SECRET") as string,
   },
 });
 
-async function fetchRelayData(publicKey) {
+async function fetchRelayData(publicKey: string) {
   dayjs.extend(dayJsutcPlugin);
   const today = dayjs.utc();
   const formattedTimestamp = `${today.year()}-0${
@@ -47,6 +49,7 @@ async function fetchRelayData(publicKey) {
 
   return rawDailyRelays;
 }
+
 function calculateSentRelays(rawDailyRelays) {
   const dailyRelays = new Map();
 
@@ -66,7 +69,8 @@ function calculateSentRelays(rawDailyRelays) {
   }
   return servedRelays;
 }
-function calculateExceededThreshold(servedRelays) {
+
+function calculateExceededThreshold(servedRelays: number) {
   let highestThresholdExceeded = 0;
   let thresholdKey = "";
 
@@ -78,6 +82,7 @@ function calculateExceededThreshold(servedRelays) {
   }
   return [thresholdKey, highestThresholdExceeded];
 }
+
 export function getTimeDifferenceExceeded(notificationSettings, thresholdKey) {
   if (!(`${thresholdKey}${LAST_SENT_SUFFIX}` in notificationSettings)) {
     return false;
@@ -98,21 +103,18 @@ export function getTimeDifferenceExceeded(notificationSettings, thresholdKey) {
     ) > 0
   );
 }
+
 export async function sendUsageNotifications(ctx) {
-  const applications = await Application.find({
+  const applications: IApplication[] = await Application.find({
     status: { $exists: true },
     notificationSettings: { $exists: true },
   });
 
   for (const application of applications) {
     const {
-      // @ts-expect-error ts-migrate(2339) FIXME: Property 'freeTierApplicationAccount' does not exi... Remove this comment to see the full error message
       freeTierApplicationAccount,
-      // @ts-expect-error ts-migrate(2339) FIXME: Property 'notificationSettings' does not exist on ... Remove this comment to see the full error message
       notificationSettings,
-      // @ts-expect-error ts-migrate(2339) FIXME: Property 'user' does not exist on type 'Document<a... Remove this comment to see the full error message
       user: userId,
-      // @ts-expect-error ts-migrate(2339) FIXME: Property 'name' does not exist on type 'Document<a... Remove this comment to see the full error message
       name: appName,
       _id: appId,
     } = application;
@@ -135,7 +137,7 @@ export async function sendUsageNotifications(ctx) {
           `NOTICE(Notifications): Orphaned app ${appId}) from user ${userId} getting usage.`
         );
       }
-      // @ts-expect-error ts-migrate(2339) FIXME: Property 'email' does not exist on type 'Document<... Remove this comment to see the full error message
+
       const { email: userEmail = "" } = user;
       const emailService = new MailgunService();
       const totalUsage = (
@@ -146,6 +148,7 @@ export async function sendUsageNotifications(ctx) {
       ctx.logger.log(
         `Notifying app ${appName} (ID: ${appId}) from user ${userId} of ${totalUsage}% usage`
       );
+
       emailService.send({
         templateData: {
           app_name: appName,

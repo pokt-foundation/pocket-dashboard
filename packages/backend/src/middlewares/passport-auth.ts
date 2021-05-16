@@ -1,8 +1,13 @@
+import { NextFunction, Response, Request } from "express";
 import HttpError from "../errors/http-error";
 import passport from "../lib/passport-local";
 
-export const authenticate = (req, res, next) => {
-  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+export const authenticate = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  passport.authenticate("jwt", { session: false }, (err, user) => {
     if (err) {
       return next(
         HttpError.UNAUTHORIZED({

@@ -38,7 +38,7 @@ passport.initialize();
 
 configureRoutes(app);
 app.use(notFoundMiddleware());
-app.use(errorHandler(app));
+app.use(errorHandler());
 
 export const startServer = async (): Promise<void> => {
   try {

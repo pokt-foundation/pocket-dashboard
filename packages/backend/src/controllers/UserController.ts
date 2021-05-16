@@ -1,21 +1,33 @@
-import express from "express";
-import crypto from "crypto";
+import express, {
+  Response,
+  Request,
+  NextFunction,
+  CookieOptions,
+} from "express";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { Types } from "mongoose";
 import asyncMiddleware from "../middlewares/async";
 import { authenticate } from "../middlewares/passport-auth";
 import Token, { TOKEN_TYPES } from "../models/Token";
-import User from "../models/User";
+import User, { IUser } from "../models/User";
 import HttpError from "../errors/http-error";
 import passport from "../lib/passport-local";
 import MailgunService from "../services/MailgunService";
 import env from "../environment";
+
 const SALT_ROUNDS = 10;
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000;
 const router = express.Router();
 
-function createCookieFromToken(user, statusCode, req, res) {
+function createCookieFromToken(
+  user: IUser,
+  statusCode: number,
+  req: Request,
+  res: Response
+) {
   const token = user.generateVerificationToken();
-  const cookieOptions = {
+  const cookieOptions: CookieOptions = {
     // Expires in 10 days
     expires: new Date(Date.now() + TEN_DAYS),
     httpOnly: true,
@@ -32,7 +44,8 @@ function createCookieFromToken(user, statusCode, req, res) {
     },
   });
 }
-function destroyCookie(user, req, res) {
+
+function destroyCookie(user: IUser, req: Request, res: Response) {
   const token = user.generateVerificationToken();
   const cookieOptions = {
     // Expires in 10 days
@@ -50,7 +63,11 @@ function destroyCookie(user, req, res) {
     },
   });
 }
-async function createNewVerificationToken(userId, userEmail) {
+
+async function createNewVerificationToken(
+  userId: Types.ObjectId,
+  userEmail: string
+) {
   const staleToken = await Token.findOne({ userId });
 
   if (staleToken) {
@@ -69,12 +86,13 @@ async function createNewVerificationToken(userId, userEmail) {
   await userValidationToken.save();
   return validationToken;
 }
+
 /**
  * User authentication using username and password.
  */
 router.post(
   "/login",
-  asyncMiddleware(async (req, res, next) => {
+  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate(
       "login",
       // As we're using an API which requires a token for each request,
@@ -129,12 +147,13 @@ router.post(
     )(req, res, next);
   })
 );
+
 /**
  * User sign up using email.
  */
 router.post(
   "/signup",
-  asyncMiddleware(async (req, res, next) => {
+  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate("signup", { session: false }, async (err, user) => {
       if (err) {
         return next(err);
@@ -142,7 +161,12 @@ router.post(
       if (!user) {
         return next(
           HttpError.BAD_REQUEST({
-            message: "There was an error while creating your account",
+            errors: [
+              {
+                id: "CREATION_ERROR",
+                message: "There was an error while creating your account",
+              },
+            ],
           })
         );
       }
@@ -169,25 +193,13 @@ router.post(
     })(req, res, next);
   })
 );
-/**
- * Validate captcha token
- */
-router.post(
-  "/verify-captcha",
-  asyncMiddleware(async (req, res) => {
-    /** @type {{token:string}} */
-    const { token } = req.body;
-    const result = await (User as any).verifyCaptcha(token);
 
-    res.json(result.data);
-  })
-);
 router.post(
   "/send-reset-email",
-  asyncMiddleware(async (req, res) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     const { email } = req.body;
     const processedEmail = email;
-    const user = await User.findOne({ email: processedEmail });
+    const user: IUser = await User.findOne({ email: processedEmail });
 
     if (!user) {
       throw HttpError.BAD_REQUEST({
@@ -210,18 +222,18 @@ router.post(
     const resetLink = `${env(
       "FRONTEND_URL"
     )}/#/newpassword?token=${resetToken}&email=${encodeURIComponent(
-      (user as any).email
+      user.email
     )}`;
     const emailService = new MailgunService();
 
     try {
       await emailService.send({
         templateData: {
-          user_email: (user as any).email,
+          user_email: user.email,
           reset_link: resetLink,
         },
         templateName: "PasswordReset",
-        toEmail: (user as any).email,
+        toEmail: user.email,
       });
     } catch (err) {
       console.log(err);
@@ -229,46 +241,61 @@ router.post(
     return res.status(204).send();
   })
 );
+
 router.post(
   "/reset-password",
-  asyncMiddleware(async (req, res) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     const { plainToken, password1, password2, email } = req.body;
 
     if (!plainToken || !password1 || !password2 || !email) {
       throw HttpError.BAD_REQUEST({
-        message: "Missing required fields in body",
+        errors: [
+          {
+            id: "MISSING_FIELDS",
+            message: "Missing required fields in body",
+          },
+        ],
       });
     }
-    const isPasswordValid = await (User as any).validatePassword(password1);
+
+    // @ts-ignore
+    const isPasswordValid = await User.validatePassword(password1);
     const processedEmail = email;
 
     if (!isPasswordValid) {
       throw HttpError.BAD_REQUEST({
-        errors: [{ message: "Password is not secure enough" }],
+        errors: [
+          {
+            id: "NOT_SECURE_PASSWORD",
+            message: "Password is not secure enough",
+          },
+        ],
       });
     }
     if (password1 !== password2) {
       throw HttpError.BAD_REQUEST({
-        errors: [{ message: "Passwords don't match" }],
+        errors: [
+          { id: "NON_MATCHING_PASSWORDS", message: "Passwords don't match" },
+        ],
       });
     }
+
     const storedToken = await Token.findOne({
-      $and: [{ email: processedEmail }, { type: TOKEN_TYPES.reset }],
+      $and: [{ email: processedEmail }, { type: "TOKEN_RESET" }],
     });
 
     if (!storedToken) {
       throw HttpError.BAD_REQUEST({
-        errors: [{ message: "Token has expired" }],
+        errors: [{ id: "EXPIRED_TOKEN", message: "Token has expired" }],
       });
     }
-    const isTokenMatching = await bcrypt.compare(
-      plainToken,
-      (storedToken as any).token
-    );
+    const isTokenMatching = await bcrypt.compare(plainToken, storedToken.token);
 
     if (!isTokenMatching) {
       throw HttpError.BAD_REQUEST({
-        errors: [{ message: "Token is not matching" }],
+        errors: [
+          { id: "NON_MATCHING_TOKEN", message: "Token is not matching" },
+        ],
       });
     }
     const newHashedPassword = await bcrypt.hash(password1, SALT_ROUNDS);
@@ -284,9 +311,10 @@ router.post(
     res.status(204).send();
   })
 );
+
 router.post(
   "/validate-user",
-  asyncMiddleware(async (req, res) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     const { plainToken, email } = req.body;
 
     if (!plainToken || !email) {
@@ -294,9 +322,10 @@ router.post(
         errors: [{ id: "MISSING_FIELDS", message: "Invalid request" }],
       });
     }
+
     const processedEmail = decodeURIComponent(email);
     const storedToken = await Token.findOne({
-      $and: [{ email: processedEmail }, { type: TOKEN_TYPES.verification }],
+      $and: [{ email: processedEmail }, { type: "TOKEN_VERIFICATION" }],
     });
 
     if (!storedToken) {
@@ -304,10 +333,8 @@ router.post(
         errors: [{ id: "EXPIRED_TOKEN", message: "Token has expired" }],
       });
     }
-    const isTokenMatching = await bcrypt.compare(
-      plainToken,
-      (storedToken as any).token
-    );
+
+    const isTokenMatching = await bcrypt.compare(plainToken, storedToken.token);
 
     if (!isTokenMatching) {
       throw HttpError.BAD_REQUEST({
@@ -325,11 +352,13 @@ router.post(
     res.status(204).send();
   })
 );
+
 router.use(authenticate);
+
 router.post(
   "/logout",
-  asyncMiddleware(async (req, res) => {
-    const user = await User.findById(req.user._id);
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const user = await User.findById((req.user as IUser)._id);
 
     destroyCookie(user, req, res);
   })

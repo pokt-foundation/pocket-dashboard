@@ -4,7 +4,7 @@ import { IFreeTierApplicationAccount, IGatewayAAT } from "./types";
 export interface IPreStakedApp extends Document {
   chain: string;
   status: string;
-  createdAt: Date;
+  createdAt: Date | number;
   fundingTxHash: string;
   stakingTxHash: string;
   freeTierApplicationAccount: IFreeTierApplicationAccount;

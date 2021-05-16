@@ -21,14 +21,14 @@ interface IGatewaySettings {
 interface INotificationSettings {
   signedUp: boolean;
   quarter: boolean;
-  quarterLastSent: Date;
+  quarterLastSent?: Date | number;
   half: boolean;
-  halfLastSent: Date;
+  halfLastSent?: Date | number;
   threeQuarters: boolean;
-  threeQuartersLastSent: Date;
+  threeQuartersLastSent?: Date | number;
   full: boolean;
-  fullLastSent: Date;
-  createdAt: Date;
+  fullLastSent?: Date | number;
+  createdAt?: Date | number;
 }
 
 export interface IApplication extends Document {
@@ -37,7 +37,7 @@ export interface IApplication extends Document {
   user: Types.ObjectId;
   freeTier: boolean;
   status: string;
-  lastChangedStatusAt: Date;
+  lastChangedStatusAt: Date | number;
   freeTierApplicationAccount: IFreeTierApplicationAccount;
   gatewayAAT: IGatewayAAT;
   gatewaySettings: IGatewaySettings;

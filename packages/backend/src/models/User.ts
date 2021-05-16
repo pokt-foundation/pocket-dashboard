@@ -18,6 +18,11 @@ export interface IUser extends Document {
   lastLogin: string;
   validated: boolean;
   v2: boolean;
+  comparePassword: (plainPassword: string, userPassword: string) => boolean;
+  encryptPassword: (password: string) => string;
+  generateVerificationToken: () => string;
+  validateEmail: (email: string) => string;
+  validatePassword: (password: string) => string;
 }
 
 const userSchema = new Schema<IUser>(

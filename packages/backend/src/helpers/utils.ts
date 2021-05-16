@@ -1,59 +1,27 @@
-import HttpError from "../errors/http-error";
+import { Response, Request } from "express";
+import HttpError, { IContent } from "../errors/http-error";
 
-/**
- * @param {{query:object}} request Request.
- * @param {string} option Option.
- *
- * @returns {string} Query option value.
- */
-export function getQueryOption(request, option) {
-  const parsedData = request.query;
-
-  // eslint-disable-next-line no-prototype-builtins
-  if (!parsedData.hasOwnProperty(option)) {
-    throw Error(`${option} query parameter is required.`);
-  }
-
-  if (parsedData[option] === undefined) {
-    throw Error(`${option} query parameter cannot be null.`);
-  }
-
-  return parsedData[option];
-}
-
-/**
- * @param {{query:object}} request Request.
- * @param {string} option Option.
- *
- * @returns {string} Query option value.
- */
-export function getOptionalQueryOption(request, option) {
-  const parsedData = request.query;
-
-  // eslint-disable-next-line no-prototype-builtins
-  if (!parsedData.hasOwnProperty(option)) {
-    return "";
-  }
-
-  if (parsedData[option] === undefined) {
-    return "";
-  }
-
-  return parsedData[option];
-}
-
-export const errorHandler = (app) => (err, req, res, next) => {
-  let code;
-  let body;
+export const errorHandler = () => (
+  err: Error | HttpError,
+  _: Request,
+  res: Response
+): void => {
+  let code: number;
+  let body: IContent;
 
   if (err instanceof HttpError) {
-    code = err.code;
+    code = Number(err.code);
     body = err.content;
   }
 
-  res
-    .status(code || 500)
-    .send(
-      body || { errors: [{ message: "There was an error with your request" }] }
-    );
+  res.status(code || 500).send(
+    body || {
+      errors: [
+        {
+          id: "REQUEST_ERR",
+          message: "There was an error with your request",
+        },
+      ],
+    }
+  );
 };

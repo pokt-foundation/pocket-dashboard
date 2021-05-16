@@ -1,11 +1,12 @@
 import { Schema, Model, model, Document } from "mongoose";
 
-interface IChain extends Document {
+export interface IChain extends Document {
   _id: string;
   networkID: string;
+  network?: string;
   ticker: string;
   name: string;
-  descrpition: string;
+  description: string;
   hash: string;
   nodeCount: string;
 }

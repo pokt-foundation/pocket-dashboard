@@ -1,9 +1,10 @@
-import express from "express";
+import express, { Response, Request } from "express";
 import crypto from "crypto";
 import asyncMiddleware from "../middlewares/async";
 import { authenticate } from "../middlewares/passport-auth";
-import Application from "../models/Application";
-import ApplicationPool from "../models/PreStakedApp";
+import Application, { IApplication } from "../models/Application";
+import ApplicationPool, { IPreStakedApp } from "../models/PreStakedApp";
+import { IUser } from "../models/User";
 import HttpError from "../errors/http-error";
 import MailgunService from "../services/MailgunService";
 import { getApp } from "../lib/pocket";
@@ -15,14 +16,15 @@ const DEFAULT_GATEWAY_SETTINGS = {
   whitelistOrigins: [],
   whitelistUserAgents: [],
 };
+
 const router = express.Router();
 
 router.use(authenticate);
 
 router.get(
   "",
-  asyncMiddleware(async (req, res) => {
-    const id = req.user._id;
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const id = (req.user as IUser)._id;
     const application = await Application.find({
       status: APPLICATION_STATUSES.READY,
       user: id,
@@ -30,7 +32,12 @@ router.get(
 
     if (!application) {
       throw HttpError.NOT_FOUND({
-        errors: [{ message: "User does not have an active application" }],
+        errors: [
+          {
+            id: "NONEXISTENT_APPLICATION",
+            message: "User does not have an active application",
+          },
+        ],
       });
     }
     res.status(200).send(application);
@@ -39,45 +46,64 @@ router.get(
 
 router.get(
   "/:applicationId",
-  asyncMiddleware(async (req, res) => {
-    const userId = req.user._id;
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id;
     const { applicationId } = req.params;
-    const application = await Application.findById(applicationId);
+    const application: IApplication = await Application.findById(applicationId);
 
     if (!application) {
       throw HttpError.NOT_FOUND({
-        errors: [{ message: "User does not have an active application" }],
+        errors: [
+          {
+            id: "NONEXISTENT_APPLICATION",
+            message: "User does not have an active application",
+          },
+        ],
       });
     }
-    if ((application as any).user.toString() !== userId.toString()) {
+    if (application.user.toString() !== userId.toString()) {
       throw HttpError.FORBIDDEN({
-        errors: [{ message: "User does not have access to this application" }],
+        errors: [
+          {
+            id: "UNAUTHORIZED_ACCESS",
+            message: "User does not have access to this application",
+          },
+        ],
       });
     }
+
     res.status(200).send(application);
   })
 );
 
 router.get(
   "/status/:applicationId",
-  asyncMiddleware(async (req, res) => {
-    const userId = req.user._id;
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id;
     const { applicationId } = req.params;
-    const application = await Application.findById(applicationId);
+    const application: IApplication = await Application.findById(applicationId);
 
     if (!application) {
       throw HttpError.NOT_FOUND({
-        errors: [{ message: "User does not have an active application" }],
+        errors: [
+          {
+            id: "NONEXISTENT_APPLICATION",
+            message: "User does not have an active application",
+          },
+        ],
       });
     }
-    if ((application as any).user.toString() !== userId.toString()) {
+    if (application.user.toString() !== userId.toString()) {
       throw HttpError.FORBIDDEN({
-        errors: [{ message: "User does not have access to this application" }],
+        errors: [
+          {
+            id: "UNAUTHORIZED_ACCESS",
+            message: "User does not have access to this application",
+          },
+        ],
       });
     }
-    const app = await getApp(
-      (application as any).freeTierApplicationAccount.address
-    );
+    const app = await getApp(application.freeTierApplicationAccount.address);
 
     res.status(200).send(app);
   })
@@ -85,7 +111,7 @@ router.get(
 
 router.post(
   "",
-  asyncMiddleware(async (req, res) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     const {
       name,
       chain,
@@ -93,7 +119,7 @@ router.post(
     } = req.body;
 
     try {
-      const id = req.user._id;
+      const id = (req.user as IUser)._id;
       const isNewAppRequestInvalid = await Application.exists({
         status: APPLICATION_STATUSES.READY,
         user: id,
@@ -109,7 +135,7 @@ router.post(
           ],
         });
       }
-      const preStakedApp = await ApplicationPool.findOne({
+      const preStakedApp: IPreStakedApp = await ApplicationPool.findOne({
         status: APPLICATION_STATUSES.READY,
         chain,
       });
@@ -132,15 +158,14 @@ router.post(
         lastChangedStatusAt: new Date(Date.now()),
         // We enforce every app to be treated as a free-tier app for now.
         freeTier: true,
-        freeTierApplicationAccount: (preStakedApp as any)
-          .freeTierApplicationAccount,
-        gatewayAAT: (preStakedApp as any).gatewayAAT,
+        freeTierApplicationAccount: preStakedApp.freeTierApplicationAccount,
+        gatewayAAT: preStakedApp.gatewayAAT,
         gatewaySettings: {
           ...gatewaySettings,
         },
       });
 
-      (application as any).gatewaySettings.secretKey = crypto
+      application.gatewaySettings.secretKey = crypto
         .randomBytes(16)
         .toString("hex");
       await application.save();
@@ -165,25 +190,35 @@ router.post(
 
 router.put(
   "/:applicationId",
-  asyncMiddleware(async (req, res) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     const { gatewaySettings } = req.body;
-    /** @type {{applicationId:string}} */
     const { applicationId } = req.params;
 
     try {
-      const application = await Application.findById(applicationId);
+      const application: IApplication = await Application.findById(
+        applicationId
+      );
 
       if (!application) {
-        throw HttpError.BAD_REQUEST({ message: "Application not found" });
-      }
-      const userId = req.user._id;
-
-      if ((application as any).user.toString() !== userId.toString()) {
         throw HttpError.BAD_REQUEST({
-          message: "Application does not belong to user",
+          errors: [
+            { id: "NONEXISTENT_APPLICATION", message: "Application not found" },
+          ],
         });
       }
-      (application as any).gatewaySettings = gatewaySettings;
+      const userId = (req.user as IUser)._id;
+
+      if (application.user.toString() !== userId.toString()) {
+        throw HttpError.BAD_REQUEST({
+          errors: [
+            {
+              id: "UNAUTHORIZED_ACCESS",
+              message: "Application does not belong to user",
+            },
+          ],
+        });
+      }
+      application.gatewaySettings = gatewaySettings;
       await application.save();
       // lodash's merge mutates the target object passed in.
       // This is what we want, as we don't want to lose any of the mongoose functionality
@@ -197,25 +232,31 @@ router.put(
 
 router.post(
   "/switch/:applicationId",
-  asyncMiddleware(async (req, res) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     const { chain } = req.body;
     const { applicationId } = req.params;
 
     try {
-      const replacementApplication = await ApplicationPool.findOne({
-        chain,
-        status: APPLICATION_STATUSES.READY,
-      });
+      const replacementApplication: IPreStakedApp = await ApplicationPool.findOne(
+        {
+          chain,
+          status: APPLICATION_STATUSES.READY,
+        }
+      );
 
       if (!replacementApplication) {
         throw new Error("No application for the selected chain is available");
       }
-      const oldApplication = await Application.findById(applicationId);
+      const oldApplication: IApplication = await Application.findById(
+        applicationId
+      );
 
       if (!oldApplication) {
         throw new Error("Cannot find application");
       }
-      if ((oldApplication as any).user.toString() !== req.user._id.toString()) {
+      if (
+        oldApplication.user.toString() !== (req.user as IUser)._id.toString()
+      ) {
         throw HttpError.FORBIDDEN({
           errors: [
             {
@@ -225,29 +266,27 @@ router.post(
           ],
         });
       }
-      // TODO: Check if at least a week has passed since the last status update.
-      // Set old app in the 1 week grace period
-      (oldApplication as any).status =
-        APPLICATION_STATUSES.AWAITING_GRACE_PERIOD;
-      (oldApplication as any).lastChangedStatusAt = Date.now();
+
+      oldApplication.status = APPLICATION_STATUSES.AWAITING_GRACE_PERIOD;
+      oldApplication.lastChangedStatusAt = Date.now();
       await oldApplication.save();
       // Create a new Application for the user and copy the previous user config
       const newReplacementApplication = new Application({
         // As we're moving to a new chain, everything related to the account and gateway AAT
         // information will change, so we use all the data from the application that we took
         // from the pool.
-        chain: (replacementApplication as any).chain,
-        freeTierApplicationAccount: (replacementApplication as any)
-          .freeTierApplicationAccount,
-        gatewayAAT: (replacementApplication as any).gatewayAAT,
+        chain: replacementApplication.chain,
+        freeTierApplicationAccount:
+          replacementApplication.freeTierApplicationAccount,
+        gatewayAAT: replacementApplication.gatewayAAT,
         status: APPLICATION_STATUSES.READY,
         lastChangedStatusAt: Date.now(),
         freeTier: true,
         // We wanna preserve user-related configuration fields, so we just copy them over
         // from the old application.
-        name: (oldApplication as any).name,
-        user: (oldApplication as any).user,
-        gatewaySettings: (oldApplication as any).gatewaySettings,
+        name: oldApplication.name,
+        user: oldApplication.user,
+        gatewaySettings: oldApplication.gatewaySettings,
       });
 
       await newReplacementApplication.save();
@@ -260,14 +299,13 @@ router.post(
 
 router.put(
   "/notifications/:applicationId",
-  asyncMiddleware(async (req, res) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     const { applicationId } = req.params;
     const { quarter, half, threeQuarters, full } = req.body;
     const application = await Application.findById(applicationId);
 
     if (!application) {
-      // @ts-expect-error ts-migrate(2350) FIXME: Only a void function can be called with the 'new' ... Remove this comment to see the full error message
-      throw new HttpError.BAD_REQUEST({
+      throw HttpError.BAD_REQUEST({
         errors: [
           {
             id: "NONEXISTENT_APPLICATION",
@@ -276,7 +314,10 @@ router.put(
         ],
       });
     }
-    if ((application as any).user.toString() !== req.user._id.toString()) {
+    if (
+      (application as IApplication).user.toString() !==
+      (req.user as IUser)._id.toString()
+    ) {
       throw HttpError.FORBIDDEN({
         errors: [
           {
@@ -287,10 +328,11 @@ router.put(
       });
     }
     const emailService = new MailgunService();
-    const isSignedUp = (application as any).notificationSettings.signedUp;
+    const isSignedUp = (application as IApplication).notificationSettings
+      .signedUp;
     const hasOptedOut = !(quarter || half || threeQuarters || full);
 
-    (application as any).notificationSettings = {
+    (application as IApplication).notificationSettings = {
       signedUp: hasOptedOut ? false : true,
       quarter,
       half,
@@ -301,12 +343,12 @@ router.put(
     if (!isSignedUp) {
       emailService.send({
         templateName: "NotificationSignup",
-        toEmail: req.user.email,
+        toEmail: (req.user as IUser).email,
       });
     } else {
       emailService.send({
         templateName: "NotificationChange",
-        toEmail: req.user.email,
+        toEmail: (req.user as IUser).email,
       });
     }
     return res.status(204).send();
