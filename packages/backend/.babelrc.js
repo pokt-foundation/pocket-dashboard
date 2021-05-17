@@ -1,5 +1,5 @@
 module.exports = {
-  presets: ["@babel/preset-env"],
+  presets: ["@babel/preset-env", "@babel/preset-typescript"],
   plugins: [
     "@babel/transform-runtime",
     "@babel/plugin-syntax-bigint",
@@ -8,7 +8,7 @@ module.exports = {
       {
         root: ["./src"],
         alias: {
-          test: "./test",
+          '@': "./src",
         },
       },
     ],

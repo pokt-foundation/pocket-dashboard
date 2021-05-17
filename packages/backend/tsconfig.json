@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": false,
+    "target": "esnext",
+    "outDir": "./build"
+  },
+  "baseUrl": "src",
+  "paths": {
+    "@/*": ["*"]
+  },
+  "exclude": ["node_modules", "build"]
+}
