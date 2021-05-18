@@ -7,10 +7,13 @@ import { useViewport } from "use-viewport";
 import "styled-components/macro";
 import {
   Banner,
+  BarChart,
   Button,
+  ButtonBase,
   CircleGraph,
   DataView,
   LineChart,
+  Modal,
   Pagination,
   Spacer,
   Split,
@@ -18,11 +21,8 @@ import {
   textStyle,
   GU,
   RADIUS,
-  ButtonBase,
   useTheme,
   useToast,
-  Modal,
-  BarChart,
 } from "ui";
 import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
