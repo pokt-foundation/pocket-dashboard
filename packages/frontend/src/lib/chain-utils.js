@@ -1,7 +1,7 @@
 const CHAIN_ID_PREFIXES = new Map([
   ["0001", { prefix: "mainnet", name: "Pocket Mainnet" }],
   ["0002", { prefix: "btc-mainnet", name: "Bitcoin Mainnet" }],
-  ["0003", { prefix: "ava-mainnet", name: "Avalanche Mainnet" }],
+  ["0003", { prefix: "avax-mainnet", name: "Avalanche Mainnet" }],
   ["0004", { prefix: "bsc-mainnet", name: "Binance Smart Chain Mainnet" }],
   ["0005", { prefix: "fuse-mainnet", name: "Fuse Mainnet" }],
   ["0006", { prefix: "solana-mainnet", name: "Solana Mainnet" }],
