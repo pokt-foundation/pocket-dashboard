@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useQuery } from "react-query";
 import { GraphQLClient, gql } from "graphql-request";
@@ -85,7 +85,7 @@ export default function SuccessDetails({
 
   const { public_key: publicKey } = appOnChainData;
 
-  const { isLoading, isError, data } = useQuery(
+  const { isLoading, data } = useQuery(
     [`user/applications/${publicKey}/success-details`, page],
     async function getFilteredRelays() {
       if (!publicKey) {
