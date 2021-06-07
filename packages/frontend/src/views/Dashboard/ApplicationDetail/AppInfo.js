@@ -19,10 +19,10 @@ import {
   Split,
   TextCopy,
   textStyle,
-  GU,
-  RADIUS,
   useTheme,
   useToast,
+  GU,
+  RADIUS,
 } from "ui";
 import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
@@ -115,20 +115,50 @@ function formatDailyRelaysForGraphing(
   };
 }
 
+const DEFAULT_LATENCY_LABELS = Array(24)
+  .fill("")
+  .map((_) => "00");
+
+const DEFAULT_LATENCY_SCALE = [
+  { label: "0ms" },
+  { label: "250ms" },
+  { label: "500ms" },
+  { label: "750ms" },
+  { label: "1000ms", highlightColor: "#AE1515" },
+  { label: "" },
+];
+
+const DEFAULT_LATENCY_VALUES = [
+  {
+    id: 1,
+    values: Array(24).fill(0),
+  },
+];
+
 function formatLatencyValuesForGraphing(
   hourlyLatency = [],
   upperBound = ONE_SECOND
 ) {
+  if (!hourlyLatency.length) {
+    return {
+      barValues: DEFAULT_LATENCY_VALUES,
+      labels: DEFAULT_LATENCY_LABELS,
+      scales: DEFAULT_LATENCY_SCALE,
+    };
+  }
+
   dayjs.extend(dayJsutcPlugin);
 
   const labels =
     hourlyLatency.length > 0
       ? hourlyLatency
-          .map(({ bucket }) => bucket.split("T")[1])
+          .map(({ bucket }) => {
+            return bucket.split("T")[1];
+          })
           .map((bucket) => bucket.substring(0, 2))
       : Array(24)
           .fill("")
-          .map((_, i) => "00");
+          .map(() => "00");
 
   while (labels.length < 24) {
     labels.push("--");
@@ -149,14 +179,7 @@ function formatLatencyValuesForGraphing(
     },
   ];
 
-  const scales = [
-    { label: "0ms" },
-    { label: "250ms" },
-    { label: "500ms" },
-    { label: "750ms" },
-    { label: "1000ms", highlightColor: "#AE1515" },
-    { label: "" },
-  ];
+  const scales = DEFAULT_LATENCY_SCALE;
 
   return {
     barValues,
