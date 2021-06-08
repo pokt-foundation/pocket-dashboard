@@ -95,10 +95,8 @@ router.post(
   asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate(
       "login",
-      // As we're using an API which requires a token for each request,
-      // we don't need to save a session in the server
       { session: false },
-      async (err, user) => {
+      async (err, user: IUser) => {
         if (err) {
           return next(err);
         }
@@ -114,6 +112,7 @@ router.post(
             })
           );
         }
+
         if (!user.validated) {
           const validationToken = await createNewVerificationToken(
             user._id,
@@ -142,6 +141,7 @@ router.post(
             })
           );
         }
+
         createCookieFromToken(user, 200, req, res);
       }
     )(req, res, next);

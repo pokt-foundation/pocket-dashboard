@@ -84,7 +84,16 @@ passport.use(
         return done(null, user);
       } catch (err) {
         // TODO: Log error to sentry and with a logger
-        return done({ status: 400, message: err.message });
+        return done(
+          HttpError.INTERNAL_SERVER_ERROR({
+            errors: [
+              {
+                id: "REQUEST_ERR",
+                message: "There was an error with your request",
+              },
+            ],
+          })
+        );
       }
     }
   )
