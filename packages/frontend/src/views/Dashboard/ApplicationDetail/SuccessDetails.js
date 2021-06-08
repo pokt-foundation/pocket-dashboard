@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useQuery } from "react-query";
 import { GraphQLClient, gql } from "graphql-request";
@@ -9,6 +9,7 @@ import {
   ButtonBase,
   CircleGraph,
   DataView,
+  Pagination,
   Spacer,
   Split,
   textStyle,
@@ -21,7 +22,6 @@ import AppStatus from "components/AppStatus/AppStatus";
 import Box from "components/Box/Box";
 import FloatUp from "components/FloatUp/FloatUp";
 import env from "environment";
-import Pagination from "ui/Pagination/Pagination";
 import { shortenAddress } from "lib/pocket-utils";
 
 const FAILED_RELAYS_KEY = "failedRelays";
@@ -71,7 +71,6 @@ const LATEST_FAILING_QUERIES = gql`
 
 export default function SuccessDetails({
   appOnChainData,
-  latestRelaysData,
   successfulRelayData,
   weeklyRelayData,
 }) {
@@ -86,14 +85,12 @@ export default function SuccessDetails({
 
   const { public_key: publicKey } = appOnChainData;
 
-  const { isLoading, isError, data } = useQuery(
+  const { isLoading, data } = useQuery(
     [`user/applications/${publicKey}/success-details`, page],
     async function getFilteredRelays() {
       if (!publicKey) {
         return [];
       }
-
-      console.log(page);
 
       try {
         const { relay: successfulRelays } = await gqlClient.request(
@@ -114,8 +111,6 @@ export default function SuccessDetails({
           }
         );
 
-        console.log(successfulRelays, failedRelays, "boom");
-
         return { successfulRelays, failedRelays };
       } catch (err) {
         console.log(Object.entries(err));
@@ -125,10 +120,6 @@ export default function SuccessDetails({
       keepPreviousData: true,
     }
   );
-
-  useEffect(() => {
-    console.log(isLoading, isError, data, "stuff");
-  }, [isLoading, isError, data]);
 
   const onSuccessfulClick = useCallback(
     () => setActiveKey(SUCCESSFUL_RELAYS_KEY),
@@ -334,7 +325,7 @@ export default function SuccessDetails({
                             0px 2px 8px 0px;
                         `}
                       />,
-                      <p>{method}</p>,
+                      <p>{method ? method : "Unknown"}</p>,
                       <p>{bytes}B</p>,
                       <TextCopy
                         value={shortenAddress(serviceNode, 16)}
