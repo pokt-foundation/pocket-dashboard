@@ -78,7 +78,6 @@ async function stakeApplication(
   app: IPreStakedApp,
   chain = "0002"
 ): Promise<void> {
-  console.log("Got app ", app);
   const { address, passPhrase, privateKey } = app.freeTierApplicationAccount;
   const { balance } = (await getBalance(address)) as QueryBalanceResponse;
 
