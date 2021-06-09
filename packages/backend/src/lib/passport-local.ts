@@ -66,7 +66,10 @@ passport.use(
           );
         }
 
-        const isPasswordValid = user.comparePassword(password, user.password);
+        const isPasswordValid = await user.comparePassword(
+          password,
+          user.password
+        );
 
         if (!isPasswordValid) {
           return done(
