@@ -160,7 +160,7 @@ router.post(
       }
       if (!user) {
         return next(
-          HttpError.BAD_REQUEST({
+          HttpError.INTERNAL_SERVER_ERROR({
             errors: [
               {
                 id: "CREATION_ERROR",

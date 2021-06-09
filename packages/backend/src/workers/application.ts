@@ -115,17 +115,18 @@ async function stakeApplication(
 }
 
 export async function fillAppPool(ctx): Promise<void> {
-  const totalPoolSize = Object.values(chains).reduce(
-    (prev, { limit }) => prev + limit,
-    0
-  );
+  // const totalPoolSize = Object.values(chains).reduce(
+  //   (prev, { limit }) => prev + limit,
+  //   0
+  // );
+  const totalPoolSize = 38;
   const appPool = await PreStakedApp.find();
 
   ctx.logger.log(
     `fillAppPool(): pool size limit ${totalPoolSize}, pool size ${appPool?.length}`
   );
 
-  if (totalPoolSize <= appPool?.length) {
+  if (totalPoolSize <= appPool.length) {
     ctx.logger.log("fillAppPool(): No need to fill the pool.");
     return;
   }
