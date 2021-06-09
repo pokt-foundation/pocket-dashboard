@@ -48,32 +48,32 @@ const MAIN_CHAINS = {
   ETHEREUM_MAINNET_ARCHIVAL: {
     ticker: "ETH",
     id: "0022",
-    limit: 3,
+    limit: 0,
   },
   FUSE_FULL: {
     ticker: "FUSE",
     id: "0005",
-    limit: 1,
+    limit: 0,
   },
   ETHEREUM_MAINNET_FULL: {
     ticker: "ETH",
     id: "0021",
-    limit: 10,
+    limit: 0,
   },
   ETHEREUM_RINKEBY_FULL: {
     ticker: "ETH",
     id: "0025",
-    limit: 3,
+    limit: 0,
   },
   ETHEREUM_XDAI_FULL: {
     ticker: "POA",
     id: "0027",
-    limit: 3,
+    limit: 9,
   },
   POCKET_MAINNET: {
     ticker: "POKT",
     id: "0001",
-    limit: 1,
+    limit: 0,
   },
 };
 
