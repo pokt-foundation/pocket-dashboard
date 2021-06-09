@@ -65,11 +65,11 @@ const MAIN_CHAINS = {
     id: "0025",
     limit: 3,
   },
-  // ETHEREUM_XDAI_FULL: {
-  //   ticker: "POA",
-  //   id: "0027",
-  //   limit: 3,
-  // },
+  ETHEREUM_XDAI_FULL: {
+    ticker: "POA",
+    id: "0027",
+    limit: 10,
+  },
   POCKET_MAINNET: {
     ticker: "POKT",
     id: "0001",
