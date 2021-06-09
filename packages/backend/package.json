@@ -16,13 +16,7 @@
     "test": "mocha test",
     "test:services": "mocha test/services",
     "test:providers": "mocha test/providers",
-    "test:models": "mocha test/models",
-    "lint": "eslint src/*.{ts,tsx}"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
+    "test:models": "mocha test/models"
   },
   "mocha": {
     "exit": true,
@@ -34,7 +28,7 @@
   "dependencies": {
     "@babel/runtime": "^7.8.4",
     "@pokt-foundation/pocket-dashboard-shared": "^0.0.3-alpha.0",
-    "@pokt-network/pocket-js": "^0.6.6-rc",
+    "@pokt-network/pocket-js": "^0.6.13-rc",
     "@sendgrid/client": "^7.4.2",
     "@sendgrid/mail": "^7.4.2",
     "@types/mongoose": "^5.10.5",
