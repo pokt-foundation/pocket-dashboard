@@ -59,6 +59,12 @@ async function createApplicationAndFund(ctx): Promise<void> {
     freeTierAccount.addressHex
   );
 
+  if (!txHash) {
+    ctx.logger.warn(
+      `Funds were not sent for app ${newAppForPool.freeTierApplicationAccount.address}! This is an issue with connecting to the network with PocketJS.`
+    );
+  }
+
   newAppForPool.status = APPLICATION_STATUSES.AWAITING_STAKING;
   newAppForPool.fundingTxHash = txHash;
   await newAppForPool.save();
@@ -99,6 +105,9 @@ async function stakeApplication(
   app.status = APPLICATION_STATUSES.READY;
   app.stakingTxHash = txHash;
   app.chain = chain;
+  ctx.logger.log(
+    `App ${app.freeTierApplicationAccount.address} is now ready: tx hash ${txHash}`
+  );
   await app.save();
 
   ctx.logger.log(
