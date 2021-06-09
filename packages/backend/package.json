@@ -16,13 +16,7 @@
     "test": "mocha test",
     "test:services": "mocha test/services",
     "test:providers": "mocha test/providers",
-    "test:models": "mocha test/models",
-    "lint": "eslint src/*.{ts,tsx}"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
+    "test:models": "mocha test/models"
   },
   "mocha": {
     "exit": true,
