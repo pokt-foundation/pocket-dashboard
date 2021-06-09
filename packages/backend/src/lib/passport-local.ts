@@ -66,7 +66,8 @@ passport.use(
           );
         }
 
-        const isPasswordValid = await user.comparePassword(
+        // @ts-ignore
+        const isPasswordValid = await User.comparePassword(
           password,
           user.password
         );
