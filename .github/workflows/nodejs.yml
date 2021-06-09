@@ -38,10 +38,6 @@ jobs:
         working-directory: packages/backend
         run: yarn
 
-      - name: Running lint
-        working-directory: packages/backend
-        run: yarn lint
-
       - name: Running prod build
         working-directory: packages/backend
         run: yarn build
