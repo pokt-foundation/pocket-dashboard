@@ -175,7 +175,7 @@ export async function stakeAppPool(ctx): Promise<void> {
 
         if (!chosenApplication) {
           ctx.logger.warn(
-            `NOTICE: No more space in the pool for app demand. Tried to stake app ${chosenApplication.freeTierApplicationAccount.address} for chain ${chain}`
+            `NOTICE: No more space in the pool for app demand. Tried to stake for ${chain} but no more stake-ready apps were left in the pool.`
           );
           return;
         }
