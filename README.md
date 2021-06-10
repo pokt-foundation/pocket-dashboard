@@ -1,41 +1,36 @@
 <div align="center">
   <a href="https://www.pokt.network">
-    <img src="https://user-images.githubusercontent.com/16605170/74199287-94f17680-4c18-11ea-9de2-b094fab91431.png" alt="Pocket Network logo" width="340"/>
+    <img src=".github/portal_logo.png" alt="Pocket Network logo" width="200"/>
   </a>
+  <h1>Pocket Portal</h1>
 </div>
 
-# Pocket Dashboard
-[![All Contributors](https://img.shields.io/badge/all_contributors-47-orange.svg?style=flat-square)](#contributors)
-[![Build Status](https://img.shields.io/github/workflow/status/pokt-foundation/pocket-dashboard/Main%20CI?style=flat-square)](https://github.com/pokt-foundation/pocket-dashboard/actions)
+Decentralized infrastructure, just a few clicks away. 🚀
 
-Decentralized infrastructure, just a few clicks away.
+[![All Contributors](https://img.shields.io/badge/all_contributors-47-orange.svg?style=flat-square)](#contributors) [![Build Status](https://img.shields.io/github/workflow/status/pokt-foundation/pocket-dashboard/Main%20CI?style=flat-square)](https://github.com/pokt-foundation/pocket-dashboard/actions)
 
-## Overview
 <div>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg"/></a>
-    <a href="https://github.com/pokt-network/pocket-dashboard/pulse"><img src="https://img.shields.io/github/last-commit/pokt-network/pocket-dashboard.svg"/></a>
-    <a href="https://github.com/pokt-network/pocket-dashboard/pulls"><img src="https://img.shields.io/github/issues-pr/pokt-network/pocket-dashboard.svg"/></a>
-    <a href="https://github.com/pokt-network/pocket-dashboard/releases"><img src="https://img.shields.io/badge/platform-linux%20%7C%20windows%20%7C%20macos-pink.svg"/></a>
-    <a href="https://github.com/pokt-network/pocket-dashboard/issues"><img src="https://img.shields.io/github/issues-closed/pokt-network/pocket-dashboard.svg"/></a>
+    <a href="https://github.com/pokt-foundation/portal-frontend/pulse"><img src="https://img.shields.io/github/last-commit/pokt-foundation/portal-frontend.svg"/></a>
+    <a href="https://github.com/pokt-foundation/portal-frontend/pulls"><img src="https://img.shields.io/github/issues-pr/pokt-foundation/portal-frontend.svg"/></a>
+    <a href="https://github.com/pokt-foundation/portal-frontend/issues"><img src="https://img.shields.io/github/issues-closed/pokt-foundation/portal-frontend.svg"/></a>
 </div>
 
-## Getting Started
+## Quick start
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+- First, make sure to run the DB script in the top level package.
+- Spin up the `Dockerfile` script in the backend package.
+- Install packages with `yarn` and launch the app with `yarn start` in each of the two packages. You'll have to provide your own values in the `env` for each, for which an example is included.
 
-### Installation
-
-To install, just use `yarn` on both backend and frontend packages. Note that we're using Node 12.15.0 LTS. We recommend using [NVM](https://github.com/nvm-sh/nvm) so you can switch versions on the fly.
-
-To then set up the database, first spin up the Docker containers with `docker-compose up`, and then there's a `sh` script that will help you set up Mongo.
-
-After this, just do `yarn start` on each package.
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://github.com/pokt-network/repo-template/blob/master/CONTRIBUTING.md) for details on contributions and the process of submitting pull requests.
+A detailed contributing and architecture guide is coming soon!
 
 ## Support & Contact
+
+If you come across an issue with the Portal, do a search in the [Issues](https://github.com/pokt-foundation/portal-frontend/issues) tab of this repo and the [Portal API Issues](https://github.com/pokt-foundation/portal-api) to make sure it hasn't been reported before. Follow these steps to help us prevent duplicate issues and unnecessary notifications going to the many people watching this repo:
+
+- If the issue you found has been reported and is still open, and the details match your issue, give a "thumbs up" to the relevant posts in the issue thread to signal that you have the same issue. No further action is required on your part.
+- If the issue you found has been reported and is still open, but the issue is missing some details, you can add a comment to the issue thread describing the additional details.
+- If the issue you found has been reported but has been closed, you can comment on the closed issue thread and ask to have the issue reopened because you are still experiencing the issue. Alternatively, you can open a new issue, reference the closed issue by number or link, and state that you are still experiencing the issue. Provide any additional details in your post so we can better understand the issue and how to fix it.
 
 <div>
   <a  href="https://twitter.com/poktnetwork" ><img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"></a>
@@ -43,7 +38,6 @@ Please read [CONTRIBUTING.md](https://github.com/pokt-network/repo-template/blob
   <a href="https://www.facebook.com/POKTnetwork" ><img src="https://img.shields.io/badge/Facebook-red.svg"></a>
   <a href="https://research.pokt.network"><img src="https://img.shields.io/discourse/https/research.pokt.network/posts.svg"></a>
 </div>
-
 
 ## License
 
