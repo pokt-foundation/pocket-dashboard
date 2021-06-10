@@ -1,76 +1,76 @@
-import * as dotenv from "dotenv";
-dotenv.config();
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 export type AuthKeys = {
-  publicSecret: string;
-  privateSecret: string;
-  secretKey: string;
-  expiration: string;
-  refreshExpiration: string;
-};
+  publicSecret: string
+  privateSecret: string
+  secretKey: string
+  expiration: string
+  refreshExpiration: string
+}
 
 export type PersistenceKeys = {
-  url: string;
-  dbUser: string;
-  dbPassword: string;
-  dbName: string;
-  dbEncryptionKey: string;
-};
+  url: string
+  dbUser: string
+  dbPassword: string
+  dbName: string
+  dbEncryptionKey: string
+}
 
 export type PocketNetworkKeys = {
-  aatVersion: string;
-  blockTime: string;
-  chainId: string;
-  clientPubKey: string;
-  transactionFee: string;
-  maxDispatchers: string;
-  requestTimeout: string;
-  maxSessions: string;
-  freeTierFundAccount: string;
-  freeTierFundAddress: string;
-  freeTierClientPubKey: string;
-  dispatchers: string;
-  chainHash: string;
-  providerType: string;
-  httpProviderNode: string;
-  mainFundAccount: string;
-  mainFundAddress: string;
-};
+  aatVersion: string
+  blockTime: string
+  chainId: string
+  clientPubKey: string
+  transactionFee: string
+  maxDispatchers: string
+  requestTimeout: string
+  maxSessions: string
+  freeTierFundAccount: string
+  freeTierFundAddress: string
+  freeTierClientPubKey: string
+  dispatchers: string
+  chainHash: string
+  providerType: string
+  httpProviderNode: string
+  mainFundAccount: string
+  mainFundAddress: string
+}
 
 export const ENV_VARS = {
   prod(): boolean {
-    return process.env.NODE_ENV === "production";
+    return process.env.NODE_ENV === 'production'
   },
   FRONTEND_URL(): string {
-    return process.env.FRONTEND_URL || "http://localhost:3000";
+    return process.env.FRONTEND_URL || 'http://localhost:3000'
   },
   ALLOWED_DOMAINS(): string[] {
-    return process.env.ALLOWED_DOMAINS?.split(",") ?? ["http://localhost:3000"];
+    return process.env.ALLOWED_DOMAINS?.split(',') ?? ['http://localhost:3000']
   },
   ENABLE_WORKERS(): boolean {
-    return Boolean(process.env.ENABLE_WORKERS) || false;
+    return Boolean(process.env.ENABLE_WORKERS) || false
   },
   HASURA_SECRET(): string {
-    return process.env.HASURA_ADMIN_SECRET || "";
+    return process.env.HASURA_ADMIN_SECRET || ''
   },
   HASURA_URL(): string {
-    return process.env.HASURA_URL?.trim() ?? "";
+    return process.env.HASURA_URL?.trim() ?? ''
   },
   AUTH(): AuthKeys {
     return {
-      publicSecret: process.env.JWT_PUBLIC_SECRET?.replace(/\\n/gm, "\n") ?? "",
+      publicSecret: process.env.JWT_PUBLIC_SECRET?.replace(/\\n/gm, '\n') ?? '',
       privateSecret:
-        process.env.JWT_PRIVATE_SECRET?.replace(/\\n/gm, "\n") ?? "",
+        process.env.JWT_PRIVATE_SECRET?.replace(/\\n/gm, '\n') ?? '',
       secretKey: process.env.JWT_SECRET_KEY,
       expiration: process.env.JWT_EXPIRATION,
       refreshExpiration: process.env.JWT_REFRESH_EXPIRATION,
-    };
+    }
   },
   EMAIL_API_KEY(): string {
-    return process.env.EMAIL_API_KEY?.trim() ?? "";
+    return process.env.EMAIL_API_KEY?.trim() ?? ''
   },
   EMAIL_FROM(): string {
-    return process.env.EMAIL_FROM;
+    return process.env.EMAIL_FROM
   },
   // TODO: Refactor to have better names
   PERSISTENCE(): PersistenceKeys {
@@ -80,7 +80,7 @@ export const ENV_VARS = {
       dbPassword: process.env.DATABASE_PASSWORD,
       dbName: process.env.DATABASE_NAME,
       dbEncryptionKey: process.env.DATABASE_ENCRYPTION_KEY,
-    };
+    }
   },
   POCKET_NETWORK(): PocketNetworkKeys {
     return {
@@ -122,22 +122,22 @@ export const ENV_VARS = {
       // http_provider_node: process.env.POCKET_NETWORK_HTTP_PROVIDER_NODE,
       // main_fund_account: process.env.POCKET_NETWORK_MAIN_FUND_ACCOUNT,
       // main_fund_address: process.env.POCKET_NETWORK_MAIN_FUND_ADDRESS,
-    };
+    }
   },
-};
+}
 
 type envVarCategory =
-  | "prod"
-  | "POCKET_NETWORK"
-  | "PERSISTENCE"
-  | "FRONTEND_URL"
-  | "ALLOWED_DOMAINS"
-  | "ENABLE_WORKERS"
-  | "HASURA_SECRET"
-  | "HASURA_URL"
-  | "AUTH"
-  | "EMAIL_API_KEY"
-  | "EMAIL_FROM";
+  | 'prod'
+  | 'POCKET_NETWORK'
+  | 'PERSISTENCE'
+  | 'FRONTEND_URL'
+  | 'ALLOWED_DOMAINS'
+  | 'ENABLE_WORKERS'
+  | 'HASURA_SECRET'
+  | 'HASURA_URL'
+  | 'AUTH'
+  | 'EMAIL_API_KEY'
+  | 'EMAIL_FROM'
 
 /**
  * Returns the corresponding object for the named passed
@@ -151,5 +151,5 @@ export default function env(
   name: envVarCategory
 ): string | boolean | AuthKeys | PersistenceKeys | PocketNetworkKeys {
   // @ts-ignore
-  return ENV_VARS[name]();
+  return ENV_VARS[name]()
 }

@@ -1,10 +1,10 @@
-import { Schema, model, Model, Document } from "mongoose";
+import { Schema, model, Model, Document } from 'mongoose'
 
 interface INetworkData extends Document {
-  nodesStaked: number;
-  appsStaked: number;
-  poktStaked: string;
-  createdAt: Date;
+  nodesStaked: number
+  appsStaked: number
+  poktStaked: string
+  createdAt: Date
 }
 
 const networkDataSchema = new Schema(
@@ -14,12 +14,12 @@ const networkDataSchema = new Schema(
     poktStaked: String,
     createdAt: Date,
   },
-  { collection: "NetworkData" }
-);
+  { collection: 'NetworkData' }
+)
 
 const NetworkDataModel: Model<INetworkData> = model(
-  "NetworkData",
+  'NetworkData',
   networkDataSchema
-);
+)
 
-export default NetworkDataModel;
+export default NetworkDataModel

@@ -1,14 +1,14 @@
-import { Schema, model, Model, Document } from "mongoose";
-import { IFreeTierApplicationAccount, IGatewayAAT } from "./types";
+import { Schema, model, Model, Document } from 'mongoose'
+import { IFreeTierApplicationAccount, IGatewayAAT } from './types'
 
 export interface IPreStakedApp extends Document {
-  chain: string;
-  status: string;
-  createdAt: Date | number;
-  fundingTxHash: string;
-  stakingTxHash: string;
-  freeTierApplicationAccount: IFreeTierApplicationAccount;
-  gatewayAAT: IGatewayAAT;
+  chain: string
+  status: string
+  createdAt: Date | number
+  fundingTxHash: string
+  stakingTxHash: string
+  freeTierApplicationAccount: IFreeTierApplicationAccount
+  gatewayAAT: IGatewayAAT
 }
 
 const preStakedAppSchema = new Schema(
@@ -31,12 +31,12 @@ const preStakedAppSchema = new Schema(
       applicationSignature: String,
     },
   },
-  { collection: "PreStakedAppPool" }
-);
+  { collection: 'PreStakedAppPool' }
+)
 
 const PreStakedAppModel: Model<IPreStakedApp> = model(
-  "PreStakedApp",
+  'PreStakedApp',
   preStakedAppSchema
-);
+)
 
-export default PreStakedAppModel;
+export default PreStakedAppModel
