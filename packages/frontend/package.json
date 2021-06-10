@@ -83,7 +83,7 @@
     "build:prod": "GENERATE_SOURCEMAP=false NODE_OPTIONS=--max_old_space_size=8192 node_modules/.bin/react-scripts build --prod",
     "test": "node_modules/.bin/react-scripts test",
     "eject": "node_modules/.bin/react-scripts eject",
-    "lint": "eslint src/",
+    "lint": "yarn run eslint src --ext .js --fix",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
     "chromatic": "npx chromatic --project-token 7b40f09c655f"
