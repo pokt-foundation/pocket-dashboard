@@ -98,17 +98,19 @@ router.post(
       { session: false },
       async (err, user: IUser) => {
         if (err) {
-          throw err;
+          return next(err);
         }
         if (!user) {
-          throw HttpError.BAD_REQUEST({
-            errors: [
-              {
-                id: "INVALID_CREDENTIALS",
-                message: "Wrong email or password",
-              },
-            ],
-          });
+          return next(
+            HttpError.BAD_REQUEST({
+              errors: [
+                {
+                  id: "INVALID_CREDENTIALS",
+                  message: "Wrong email or password",
+                },
+              ],
+            })
+          );
         }
 
         if (!user.validated) {
@@ -131,11 +133,13 @@ router.post(
             templateName: "SignUp",
             toEmail: user.email,
           });
-          throw HttpError.BAD_REQUEST({
-            errors: [
-              { id: "NOT_VALIDATED", message: "Please verify your email" },
-            ],
-          });
+          return next(
+            HttpError.BAD_REQUEST({
+              errors: [
+                { id: "NOT_VALIDATED", message: "Please verify your email" },
+              ],
+            })
+          );
         }
 
         createCookieFromToken(user, 200, req, res);
@@ -152,17 +156,19 @@ router.post(
   asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate("signup", { session: false }, async (err, user) => {
       if (err) {
-        throw err;
+        return next(err);
       }
       if (!user) {
-        throw HttpError.INTERNAL_SERVER_ERROR({
-          errors: [
-            {
-              id: "CREATION_ERROR",
-              message: "There was an error while creating your account",
-            },
-          ],
-        });
+        return next(
+          HttpError.INTERNAL_SERVER_ERROR({
+            errors: [
+              {
+                id: "CREATION_ERROR",
+                message: "There was an error while creating your account",
+              },
+            ],
+          })
+        );
       }
       const validationToken = await createNewVerificationToken(
         user._id,
