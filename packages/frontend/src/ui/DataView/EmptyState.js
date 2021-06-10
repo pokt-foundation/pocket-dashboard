@@ -1,59 +1,59 @@
-import React, { useMemo } from "react";
-import "styled-components/macro";
-import PropTypes from "prop-types";
-import { useTheme, GU, textStyle } from "ui";
-import LoadingRing from "../LoadingRing/LoadingRing";
-import Link from "../Link/Link";
+import React, { useMemo } from 'react'
+import 'styled-components/macro'
+import PropTypes from 'prop-types'
+import { useTheme, GU, textStyle } from 'ui'
+import LoadingRing from '../LoadingRing/LoadingRing'
+import Link from '../Link/Link'
 
 function useEmptyStateParts(status, configurator, functionMode) {
   const defaultConfigurator = useMemo(() => {
     return {
       default: {
         displayLoader: false,
-        title: "No data available.",
+        title: 'No data available.',
         subtitle: null,
         clearLabel: null,
       },
       loading: {
         displayLoader: true,
-        title: "Loading data",
+        title: 'Loading data',
         subtitle: null,
         clearLabel: null,
       },
-      "empty-filters": {
+      'empty-filters': {
         displayLoader: false,
-        title: "No results found.",
-        subtitle: "We cannot find any item matching your filter selection.",
-        clearLabel: "Clear filters",
+        title: 'No results found.',
+        subtitle: 'We cannot find any item matching your filter selection.',
+        clearLabel: 'Clear filters',
       },
-      "empty-search": {
+      'empty-search': {
         displayLoader: false,
-        title: "No results found.",
-        subtitle: "We cannot find any item matching your search query.",
-        clearLabel: "Clear filters",
+        title: 'No results found.',
+        subtitle: 'We cannot find any item matching your search query.',
+        clearLabel: 'Clear filters',
       },
-    };
-  }, []);
+    }
+  }, [])
 
-  const parts = functionMode ? {} : configurator[status];
+  const parts = functionMode ? {} : configurator[status]
 
   return {
     ...defaultConfigurator[status],
     ...parts,
-  };
+  }
 }
 
 function EmptyState({ status, configurator, onStatusEmptyClear }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
-  const functionMode = typeof configurator === "function";
-  const emptyState = useEmptyStateParts(status, configurator, functionMode);
-  const emptyStateOverride = functionMode ? configurator(status) : null;
+  const functionMode = typeof configurator === 'function'
+  const emptyState = useEmptyStateParts(status, configurator, functionMode)
+  const emptyStateOverride = functionMode ? configurator(status) : null
 
   // Returning an element from the function mode overrides everything.
   // If `null` or a non-element is returned, the default state is used instead.
   if (React.isValidElement(emptyStateOverride)) {
-    return emptyStateOverride;
+    return emptyStateOverride
   }
 
   return (
@@ -84,7 +84,7 @@ function EmptyState({ status, configurator, onStatusEmptyClear }) {
         {emptyState.title && (
           <h1
             css={`
-              ${textStyle("title2")};
+              ${textStyle('title2')};
               display: flex;
               align-items: center;
               justify-content: center;
@@ -107,7 +107,7 @@ function EmptyState({ status, configurator, onStatusEmptyClear }) {
               color: ${theme.surfaceContentSecondary};
             `}
           >
-            {emptyState.subtitle}{" "}
+            {emptyState.subtitle}{' '}
             {emptyState.clearLabel && (
               <Link onClick={onStatusEmptyClear}>{emptyState.clearLabel}</Link>
             )}
@@ -115,18 +115,18 @@ function EmptyState({ status, configurator, onStatusEmptyClear }) {
         )}
       </div>
     </section>
-  );
+  )
 }
 
 EmptyState.propTypes = {
   status: PropTypes.oneOf([
-    "default",
-    "empty-filters",
-    "empty-search",
-    "loading",
+    'default',
+    'empty-filters',
+    'empty-search',
+    'loading',
   ]),
   configurator: PropTypes.object,
   onStatusEmptyClear: PropTypes.func,
-};
+}
 
-export default EmptyState;
+export default EmptyState

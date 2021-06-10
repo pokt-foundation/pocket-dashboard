@@ -1,15 +1,15 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Spring, animated } from "react-spring/renderprops";
-import "styled-components/macro";
-import { useTheme } from "ui/theme";
-import { noop } from "ui/utils";
-import { springs, GU, RADIUS } from "ui/style";
-import FocusVisible from "../FocusVisible/FocusVisible";
+import React from 'react'
+import PropTypes from 'prop-types'
+import { Spring, animated } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import { useTheme } from 'ui/theme'
+import { noop } from 'ui/utils'
+import { springs, GU, RADIUS } from 'ui/style'
+import FocusVisible from '../FocusVisible/FocusVisible'
 
-const SIZE = 18;
-const CHECKBOX_RADIUS = 2;
-const RADIO_BULLET_SIZE = 10;
+const SIZE = 18
+const CHECKBOX_RADIUS = 2
+const RADIO_BULLET_SIZE = 10
 
 class Checkbox extends React.PureComponent {
   static propTypes = {
@@ -19,38 +19,38 @@ class Checkbox extends React.PureComponent {
     onChange: PropTypes.func,
     tabIndex: PropTypes.string,
     theme: PropTypes.object,
-    variant: PropTypes.oneOf(["checkbox", "radio"]),
-  };
+    variant: PropTypes.oneOf(['checkbox', 'radio']),
+  }
   static defaultProps = {
     checked: false,
     disabled: false,
     indeterminate: false,
     onChange: noop,
-    tabIndex: "0",
-    variant: "checkbox",
-  };
-  _element = React.createRef();
+    tabIndex: '0',
+    variant: 'checkbox',
+  }
+  _element = React.createRef()
   getAriaChecked() {
-    const { checked, indeterminate } = this.props;
+    const { checked, indeterminate } = this.props
 
     if (indeterminate) {
-      return "mixed";
+      return 'mixed'
     }
     if (checked) {
-      return "true";
+      return 'true'
     }
-    return "false";
+    return 'false'
   }
   handleClick = () => {
-    const { onChange, checked, indeterminate } = this.props;
+    const { onChange, checked, indeterminate } = this.props
 
-    onChange(indeterminate ? false : !checked);
-  };
+    onChange(indeterminate ? false : !checked)
+  }
   focus = () => {
-    this._element.current.focus();
-  };
+    this._element.current.focus()
+  }
   renderCheck(visible, Icon) {
-    const { disabled, theme } = this.props;
+    const { disabled, theme } = this.props
 
     return (
       <Spring
@@ -81,7 +81,7 @@ class Checkbox extends React.PureComponent {
           </animated.span>
         )}
       </Spring>
-    );
+    )
   }
   render() {
     const {
@@ -92,7 +92,7 @@ class Checkbox extends React.PureComponent {
       theme,
       variant,
       ...props
-    } = this.props;
+    } = this.props
 
     return (
       <FocusVisible>
@@ -115,8 +115,8 @@ class Checkbox extends React.PureComponent {
               padding: 0;
               background: ${disabled ? theme.controlDisabled : theme.control};
               border: 1px solid ${theme.controlBorder};
-              border-radius: ${variant === "radio"
-                ? "50%"
+              border-radius: ${variant === 'radio'
+                ? '50%'
                 : `${CHECKBOX_RADIUS}px`};
               outline: 0;
               &::-moz-focus-inner {
@@ -130,17 +130,17 @@ class Checkbox extends React.PureComponent {
                       border-color: ${theme.controlBorderPressed};
                     }
                     &:focus .focus-ring {
-                      display: ${focusVisible ? "block" : "none"};
+                      display: ${focusVisible ? 'block' : 'none'};
                     }
                   `
-                : ""};
+                : ''};
             `}
             {...props}
           >
-            {variant === "checkbox" &&
+            {variant === 'checkbox' &&
               this.renderCheck(checked && !indeterminate, Check)}
-            {variant === "checkbox" && this.renderCheck(indeterminate, Dash)}
-            {variant === "radio" && this.renderCheck(checked, Bullet)}
+            {variant === 'checkbox' && this.renderCheck(indeterminate, Dash)}
+            {variant === 'radio' && this.renderCheck(checked, Bullet)}
 
             <span
               className="focus-ring"
@@ -151,14 +151,14 @@ class Checkbox extends React.PureComponent {
                 right: -2px;
                 bottom: -2px;
                 border: 2px solid ${theme.focus};
-                border-radius: ${variant === "radio" ? "50%" : `${RADIUS}px`};
+                border-radius: ${variant === 'radio' ? '50%' : `${RADIUS}px`};
                 display: none;
               `}
             />
           </button>
         )}
       </FocusVisible>
-    );
+    )
   }
 }
 
@@ -169,7 +169,7 @@ const Dash = ({ color }) => (
   <svg width="14" height="14" viewBox="0 0 14 14">
     <line x1="3" y1="7" x2="11" y2="7" stroke={color} strokeWidth="1.5" />
   </svg>
-);
+)
 
 const Check = ({ color }) => (
   <svg width="12" height="8" viewBox="0 0 12 8">
@@ -187,7 +187,7 @@ const Check = ({ color }) => (
       fill={color}
     />
   </svg>
-);
+)
 
 const Bullet = ({ color }) => (
   <span
@@ -199,14 +199,14 @@ const Bullet = ({ color }) => (
       background: ${color};
     `}
   />
-);
+)
 
 const CheckBoxWithTheme = React.forwardRef((props, ref) => {
-  const theme = useTheme();
+  const theme = useTheme()
 
-  return <Checkbox theme={theme} ref={ref} {...props} />;
-});
+  return <Checkbox theme={theme} ref={ref} {...props} />
+})
 
 /* eslint-enable react/prop-types */
 
-export default CheckBoxWithTheme;
+export default CheckBoxWithTheme

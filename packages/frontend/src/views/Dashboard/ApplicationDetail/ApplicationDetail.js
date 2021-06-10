@@ -1,13 +1,13 @@
-import React from "react";
-import { Switch, Route, useParams, useRouteMatch } from "react-router";
-import "styled-components/macro";
-import { Spacer, textStyle, GU } from "ui";
-import AnimatedLogo from "components/AnimatedLogo/AnimatedLogo";
-import AppInfo from "views/Dashboard/ApplicationDetail/AppInfo";
-import Chains from "views/Dashboard/ApplicationDetail/Chains";
-import Notifications from "views/Dashboard/ApplicationDetail/Notifications";
-import Security from "views/Dashboard/ApplicationDetail/Security";
-import SuccessDetails from "views/Dashboard/ApplicationDetail/SuccessDetails";
+import React from 'react'
+import { Switch, Route, useParams, useRouteMatch } from 'react-router'
+import 'styled-components/macro'
+import { Spacer, textStyle, GU } from 'ui'
+import AnimatedLogo from 'components/AnimatedLogo/AnimatedLogo'
+import AppInfo from 'views/Dashboard/ApplicationDetail/AppInfo'
+import Chains from 'views/Dashboard/ApplicationDetail/Chains'
+import Notifications from 'views/Dashboard/ApplicationDetail/Notifications'
+import Security from 'views/Dashboard/ApplicationDetail/Security'
+import SuccessDetails from 'views/Dashboard/ApplicationDetail/SuccessDetails'
 import {
   useActiveApplication,
   useAppOnChainStatus,
@@ -17,61 +17,57 @@ import {
   usePreviousSuccessfulRelays,
   useSucessfulWeeklyRelays,
   useWeeklyAppRelaysInfo,
-} from "views/Dashboard/application-hooks";
-import env from "environment";
+} from 'views/Dashboard/application-hooks'
+import env from 'environment'
 
 // Ethers.js
 const TEST_APP_PUB_KEY =
-  "2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74";
+  '2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74'
 
 export default function ApplicationDetail() {
-  const { appId } = useParams();
-  const { path } = useRouteMatch();
-  const {
-    appData,
-    isAppLoading,
-    refetchActiveAppData,
-  } = useActiveApplication();
-  const { appOnChainData, isAppOnChainLoading } = useAppOnChainStatus(appId);
+  const { appId } = useParams()
+  const { path } = useRouteMatch()
+  const { appData, isAppLoading, refetchActiveAppData } = useActiveApplication()
+  const { appOnChainData, isAppOnChainLoading } = useAppOnChainStatus(appId)
   const { isWeeklyAppRelaysLoading, weeklyRelaysData } = useWeeklyAppRelaysInfo(
-    !env("USE_TEST_APP")
+    !env('USE_TEST_APP')
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
-  );
+  )
   const {
     isSuccesfulWeeklyRelaysLoading,
     successfulWeeklyRelaysData,
   } = useSucessfulWeeklyRelays(
-    !env("USE_TEST_APP")
+    !env('USE_TEST_APP')
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
-  );
+  )
   const { isDailyRelayCountLoading, dailyRelayCountData } = useDailyRelayCount(
-    !env("USE_TEST_APP")
+    !env('USE_TEST_APP')
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
-  );
+  )
   const {
     isCurrentSessionRelaysLoading,
     currentSessionRelayCount,
   } = useCurrentSessionRelayCount(
-    !env("USE_TEST_APP")
+    !env('USE_TEST_APP')
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
-  );
+  )
   const { isLatestLatencyLoading, latestLatencyData } = useLatestLatencyValues(
-    !env("USE_TEST_APP")
+    !env('USE_TEST_APP')
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
-  );
+  )
   const {
     isPreviousSuccessfulRelaysLoading,
     previousSucessfulRelaysData,
   } = usePreviousSuccessfulRelays(
-    !env("USE_TEST_APP")
+    !env('USE_TEST_APP')
       ? appData?.freeTierApplicationAccount?.publicKey
       : TEST_APP_PUB_KEY
-  );
+  )
 
   const appLoading =
     isAppLoading ||
@@ -81,7 +77,7 @@ export default function ApplicationDetail() {
     isSuccesfulWeeklyRelaysLoading ||
     isDailyRelayCountLoading ||
     isCurrentSessionRelaysLoading ||
-    isLatestLatencyLoading;
+    isLatestLatencyLoading
 
   return appLoading ? (
     <div
@@ -100,7 +96,7 @@ export default function ApplicationDetail() {
       <Spacer size={2 * GU} />
       <p
         css={`
-          ${textStyle("body2")}
+          ${textStyle('body2')}
         `}
       >
         Loading application...
@@ -144,5 +140,5 @@ export default function ApplicationDetail() {
         <Chains appData={appData} />
       </Route>
     </Switch>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react'
 
-function IconNetwork({ color = "currentColor", ...props }) {
+function IconNetwork({ color = 'currentColor', ...props }) {
   return (
     <svg
       width="21"
@@ -17,7 +17,7 @@ function IconNetwork({ color = "currentColor", ...props }) {
         fill={color}
       />
     </svg>
-  );
+  )
 }
 
-export default IconNetwork;
+export default IconNetwork

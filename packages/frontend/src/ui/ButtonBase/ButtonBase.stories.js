@@ -1,26 +1,26 @@
-import React from "react";
-import ButtonBase from "ui/ButtonBase/ButtonBase";
+import React from 'react'
+import ButtonBase from 'ui/ButtonBase/ButtonBase'
 
 export default {
-  title: "pocketUI/ButtonBase",
+  title: 'pocketUI/ButtonBase',
   component: ButtonBase,
   argTypes: {
-    children: { control: "text", defaultValue: "Log in" },
-    disabled: { control: "boolean", defaultValue: false },
+    children: { control: 'text', defaultValue: 'Log in' },
+    disabled: { control: 'boolean', defaultValue: false },
     display: {
-      control: { type: "select", options: ["auto", "all", "icon", "label"] },
-      defaultValue: "auto",
+      control: { type: 'select', options: ['auto', 'all', 'icon', 'label'] },
+      defaultValue: 'auto',
     },
     external: {
       control: {
-        type: "boolean",
+        type: 'boolean',
         defaultValue: false,
       },
     },
-    href: { control: "text", defaultValue: "" },
+    href: { control: 'text', defaultValue: '' },
   },
-};
+}
 
-const Template = (args) => <ButtonBase {...args} />;
+const Template = (args) => <ButtonBase {...args} />
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

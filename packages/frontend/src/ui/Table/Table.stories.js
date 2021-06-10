@@ -1,13 +1,13 @@
-import React from "react";
-import Table from "ui/Table/Table";
-import TableCell from "ui/Table/TableCell";
-import TableHeader from "ui/Table/TableHeader";
-import TableRow from "ui/Table/TableRow";
+import React from 'react'
+import Table from 'ui/Table/Table'
+import TableCell from 'ui/Table/TableCell'
+import TableHeader from 'ui/Table/TableHeader'
+import TableRow from 'ui/Table/TableRow'
 
 export default {
-  title: "pocketUI/Table",
+  title: 'pocketUI/Table',
   component: Table,
-};
+}
 
 const Template = (args) => (
   <Table
@@ -38,6 +38,6 @@ const Template = (args) => (
       </TableCell>
     </TableRow>
   </Table>
-);
+)
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

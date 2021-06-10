@@ -1,20 +1,20 @@
-import React from "react";
-import Switch from "ui/Switch/Switch";
+import React from 'react'
+import Switch from 'ui/Switch/Switch'
 
 export default {
-  title: "pocketUI/Switch",
+  title: 'pocketUI/Switch',
   component: Switch,
   argTypes: {
-    checked: { control: "boolean", defaultValue: false },
+    checked: { control: 'boolean', defaultValue: false },
     disabled: {
       control: {
-        type: "boolean",
+        type: 'boolean',
         defaultValue: false,
       },
     },
   },
-};
+}
 
-const Template = (args) => <Switch {...args} />;
+const Template = (args) => <Switch {...args} />
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

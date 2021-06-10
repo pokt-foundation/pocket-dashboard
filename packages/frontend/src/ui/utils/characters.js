@@ -1,1 +1,1 @@
-export const NO_BREAK_SPACE = "\u00a0";
+export const NO_BREAK_SPACE = '\u00a0'

@@ -1,1 +1,1 @@
-export * from "ui/icons/components";
+export * from 'ui/icons/components'

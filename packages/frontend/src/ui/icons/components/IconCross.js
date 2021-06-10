@@ -1,9 +1,9 @@
-import React from "react";
-import useIconSize from "ui/icons/icon-size";
-import IconPropTypes from "ui/icons/IconPropTypes";
+import React from 'react'
+import useIconSize from 'ui/icons/icon-size'
+import IconPropTypes from 'ui/icons/IconPropTypes'
 
 function IconCross({ size, ...props }) {
-  const sizeValue = useIconSize(size);
+  const sizeValue = useIconSize(size)
 
   return (
     <svg
@@ -26,8 +26,8 @@ function IconCross({ size, ...props }) {
         d="M17.858 17.173l-5.515-5.516-5.516-5.515a.485.485 0 10-.685.685l11.03 11.031a.483.483 0 00.686 0 .485.485 0 000-.685z"
       />
     </svg>
-  );
+  )
 }
 
-IconCross.propTypes = IconPropTypes;
-export default IconCross;
+IconCross.propTypes = IconPropTypes
+export default IconCross

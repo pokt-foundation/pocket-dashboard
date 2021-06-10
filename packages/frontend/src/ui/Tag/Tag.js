@@ -1,37 +1,37 @@
-import React, { useMemo } from "react";
-import PropTypes from "prop-types";
-import "styled-components/macro";
-import { useTheme } from "ui";
-import { GU, textStyle } from "ui";
-import { unselectable } from "ui";
+import React, { useMemo } from 'react'
+import PropTypes from 'prop-types'
+import 'styled-components/macro'
+import { useTheme } from 'ui'
+import { GU, textStyle } from 'ui'
+import { unselectable } from 'ui'
 
-const MODE_INDICATOR = "indicator";
-const MODE_IDENTIFIER = "identifier";
-const MODE_NEW = "new";
-const MODE_ACTIVITY = "activity";
+const MODE_INDICATOR = 'indicator'
+const MODE_IDENTIFIER = 'identifier'
+const MODE_NEW = 'new'
+const MODE_ACTIVITY = 'activity'
 
-const SIZE_NORMAL = "normal";
-const SIZE_SMALL = "small";
+const SIZE_NORMAL = 'normal'
+const SIZE_SMALL = 'small'
 
-const COUNT_DEFAULT = 2;
+const COUNT_DEFAULT = 2
 
 function useMode(mode) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   if (mode === MODE_IDENTIFIER) {
     return {
       background: theme.tagIdentifier,
       color: theme.tagIdentifierContent,
       size: SIZE_NORMAL,
-    };
+    }
   }
 
   if (mode === MODE_NEW) {
     return {
       background: theme.positive,
-      color: "black",
+      color: 'black',
       size: SIZE_NORMAL,
-    };
+    }
   }
 
   if (mode === MODE_ACTIVITY) {
@@ -39,7 +39,7 @@ function useMode(mode) {
       background: theme.tagActivity,
       color: theme.tagActivityContent,
       size: SIZE_SMALL,
-    };
+    }
   }
 
   // mode === MODE_INDICATOR (default)
@@ -47,58 +47,57 @@ function useMode(mode) {
     background: theme.tagIndicator,
     color: theme.tagIndicatorContent,
     size: SIZE_NORMAL,
-  };
+  }
 }
 
 function getSize(size, { uppercase, discMode, iconAndLabel }) {
   if (size === SIZE_SMALL) {
     return `
       min-width: ${2 * GU}px;
-      width: ${discMode ? `${2 * GU}px` : "auto"};
+      width: ${discMode ? `${2 * GU}px` : 'auto'};
       height: ${2 * GU}px;
-      padding: ${discMode ? "0" : `0 ${0.5 * GU}px`};
-      padding-top: ${uppercase ? "0.5px" : 0};
+      padding: ${discMode ? '0' : `0 ${0.5 * GU}px`};
+      padding-top: ${uppercase ? '0.5px' : 0};
       border-radius: ${2 * GU}px;
-      ${textStyle("label3")};
+      ${textStyle('label3')};
       font-weight: 600;
-    `;
+    `
   }
 
   // normal
   return `
     min-width: ${12 * GU}px;
-    width: ${discMode ? `${3 * GU}px` : "auto"};
+    width: ${discMode ? `${3 * GU}px` : 'auto'};
     height: ${3.5 * GU}px;
-    padding: ${discMode ? "0" : `0 ${1.5 * GU}px`} ;
-    padding-top: ${uppercase ? "1px" : 0};
-    ${iconAndLabel ? `padding-left: ${1.25 * GU}px` : ""};
+    padding: ${discMode ? '0' : `0 ${1.5 * GU}px`} ;
+    padding-top: ${uppercase ? '1px' : 0};
+    ${iconAndLabel ? `padding-left: ${1.25 * GU}px` : ''};
     border-radius: ${2.5 * GU}px;
-    ${textStyle("label2")};
+    ${textStyle('label2')};
     font-weight: 600;
-  `;
+  `
 }
 
-function useLabel({ label = "", limitDigits }) {
+function useLabel({ label = '', limitDigits }) {
   const finalLabel = useMemo(() => {
     if (limitDigits === false) {
-      return typeof label === "number" ? String(label) : label || "";
+      return typeof label === 'number' ? String(label) : label || ''
     }
 
-    const digits =
-      typeof limitDigits === "number" ? limitDigits : COUNT_DEFAULT;
-    const parsed = parseInt(label, 10);
+    const digits = typeof limitDigits === 'number' ? limitDigits : COUNT_DEFAULT
+    const parsed = parseInt(label, 10)
 
     if (isNaN(parsed)) {
-      return label || "";
+      return label || ''
     }
 
-    const max = Math.pow(10, digits) - 1;
-    const formattedValue = parsed > max ? `${max}+` : parsed;
+    const max = Math.pow(10, digits) - 1
+    const formattedValue = parsed > max ? `${max}+` : parsed
 
-    return String(formattedValue);
-  }, [label, limitDigits]);
+    return String(formattedValue)
+  }, [label, limitDigits])
 
-  return finalLabel;
+  return finalLabel
 }
 
 function Tag({
@@ -114,16 +113,16 @@ function Tag({
   ...props
 }) {
   if ((icon || label !== undefined) && children !== undefined) {
-    throw new Error("Tag: you cannot use icon or label with children.");
+    throw new Error('Tag: you cannot use icon or label with children.')
   }
 
-  const modeProps = useMode(mode);
+  const modeProps = useMode(mode)
 
-  const finalSize = size || modeProps.size;
+  const finalSize = size || modeProps.size
   const finalLabel = useLabel({
     label: label !== undefined ? label : children,
     limitDigits,
-  });
+  })
 
   const sizeStyles = getSize(finalSize, {
     uppercase,
@@ -131,15 +130,15 @@ function Tag({
       // icon only
       (icon && !finalLabel) ||
       // label only, using 1 or 0 chars
-      (!icon && typeof finalLabel === "string" && finalLabel.length < 2),
+      (!icon && typeof finalLabel === 'string' && finalLabel.length < 2),
     iconAndLabel: icon && finalLabel,
-  });
+  })
 
   // Slightly tweak the alignment when there are no descenders,
   // to make the characters look more aligned.
   const alignmentCorrection =
     finalSize === SIZE_NORMAL &&
-    (uppercase || typeof label === "number" || limitDigits !== false);
+    (uppercase || typeof label === 'number' || limitDigits !== false)
 
   return (
     <span
@@ -149,7 +148,7 @@ function Tag({
         justify-content: center;
         white-space: nowrap;
         ${sizeStyles};
-        ${!uppercase ? "text-transform: unset" : ""};
+        ${!uppercase ? 'text-transform: unset' : ''};
         color: ${color || modeProps.color};
         background: ${background || modeProps.background};
         ${unselectable};
@@ -171,13 +170,13 @@ function Tag({
         css={`
           overflow: hidden;
           text-overflow: ellipsis;
-          margin-top: ${alignmentCorrection ? "1px" : "0"};
+          margin-top: ${alignmentCorrection ? '1px' : '0'};
         `}
       >
         {finalLabel}
       </span>
     </span>
-  );
+  )
 }
 
 Tag.propTypes = {
@@ -195,11 +194,11 @@ Tag.propTypes = {
   ]),
   size: PropTypes.oneOf([SIZE_NORMAL, SIZE_SMALL]),
   uppercase: PropTypes.bool,
-};
+}
 
 Tag.defaultProps = {
   uppercase: true,
   limitDigits: false,
-};
+}
 
-export default Tag;
+export default Tag

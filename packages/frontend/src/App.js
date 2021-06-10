@@ -1,10 +1,10 @@
-import React from "react";
-import { HashRouter as Router } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { AppWrapper } from "ui";
-import DashboardRoutes from "views/DashboardRoutes";
+import React from 'react'
+import { HashRouter as Router } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { AppWrapper } from 'ui'
+import DashboardRoutes from 'views/DashboardRoutes'
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         </Router>
       </AppWrapper>
     </QueryClientProvider>
-  );
+  )
 }
 
-export default App;
+export default App

@@ -1,12 +1,12 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { GU } from "ui/style";
-import Button from "ui/Button/Button";
-import ButtonBase from "ui/ButtonBase/ButtonBase";
+import React from 'react'
+import PropTypes from 'prop-types'
+import { GU } from 'ui/style'
+import Button from 'ui/Button/Button'
+import ButtonBase from 'ui/ButtonBase/ButtonBase'
 
 function ButtonIcon({ label, children, mode, ...props }) {
-  if (mode === "button") {
-    return <Button label={label} icon={children} display="icon" {...props} />;
+  if (mode === 'button') {
+    return <Button label={label} icon={children} display="icon" {...props} />
   }
 
   return (
@@ -26,7 +26,7 @@ function ButtonIcon({ label, children, mode, ...props }) {
     >
       {children}
     </ButtonBase>
-  );
+  )
 }
 
 ButtonIcon.propTypes = {
@@ -34,7 +34,7 @@ ButtonIcon.propTypes = {
   children: PropTypes.node.isRequired,
 
   // deprecated
-  mode: PropTypes.oneOf(["button"]),
-};
+  mode: PropTypes.oneOf(['button']),
+}
 
-export default ButtonIcon;
+export default ButtonIcon

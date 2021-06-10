@@ -1,6 +1,6 @@
-import React from "react";
-import "styled-components/macro";
-import { Button, TextInput, textStyle, GU, RADIUS } from "ui";
+import React from 'react'
+import 'styled-components/macro'
+import { Button, TextInput, textStyle, GU, RADIUS } from 'ui'
 
 export default function Home() {
   return (
@@ -20,7 +20,7 @@ export default function Home() {
       >
         <h2
           css={`
-            ${textStyle("title2")}
+            ${textStyle('title2')}
           `}
         >
           Get Started
@@ -30,5 +30,5 @@ export default function Home() {
         <Button>Get started</Button>
       </div>
     </div>
-  );
+  )
 }

@@ -15,4 +15,4 @@ export const springs = {
   // Super fast speed spring, for interactions
   // that feel instant (e.g. a checkbox tick).
   instant: { mass: 0.3, tension: 1000, friction: 30 },
-};
+}

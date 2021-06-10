@@ -13,5 +13,5 @@
  * @returns {Number} Normalized number
  */
 export function norm(aNumber, low, high) {
-  return (aNumber - low) / (high - low);
+  return (aNumber - low) / (high - low)
 }

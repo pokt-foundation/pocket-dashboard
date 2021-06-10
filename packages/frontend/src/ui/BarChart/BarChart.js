@@ -1,49 +1,43 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Spring } from "react-spring/renderprops";
-import "styled-components/macro";
-import PropTypes from "ui/prop-types";
-import { GU, springs } from "ui/style";
-import { unselectable } from "ui";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Spring } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import PropTypes from 'ui/prop-types'
+import { GU, springs } from 'ui/style'
+import { unselectable } from 'ui'
 
-const LABELS_HEIGHT = 30;
-const WIDTH_DEFAULT = 300;
-const GAP = 0.9;
+const LABELS_HEIGHT = 30
+const WIDTH_DEFAULT = 300
+const GAP = 0.9
 
-const FULL_DAY = 24; // hours, equivalent to rectangles drawn
+const FULL_DAY = 24 // hours, equivalent to rectangles drawn
 
 function useMeasuredWidth() {
-  const ref = useRef();
-  const [measuredWidth, setMeasuredWidth] = useState(WIDTH_DEFAULT);
+  const ref = useRef()
+  const [measuredWidth, setMeasuredWidth] = useState(WIDTH_DEFAULT)
 
   const onResize = useCallback(() => {
     if (ref.current) {
-      setMeasuredWidth(ref.current.clientWidth);
+      setMeasuredWidth(ref.current.clientWidth)
     }
-  }, []);
+  }, [])
 
   const onRef = useCallback(
     (element) => {
-      ref.current = element;
-      onResize();
+      ref.current = element
+      onResize()
     },
     [onResize]
-  );
+  )
 
   useEffect(() => {
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [onResize]);
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [onResize])
 
-  return [measuredWidth, onRef];
+  return [measuredWidth, onRef]
 }
 
-const OFFSET = 50;
+const OFFSET = 50
 
 function BarChart({
   animDelay,
@@ -63,53 +57,53 @@ function BarChart({
   width: widthProps,
   ...props
 }) {
-  const [width, onSvgRef] = useMeasuredWidth();
+  const [width, onSvgRef] = useMeasuredWidth()
 
   const lines = useMemo(() => {
     return linesProps.map((lineOrValues) =>
       Array.isArray(lineOrValues) ? { values: lineOrValues } : lineOrValues
-    );
-  }, [linesProps]);
+    )
+  }, [linesProps])
 
   // the count of provided values
   const valuesCount = useMemo(() => {
     // All the values have the same length, so we can use the first one.
-    return lines[0] ? lines[0].values.length : 0;
-  }, [lines]);
+    return lines[0] ? lines[0].values.length : 0
+  }, [lines])
 
   // the total amount of values
   const totalCount = useMemo(() => {
     // If no total is provided, the total is the number of provided values.
-    return total > 0 && total > valuesCount ? total : valuesCount;
-  }, [valuesCount, total]);
+    return total > 0 && total > valuesCount ? total : valuesCount
+  }, [valuesCount, total])
 
   const getX = useCallback(
     (index) => {
-      return (width / Math.max(1, totalCount - 1)) * index;
+      return (width / Math.max(1, totalCount - 1)) * index
     },
     [width, totalCount]
-  );
+  )
 
   const getRectX = useCallback(
     (index) => {
-      return (width / FULL_DAY) * index + GU;
+      return (width / FULL_DAY) * index + GU
     },
     [width]
-  );
+  )
 
   const getLabelPosition = useCallback((index, length) => {
     if (index === 0) {
-      return "start";
+      return 'start'
     }
     if (index === length - 1) {
-      return "end";
+      return 'end'
     }
-    return "middle";
-  }, []);
+    return 'middle'
+  }, [])
 
-  const labels = label;
+  const labels = label
 
-  const chartHeight = height - (labels ? LABELS_HEIGHT : 0);
+  const chartHeight = height - (labels ? LABELS_HEIGHT : 0)
 
   return (
     <Spring
@@ -123,7 +117,7 @@ function BarChart({
         <svg
           ref={onSvgRef}
           viewBox={`0 0 ${width + OFFSET} ${height + GU}`}
-          width={widthProps || "auto"}
+          width={widthProps || 'auto'}
           height="auto"
           css="display: block"
           {...props}
@@ -137,7 +131,7 @@ function BarChart({
                       `${path} M ${getX(index)},${
                         !index ? 0 : chartHeight
                       } l 0,-8`,
-                    ""
+                    ''
                   )}
                 `}
                 stroke={borderColor}
@@ -171,10 +165,10 @@ function BarChart({
                           `}
                         />
                       </>
-                    );
+                    )
                   })}
                 </g>
-              );
+              )
             })}
           </g>
           {labels && (
@@ -204,7 +198,7 @@ function BarChart({
           <g transform={`translate(${2 * GU},${GU})`}>
             {scales &&
               scales.map(({ label, highlightColor }, index) => {
-                const scaleLength = scales.length - 1;
+                const scaleLength = scales.length - 1
 
                 return (
                   <text
@@ -229,7 +223,7 @@ function BarChart({
                   >
                     {label}
                   </text>
-                );
+                )
               })}
           </g>
           {threshold && (
@@ -239,8 +233,8 @@ function BarChart({
                 y1={chartHeight / (scales.length - 1) + GU}
                 x2={width}
                 y2={chartHeight / (scales.length - 1) + GU}
-                style={{ stroke: "#952828", strokeWidth: 2 }}
-              />{" "}
+                style={{ stroke: '#952828', strokeWidth: 2 }}
+              />{' '}
               <defs>
                 <linearGradient id="thresholdFill" x1="0" x2="0" y1="0" y2="1">
                   <stop offset="0%" stop-color="red" stopOpacity="0" />
@@ -259,7 +253,7 @@ function BarChart({
         </svg>
       )}
     </Spring>
-  );
+  )
 }
 
 BarChart.propTypes = {
@@ -285,14 +279,14 @@ BarChart.propTypes = {
   label: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes._null,
-    PropTypes.arrayOf("string"),
+    PropTypes.arrayOf('string'),
   ]),
   scales: PropTypes.arrayOf(PropTypes.string),
   renderCheckpoints: PropTypes.bool,
   reset: PropTypes.bool,
   threshold: PropTypes.bool,
   color: PropTypes.func,
-};
+}
 
 BarChart.defaultProps = {
   springConfig: springs.lazy,
@@ -302,13 +296,13 @@ BarChart.defaultProps = {
   animDelay: 500,
   rendercheckpoints: false,
   reset: false,
-  borderColor: "rgba(209, 209, 209, 0.5)",
-  labelColor: "white",
+  borderColor: 'rgba(209, 209, 209, 0.5)',
+  labelColor: 'white',
   lines: [],
   scales: [],
   threshold: false,
   color: (index, { lines }) =>
     `hsl(${(index * (360 / lines.length) + 40) % 360}, 60%, 70%)`,
-};
+}
 
-export default BarChart;
+export default BarChart

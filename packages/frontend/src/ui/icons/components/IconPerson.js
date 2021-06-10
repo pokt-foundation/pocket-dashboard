@@ -1,9 +1,9 @@
-import React from "react";
-import useIconSize from "ui/icons/icon-size";
-import IconPropTypes from "ui/icons/IconPropTypes";
+import React from 'react'
+import useIconSize from 'ui/icons/icon-size'
+import IconPropTypes from 'ui/icons/IconPropTypes'
 
 function IconPerson({ size, ...props }) {
-  const sizeValue = useIconSize(size);
+  const sizeValue = useIconSize(size)
 
   return (
     <svg
@@ -23,8 +23,8 @@ function IconPerson({ size, ...props }) {
         stroke="currentColor"
       />
     </svg>
-  );
+  )
 }
 
-IconPerson.propTypes = IconPropTypes;
-export default IconPerson;
+IconPerson.propTypes = IconPropTypes
+export default IconPerson

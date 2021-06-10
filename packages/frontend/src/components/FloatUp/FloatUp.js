@@ -1,7 +1,7 @@
-import React from "react";
-import { useTransition, animated } from "react-spring";
-import PropTypes from "prop-types";
-import { GU } from "ui";
+import React from 'react'
+import { useTransition, animated } from 'react-spring'
+import PropTypes from 'prop-types'
+import { GU } from 'ui'
 
 export default function FloatUp({
   content,
@@ -15,11 +15,11 @@ export default function FloatUp({
     enter: { opacity: 1, transform: `translate3d(0, 0, 0)` },
     leave: {
       opacity: 0,
-      position: "absolute",
+      position: 'absolute',
       transform: `translate3d(0, -${1 * GU}px, 0)`,
     },
     immediate: disable,
-  });
+  })
 
   return (
     <div
@@ -41,7 +41,7 @@ export default function FloatUp({
         </animated.div>
       ))}
     </div>
-  );
+  )
 }
 
 FloatUp.propTypes = {
@@ -49,4 +49,4 @@ FloatUp.propTypes = {
   disabled: PropTypes.bool,
   fallback: PropTypes.func,
   loading: PropTypes.bool,
-};
+}

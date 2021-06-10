@@ -1,13 +1,13 @@
-import React from "react";
-import PropTypes from "prop-types";
-import "styled-components/macro";
-import { GU } from "ui/style";
-import { useTheme } from "ui/theme";
-import ButtonBase from "ui/ButtonBase/ButtonBase";
+import React from 'react'
+import PropTypes from 'prop-types'
+import 'styled-components/macro'
+import { GU } from 'ui/style'
+import { useTheme } from 'ui/theme'
+import ButtonBase from 'ui/ButtonBase/ButtonBase'
 
 const DiscButton = React.forwardRef(
   ({ children, description, size, ...props }, ref) => {
-    const theme = useTheme();
+    const theme = useTheme()
 
     return (
       <ButtonBase
@@ -39,18 +39,18 @@ const DiscButton = React.forwardRef(
       >
         {children}
       </ButtonBase>
-    );
+    )
   }
-);
+)
 
 DiscButton.propTypes = {
   children: PropTypes.node.isRequired,
   description: PropTypes.string.isRequired,
   size: PropTypes.number,
-};
+}
 
 DiscButton.defaultProps = {
   size: 5 * GU,
-};
+}
 
-export default DiscButton;
+export default DiscButton

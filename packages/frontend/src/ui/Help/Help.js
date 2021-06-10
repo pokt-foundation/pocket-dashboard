@@ -1,21 +1,21 @@
-import React, { useCallback, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { useInside } from "use-inside";
-import "styled-components/macro";
-import { GU, textStyle } from "ui/style";
-import { useTheme } from "ui/theme";
-import { IconQuestion } from "ui/icons";
-import DiscButton from "ui/DiscButton/DiscButton";
-import Popover from "ui/Popover/Popover";
+import React, { useCallback, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
+import { useInside } from 'use-inside'
+import 'styled-components/macro'
+import { GU, textStyle } from 'ui/style'
+import { useTheme } from 'ui/theme'
+import { IconQuestion } from 'ui/icons'
+import DiscButton from 'ui/DiscButton/DiscButton'
+import Popover from 'ui/Popover/Popover'
 
 function Help({ hint, children }) {
-  const theme = useTheme();
-  const buttonElement = useRef();
-  const [visible, setVisible] = useState(false);
-  const open = useCallback(() => setVisible(true), []);
-  const close = useCallback(() => setVisible(false), []);
-  const [insideBoxHeading] = useInside("Box:heading");
-  const [insideFieldLabel] = useInside("Field:label");
+  const theme = useTheme()
+  const buttonElement = useRef()
+  const [visible, setVisible] = useState(false)
+  const open = useCallback(() => setVisible(true), [])
+  const close = useCallback(() => setVisible(false), [])
+  const [insideBoxHeading] = useInside('Box:heading')
+  const [insideFieldLabel] = useInside('Field:label')
 
   return (
     <React.Fragment>
@@ -38,7 +38,7 @@ function Help({ hint, children }) {
         css={`
           border: 0;
           overflow: hidden;
-          ${textStyle("body3")};
+          ${textStyle('body3')};
         `}
       >
         <div
@@ -49,7 +49,7 @@ function Help({ hint, children }) {
             min-height: ${20 * GU}px;
             padding: ${5 * GU}px;
             &:before {
-              content: "";
+              content: '';
               position: absolute;
               top: 0;
               left: 0;
@@ -63,12 +63,12 @@ function Help({ hint, children }) {
         </div>
       </Popover>
     </React.Fragment>
-  );
+  )
 }
 
 Help.propTypes = {
   hint: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-};
+}
 
-export default Help;
+export default Help

@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
-import { format } from "d3-format";
-import { useViewport } from "use-viewport";
-import "styled-components/macro";
+import React, { useMemo } from 'react'
+import { format } from 'd3-format'
+import { useViewport } from 'use-viewport'
+import 'styled-components/macro'
 import {
   CircleGraph,
   DataView,
@@ -11,31 +11,31 @@ import {
   textStyle,
   useTheme,
   GU,
-} from "ui";
-import AnimatedLogo from "components/AnimatedLogo/AnimatedLogo";
-import Box from "components/Box/Box";
-import FloatUp from "components/FloatUp/FloatUp";
+} from 'ui'
+import AnimatedLogo from 'components/AnimatedLogo/AnimatedLogo'
+import Box from 'components/Box/Box'
+import FloatUp from 'components/FloatUp/FloatUp'
 import {
   useNetworkSuccessRate,
   useTotalWeeklyRelays,
   useNetworkSummary,
   useChains,
-} from "views/Dashboard/Network/network-hooks";
-import { norm } from "lib/math-utils";
+} from 'views/Dashboard/Network/network-hooks'
+import { norm } from 'lib/math-utils'
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const PER_PAGE = 5;
+const PER_PAGE = 5
 
 function formatDailyRelaysForGraphing(dailyRelays) {
   const labels = dailyRelays
-    .map(({ bucket }) => bucket.split("T")[0])
-    .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
+    .map(({ bucket }) => bucket.split('T')[0])
+    .map((bucket) => DAYS[new Date(bucket).getUTCDay()])
 
   const highestDailyAmount = dailyRelays.reduce(
     (highest, { total_relays: totalRelays }) => Math.max(highest, totalRelays),
     0
-  );
+  )
 
   const lines = [
     {
@@ -44,9 +44,9 @@ function formatDailyRelaysForGraphing(dailyRelays) {
         norm(totalRelays, 0, highestDailyAmount)
       ),
     },
-  ];
+  ]
 
-  const formatSi = format(".2s");
+  const formatSi = format('.2s')
 
   const scales = [
     { label: 0 },
@@ -54,23 +54,23 @@ function formatDailyRelaysForGraphing(dailyRelays) {
     { label: formatSi((highestDailyAmount * 0.5).toFixed(0)) },
     { label: formatSi((highestDailyAmount * 0.75).toFixed(0)) },
     { label: formatSi(highestDailyAmount.toFixed(0)) },
-  ];
+  ]
 
   return {
     labels,
     lines,
     scales,
-  };
+  }
 }
 
 export default function NetworkStatus() {
-  const { isRelaysError, isRelaysLoading, relayData } = useTotalWeeklyRelays();
-  const { isSuccessRateLoading, successRateData } = useNetworkSuccessRate();
-  const { isSummaryLoading, summaryData } = useNetworkSummary();
-  const { isChainsLoading, chains } = useChains();
-  const theme = useTheme();
-  const { within } = useViewport();
-  const compactMode = within(-1, "medium");
+  const { isRelaysError, isRelaysLoading, relayData } = useTotalWeeklyRelays()
+  const { isSuccessRateLoading, successRateData } = useNetworkSuccessRate()
+  const { isSummaryLoading, summaryData } = useNetworkSummary()
+  const { isChainsLoading, chains } = useChains()
+  const theme = useTheme()
+  const { within } = useViewport()
+  const compactMode = within(-1, 'medium')
 
   const { labels = [], lines = [], scales = [] } = useMemo(
     () =>
@@ -78,7 +78,7 @@ export default function NetworkStatus() {
         ? {}
         : formatDailyRelaysForGraphing(relayData.dailyRelays),
     [isRelaysError, isRelaysLoading, relayData]
-  );
+  )
 
   const loading = useMemo(
     () =>
@@ -87,7 +87,7 @@ export default function NetworkStatus() {
       isSummaryLoading ||
       isChainsLoading,
     [isChainsLoading, isRelaysLoading, isSuccessRateLoading, isSummaryLoading]
-  );
+  )
 
   return loading ? (
     <div
@@ -106,7 +106,7 @@ export default function NetworkStatus() {
       <Spacer size={2 * GU} />
       <p
         css={`
-          ${textStyle("body2")}
+          ${textStyle('body2')}
         `}
       >
         Loading network status...
@@ -128,7 +128,7 @@ export default function NetworkStatus() {
                   >
                     <h3
                       css={`
-                        ${textStyle("title2")}
+                        ${textStyle('title2')}
                       `}
                     >
                       Total Relays
@@ -141,7 +141,7 @@ export default function NetworkStatus() {
                     >
                       <h4
                         css={`
-                          ${textStyle("title4")}
+                          ${textStyle('title4')}
                         `}
                       >
                         {Intl.NumberFormat().format(
@@ -167,9 +167,9 @@ export default function NetworkStatus() {
                 <Spacer size={4 * GU} />
                 <Box title="Available Networks">
                   <DataView
-                    fields={["Network", "ID", "Ticker"]}
+                    fields={['Network', 'ID', 'Ticker']}
                     entries={chains}
-                    mode={compactMode ? "list" : "table"}
+                    mode={compactMode ? 'list' : 'table'}
                     entriesPerPage={PER_PAGE}
                     renderEntry={({ description, id, network, ticker }) => [
                       <p>{description || network}</p>,
@@ -207,7 +207,7 @@ export default function NetworkStatus() {
                     <div>
                       <p
                         css={`
-                          ${textStyle("title3")}
+                          ${textStyle('title3')}
                         `}
                       >
                         {Intl.NumberFormat().format(
@@ -216,7 +216,7 @@ export default function NetworkStatus() {
                       </p>
                       <p
                         css={`
-                          ${textStyle("body2")}
+                          ${textStyle('body2')}
                         `}
                       >
                         Sucessful relays
@@ -224,7 +224,7 @@ export default function NetworkStatus() {
                       <Spacer size={0.5 * GU} />
                       <p
                         css={`
-                          ${textStyle("body4")}
+                          ${textStyle('body4')}
                         `}
                       >
                         Last 7 Days Count
@@ -264,5 +264,5 @@ export default function NetworkStatus() {
         </>
       )}
     />
-  );
+  )
 }

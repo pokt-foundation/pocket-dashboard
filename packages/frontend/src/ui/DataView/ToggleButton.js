@@ -1,16 +1,16 @@
-import React from "react";
-import PropTypes from "prop-types";
-import "styled-components/macro";
-import ButtonIcon from "../Button/ButtonIcon";
-import { IconDown, IconUp } from "ui/icons";
-import { useTheme, RADIUS } from "ui";
+import React from 'react'
+import PropTypes from 'prop-types'
+import 'styled-components/macro'
+import ButtonIcon from '../Button/ButtonIcon'
+import { IconDown, IconUp } from 'ui/icons'
+import { useTheme, RADIUS } from 'ui'
 
 function ToggleButton({ onClick, opened }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <ButtonIcon
-      label={opened ? "Close" : "Open"}
+      label={opened ? 'Close' : 'Open'}
       focusRingRadius={RADIUS}
       onClick={onClick}
       css={`
@@ -41,12 +41,12 @@ function ToggleButton({ onClick, opened }) {
         <IconDown size="small" />
       </div>
     </ButtonIcon>
-  );
+  )
 }
 
 ToggleButton.propTypes = {
   onClick: PropTypes.func.isRequired,
   opened: PropTypes.bool.isRequired,
-};
+}
 
-export { ToggleButton };
+export { ToggleButton }

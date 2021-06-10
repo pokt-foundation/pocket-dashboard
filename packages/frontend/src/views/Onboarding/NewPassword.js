@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
-import { useMutation } from "react-query";
-import axios from "axios";
-import { isStrongPassword } from "validator";
-import "styled-components/macro";
+import React, { useCallback, useMemo, useState } from 'react'
+import { useHistory, useLocation } from 'react-router-dom'
+import { useMutation } from 'react-query'
+import axios from 'axios'
+import { isStrongPassword } from 'validator'
+import 'styled-components/macro'
 import {
   Button,
   Field,
@@ -13,28 +13,28 @@ import {
   useTheme,
   GU,
   RADIUS,
-} from "ui";
-import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
-import env from "environment";
-import PoktShape from "assets/poktshape.png";
+} from 'ui'
+import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
+import env from 'environment'
+import PoktShape from 'assets/poktshape.png'
 
 export default function NewPassword() {
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState(null);
-  const [repeatedPassword, setRepeatedPassword] = useState("");
-  const [repeatedPasswordError, setRepeatedPasswordError] = useState(null);
-  const [errors, setErrors] = useState([]);
-  const { search } = useLocation();
-  const history = useHistory();
-  const theme = useTheme();
+  const [password, setPassword] = useState('')
+  const [passwordError, setPasswordError] = useState(null)
+  const [repeatedPassword, setRepeatedPassword] = useState('')
+  const [repeatedPasswordError, setRepeatedPasswordError] = useState(null)
+  const [errors, setErrors] = useState([])
+  const { search } = useLocation()
+  const history = useHistory()
+  const theme = useTheme()
 
-  const token = new URLSearchParams(search).get("token");
-  const rawEmail = new URLSearchParams(search).get("email");
-  const email = decodeURIComponent(rawEmail);
+  const token = new URLSearchParams(search).get('token')
+  const rawEmail = new URLSearchParams(search).get('email')
+  const email = decodeURIComponent(rawEmail)
 
   const { isLoading, isError, mutate } = useMutation(
     async function sendResetEmail() {
-      const path = `${env("BACKEND_URL")}/api/users/reset-password`;
+      const path = `${env('BACKEND_URL')}/api/users/reset-password`
 
       try {
         await axios.post(path, {
@@ -42,76 +42,76 @@ export default function NewPassword() {
           password1: password,
           password2: repeatedPassword,
           email,
-        });
+        })
 
-        history.push("/login");
+        history.push('/login')
       } catch (err) {
-        console.log(Object.entries(err), "rip");
+        console.log(Object.entries(err), 'rip')
       }
     }
-  );
+  )
 
-  const onPasswordChange = useCallback((e) => setPassword(e.target.value), []);
+  const onPasswordChange = useCallback((e) => setPassword(e.target.value), [])
   const onRepeatedPasswordChange = useCallback(
     (e) => setRepeatedPassword(e.target.value),
     []
-  );
+  )
   const onInputFocus = useCallback(() => {
     if (errors.length) {
-      setErrors([]);
+      setErrors([])
     }
     if (passwordError) {
-      setPasswordError(null);
+      setPasswordError(null)
     }
     if (repeatedPasswordError) {
-      setRepeatedPasswordError(null);
+      setRepeatedPasswordError(null)
     }
-  }, [errors, passwordError, repeatedPasswordError]);
+  }, [errors, passwordError, repeatedPasswordError])
   const onPasswordBlur = useCallback(() => {
     if (!password) {
       const passwordError = {
-        id: "INVALID_PASSWORD",
-        message: "Password cannot be empty",
-      };
+        id: 'INVALID_PASSWORD',
+        message: 'Password cannot be empty',
+      }
 
-      setPasswordError(passwordError);
+      setPasswordError(passwordError)
     } else if (!isStrongPassword(password)) {
       const passwordError = {
-        id: "INVALID_PASSWORD",
+        id: 'INVALID_PASSWORD',
         message: "Password's not strong enough.",
-      };
+      }
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
+      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id)
 
-      setErrors([...filteredErrors, passwordError]);
+      setErrors([...filteredErrors, passwordError])
     }
-  }, [errors, password]);
+  }, [errors, password])
   const onRepeatedPasswordBlur = useCallback(() => {
     if (!password) {
       const passwordError = {
-        id: "INVALID_PASSWORD",
-        message: "Password cannot be empty",
-      };
+        id: 'INVALID_PASSWORD',
+        message: 'Password cannot be empty',
+      }
 
-      setRepeatedPasswordError(passwordError);
+      setRepeatedPasswordError(passwordError)
     } else if (!isStrongPassword(repeatedPassword)) {
       const passwordError = {
-        id: "INVALID_PASSWORD",
+        id: 'INVALID_PASSWORD',
         message: "Password's not strong enough.",
-      };
+      }
 
-      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id);
+      const filteredErrors = errors.filter(({ id }) => passwordError.id !== id)
 
-      setErrors([...filteredErrors, passwordError]);
+      setErrors([...filteredErrors, passwordError])
     } else if (password !== repeatedPassword) {
       const passwordError = {
-        id: "NON_MATCHING_PASSWORD",
+        id: 'NON_MATCHING_PASSWORD',
         message: "Passwords don't match",
-      };
+      }
 
-      setRepeatedPasswordError(passwordError);
+      setRepeatedPasswordError(passwordError)
     }
-  }, [errors, password, repeatedPassword]);
+  }, [errors, password, repeatedPassword])
 
   const isSubmitDisabled = useMemo(
     () =>
@@ -121,7 +121,7 @@ export default function NewPassword() {
       passwordError ||
       repeatedPasswordError,
     [errors, isError, isLoading, passwordError, repeatedPasswordError]
-  );
+  )
 
   return (
     <div
@@ -165,7 +165,7 @@ export default function NewPassword() {
           <Spacer size={8 * GU} />
           <h2
             css={`
-              ${textStyle("title2")}
+              ${textStyle('title2')}
               margin-bottom: ${6 * GU}px;
               align-self: flex-start;
             `}
@@ -233,7 +233,7 @@ export default function NewPassword() {
             <Spacer size={1 * GU} />
             <p
               css={`
-                ${textStyle("body4")}
+                ${textStyle('body4')}
                 color: ${theme.surfaceContentSecondary};
               `}
             >
@@ -271,5 +271,5 @@ export default function NewPassword() {
         </main>
       </div>
     </div>
-  );
+  )
 }

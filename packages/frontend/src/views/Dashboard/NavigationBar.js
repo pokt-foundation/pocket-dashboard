@@ -1,8 +1,8 @@
-import React, { useCallback, useRef, useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
-import { useMutation } from "react-query";
-import { useViewport } from "use-viewport";
-import "styled-components/macro";
+import React, { useCallback, useRef, useState } from 'react'
+import { useHistory, useLocation } from 'react-router-dom'
+import { useMutation } from 'react-query'
+import { useViewport } from 'use-viewport'
+import 'styled-components/macro'
 import {
   ButtonBase,
   DiscButton,
@@ -14,54 +14,54 @@ import {
   useTheme,
   GU,
   RADIUS,
-} from "ui";
-import env from "environment";
-import axios from "axios";
+} from 'ui'
+import env from 'environment'
+import axios from 'axios'
 
-const DEFAULT_TITLE = "Pocket Dashboard";
+const DEFAULT_TITLE = 'Pocket Dashboard'
 
 function useRouteTitle(applications = []) {
-  const { pathname } = useLocation();
+  const { pathname } = useLocation()
 
-  if (pathname.includes("notifications")) {
-    return "Notifications";
+  if (pathname.includes('notifications')) {
+    return 'Notifications'
   }
 
-  if (pathname.includes("success-details")) {
-    return "Request Status Details";
+  if (pathname.includes('success-details')) {
+    return 'Request Status Details'
   }
 
-  if (pathname.includes("security")) {
-    return "App Security";
+  if (pathname.includes('security')) {
+    return 'App Security'
   }
 
-  if (pathname.includes("app")) {
+  if (pathname.includes('app')) {
     const title = applications.reduce(
       (title, { appId, appName }) =>
         pathname.includes(appId) ? appName : title,
       DEFAULT_TITLE
-    );
+    )
 
-    return title;
+    return title
   }
 
-  if (pathname.includes("home")) {
-    return "Network Overview";
+  if (pathname.includes('home')) {
+    return 'Network Overview'
   }
 
-  if (pathname.includes("create")) {
-    return "Application Setup";
+  if (pathname.includes('create')) {
+    return 'Application Setup'
   }
 
-  return DEFAULT_TITLE;
+  return DEFAULT_TITLE
 }
 
 export default function NavigationBar({ applications = [] }) {
-  const history = useHistory();
-  const title = useRouteTitle(applications);
-  const theme = useTheme();
+  const history = useHistory()
+  const title = useRouteTitle(applications)
+  const theme = useTheme()
   const { mutate: onLogout } = useMutation(async function logout() {
-    const path = `${env("BACKEND_URL")}/api/users/logout`;
+    const path = `${env('BACKEND_URL')}/api/users/logout`
 
     try {
       await axios.post(
@@ -70,13 +70,13 @@ export default function NavigationBar({ applications = [] }) {
         {
           withCredentials: true,
         }
-      );
+      )
 
-      history.push("/login");
+      history.push('/login')
     } catch (err) {
       // TODO: Log to sentry
     }
-  });
+  })
 
   return (
     <nav
@@ -91,7 +91,7 @@ export default function NavigationBar({ applications = [] }) {
         css={`
           display: inline-block;
           flex-grow: 1;
-          ${textStyle("title1")}
+          ${textStyle('title1')}
         `}
       >
         <span>{title}</span>
@@ -129,18 +129,18 @@ export default function NavigationBar({ applications = [] }) {
         </li>
       </ul>
     </nav>
-  );
+  )
 }
 
 function SettingsButton({ onLogout }) {
-  const theme = useTheme();
-  const { below } = useViewport();
+  const theme = useTheme()
+  const { below } = useViewport()
 
-  const [opened, setOpened] = useState(false);
-  const containerRef = useRef();
+  const [opened, setOpened] = useState(false)
+  const containerRef = useRef()
 
-  const handleToggle = useCallback(() => setOpened((opened) => !opened), []);
-  const handleClose = useCallback(() => setOpened(false), []);
+  const handleToggle = useCallback(() => setOpened((opened) => !opened), [])
+  const handleClose = useCallback(() => setOpened(false), [])
 
   return (
     <React.Fragment>
@@ -178,7 +178,7 @@ function SettingsButton({ onLogout }) {
         <ul
           css={`
             /* Use 20px as the padding setting for popper is 10px */
-            width: ${below("medium") ? `calc(100vw - 20px)` : `${30 * GU}px`};
+            width: ${below('medium') ? `calc(100vw - 20px)` : `${30 * GU}px`};
             padding: 0;
             margin: 0;
             list-style: none;
@@ -194,7 +194,7 @@ function SettingsButton({ onLogout }) {
               height: ${4 * GU}px;
               padding-left: ${2 * GU}px;
               border-bottom: 1px solid ${theme.border};
-              ${textStyle("label2")}
+              ${textStyle('label2')}
               color: ${theme.surfaceContentSecondary};
             `}
           >
@@ -204,11 +204,11 @@ function SettingsButton({ onLogout }) {
         </ul>
       </Popover>
     </React.Fragment>
-  );
+  )
 }
 
 function Item({ icon, label, onClick }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <li
@@ -256,5 +256,5 @@ function Item({ icon, label, onClick }) {
         </div>
       </ButtonBase>
     </li>
-  );
+  )
 }

@@ -1,15 +1,15 @@
-import axios from "axios";
-import * as dayjs from "dayjs";
-import * as dayJsutcPlugin from "dayjs/plugin/utc";
-import { GraphQLClient, gql } from "graphql-request";
-import { useQuery } from "react-query";
-import env from "environment";
+import axios from 'axios'
+import * as dayjs from 'dayjs'
+import * as dayJsutcPlugin from 'dayjs/plugin/utc'
+import { GraphQLClient, gql } from 'graphql-request'
+import { useQuery } from 'react-query'
+import env from 'environment'
 
-const gqlClient = new GraphQLClient(env("HASURA_URL"), {
+const gqlClient = new GraphQLClient(env('HASURA_URL'), {
   headers: {
-    "x-hasura-admin-secret": env("HASURA_SECRET"),
+    'x-hasura-admin-secret': env('HASURA_SECRET'),
   },
-});
+})
 
 const RELAY_APPS_QUERY = gql`
   query DAILY_RELAYS_QUERY {
@@ -18,7 +18,7 @@ const RELAY_APPS_QUERY = gql`
       total_relays
     }
   }
-`;
+`
 
 const SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY = gql`
   query DAILY_RELAYS_QUERY($_gte: timestamptz!) {
@@ -32,7 +32,7 @@ const SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY = gql`
       }
     }
   }
-`;
+`
 
 const WEEKLY_RELAY_COUNT_QUERY = gql`
   query DAILY_RELAYS_QUERY($_gte: timestamptz!) {
@@ -44,34 +44,34 @@ const WEEKLY_RELAY_COUNT_QUERY = gql`
       }
     }
   }
-`;
+`
 
 export function useNetworkSummary() {
   const {
     isLoading: isSummaryLoading,
     isError: isSummaryError,
     data: summaryData,
-  } = useQuery("/network/summary", async function getNetworkSummary() {
-    const path = `${env("BACKEND_URL")}/api/network/summary`;
+  } = useQuery('/network/summary', async function getNetworkSummary() {
+    const path = `${env('BACKEND_URL')}/api/network/summary`
 
     try {
       const {
         data: { summary },
       } = await axios.get(path, {
         withCredentials: true,
-      });
+      })
 
-      return summary;
+      return summary
     } catch (err) {
-      console.log("?", err);
+      console.log('?', err)
     }
-  });
+  })
 
   return {
     isSummaryError,
     isSummaryLoading,
     summaryData,
-  };
+  }
 }
 
 export function useChains() {
@@ -79,29 +79,29 @@ export function useChains() {
     isLoading: isChainsLoading,
     isError: isChainsError,
     data: chains,
-  } = useQuery("/network/chains", async function getNetworkChains() {
-    const path = `${env("BACKEND_URL")}/api/network/chains`;
+  } = useQuery('/network/chains', async function getNetworkChains() {
+    const path = `${env('BACKEND_URL')}/api/network/chains`
 
     try {
       const res = await axios.get(path, {
         withCredentials: true,
-      });
+      })
 
       const {
         data: { chains },
-      } = res;
+      } = res
 
-      return chains;
+      return chains
     } catch (err) {
-      console.log("?", err);
+      console.log('?', err)
     }
-  });
+  })
 
   return {
     isChainsError,
     isChainsLoading,
     chains,
-  };
+  }
 }
 
 export function useTotalWeeklyRelays() {
@@ -109,24 +109,24 @@ export function useTotalWeeklyRelays() {
     isLoading: isRelaysLoading,
     isError: isRelaysError,
     data: relayData,
-  } = useQuery("network/weekly-relays", async function getWeeklyRelays() {
+  } = useQuery('network/weekly-relays', async function getWeeklyRelays() {
     try {
-      const res = await gqlClient.request(RELAY_APPS_QUERY);
+      const res = await gqlClient.request(RELAY_APPS_QUERY)
 
-      dayjs.extend(dayJsutcPlugin);
+      dayjs.extend(dayJsutcPlugin)
 
-      const sevenDaysAgo = dayjs.utc().subtract(7, "day");
+      const sevenDaysAgo = dayjs.utc().subtract(7, 'day')
 
       const formattedTimestamp = `${sevenDaysAgo.year()}-0${
         sevenDaysAgo.month() + 1
-      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`
 
       const totalWeeklyRelaysRes = await gqlClient.request(
         WEEKLY_RELAY_COUNT_QUERY,
         {
           _gte: formattedTimestamp,
         }
-      );
+      )
 
       const {
         relay_apps_hourly_aggregate: {
@@ -134,22 +134,22 @@ export function useTotalWeeklyRelays() {
             sum: { total_relays: totalWeeklyRelays },
           },
         },
-      } = totalWeeklyRelaysRes;
-      const { relays_daily: dailyRelays } = res;
+      } = totalWeeklyRelaysRes
+      const { relays_daily: dailyRelays } = res
 
-      const processedDailyRelays = dailyRelays.reverse();
+      const processedDailyRelays = dailyRelays.reverse()
 
-      return { dailyRelays: processedDailyRelays, totalWeeklyRelays };
+      return { dailyRelays: processedDailyRelays, totalWeeklyRelays }
     } catch (err) {
-      console.log(err, "rip");
+      console.log(err, 'rip')
     }
-  });
+  })
 
   return {
     isRelaysError,
     isRelaysLoading,
     relayData,
-  };
+  }
 }
 
 export function useNetworkSuccessRate() {
@@ -157,19 +157,19 @@ export function useNetworkSuccessRate() {
     isLoading: isSuccessRateLoading,
     isError: isSuccessRateError,
     data: successRateData,
-  } = useQuery("network/success-rate", async function getWeeklyRelays() {
+  } = useQuery('network/success-rate', async function getWeeklyRelays() {
     try {
-      dayjs.extend(dayJsutcPlugin);
+      dayjs.extend(dayJsutcPlugin)
 
-      const sevenDaysAgo = dayjs.utc().subtract(7, "day");
+      const sevenDaysAgo = dayjs.utc().subtract(7, 'day')
 
       const formattedTimestamp = `${sevenDaysAgo.year()}-0${
         sevenDaysAgo.month() + 1
-      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`
 
       const res = await gqlClient.request(SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY, {
         _gte: formattedTimestamp,
-      });
+      })
 
       const {
         relay_apps_hourly_aggregate: {
@@ -177,17 +177,17 @@ export function useNetworkSuccessRate() {
             sum: { total_relays: totalSuccessfulWeeklyRelays },
           },
         },
-      } = res;
+      } = res
 
-      return { totalSuccessfulWeeklyRelays };
+      return { totalSuccessfulWeeklyRelays }
     } catch (err) {
-      console.log(err, "rip");
+      console.log(err, 'rip')
     }
-  });
+  })
 
   return {
     isSuccessRateError,
     isSuccessRateLoading,
     successRateData,
-  };
+  }
 }

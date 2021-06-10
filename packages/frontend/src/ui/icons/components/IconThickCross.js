@@ -1,9 +1,9 @@
-import React from "react";
-import useIconSize from "ui/icons/icon-size";
-import IconPropTypes from "ui/icons/IconPropTypes";
+import React from 'react'
+import useIconSize from 'ui/icons/icon-size'
+import IconPropTypes from 'ui/icons/IconPropTypes'
 
 function IconThickCross({ size, ...props }) {
-  const sizeValue = useIconSize(size);
+  const sizeValue = useIconSize(size)
 
   return (
     <svg
@@ -20,8 +20,8 @@ function IconThickCross({ size, ...props }) {
         fill="currentColor"
       />
     </svg>
-  );
+  )
 }
 
-IconThickCross.propTypes = IconPropTypes;
-export default IconThickCross;
+IconThickCross.propTypes = IconPropTypes
+export default IconThickCross

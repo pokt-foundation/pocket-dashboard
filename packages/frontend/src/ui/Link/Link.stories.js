@@ -1,27 +1,27 @@
-import React from "react";
-import Link from "ui/Link/Link";
+import React from 'react'
+import Link from 'ui/Link/Link'
 
 export default {
-  title: "pocketUI/Link",
+  title: 'pocketUI/Link',
   component: Link,
   argTypes: {
     children: {
-      type: "text",
-      defaultValue: "Click here!",
+      type: 'text',
+      defaultValue: 'Click here!',
     },
     external: {
-      control: "boolean",
+      control: 'boolean',
       defaultValue: false,
     },
     href: {
       control: {
-        type: "text",
-        defaultValue: "",
+        type: 'text',
+        defaultValue: '',
       },
     },
   },
-};
+}
 
-const Template = (args) => <Link {...args} />;
+const Template = (args) => <Link {...args} />
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

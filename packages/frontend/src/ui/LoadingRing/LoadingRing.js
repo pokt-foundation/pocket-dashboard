@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from "react";
-import PropTypes from "prop-types";
-import { keyframes } from "styled-components";
-import "styled-components/macro";
-import { useInside } from "use-inside";
-import { useTheme } from "ui/theme";
+import React, { useMemo, useState } from 'react'
+import PropTypes from 'prop-types'
+import { keyframes } from 'styled-components'
+import 'styled-components/macro'
+import { useInside } from 'use-inside'
+import { useTheme } from 'ui/theme'
 
 const spin = keyframes`
   from {
@@ -12,52 +12,51 @@ const spin = keyframes`
   to {
     transform: rotate(360deg);
   }
-`;
+`
 
-const SIZE_SMALL = 14;
-const SIZE_MEDIUM = 24;
+const SIZE_SMALL = 14
+const SIZE_MEDIUM = 24
 
-const CONTAINER_SIZE_SMALL = 22;
-const CONTAINER_SIZE_MEDIUM = 24;
+const CONTAINER_SIZE_SMALL = 22
+const CONTAINER_SIZE_MEDIUM = 24
 
-const BORDER_WIDTH_STRONG = 2.5;
-const BORDER_WIDTH_MEDIUM = 1;
+const BORDER_WIDTH_STRONG = 2.5
+const BORDER_WIDTH_MEDIUM = 1
 
-let lastInstanceId = 1;
+let lastInstanceId = 1
 
 const LoadingRing = React.memo(function LoadingRing({
   paused,
   mode: modeProp,
   ...props
 }) {
-  const theme = useTheme();
-  const [instanceId] = useState(() => `sync-indicator-${lastInstanceId++}`);
-  const [insideFloatIndicator] = useInside("FloatIndicator");
+  const theme = useTheme()
+  const [instanceId] = useState(() => `sync-indicator-${lastInstanceId++}`)
+  const [insideFloatIndicator] = useInside('FloatIndicator')
 
-  const mode = modeProp || (insideFloatIndicator ? "half-circle" : "two-parts");
+  const mode = modeProp || (insideFloatIndicator ? 'half-circle' : 'two-parts')
 
   const containerSize =
-    mode === "half-circle" ? CONTAINER_SIZE_MEDIUM : CONTAINER_SIZE_SMALL;
+    mode === 'half-circle' ? CONTAINER_SIZE_MEDIUM : CONTAINER_SIZE_SMALL
   const borderWidth =
-    mode === "half-circle" ? BORDER_WIDTH_STRONG : BORDER_WIDTH_MEDIUM;
-  const size =
-    (mode === "half-circle" ? SIZE_MEDIUM : SIZE_SMALL) - borderWidth;
+    mode === 'half-circle' ? BORDER_WIDTH_STRONG : BORDER_WIDTH_MEDIUM
+  const size = (mode === 'half-circle' ? SIZE_MEDIUM : SIZE_SMALL) - borderWidth
 
   const [gapLength, dashLength] = useMemo(() => {
-    const length = Math.PI * size;
+    const length = Math.PI * size
 
     // Both modes display a full circle when paused.
     if (paused) {
-      return [0, length];
+      return [0, length]
     }
 
-    if (mode === "two-parts") {
-      return [length / 4, length / 4];
+    if (mode === 'two-parts') {
+      return [length / 4, length / 4]
     }
 
     // half-circle
-    return [length / 2, length / 2];
-  }, [mode, size, paused]);
+    return [length / 2, length / 2]
+  }, [mode, size, paused])
 
   return (
     <span
@@ -106,7 +105,7 @@ const LoadingRing = React.memo(function LoadingRing({
               animation-duration: 1s;
               animation-iteration-count: infinite;
               animation-timing-function: linear;
-              animation-name: ${paused ? "none" : spin};
+              animation-name: ${paused ? 'none' : spin};
               transform-origin: 50% 50%;
             `}
           />
@@ -120,16 +119,16 @@ const LoadingRing = React.memo(function LoadingRing({
         />
       </svg>
     </span>
-  );
-});
+  )
+})
 
 LoadingRing.propTypes = {
-  mode: PropTypes.oneOf(["two-parts", "half-circle"]),
+  mode: PropTypes.oneOf(['two-parts', 'half-circle']),
   paused: PropTypes.bool,
-};
+}
 
 LoadingRing.defaultProps = {
   paused: false,
-};
+}
 
-export default LoadingRing;
+export default LoadingRing

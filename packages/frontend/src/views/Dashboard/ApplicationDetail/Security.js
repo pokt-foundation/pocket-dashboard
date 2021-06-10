@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useHistory } from "react-router";
-import { useMutation } from "react-query";
-import axios from "axios";
-import "styled-components/macro";
+import React, { useCallback, useEffect, useState } from 'react'
+import { useHistory } from 'react-router'
+import { useMutation } from 'react-query'
+import axios from 'axios'
+import 'styled-components/macro'
 import {
   Button,
   ButtonBase,
@@ -16,49 +16,49 @@ import {
   textStyle,
   useToast,
   GU,
-} from "ui";
-import Box from "components/Box/Box";
-import FloatUp from "components/FloatUp/FloatUp";
-import env from "environment";
+} from 'ui'
+import Box from 'components/Box/Box'
+import FloatUp from 'components/FloatUp/FloatUp'
+import env from 'environment'
 
 export default function Security({ appData, refetchActiveAppData }) {
-  const [origin, setOrigin] = useState("");
-  const [origins, setOrigins] = useState([]);
-  const [secretKeyRequired, setSecretKeyRequired] = useState(false);
-  const [userAgent, setUserAgent] = useState("");
-  const [userAgents, setUserAgents] = useState([]);
-  const history = useHistory();
-  const toast = useToast();
+  const [origin, setOrigin] = useState('')
+  const [origins, setOrigins] = useState([])
+  const [secretKeyRequired, setSecretKeyRequired] = useState(false)
+  const [userAgent, setUserAgent] = useState('')
+  const [userAgents, setUserAgents] = useState([])
+  const history = useHistory()
+  const toast = useToast()
 
   useEffect(() => {
     setUserAgents((agents) => {
       const currentUserAgents = appData.gatewaySettings.whitelistUserAgents
         .length
         ? [...appData.gatewaySettings.whitelistUserAgents]
-        : [];
+        : []
 
       const filteredStateUserAgents = agents.filter(
         (a) => !currentUserAgents.includes(a)
-      );
+      )
 
-      return [...currentUserAgents, ...filteredStateUserAgents];
-    });
+      return [...currentUserAgents, ...filteredStateUserAgents]
+    })
     setOrigins((origins) => {
       const currentOrigins = appData.gatewaySettings.whitelistOrigins.length
         ? [...appData.gatewaySettings.whitelistOrigins]
-        : [];
+        : []
 
       const filteredStateOrigins = origins.filter(
         (o) => !currentOrigins.includes(o)
-      );
+      )
 
-      return [...currentOrigins, ...filteredStateOrigins];
-    });
-    setSecretKeyRequired(appData.gatewaySettings.secretKeyRequired);
-  }, [appData]);
+      return [...currentOrigins, ...filteredStateOrigins]
+    })
+    setSecretKeyRequired(appData.gatewaySettings.secretKeyRequired)
+  }, [appData])
 
   const { mutate } = useMutation(async function updateApplicationSettings() {
-    const path = `${env("BACKEND_URL")}/api/applications/${appData._id}`;
+    const path = `${env('BACKEND_URL')}/api/applications/${appData._id}`
 
     try {
       await axios.put(
@@ -73,37 +73,37 @@ export default function Security({ appData, refetchActiveAppData }) {
         {
           withCredentials: true,
         }
-      );
+      )
 
-      await refetchActiveAppData();
+      await refetchActiveAppData()
 
-      toast("Security preferences updated");
-      history.goBack();
+      toast('Security preferences updated')
+      history.goBack()
     } catch (err) {
       // TODO: Log with sentry
-      console.log("err", err);
+      console.log('err', err)
     }
-  });
+  })
 
   const onSecretKeyRequiredChange = useCallback(() => {
-    setSecretKeyRequired((r) => !r);
-  }, []);
+    setSecretKeyRequired((r) => !r)
+  }, [])
   const setWhitelistedUserAgent = useCallback(() => {
-    setUserAgents((userAgents) => [...userAgents, userAgent]);
-    setUserAgent("");
-  }, [userAgent]);
+    setUserAgents((userAgents) => [...userAgents, userAgent])
+    setUserAgent('')
+  }, [userAgent])
   const setWhitelistedOrigin = useCallback(() => {
-    setOrigins((origins) => [...origins, origin]);
-    setOrigin("");
-  }, [origin]);
+    setOrigins((origins) => [...origins, origin])
+    setOrigin('')
+  }, [origin])
   const onDeleteUserAgentClick = useCallback((userAgent) => {
     setUserAgents((userAgents) => [
       ...userAgents.filter((u) => u !== userAgent),
-    ]);
-  }, []);
+    ])
+  }, [])
   const onDeleteOriginClick = useCallback((origin) => {
-    setOrigins((origins) => [...origins.filter((o) => o !== origin)]);
-  }, []);
+    setOrigins((origins) => [...origins.filter((o) => o !== origin)])
+  }, [])
 
   return (
     <FloatUp
@@ -114,7 +114,7 @@ export default function Security({ appData, refetchActiveAppData }) {
               <Box>
                 <p
                   css={`
-                    ${textStyle("body2")}
+                    ${textStyle('body2')}
                     margin-bottom: ${2 * GU}px;
                   `}
                 >
@@ -158,7 +158,7 @@ export default function Security({ appData, refetchActiveAppData }) {
                   >
                     <h3
                       css={`
-                        ${textStyle("body2")}
+                        ${textStyle('body2')}
                       `}
                     >
                       Secret key required
@@ -263,5 +263,5 @@ export default function Security({ appData, refetchActiveAppData }) {
         </>
       )}
     />
-  );
+  )
 }

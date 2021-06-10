@@ -1,19 +1,19 @@
-import axios from "axios";
-import * as dayjs from "dayjs";
-import * as dayJsutcPlugin from "dayjs/plugin/utc";
-import { GraphQLClient, gql } from "graphql-request";
-import { useParams } from "react-router";
-import { useQuery } from "react-query";
-import env from "environment";
+import axios from 'axios'
+import * as dayjs from 'dayjs'
+import * as dayJsutcPlugin from 'dayjs/plugin/utc'
+import { GraphQLClient, gql } from 'graphql-request'
+import { useParams } from 'react-router'
+import { useQuery } from 'react-query'
+import env from 'environment'
 
-const BUCKETS_PER_HOUR = 2;
-const OFFSET = 10;
+const BUCKETS_PER_HOUR = 2
+const OFFSET = 10
 
-const gqlClient = new GraphQLClient(env("HASURA_URL"), {
+const gqlClient = new GraphQLClient(env('HASURA_URL'), {
   headers: {
-    "x-hasura-admin-secret": env("HASURA_SECRET"),
+    'x-hasura-admin-secret': env('HASURA_SECRET'),
   },
-});
+})
 
 const TOTAL_RELAYS_AND_AVG_LATENCY_QUERY = gql`
   query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY($_eq: String, $_gte: timestamptz) {
@@ -31,7 +31,7 @@ const TOTAL_RELAYS_AND_AVG_LATENCY_QUERY = gql`
       }
     }
   }
-`;
+`
 
 const TOTAL_RANGED_RELAYS_QUERY = gql`
   query TOTAL_RANGED_RELAYS_QUERY(
@@ -56,7 +56,7 @@ const TOTAL_RANGED_RELAYS_QUERY = gql`
       }
     }
   }
-`;
+`
 
 const WEEKLY_SUCCESSFUL_RELAYS_QUERY = gql`
   query SUCCESSFUL_WEEKLY_RELAYS($_eq: String, $_gte: timestamptz) {
@@ -78,7 +78,7 @@ const WEEKLY_SUCCESSFUL_RELAYS_QUERY = gql`
       }
     }
   }
-`;
+`
 
 const WEEKLY_RANGED_SUCCESSFUL_RELAYS = gql`
   query SUCCESSFUL_WEEKLY_RELAYS(
@@ -101,7 +101,7 @@ const WEEKLY_RANGED_SUCCESSFUL_RELAYS = gql`
       }
     }
   }
-`;
+`
 
 const DAILY_APP_RELAYS_QUERY = gql`
   query DAILY_RELAYS_QUERY($_eq: String, $_gte: timestamptz) {
@@ -113,7 +113,7 @@ const DAILY_APP_RELAYS_QUERY = gql`
       total_relays
     }
   }
-`;
+`
 
 const LAST_SESSION_RELAYS_QUERY = gql`
   query LAST_SESSION_RELAYS($_eq: String, $_gte: timestamptz) {
@@ -126,7 +126,7 @@ const LAST_SESSION_RELAYS_QUERY = gql`
       total_relays
     }
   }
-`;
+`
 
 const LATEST_RELAYS_QUERY = gql`
   query LATEST_RELAYS($_eq: String, $limit: Int, $offset: Int) {
@@ -144,7 +144,7 @@ const LATEST_RELAYS_QUERY = gql`
       elapsed_time
     }
   }
-`;
+`
 
 const LATEST_LATENCY_VALUES_QUERY = gql`
   query TOTAL_RELAYS_AND_AVG_LATENCY_QUERY($_eq: String, $_gte: timestamptz) {
@@ -160,7 +160,7 @@ const LATEST_LATENCY_VALUES_QUERY = gql`
       bucket
     }
   }
-`;
+`
 
 export function useUserApplications() {
   const {
@@ -168,37 +168,37 @@ export function useUserApplications() {
     isError: isAppsError,
     data: appsData,
     refetch: refetchUserApps,
-  } = useQuery("user/applications", async function getUserApplications() {
-    const path = `${env("BACKEND_URL")}/api/applications`;
+  } = useQuery('user/applications', async function getUserApplications() {
+    const path = `${env('BACKEND_URL')}/api/applications`
 
     try {
       const { data } = await axios.get(path, {
         withCredentials: true,
-      });
+      })
 
       const userApps = data.map(({ name, _id, ...rest }) => ({
         appName: name,
         appId: _id,
         ...rest,
-      }));
+      }))
 
-      return userApps;
+      return userApps
     } catch (err) {
       // TODO: Send to sentry
-      console.log(err, "rip");
+      console.log(err, 'rip')
     }
-  });
+  })
 
   return {
     appsData,
     isAppsError,
     isAppsLoading,
     refetchUserApps,
-  };
+  }
 }
 
 export function useActiveApplication() {
-  const { appId } = useParams();
+  const { appId } = useParams()
 
   const {
     isLoading: isAppLoading,
@@ -206,35 +206,35 @@ export function useActiveApplication() {
     data: appData,
     refetch: refetchActiveAppData,
   } = useQuery(
-    `user/applications/${appId ?? "NO_APPLICATION"}`,
+    `user/applications/${appId ?? 'NO_APPLICATION'}`,
     async function getActiveApplication() {
       if (!appId) {
-        return null;
+        return null
       }
 
-      const path = `${env("BACKEND_URL")}/api/applications/${appId}`;
+      const path = `${env('BACKEND_URL')}/api/applications/${appId}`
 
       try {
         const { data } = await axios.get(path, {
           withCredentials: true,
-        });
+        })
 
-        return data;
+        return data
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     }
-  );
+  )
 
   return {
     appData,
     isAppError,
     isAppLoading,
     refetchActiveAppData,
-  };
+  }
 }
 
-export function useWeeklyAppRelaysInfo(appPubKey = "") {
+export function useWeeklyAppRelaysInfo(appPubKey = '') {
   const {
     isLoading: isWeeklyAppRelaysLoading,
     isError: isWeeklyAppRelaysError,
@@ -243,16 +243,16 @@ export function useWeeklyAppRelaysInfo(appPubKey = "") {
     `user/applications/${appPubKey}/weekly-relays-avg-latency`,
     async function getWeeklyAppRelaysInfo() {
       if (!appPubKey) {
-        return null;
+        return null
       }
 
-      dayjs.extend(dayJsutcPlugin);
+      dayjs.extend(dayJsutcPlugin)
 
-      const sevenDaysAgo = dayjs.utc().subtract(7, "day");
+      const sevenDaysAgo = dayjs.utc().subtract(7, 'day')
 
       const formattedTimestamp = `${sevenDaysAgo.year()}-0${
         sevenDaysAgo.month() + 1
-      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`
 
       try {
         const res = await gqlClient.request(
@@ -261,7 +261,7 @@ export function useWeeklyAppRelaysInfo(appPubKey = "") {
             _eq: appPubKey,
             _gte: formattedTimestamp,
           }
-        );
+        )
 
         const {
           relay_apps_daily_aggregate: {
@@ -270,23 +270,23 @@ export function useWeeklyAppRelaysInfo(appPubKey = "") {
               sum: { total_relays: weeklyAppRelays },
             },
           },
-        } = res;
+        } = res
 
         return {
           avgLatency: avgLatency ?? 0,
           weeklyAppRelays: weeklyAppRelays ?? 0,
-        };
+        }
       } catch (err) {
-        console.log(err, "rip");
+        console.log(err, 'rip')
       }
     }
-  );
+  )
 
   return {
     isWeeklyAppRelaysError,
     isWeeklyAppRelaysLoading,
     weeklyRelaysData,
-  };
+  }
 }
 
 export function useSucessfulWeeklyRelays(appPubKey) {
@@ -298,22 +298,22 @@ export function useSucessfulWeeklyRelays(appPubKey) {
     `user/applications/${appPubKey}/sucessful-weekly-relays`,
     async function getWeeklyAppRelaysInfo() {
       if (!appPubKey) {
-        return null;
+        return null
       }
 
-      dayjs.extend(dayJsutcPlugin);
+      dayjs.extend(dayJsutcPlugin)
 
-      const sevenDaysAgo = dayjs.utc().subtract(7, "day");
+      const sevenDaysAgo = dayjs.utc().subtract(7, 'day')
 
       const formattedTimestamp = `${sevenDaysAgo.year()}-0${
         sevenDaysAgo.month() + 1
-      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`
 
       try {
         const res = await gqlClient.request(WEEKLY_SUCCESSFUL_RELAYS_QUERY, {
           _eq: appPubKey,
           _gte: formattedTimestamp,
-        });
+        })
 
         const {
           relay_apps_daily_aggregate: {
@@ -322,23 +322,23 @@ export function useSucessfulWeeklyRelays(appPubKey) {
               sum: { total_relays: successfulWeeklyRelays },
             },
           },
-        } = res;
+        } = res
 
         return {
           avgLatency: avgLatency ?? 0,
           successfulWeeklyRelays: successfulWeeklyRelays ?? 0,
-        };
+        }
       } catch (err) {
-        console.log(err, "rip");
+        console.log(err, 'rip')
       }
     }
-  );
+  )
 
   return {
     isSuccesfulWeeklyRelaysLoading,
     isSuccessfulWeeklyRelaysError,
     successfulWeeklyRelaysData,
-  };
+  }
 }
 
 export function useDailyRelayCount(appPubKey) {
@@ -350,61 +350,61 @@ export function useDailyRelayCount(appPubKey) {
     `user/applications/${appPubKey}/daily-app-count`,
     async function getWeeklyAppRelaysInfo() {
       if (!appPubKey) {
-        return null;
+        return null
       }
 
-      dayjs.extend(dayJsutcPlugin);
+      dayjs.extend(dayJsutcPlugin)
 
-      const sevenDaysAgo = dayjs.utc().subtract(7, "day");
+      const sevenDaysAgo = dayjs.utc().subtract(7, 'day')
 
       const formattedTimestamp = `${sevenDaysAgo.year()}-0${
         sevenDaysAgo.month() + 1
-      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`
 
       try {
         const res = await gqlClient.request(DAILY_APP_RELAYS_QUERY, {
           _eq: appPubKey,
           _gte: formattedTimestamp,
-        });
+        })
 
-        const { relay_apps_daily: rawDailyRelays = [] } = res;
+        const { relay_apps_daily: rawDailyRelays = [] } = res
 
-        const dailyRelays = new Map();
+        const dailyRelays = new Map()
 
         for (const {
           bucket,
           total_relays: dailyRelayCount,
         } of rawDailyRelays) {
           if (!dailyRelays.has(bucket)) {
-            dailyRelays.set(bucket, dailyRelayCount);
+            dailyRelays.set(bucket, dailyRelayCount)
           } else {
-            const currentCount = dailyRelays.get(bucket);
+            const currentCount = dailyRelays.get(bucket)
 
             dailyRelays.set(
               bucket,
               Number(currentCount) + Number(dailyRelayCount)
-            );
+            )
           }
         }
 
-        const processedDailyRelays = [];
+        const processedDailyRelays = []
 
         for (const [bucket, dailyRelayCount] of dailyRelays.entries()) {
-          processedDailyRelays.push({ bucket, dailyRelays: dailyRelayCount });
+          processedDailyRelays.push({ bucket, dailyRelays: dailyRelayCount })
         }
 
-        return processedDailyRelays.reverse();
+        return processedDailyRelays.reverse()
       } catch (err) {
-        console.log(err, "rip");
+        console.log(err, 'rip')
       }
     }
-  );
+  )
 
   return {
     isDailyRelayCountError,
     isDailyRelayCountLoading,
     dailyRelayCountData,
-  };
+  }
 }
 
 export function useCurrentSessionRelayCount(appPubKey) {
@@ -416,41 +416,41 @@ export function useCurrentSessionRelayCount(appPubKey) {
     `user/applications/${appPubKey}/avg-session-count`,
     async function getWeeklyAppRelaysInfo() {
       if (!appPubKey) {
-        return null;
+        return null
       }
 
-      dayjs.extend(dayJsutcPlugin);
+      dayjs.extend(dayJsutcPlugin)
 
-      const today = dayjs.utc();
+      const today = dayjs.utc()
 
       const formattedTimestamp = `${today.year()}-0${
         today.month() + 1
-      }-${today.date()}T00:00:00+00:00`;
+      }-${today.date()}T00:00:00+00:00`
 
       try {
         const res = await gqlClient.request(LAST_SESSION_RELAYS_QUERY, {
           _eq: appPubKey,
           _gte: formattedTimestamp,
-        });
-        const { relay_app_hourly: hourlyRelays } = res;
+        })
+        const { relay_app_hourly: hourlyRelays } = res
 
         const totalSessionRelays = hourlyRelays.reduce(
           (total, { total_relays: totalRelays }) => total + totalRelays,
           0
-        );
+        )
 
-        return totalSessionRelays ?? 0;
+        return totalSessionRelays ?? 0
       } catch (err) {
-        console.log(err, "rip");
+        console.log(err, 'rip')
       }
     }
-  );
+  )
 
   return {
     isCurrentSessionRelaysLoading,
     isCurrentSessionRelaysError,
     currentSessionRelayCount,
-  };
+  }
 }
 
 export function useLatestRelays(appPubKey, page = 0, limit = 10) {
@@ -462,7 +462,7 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
     [`user/applications/${appPubKey}/latest-relays`, page],
     async function getLatestRelays() {
       if (!appPubKey) {
-        return null;
+        return null
       }
 
       try {
@@ -470,25 +470,25 @@ export function useLatestRelays(appPubKey, page = 0, limit = 10) {
           _eq: appPubKey,
           limit,
           offset: page * OFFSET,
-        });
+        })
 
-        const { relay: latestRelays } = res;
+        const { relay: latestRelays } = res
 
-        return { latestRelays: latestRelays ?? [] };
+        return { latestRelays: latestRelays ?? [] }
       } catch (err) {
-        console.log(err, "rip");
+        console.log(err, 'rip')
       }
     },
     {
       keepPreviousData: true,
     }
-  );
+  )
 
   return {
     isLatestRelaysLoading,
     isLatestRelaysError,
     latestRelayData,
-  };
+  }
 }
 
 export function useAppOnChainStatus(appId) {
@@ -500,28 +500,28 @@ export function useAppOnChainStatus(appId) {
     `user/applications/${appId}/onchaindata`,
     async function getOnChainAppData() {
       if (!appId) {
-        return null;
+        return null
       }
 
-      const path = `${env("BACKEND_URL")}/api/applications/status/${appId}`;
+      const path = `${env('BACKEND_URL')}/api/applications/status/${appId}`
 
       try {
         const { data } = await axios.get(path, {
           withCredentials: true,
-        });
+        })
 
-        return data;
+        return data
       } catch (err) {
-        console.log(Object.entries(err), "rip");
+        console.log(Object.entries(err), 'rip')
       }
     }
-  );
+  )
 
   return {
     appOnChainData,
     isAppOnChainError,
     isAppOnChainLoading,
-  };
+  }
 }
 
 export function usePreviousSuccessfulRelays(appPubKey) {
@@ -533,28 +533,28 @@ export function usePreviousSuccessfulRelays(appPubKey) {
     `user/applications/${appPubKey}/sucessful-ranged-weekly-relays`,
     async function getWeeklyAppRelaysInfo() {
       if (!appPubKey) {
-        return null;
+        return null
       }
 
-      dayjs.extend(dayJsutcPlugin);
+      dayjs.extend(dayJsutcPlugin)
 
-      const fourteenDaysAgo = dayjs.utc().subtract(14, "day");
-      const sevenDaysAgo = dayjs.utc().subtract(7, "days");
+      const fourteenDaysAgo = dayjs.utc().subtract(14, 'day')
+      const sevenDaysAgo = dayjs.utc().subtract(7, 'days')
 
       const fourteenDaysAgoTimestamp = `${fourteenDaysAgo.year()}-0${
         fourteenDaysAgo.month() + 1
-      }-${fourteenDaysAgo.date()}T00:00:00+00:00`;
+      }-${fourteenDaysAgo.date()}T00:00:00+00:00`
 
       const sevenDaysAgoTimestamp = `${sevenDaysAgo.year()}-0${
         sevenDaysAgo.month() + 1
-      }-${sevenDaysAgo.date()}T00:00:00+00:00`;
+      }-${sevenDaysAgo.date()}T00:00:00+00:00`
 
       try {
         const res = await gqlClient.request(WEEKLY_RANGED_SUCCESSFUL_RELAYS, {
           _eq: appPubKey,
           _gte: fourteenDaysAgoTimestamp,
           _lte: sevenDaysAgoTimestamp,
-        });
+        })
         const totalRelaysRes = await gqlClient.request(
           TOTAL_RANGED_RELAYS_QUERY,
           {
@@ -562,7 +562,7 @@ export function usePreviousSuccessfulRelays(appPubKey) {
             _gte: fourteenDaysAgoTimestamp,
             _lte: sevenDaysAgoTimestamp,
           }
-        );
+        )
 
         const {
           relay_apps_daily_aggregate: {
@@ -570,7 +570,7 @@ export function usePreviousSuccessfulRelays(appPubKey) {
               sum: { total_relays: successfulWeeklyRelays = 0 },
             },
           },
-        } = res;
+        } = res
 
         const {
           relay_apps_daily_aggregate: {
@@ -578,23 +578,23 @@ export function usePreviousSuccessfulRelays(appPubKey) {
               sum: { total_relays: previousTotalRelays = 0 },
             },
           },
-        } = totalRelaysRes;
+        } = totalRelaysRes
 
         return {
           previousTotalRelays: previousTotalRelays ?? 0,
           successfulWeeklyRelays: successfulWeeklyRelays ?? 0,
-        };
+        }
       } catch (err) {
-        console.log(err, "rip");
+        console.log(err, 'rip')
       }
     }
-  );
+  )
 
   return {
     isPreviousSuccessfulRelaysLoading,
     isPreviousSuccessfulRelaysError,
     previousSucessfulRelaysData,
-  };
+  }
 }
 
 export function useLatestLatencyValues(appPubKey) {
@@ -606,56 +606,56 @@ export function useLatestLatencyValues(appPubKey) {
     `user/applications/${appPubKey}/latest-latency-values`,
     async function getWeeklyAppRelaysInfo() {
       if (!appPubKey) {
-        return null;
+        return null
       }
 
-      dayjs.extend(dayJsutcPlugin);
+      dayjs.extend(dayJsutcPlugin)
 
-      const dayAgo = dayjs.utc().subtract(24, "hour");
+      const dayAgo = dayjs.utc().subtract(24, 'hour')
 
       const formattedTimestamp = `${dayAgo.year()}-0${
         dayAgo.month() + 1
-      }-${dayAgo.date()}T${dayAgo.hour() + 1}:00:00+00:00`;
+      }-${dayAgo.date()}T${dayAgo.hour() + 1}:00:00+00:00`
 
       try {
         const res = await gqlClient.request(LATEST_LATENCY_VALUES_QUERY, {
           _eq: appPubKey,
           _gte: formattedTimestamp,
-        });
+        })
 
-        const { relay_app_hourly: rawHourlyLatency = [] } = res;
+        const { relay_app_hourly: rawHourlyLatency = [] } = res
 
-        const hourlyLatency = new Map();
+        const hourlyLatency = new Map()
 
         for (const { bucket, elapsed_time: elapsedTime } of rawHourlyLatency) {
           if (!hourlyLatency.has(bucket)) {
-            hourlyLatency.set(bucket, elapsedTime);
+            hourlyLatency.set(bucket, elapsedTime)
           } else {
-            const currentCount = hourlyLatency.get(bucket);
+            const currentCount = hourlyLatency.get(bucket)
 
             hourlyLatency.set(
               bucket,
               (Number(currentCount) + Number(elapsedTime)) / 2
-            );
+            )
           }
         }
 
-        const processedHourlyLatency = [];
+        const processedHourlyLatency = []
 
         for (const [bucket, hourlyLatencyAvg] of hourlyLatency.entries()) {
-          processedHourlyLatency.push({ bucket, latency: hourlyLatencyAvg });
+          processedHourlyLatency.push({ bucket, latency: hourlyLatencyAvg })
         }
 
-        return processedHourlyLatency.reverse();
+        return processedHourlyLatency.reverse()
       } catch (err) {
-        console.log(err, "rip");
+        console.log(err, 'rip')
       }
     }
-  );
+  )
 
   return {
     isLatestLatencyError,
     isLatestLatencyLoading,
     latestLatencyData,
-  };
+  }
 }

@@ -1,21 +1,21 @@
-import React, { useCallback } from "react";
-import PropTypes from "prop-types";
-import { Spring, animated } from "react-spring/renderprops";
-import "styled-components/macro";
-import { useTheme } from "ui/theme";
-import { clamp } from "ui/utils";
+import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
+import { Spring, animated } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import { useTheme } from 'ui/theme'
+import { clamp } from 'ui/utils'
 
-const STROKE_WIDTH = 4;
-const SIZE_DEFAULT = 80;
+const STROKE_WIDTH = 4
+const SIZE_DEFAULT = 80
 
 function labelDefault(animValue, value) {
   const parts = {
-    suffix: "%",
+    suffix: '%',
     value: String(Math.floor(animValue * 100)),
-  };
+  }
 
-  const animPercentage = animValue * 100;
-  const percentage = value * 100;
+  const animPercentage = animValue * 100
+  const percentage = value * 100
 
   const lessThanOne =
     percentage > 0 &&
@@ -23,51 +23,51 @@ function labelDefault(animValue, value) {
     animPercentage > 0 &&
     // We know that the actual percentage is less than 1,
     // so this is to avoid a jump with ‚Äú1%‚Äù without prefix.
-    animPercentage < 2;
+    animPercentage < 2
 
-  return lessThanOne ? { ...parts, prefix: "<", value: "1" } : parts;
+  return lessThanOne ? { ...parts, prefix: '<', value: '1' } : parts
 }
 
 function labelCompat(parts) {
   if (
-    typeof parts === "string" ||
-    typeof parts === "number" ||
+    typeof parts === 'string' ||
+    typeof parts === 'number' ||
     React.isValidElement(parts)
   ) {
-    return { value: String(parts) };
+    return { value: String(parts) }
   }
-  return parts;
+  return parts
 }
 
 function CircleGraph({ color, label, size, strokeWidth, value }) {
-  const theme = useTheme();
-  const length = Math.PI * 2 * (size - strokeWidth);
-  const radius = (size - strokeWidth) / 2;
+  const theme = useTheme()
+  const length = Math.PI * 2 * (size - strokeWidth)
+  const radius = (size - strokeWidth) / 2
 
   if (label === undefined) {
-    label = labelDefault;
+    label = labelDefault
   }
 
   const labelPart = useCallback(
     (name) => (animValue) => {
-      if (typeof label !== "function") {
-        return null;
+      if (typeof label !== 'function') {
+        return null
       }
 
-      const cValue = clamp(animValue);
-      const parts = labelCompat(label(cValue, value));
+      const cValue = clamp(animValue)
+      const parts = labelCompat(label(cValue, value))
 
       return (
         (parts[name] === undefined
           ? labelDefault(cValue, value)[name]
-          : parts[name]) || ""
-      );
+          : parts[name]) || ''
+      )
     },
     [label, value]
-  );
+  )
 
   const colorFn =
-    typeof color === "function" ? color : () => color || theme.accent;
+    typeof color === 'function' ? color : () => color || theme.accent
 
   return (
     <Spring to={{ progressValue: value }} native>
@@ -129,7 +129,7 @@ function CircleGraph({ color, label, size, strokeWidth, value }) {
               line-height: 1.2;
             `}
           >
-            {typeof label !== "function"
+            {typeof label !== 'function'
               ? label
               : label && (
                   <div
@@ -149,10 +149,10 @@ function CircleGraph({ color, label, size, strokeWidth, value }) {
                       `}
                     >
                       <animated.div style={{ fontSize: `${size * 0.2}px` }}>
-                        {progressValue.interpolate(labelPart("prefix"))}
+                        {progressValue.interpolate(labelPart('prefix'))}
                       </animated.div>
                       <animated.div style={{ fontSize: `${size * 0.25}px` }}>
-                        {progressValue.interpolate(labelPart("value"))}
+                        {progressValue.interpolate(labelPart('value'))}
                       </animated.div>
                       <animated.div
                         css={`
@@ -161,7 +161,7 @@ function CircleGraph({ color, label, size, strokeWidth, value }) {
                         `}
                         style={{ fontSize: `${size * 0.13}px` }}
                       >
-                        {progressValue.interpolate(labelPart("suffix"))}
+                        {progressValue.interpolate(labelPart('suffix'))}
                       </animated.div>
                     </div>
                     <animated.div
@@ -176,7 +176,7 @@ function CircleGraph({ color, label, size, strokeWidth, value }) {
                       `}
                       style={{ fontSize: `${size * 0.1}px` }}
                     >
-                      {progressValue.interpolate(labelPart("secondary"))}
+                      {progressValue.interpolate(labelPart('secondary'))}
                     </animated.div>
                   </div>
                 )}
@@ -184,7 +184,7 @@ function CircleGraph({ color, label, size, strokeWidth, value }) {
         </div>
       )}
     </Spring>
-  );
+  )
 }
 
 CircleGraph.propTypes = {
@@ -193,11 +193,11 @@ CircleGraph.propTypes = {
   size: PropTypes.number,
   strokeWidth: PropTypes.number,
   value: PropTypes.number.isRequired,
-};
+}
 
 CircleGraph.defaultProps = {
   size: SIZE_DEFAULT,
   strokeWidth: STROKE_WIDTH,
-};
+}
 
-export default CircleGraph;
+export default CircleGraph

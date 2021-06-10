@@ -1,9 +1,9 @@
-import React from "react";
-import useIconSize from "ui/icons/icon-size";
-import IconPropTypes from "ui/icons/IconPropTypes";
+import React from 'react'
+import useIconSize from 'ui/icons/icon-size'
+import IconPropTypes from 'ui/icons/IconPropTypes'
 
 function IconCopy({ size, ...props }) {
-  const sizeValue = useIconSize(size);
+  const sizeValue = useIconSize(size)
 
   return (
     <svg
@@ -26,8 +26,8 @@ function IconCopy({ size, ...props }) {
         d="M10.665 16.277h7.398a1.99 1.99 0 001.987-1.987V5.483a1.99 1.99 0 00-1.987-1.988h-7.398a1.99 1.99 0 00-1.988 1.988v8.807a1.99 1.99 0 001.988 1.987zm-.83-10.794a.83.83 0 01.83-.83h7.398c.457 0 .83.372.83.83v8.807c0 .458-.373.83-.83.83h-7.398a.832.832 0 01-.83-.83V5.483z"
       />
     </svg>
-  );
+  )
 }
 
-IconCopy.propTypes = IconPropTypes;
-export default IconCopy;
+IconCopy.propTypes = IconPropTypes
+export default IconCopy

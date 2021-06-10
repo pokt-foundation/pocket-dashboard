@@ -1,9 +1,9 @@
-import React from "react";
-import useIconSize from "../icon-size";
-import IconPropTypes from "../IconPropTypes";
+import React from 'react'
+import useIconSize from '../icon-size'
+import IconPropTypes from '../IconPropTypes'
 
 function IconPlus({ size, ...props }) {
-  const sizeValue = useIconSize(size);
+  const sizeValue = useIconSize(size)
 
   return (
     <svg
@@ -26,8 +26,8 @@ function IconPlus({ size, ...props }) {
         d="M18.434 11.434H5.566a.566.566 0 000 1.132h12.869a.565.565 0 100-1.132z"
       />
     </svg>
-  );
+  )
 }
 
-IconPlus.propTypes = IconPropTypes;
-export default IconPlus;
+IconPlus.propTypes = IconPropTypes
+export default IconPlus

@@ -1,25 +1,25 @@
-import React from "react";
-import PropTypes from "prop-types";
-import "styled-components/macro";
-import { Inside, useInside } from "use-inside";
-import { GU, RADIUS, textStyle } from "ui/style";
-import { useTheme } from "ui/theme";
-import { useLayout } from "ui/Layout/Layout";
+import React from 'react'
+import PropTypes from 'prop-types'
+import 'styled-components/macro'
+import { Inside, useInside } from 'use-inside'
+import { GU, RADIUS, textStyle } from 'ui/style'
+import { useTheme } from 'ui/theme'
+import { useLayout } from 'ui/Layout/Layout'
 
 function Box({ heading, children, padding, ...props }) {
-  const theme = useTheme();
-  const [insideSplitPrimary] = useInside("Split:primary");
-  const { layoutName } = useLayout();
-  const fullWidth = layoutName === "small";
+  const theme = useTheme()
+  const [insideSplitPrimary] = useInside('Split:primary')
+  const { layoutName } = useLayout()
+  const fullWidth = layoutName === 'small'
 
-  const defaultPadding = (fullWidth ? 2 : insideSplitPrimary ? 5 : 3) * GU;
+  const defaultPadding = (fullWidth ? 2 : insideSplitPrimary ? 5 : 3) * GU
 
-  const contentPadding = padding === undefined ? defaultPadding : padding;
+  const contentPadding = padding === undefined ? defaultPadding : padding
 
   return (
     <Inside name="Box">
       <div
-        as={heading ? "section" : "div"}
+        as={heading ? 'section' : 'div'}
         css={`
           position: relative;
           border-radius: ${fullWidth ? 0 : RADIUS}px;
@@ -46,7 +46,7 @@ function Box({ heading, children, padding, ...props }) {
               // that a node structure can inherit from it. Most components set
               // their color and text style, but it is something to be aware of.
               color: ${theme.surfaceContentSecondary};
-              ${textStyle("label2")};
+              ${textStyle('label2')};
             `}
           >
             <Inside name="Box:heading">{heading}</Inside>
@@ -63,7 +63,7 @@ function Box({ heading, children, padding, ...props }) {
         </div>
       </div>
     </Inside>
-  );
+  )
 }
 
 Box.propTypes = {
@@ -75,6 +75,6 @@ Box.propTypes = {
     // deprecated
     PropTypes.bool,
   ]),
-};
+}
 
-export default Box;
+export default Box

@@ -1,9 +1,9 @@
-import React from "react";
-import useIconSize from "ui/icons/icon-size";
-import IconPropTypes from "ui/icons/IconPropTypes";
+import React from 'react'
+import useIconSize from 'ui/icons/icon-size'
+import IconPropTypes from 'ui/icons/IconPropTypes'
 
 function IconInfo({ size, ...props }) {
-  const sizeValue = useIconSize(size);
+  const sizeValue = useIconSize(size)
 
   return (
     <svg
@@ -18,8 +18,8 @@ function IconInfo({ size, ...props }) {
         fill="currentColor"
       />
     </svg>
-  );
+  )
 }
 
-IconInfo.propTypes = IconPropTypes;
-export default IconInfo;
+IconInfo.propTypes = IconPropTypes
+export default IconInfo

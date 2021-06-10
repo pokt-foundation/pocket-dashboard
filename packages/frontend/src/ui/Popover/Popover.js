@@ -1,13 +1,13 @@
-import React from "react";
-import Popper from "popper.js";
-import { Transition, animated } from "react-spring/renderprops";
-import "styled-components/macro";
-import PropTypes from "ui/prop-types";
-import { useRoot } from "ui/Root/Root";
-import { springs, GU, RADIUS } from "ui/style";
-import { useTheme } from "ui/theme";
-import { noop, stylingProps, warn, KEY_ESC } from "ui/utils";
-import RootPortal from "ui/Root/RootPortal";
+import React from 'react'
+import Popper from 'popper.js'
+import { Transition, animated } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import PropTypes from 'ui/prop-types'
+import { useRoot } from 'ui/Root/Root'
+import { springs, GU, RADIUS } from 'ui/style'
+import { useTheme } from 'ui/theme'
+import { noop, stylingProps, warn, KEY_ESC } from 'ui/utils'
+import RootPortal from 'ui/Root/RootPortal'
 
 class PopoverBase extends React.Component {
   static propTypes = {
@@ -18,8 +18,8 @@ class PopoverBase extends React.Component {
     placement: PropTypes.oneOf(
       // "center" is a value that doesn‚Äôt exist in Popper, but we are using it
       // to define custom Popper settings (see getPopperSettings() below).
-      ["center"].concat(
-        ...["auto", "top", "right", "bottom", "left"].map((position) => [
+      ['center'].concat(
+        ...['auto', 'top', 'right', 'bottom', 'left'].map((position) => [
           position,
           `${position}-start`,
           `${position}-end`,
@@ -30,56 +30,56 @@ class PopoverBase extends React.Component {
     theme: PropTypes.object,
     transitionStyles: PropTypes.object,
     zIndex: PropTypes.number,
-  };
+  }
 
   static defaultProps = {
     closeOnOpenerFocus: false,
     opener: null,
-    placement: "center",
+    placement: 'center',
     onClose: noop,
     zIndex: 999,
-  };
+  }
 
-  _cardElement = React.createRef();
-  _popperElement = React.createRef();
-  _document = null;
-  _popper = null;
+  _cardElement = React.createRef()
+  _popperElement = React.createRef()
+  _document = null
+  _popper = null
 
   componentDidMount() {
-    this._document = this._popperElement.current.ownerDocument;
-    this._document.addEventListener("keydown", this.handleEscape);
-    this.focus();
-    this.initPopper();
+    this._document = this._popperElement.current.ownerDocument
+    this._document.addEventListener('keydown', this.handleEscape)
+    this.focus()
+    this.initPopper()
   }
 
   componentWillUnmount() {
-    this.destroyPopper();
-    this._document.removeEventListener("keydown", this.handleEscape);
-    delete this._document;
-    delete this._popper;
+    this.destroyPopper()
+    this._document.removeEventListener('keydown', this.handleEscape)
+    delete this._document
+    delete this._popper
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { placement, children, opener } = this.props;
+    const { placement, children, opener } = this.props
 
     if (
       prevProps.placement !== placement ||
       prevProps.children !== children ||
       prevProps.opener !== opener
     ) {
-      this.destroyPopper();
-      this.initPopper();
+      this.destroyPopper()
+      this.initPopper()
     }
   }
 
   focus() {
     if (this._cardElement.current) {
-      this._cardElement.current.focus();
+      this._cardElement.current.focus()
     }
   }
 
   getPopperSettings() {
-    const { placement, rootBoundary } = this.props;
+    const { placement, rootBoundary } = this.props
 
     const settings = {
       placement,
@@ -87,58 +87,58 @@ class PopoverBase extends React.Component {
         preventOverflow: {
           enabled: true,
           padding: 10,
-          boundariesElement: rootBoundary || "window",
+          boundariesElement: rootBoundary || 'window',
         },
       },
       positionFixed: false,
-    };
+    }
 
-    if (placement !== "center") {
-      return settings;
+    if (placement !== 'center') {
+      return settings
     }
 
     return {
       ...settings,
-      placement: "top-start",
+      placement: 'top-start',
       modifiers: {
         ...settings.modifiers,
         arrow: { enabled: false },
         flip: { enabled: false },
-        offset: { enabled: true, offset: "50% - 50%p, -50%p - 50%" },
+        offset: { enabled: true, offset: '50% - 50%p, -50%p - 50%' },
       },
-    };
+    }
   }
 
   initPopper() {
-    const { opener } = this.props;
+    const { opener } = this.props
 
     if (!this._popper && opener) {
       this._popper = new Popper(
         opener,
         this._popperElement.current,
         this.getPopperSettings()
-      );
+      )
     }
   }
 
   destroyPopper() {
     if (this._popper) {
-      this._popper.destroy();
-      this._popper = null;
+      this._popper.destroy()
+      this._popper = null
     }
   }
 
   handleEscape = ({ keyCode }) => {
     if (keyCode === KEY_ESC) {
       // On escape, we always move the focus back to the opener.
-      this.props.opener.focus();
-      this.attemptClose();
+      this.props.opener.focus()
+      this.attemptClose()
     }
-  };
+  }
 
   handleBlur = (event) => {
-    const { closeOnOpenerFocus, opener } = this.props;
-    const focusedElement = event.relatedTarget;
+    const { closeOnOpenerFocus, opener } = this.props
+    const focusedElement = event.relatedTarget
 
     // Do not close if:
     // - The blur event is emitted from an element inside of the popover.
@@ -150,49 +150,49 @@ class PopoverBase extends React.Component {
     ) {
       if (
         closeOnOpenerFocus &&
-        (opener.tagName === "BUTTON" || opener.tagName === "INPUT")
+        (opener.tagName === 'BUTTON' || opener.tagName === 'INPUT')
       ) {
         warn(
           `Popover: using "closeOnOpenerFocus" with a <button> or <input> may lead to bugs due ` +
-            "to cross-environment focus event handling. " +
-            "See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus " +
-            "for more information."
-        );
+            'to cross-environment focus event handling. ' +
+            'See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus ' +
+            'for more information.'
+        )
       }
-      return;
+      return
     }
 
     // Probably a click outside, that doesn‚Äôt focus anything else: move the
     // focus back to the opener.
     if (!focusedElement) {
-      opener.focus();
+      opener.focus()
     }
-    this.attemptClose();
-  };
+    this.attemptClose()
+  }
 
   attemptClose() {
-    const accepted = this.props.onClose();
+    const accepted = this.props.onClose()
 
     // If closing the popover is not accepted, we need to focus it again so
     // that it can react to onBlur events.
     if (accepted === false) {
-      this.focus();
+      this.focus()
     }
   }
 
   boundaryDimensions() {
-    const { rootBoundary } = this.props;
-    const hasWindow = typeof window !== "undefined";
+    const { rootBoundary } = this.props
+    const hasWindow = typeof window !== 'undefined'
 
     return rootBoundary
       ? [rootBoundary.clientWidth, rootBoundary.clientHeight]
-      : [hasWindow ? window.innerWidth : 0, hasWindow ? window.innerHeight : 0];
+      : [hasWindow ? window.innerWidth : 0, hasWindow ? window.innerHeight : 0]
   }
 
   render() {
-    const { children, theme, transitionStyles, zIndex } = this.props;
-    const { scale, opacity } = transitionStyles;
-    const [maxWidth, maxHeight] = this.boundaryDimensions();
+    const { children, theme, transitionStyles, zIndex } = this.props
+    const { scale, opacity } = transitionStyles
+    const [maxWidth, maxHeight] = this.boundaryDimensions()
 
     return (
       <animated.div
@@ -231,13 +231,13 @@ class PopoverBase extends React.Component {
           {children}
         </animated.div>
       </animated.div>
-    );
+    )
   }
 }
 
 function Popover({ scaleEffect, visible, ...props }) {
-  const theme = useTheme();
-  const root = useRoot();
+  const theme = useTheme()
+  const root = useRoot()
 
   return (
     <RootPortal>
@@ -262,19 +262,19 @@ function Popover({ scaleEffect, visible, ...props }) {
         }
       </Transition>
     </RootPortal>
-  );
+  )
 }
 
 Popover.propTypes = {
   ...PopoverBase.propTypes,
   scaleEffect: PropTypes.bool,
   visible: PropTypes.bool,
-};
+}
 
 Popover.defaultProps = {
   ...PopoverBase.defaultProps,
   scaleEffect: true,
   visible: true,
-};
+}
 
-export default Popover;
+export default Popover

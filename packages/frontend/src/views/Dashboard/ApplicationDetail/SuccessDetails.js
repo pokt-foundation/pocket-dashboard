@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { useQuery } from "react-query";
-import { GraphQLClient, gql } from "graphql-request";
-import { useViewport } from "use-viewport";
-import Styled from "styled-components/macro";
+import React, { useCallback, useMemo, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import { useQuery } from 'react-query'
+import { GraphQLClient, gql } from 'graphql-request'
+import { useViewport } from 'use-viewport'
+import Styled from 'styled-components/macro'
 import {
   Button,
   ButtonBase,
@@ -17,23 +17,23 @@ import {
   useToast,
   GU,
   TextCopy,
-} from "ui";
-import AppStatus from "components/AppStatus/AppStatus";
-import Box from "components/Box/Box";
-import FloatUp from "components/FloatUp/FloatUp";
-import env from "environment";
-import { shortenAddress } from "lib/pocket-utils";
+} from 'ui'
+import AppStatus from 'components/AppStatus/AppStatus'
+import Box from 'components/Box/Box'
+import FloatUp from 'components/FloatUp/FloatUp'
+import env from 'environment'
+import { shortenAddress } from 'lib/pocket-utils'
 
-const FAILED_RELAYS_KEY = "failedRelays";
-const SUCCESSFUL_CODE = 200;
-const SUCCESSFUL_RELAYS_KEY = "successfulRelays";
-const SKIP_AMOUNT = 10;
+const FAILED_RELAYS_KEY = 'failedRelays'
+const SUCCESSFUL_CODE = 200
+const SUCCESSFUL_RELAYS_KEY = 'successfulRelays'
+const SKIP_AMOUNT = 10
 
-const gqlClient = new GraphQLClient(env("HASURA_URL"), {
+const gqlClient = new GraphQLClient(env('HASURA_URL'), {
   headers: {
-    "x-hasura-admin-secret": env("HASURA_SECRET"),
+    'x-hasura-admin-secret': env('HASURA_SECRET'),
   },
-});
+})
 
 const LATEST_SUCCESFUL_QUERIES = gql`
   query LATEST_FILTERED_RELAYS($_eq: String, $_eq1: numeric, $offset: Int) {
@@ -50,7 +50,7 @@ const LATEST_SUCCESFUL_QUERIES = gql`
       service_node
     }
   }
-`;
+`
 
 const LATEST_FAILING_QUERIES = gql`
   query LATEST_FILTERED_RELAYS($_eq: String, $_eq1: numeric, $offset: Int) {
@@ -67,29 +67,29 @@ const LATEST_FAILING_QUERIES = gql`
       service_node
     }
   }
-`;
+`
 
 export default function SuccessDetails({
   appOnChainData,
   successfulRelayData,
   weeklyRelayData,
 }) {
-  const [page, setPage] = useState(0);
-  const [activeKey, setActiveKey] = useState(SUCCESSFUL_RELAYS_KEY);
-  const history = useHistory();
-  const theme = useTheme();
-  const toast = useToast();
-  const { within } = useViewport();
+  const [page, setPage] = useState(0)
+  const [activeKey, setActiveKey] = useState(SUCCESSFUL_RELAYS_KEY)
+  const history = useHistory()
+  const theme = useTheme()
+  const toast = useToast()
+  const { within } = useViewport()
 
-  const compactMode = within(-1, "medium");
+  const compactMode = within(-1, 'medium')
 
-  const { public_key: publicKey } = appOnChainData;
+  const { public_key: publicKey } = appOnChainData
 
   const { isLoading, data } = useQuery(
     [`user/applications/${publicKey}/success-details`, page],
     async function getFilteredRelays() {
       if (!publicKey) {
-        return [];
+        return []
       }
 
       try {
@@ -100,7 +100,7 @@ export default function SuccessDetails({
             _eq1: SUCCESSFUL_CODE,
             offset: page * SKIP_AMOUNT,
           }
-        );
+        )
 
         const { relay: failedRelays } = await gqlClient.request(
           LATEST_FAILING_QUERIES,
@@ -109,45 +109,45 @@ export default function SuccessDetails({
             _eq1: SUCCESSFUL_CODE,
             offset: page * SKIP_AMOUNT,
           }
-        );
+        )
 
-        return { successfulRelays, failedRelays };
+        return { successfulRelays, failedRelays }
       } catch (err) {
-        console.log(Object.entries(err));
+        console.log(Object.entries(err))
       }
     },
     {
       keepPreviousData: true,
     }
-  );
+  )
 
   const onSuccessfulClick = useCallback(
     () => setActiveKey(SUCCESSFUL_RELAYS_KEY),
     []
-  );
-  const onFailedClick = useCallback(() => setActiveKey(FAILED_RELAYS_KEY), []);
+  )
+  const onFailedClick = useCallback(() => setActiveKey(FAILED_RELAYS_KEY), [])
   const successRate = useMemo(() => {
     return weeklyRelayData.weeklyAppRelays === 0
       ? 0
       : successfulRelayData.successfulWeeklyRelays /
-          weeklyRelayData.weeklyAppRelays;
-  }, [weeklyRelayData, successfulRelayData]);
+          weeklyRelayData.weeklyAppRelays
+  }, [weeklyRelayData, successfulRelayData])
   const failureRate = useMemo(() => {
     return weeklyRelayData.weeklyAppRelays === 0
       ? 0
       : (weeklyRelayData.weeklyAppRelays -
           successfulRelayData.successfulWeeklyRelays) /
-          weeklyRelayData.weeklyAppRelays;
-  }, [successfulRelayData, weeklyRelayData]);
-  const onPageChange = useCallback((page) => setPage(page), []);
+          weeklyRelayData.weeklyAppRelays
+  }, [successfulRelayData, weeklyRelayData])
+  const onPageChange = useCallback((page) => setPage(page), [])
 
   const displayData = useMemo(() => {
     if (activeKey === SUCCESSFUL_RELAYS_KEY) {
-      return data?.successfulRelays ?? [];
+      return data?.successfulRelays ?? []
     } else {
-      return data?.failedRelays ?? [];
+      return data?.failedRelays ?? []
     }
-  }, [activeKey, data]);
+  }, [activeKey, data])
 
   return (
     <FloatUp
@@ -178,7 +178,7 @@ export default function SuccessDetails({
                   >
                     <h2
                       css={`
-                        ${textStyle("title1")}
+                        ${textStyle('title1')}
                       `}
                     >
                       {Intl.NumberFormat().format(
@@ -187,14 +187,14 @@ export default function SuccessDetails({
                       <span
                         css={`
                           display: block;
-                          ${textStyle("title3")}
+                          ${textStyle('title3')}
                         `}
                       >
                         Total requests
                       </span>
                       <span
                         css={`
-                          ${textStyle("body3")}
+                          ${textStyle('body3')}
                         `}
                       >
                         Last 7 days count
@@ -211,7 +211,7 @@ export default function SuccessDetails({
                     <div>
                       <h2
                         css={`
-                          ${textStyle("title2")}
+                          ${textStyle('title2')}
                         `}
                       >
                         {Intl.NumberFormat().format(
@@ -220,7 +220,7 @@ export default function SuccessDetails({
                         <span
                           css={`
                             display: block;
-                            ${textStyle("body3")}
+                            ${textStyle('body3')}
                           `}
                         >
                           Processed requests
@@ -228,7 +228,7 @@ export default function SuccessDetails({
                       </h2>
                       <h2
                         css={`
-                          ${textStyle("title3")}
+                          ${textStyle('title3')}
                         `}
                       >
                         Success rate
@@ -245,7 +245,7 @@ export default function SuccessDetails({
                     <div>
                       <h2
                         css={`
-                          ${textStyle("title2")}
+                          ${textStyle('title2')}
                         `}
                       >
                         {Intl.NumberFormat().format(
@@ -255,7 +255,7 @@ export default function SuccessDetails({
                         <span
                           css={`
                             display: block;
-                            ${textStyle("body3")}
+                            ${textStyle('body3')}
                           `}
                         >
                           Dropped requests
@@ -263,7 +263,7 @@ export default function SuccessDetails({
                       </h2>
                       <h2
                         css={`
-                          ${textStyle("title3")}
+                          ${textStyle('title3')}
                         `}
                       >
                         Failure rate
@@ -298,10 +298,10 @@ export default function SuccessDetails({
                 <Spacer size={5 * GU} />
                 <DataView
                   fields={[
-                    "",
-                    "Request type",
-                    "Bytes transferred",
-                    "Service Node",
+                    '',
+                    'Request type',
+                    'Bytes transferred',
+                    'Service Node',
                   ]}
                   entries={displayData}
                   renderEntry={({
@@ -325,11 +325,11 @@ export default function SuccessDetails({
                             0px 2px 8px 0px;
                         `}
                       />,
-                      <p>{method ? method : "Unknown"}</p>,
+                      <p>{method ? method : 'Unknown'}</p>,
                       <p>{bytes}B</p>,
                       <TextCopy
                         value={shortenAddress(serviceNode, 16)}
-                        onCopy={() => toast("Node address copied to cliboard")}
+                        onCopy={() => toast('Node address copied to cliboard')}
                         css={`
                           width: 100%;
                           > div > input {
@@ -337,9 +337,9 @@ export default function SuccessDetails({
                           }
                         `}
                       />,
-                    ];
+                    ]
                   }}
-                  status={isLoading ? "loading" : "default"}
+                  status={isLoading ? 'loading' : 'default'}
                 />
                 <Pagination
                   pages={10}
@@ -361,11 +361,11 @@ export default function SuccessDetails({
         />
       )}
     />
-  );
+  )
 }
 
 function Tab({ active, children, onClick }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <ButtonBase
@@ -376,7 +376,7 @@ function Tab({ active, children, onClick }) {
         width: 100%;
         border-radius: 0 0 ${1 * GU}px ${1 * GU}px;
         color: ${theme.infoSurfaceContent};
-        ${textStyle("body2")}
+        ${textStyle('body2')}
         ${active &&
         `
           background: #091828;
@@ -388,10 +388,10 @@ function Tab({ active, children, onClick }) {
     >
       {children}
     </ButtonBase>
-  );
+  )
 }
 
 const Inline = Styled.div`
   display: flex;
   align-items: center;
-`;
+`

@@ -1,23 +1,23 @@
-import React from "react";
-import TextInput from "ui/TextInput/TextInput";
+import React from 'react'
+import TextInput from 'ui/TextInput/TextInput'
 
 export default {
-  title: "pocketUI/TextInput",
+  title: 'pocketUI/TextInput',
   component: TextInput,
   argTypes: {
     wide: {
-      control: "boolean",
+      control: 'boolean',
       defaultValue: false,
     },
     value: {
       control: {
-        type: "text",
-        defaultValue: "",
+        type: 'text',
+        defaultValue: '',
       },
     },
   },
-};
+}
 
-const Template = (args) => <TextInput {...args} />;
+const Template = (args) => <TextInput {...args} />
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

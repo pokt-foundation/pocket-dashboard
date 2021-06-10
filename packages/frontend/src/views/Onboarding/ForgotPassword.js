@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from "react";
-import { useMutation } from "react-query";
-import axios from "axios";
-import "styled-components/macro";
+import React, { useCallback, useState } from 'react'
+import { useMutation } from 'react-query'
+import axios from 'axios'
+import 'styled-components/macro'
 import {
   Button,
   Field,
@@ -13,30 +13,30 @@ import {
   useTheme,
   GU,
   RADIUS,
-} from "ui";
-import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
-import env from "environment";
-import PoktShape from "assets/poktshape.png";
+} from 'ui'
+import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
+import env from 'environment'
+import PoktShape from 'assets/poktshape.png'
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const theme = useTheme();
+  const [email, setEmail] = useState('')
+  const theme = useTheme()
 
   const { isLoading, isSuccess, mutate } = useMutation(
     async function sendResetEmail(e) {
-      const path = `${env("BACKEND_URL")}/api/users/send-reset-email`;
+      const path = `${env('BACKEND_URL')}/api/users/send-reset-email`
 
       try {
         await axios.post(path, {
           email,
-        });
+        })
       } catch (err) {
-        throw new Error(err);
+        throw new Error(err)
       }
     }
-  );
+  )
 
-  const onEmailChange = useCallback((e) => setEmail(e.target.value), []);
+  const onEmailChange = useCallback((e) => setEmail(e.target.value), [])
 
   return (
     <div
@@ -80,7 +80,7 @@ export default function ForgotPassword() {
           <Spacer size={8 * GU} />
           <h2
             css={`
-              ${textStyle("title2")}
+              ${textStyle('title2')}
               margin-bottom: ${6 * GU}px;
               align-self: flex-start;
             `}
@@ -108,7 +108,7 @@ export default function ForgotPassword() {
             `}
           >
             If the email you specify exists, we'll send an email with
-            instructions for resetting your email. Remember you can{" "}
+            instructions for resetting your email. Remember you can{' '}
             <Link href="mailto:dashboard@pokt.network">contact us</Link> if you
             have any issues.
           </p>
@@ -147,5 +147,5 @@ export default function ForgotPassword() {
         </main>
       </div>
     </div>
-  );
+  )
 }
