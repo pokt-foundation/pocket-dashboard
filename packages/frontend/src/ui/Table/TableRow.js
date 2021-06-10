@@ -1,5 +1,5 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
-const StyledTableRow = styled.tr``;
+const StyledTableRow = styled.tr``
 
-export default StyledTableRow;
+export default StyledTableRow

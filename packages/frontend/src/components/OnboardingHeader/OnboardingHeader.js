@@ -1,7 +1,7 @@
-import React from "react";
-import "styled-components/macro";
-import { textStyle, GU } from "ui";
-import PoktLogo from "assets/poktlogo.png";
+import React from 'react'
+import 'styled-components/macro'
+import { textStyle, GU } from 'ui'
+import PoktLogo from 'assets/poktlogo.png'
 
 export default function OnboardingHeader() {
   return (
@@ -19,7 +19,7 @@ export default function OnboardingHeader() {
           position: absolute;
           top: ${2 * GU}px;
           left: ${3 * GU}px;
-          ${textStyle("title1")}
+          ${textStyle('title1')}
           display: flex;
           justify-content: center;
         `}
@@ -42,5 +42,5 @@ export default function OnboardingHeader() {
         </h1>
       </header>
     </a>
-  );
+  )
 }

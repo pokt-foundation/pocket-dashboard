@@ -1,33 +1,33 @@
-import React from "react";
-import Button from "ui/Button/Button";
+import React from 'react'
+import Button from 'ui/Button/Button'
 
 export default {
-  title: "pocketUI/Button",
+  title: 'pocketUI/Button',
   component: Button,
   argTypes: {
-    children: { control: "text", defaultValue: "Log in" },
-    disabled: { control: "boolean", defaultValue: false },
+    children: { control: 'text', defaultValue: 'Log in' },
+    disabled: { control: 'boolean', defaultValue: false },
     display: {
-      control: { type: "select", options: ["auto", "all", "icon", "label"] },
-      defaultValue: "auto",
+      control: { type: 'select', options: ['auto', 'all', 'icon', 'label'] },
+      defaultValue: 'auto',
     },
     mode: {
       control: {
-        type: "select",
-        options: ["normal", "strong", "positive", "negative"],
+        type: 'select',
+        options: ['normal', 'strong', 'positive', 'negative'],
       },
     },
     size: {
       control: {
-        type: "select",
-        options: ["medium", "small", "mini"],
+        type: 'select',
+        options: ['medium', 'small', 'mini'],
       },
-      defaultValue: "medium",
+      defaultValue: 'medium',
     },
-    wide: { control: "boolean", defaultValue: false },
+    wide: { control: 'boolean', defaultValue: false },
   },
-};
+}
 
-const Template = (args) => <Button {...args} />;
+const Template = (args) => <Button {...args} />
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

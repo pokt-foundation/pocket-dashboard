@@ -1,21 +1,21 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react'
+import PropTypes from 'prop-types'
 
-import "./page.css";
+import './page.css'
 
 export const Page = ({ user, onLogin, onLogout, onCreateAccount }) => (
   <article>
     <section>
       <h2>Pages in Storybook</h2>
       <p>
-        We recommend building UIs with a{" "}
+        We recommend building UIs with a{' '}
         <a
           href="https://componentdriven.org"
           target="_blank"
           rel="noopener noreferrer"
         >
           <strong>component-driven</strong>
-        </a>{" "}
+        </a>{' '}
         process starting with atomic components and ending with pages.
       </p>
       <p>
@@ -34,7 +34,7 @@ export const Page = ({ user, onLogin, onLogout, onCreateAccount }) => (
         </li>
       </ul>
       <p>
-        Get a guided tutorial on component-driven development at{" "}
+        Get a guided tutorial on component-driven development at{' '}
         <a
           href="https://www.learnstorybook.com"
           target="_blank"
@@ -42,7 +42,7 @@ export const Page = ({ user, onLogin, onLogout, onCreateAccount }) => (
         >
           Learn Storybook
         </a>
-        . Read more in the{" "}
+        . Read more in the{' '}
         <a
           href="https://storybook.js.org/docs"
           target="_blank"
@@ -53,7 +53,7 @@ export const Page = ({ user, onLogin, onLogout, onCreateAccount }) => (
         .
       </p>
       <div className="tip-wrapper">
-        <span className="tip">Tip</span> Adjust the width of the canvas with the{" "}
+        <span className="tip">Tip</span> Adjust the width of the canvas with the{' '}
         <svg
           width="10"
           height="10"
@@ -72,14 +72,14 @@ export const Page = ({ user, onLogin, onLogout, onCreateAccount }) => (
       </div>
     </section>
   </article>
-);
+)
 Page.propTypes = {
   user: PropTypes.shape({}),
   onLogin: PropTypes.func.isRequired,
   onLogout: PropTypes.func.isRequired,
   onCreateAccount: PropTypes.func.isRequired,
-};
+}
 
 Page.defaultProps = {
   user: null,
-};
+}

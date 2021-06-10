@@ -1,12 +1,12 @@
-import React, { useCallback, useMemo, useState } from "react";
-import PropTypes from "prop-types";
-import { Transition, animated } from "react-spring/renderprops";
-import "styled-components/macro";
-import { useTheme, springs, textStyle, GU } from "ui";
-import { useLayout } from "../Layout/Layout";
-import { CheckBox } from "ui";
-import { ToggleButton } from "./ToggleButton";
-import { OpenedSurfaceBorder } from "./OpenedSurfaceBorder";
+import React, { useCallback, useMemo, useState } from 'react'
+import PropTypes from 'prop-types'
+import { Transition, animated } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import { useTheme, springs, textStyle, GU } from 'ui'
+import { useLayout } from '../Layout/Layout'
+import { CheckBox } from 'ui'
+import { ToggleButton } from './ToggleButton'
+import { OpenedSurfaceBorder } from './OpenedSurfaceBorder'
 
 // Table heading cells
 function headingsFromFields(
@@ -15,23 +15,23 @@ function headingsFromFields(
 ) {
   const cells = fields.map((field, index) => [
     field.label,
-    field.align === "end" ? "right" : "left",
-  ]);
+    field.align === 'end' ? 'right' : 'left',
+  ])
 
   if (hasAnyExpansion || selectable) {
-    cells.unshift([selectable ? selectContent : null, "left"]);
+    cells.unshift([selectable ? selectContent : null, 'left'])
   }
 
   if (hasAnyActions) {
-    cells.push([null, "left"]);
+    cells.push([null, 'left'])
   }
 
   // Return null if all the fields are empty
   if (cells.every((cell) => !cell[0])) {
-    return null;
+    return null
   }
 
-  return cells;
+  return cells
 }
 
 function cellsFromEntry(
@@ -50,24 +50,24 @@ function cellsFromEntry(
     content,
     fields[index].align,
     false,
-  ]);
+  ])
 
   // Checkbox
   if (selectable) {
-    cells.unshift([selectContent, "start", true]);
+    cells.unshift([selectContent, 'start', true])
   }
 
   // Toggle child
   if (!selectable && hasAnyExpansion) {
-    cells.unshift([hasExpansion && toggleChildContent, "start", true]);
+    cells.unshift([hasExpansion && toggleChildContent, 'start', true])
   }
 
   // Actions
   if (hasAnyActions) {
-    cells.push([entry.actions, "end", true]);
+    cells.push([entry.actions, 'end', true])
   }
 
-  return cells;
+  return cells
 }
 
 function TableView({
@@ -84,11 +84,11 @@ function TableView({
   selectable,
   selectedCount,
 }) {
-  const [opened, setOpened] = useState(-1);
+  const [opened, setOpened] = useState(-1)
 
   const toggleEntry = useCallback((index) => {
-    setOpened((opened) => (opened === index ? -1 : index));
-  }, []);
+    setOpened((opened) => (opened === index ? -1 : index))
+  }, [])
 
   const headCells = useMemo(
     () =>
@@ -112,7 +112,7 @@ function TableView({
       onSelectAll,
       selectable,
     ]
-  );
+  )
 
   return (
     <table
@@ -150,7 +150,7 @@ function TableView({
         ))}
       </tbody>
     </table>
-  );
+  )
 }
 
 TableView.propTypes = {
@@ -166,29 +166,29 @@ TableView.propTypes = {
   rowHeight: PropTypes.number.isRequired,
   selectable: PropTypes.bool.isRequired,
   selectedCount: PropTypes.number.isRequired,
-};
+}
 
 // Disable prop types check for internal components
 /* eslint-disable react/prop-types */
 
 function useSidePadding() {
-  const { layoutName } = useLayout();
+  const { layoutName } = useLayout()
 
-  return layoutName === "small" ? 2 * GU : 3 * GU;
+  return layoutName === 'small' ? 2 * GU : 3 * GU
 }
 
 function HeadRow({ cells, selectedCount, renderSelectionCount }) {
-  const theme = useTheme();
-  const sidePadding = useSidePadding();
+  const theme = useTheme()
+  const sidePadding = useSidePadding()
 
   return (
     <tr>
       {cells.map((cell, index) => {
-        const hidden = selectedCount > 0 && index > 1;
+        const hidden = selectedCount > 0 && index > 1
         const content =
           selectedCount > 0 && index === 1
             ? renderSelectionCount(selectedCount)
-            : cell[0];
+            : cell[0]
 
         return (
           !hidden && (
@@ -203,7 +203,7 @@ function HeadRow({ cells, selectedCount, renderSelectionCount }) {
                   : 0}px;
                 padding-bottom: ${2 * GU}px;
                 text-align: ${cell[1]};
-                ${textStyle("body2")};
+                ${textStyle('body2')};
                 font-weight: 600;
                 border-bottom: 1px solid ${theme.tableBorder};
               `}
@@ -212,10 +212,10 @@ function HeadRow({ cells, selectedCount, renderSelectionCount }) {
               {content}
             </th>
           )
-        );
+        )
       })}
     </tr>
-  );
+  )
 }
 
 const Entry = React.memo(function Entry({
@@ -231,19 +231,19 @@ const Entry = React.memo(function Entry({
   rowHeight,
   selectable,
 }) {
-  const hasExpansion = entry.expansion.content.length > 0;
-  const entryIndex = entry.index;
+  const hasExpansion = entry.expansion.content.length > 0
+  const entryIndex = entry.index
 
   const handleToggle = useCallback(() => {
-    onToggle(entryIndex);
-  }, [entryIndex, onToggle]);
+    onToggle(entryIndex)
+  }, [entryIndex, onToggle])
 
   const handleSelectChange = useCallback(
     (check) => {
-      onSelect(entryIndex, check);
+      onSelect(entryIndex, check)
     },
     [entryIndex, onSelect]
-  );
+  )
 
   const cells = cellsFromEntry(entry, {
     fields,
@@ -257,7 +257,7 @@ const Entry = React.memo(function Entry({
     selectContent: selectable ? (
       <CheckBox onChange={handleSelectChange} checked={entry.selected} />
     ) : null,
-  });
+  })
 
   return (
     <React.Fragment>
@@ -277,23 +277,23 @@ const Entry = React.memo(function Entry({
         />
       )}
     </React.Fragment>
-  );
-});
+  )
+})
 
 function EntryRow({ firstRow, cells, selected, rowHeight, mode }) {
-  const theme = useTheme();
-  const sidePadding = useSidePadding();
+  const theme = useTheme()
+  const sidePadding = useSidePadding()
 
   return (
     <tr
       css={`
         transition: background 150ms ease-in-out;
-        background: ${selected ? theme.surfaceSelected : "none"};
+        background: ${selected ? theme.surfaceSelected : 'none'};
       `}
     >
       {cells.map(([content, align, compact], index, cells) => {
-        const first = index === 0;
-        const last = index === cells.length - 1;
+        const first = index === 0
+        const last = index === cells.length - 1
 
         return (
           <td
@@ -301,16 +301,16 @@ function EntryRow({ firstRow, cells, selected, rowHeight, mode }) {
             css={`
               position: relative;
               width: ${compact
-                ? "1px" // For some reason Blink tends to make 0 grow but not 1px
-                : "auto"};
+                ? '1px' // For some reason Blink tends to make 0 grow but not 1px
+                : 'auto'};
               height: ${rowHeight}px;
               padding-top: 0;
               padding-bottom: 0;
               padding-left: ${first || compact ? sidePadding : 0}px;
-              padding-right: ${(!first && (align !== "end" || last)) || compact
+              padding-right: ${(!first && (align !== 'end' || last)) || compact
                 ? sidePadding
                 : 0}px;
-              border-top: ${firstRow ? "0" : `1px solid ${theme.tableBorder}`};
+              border-top: ${firstRow ? '0' : `1px solid ${theme.tableBorder}`};
             `}
           >
             <div
@@ -323,10 +323,10 @@ function EntryRow({ firstRow, cells, selected, rowHeight, mode }) {
               {content}
             </div>
           </td>
-        );
+        )
       })}
     </tr>
-  );
+  )
 }
 
 function EntryExpansion({
@@ -336,22 +336,22 @@ function EntryExpansion({
   opened,
   rowHeight,
 }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   // Handles the height of the expansion in free layout mode
-  const [freeLayoutContentHeight, setFreeLayoutContentHeight] = useState(0);
+  const [freeLayoutContentHeight, setFreeLayoutContentHeight] = useState(0)
 
   // We don't want to memoize this callback because we need to query for a new height
   // and cover updates when entries get re-ordered
   const handleFreeLayoutContentRef = (element) => {
     if (element) {
-      setFreeLayoutContentHeight(element.getBoundingClientRect().height);
+      setFreeLayoutContentHeight(element.getBoundingClientRect().height)
     }
-  };
+  }
 
   const contentHeight = expansion.freeLayout
     ? freeLayoutContentHeight
-    : rowHeight * expansion.content.length;
+    : rowHeight * expansion.content.length
 
   return (
     <Transition
@@ -384,7 +384,7 @@ function EntryExpansion({
                   css="overflow: hidden"
                   style={{
                     height: height.interpolate((h) =>
-                      h !== contentHeight ? `${h}px` : "auto"
+                      h !== contentHeight ? `${h}px` : 'auto'
                     ),
                   }}
                 >
@@ -393,7 +393,7 @@ function EntryExpansion({
                       key={i}
                       css={`
                         height: ${expansion.freeLayout
-                          ? "auto"
+                          ? 'auto'
                           : `${rowHeight}px`};
                         border-top: 1px solid ${theme.tableBorder};
                       `}
@@ -416,7 +416,7 @@ function EntryExpansion({
                 css="overflow: hidden"
                 style={{
                   height: height.interpolate((h) =>
-                    h !== contentHeight ? `${h}px` : "auto"
+                    h !== contentHeight ? `${h}px` : 'auto'
                   ),
                 }}
               >
@@ -430,7 +430,7 @@ function EntryExpansion({
                       display: flex;
                       align-items: center;
                       height: ${expansion.freeLayout
-                        ? "auto"
+                        ? 'auto'
                         : `${rowHeight}px`};
                       padding-left: ${alignChildOnCell < 1 ? 3 * GU : 0}px;
                       padding-right: ${3 * GU}px;
@@ -446,7 +446,7 @@ function EntryExpansion({
         ))
       }
     </Transition>
-  );
+  )
 }
 
 const Toggle = React.memo(function Toggle({ opened, onToggle }) {
@@ -460,9 +460,9 @@ const Toggle = React.memo(function Toggle({ opened, onToggle }) {
       <OpenedSurfaceBorder opened={opened} />
       <ToggleButton opened={opened} onClick={onToggle} />
     </div>
-  );
-});
+  )
+})
 
 /* eslint-enable react/prop-types */
 
-export { TableView };
+export { TableView }

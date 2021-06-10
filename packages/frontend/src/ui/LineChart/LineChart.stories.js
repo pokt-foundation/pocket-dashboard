@@ -1,14 +1,14 @@
-import React from "react";
-import LineChart from "./LineChart";
+import React from 'react'
+import LineChart from './LineChart'
 
 export default {
-  title: "pocketUI/LineChart",
+  title: 'pocketUI/LineChart',
   component: LineChart,
-};
+}
 
-const LINES = [{ id: 1, values: [0.1, 0.2, 0.3, 0] }];
+const LINES = [{ id: 1, values: [0.1, 0.2, 0.3, 0] }]
 
-const LABELS = ["", "", "", ""];
+const LABELS = ['', '', '', '']
 
 const Template = (args) => {
   return (
@@ -19,7 +19,7 @@ const Template = (args) => {
       height={90}
       color={() => `#1B2331`}
     />
-  );
-};
+  )
+}
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

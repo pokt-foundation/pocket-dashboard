@@ -1,16 +1,16 @@
-import React, { useCallback, useContext, useState } from "react";
-import PropTypes from "prop-types";
+import React, { useCallback, useContext, useState } from 'react'
+import PropTypes from 'prop-types'
 
-const RootContext = React.createContext(null);
+const RootContext = React.createContext(null)
 
 function RootProvider({ children, ...props }) {
-  const [element, setElement] = useState(null);
+  const [element, setElement] = useState(null)
 
   const handleRef = useCallback((element) => {
     if (element !== null) {
-      setElement(element);
+      setElement(element)
     }
-  }, []);
+  }, [])
 
   return (
     <RootContext.Provider value={element}>
@@ -33,19 +33,19 @@ function RootProvider({ children, ...props }) {
         }
       </div>
     </RootContext.Provider>
-  );
+  )
 }
 
 RootProvider.propTypes = {
   children: PropTypes.node,
-};
+}
 
 function Root(props) {
-  return <RootContext.Consumer {...props} />;
+  return <RootContext.Consumer {...props} />
 }
-Root.Provider = RootProvider;
+Root.Provider = RootProvider
 
-const useRoot = () => useContext(RootContext);
+const useRoot = () => useContext(RootContext)
 
-export { Root, useRoot };
-export default Root;
+export { Root, useRoot }
+export default Root

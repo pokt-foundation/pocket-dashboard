@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useHistory } from "react-router-dom";
-import { animated, useTransition } from "react-spring";
-import { useMutation, useQuery } from "react-query";
-import axios from "axios";
-import "styled-components/macro";
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import { useHistory } from 'react-router-dom'
+import { animated, useTransition } from 'react-spring'
+import { useMutation, useQuery } from 'react-query'
+import axios from 'axios'
+import 'styled-components/macro'
 import {
   Button,
   ButtonBase,
@@ -19,99 +19,99 @@ import {
   springs,
   textStyle,
   GU,
-} from "ui";
-import Box from "components/Box/Box";
-import FloatUp from "components/FloatUp/FloatUp";
-import { useUserApplications } from "views/Dashboard/application-hooks";
-import { log } from "lib/utils";
-import env from "environment";
+} from 'ui'
+import Box from 'components/Box/Box'
+import FloatUp from 'components/FloatUp/FloatUp'
+import { useUserApplications } from 'views/Dashboard/application-hooks'
+import { log } from 'lib/utils'
+import env from 'environment'
 
 const SCREENS = new Map([
   [0, BasicSetup],
   [1, SecuritySetup],
-]);
+])
 
-const APP_CONFIG_DATA_KEY = "POKT_NETWORK_APP_CONFIG_DATA";
-const APP_CONFIG_SCREEN_KEY = "POKT_NETWORK_APP_CONFIG_SREEN";
+const APP_CONFIG_DATA_KEY = 'POKT_NETWORK_APP_CONFIG_DATA'
+const APP_CONFIG_SCREEN_KEY = 'POKT_NETWORK_APP_CONFIG_SREEN'
 
 const UPDATE_TYPES = new Map([
-  ["UPDATE_APP_NAME", "appName"],
-  ["UPDATE_SELECTED_NETWORK", "selectedNetwork"],
-  ["UPDATE_WHITELISTED_USER_AGENTS", "whitelistUserAgents"],
-  ["UPDATE_WHITELISTED_ORIGINS", "whitelistOrigins"],
-  ["UPDATE_REQUIRE_SECRET_KEY", "secretKeyRequired"],
-]);
+  ['UPDATE_APP_NAME', 'appName'],
+  ['UPDATE_SELECTED_NETWORK', 'selectedNetwork'],
+  ['UPDATE_WHITELISTED_USER_AGENTS', 'whitelistUserAgents'],
+  ['UPDATE_WHITELISTED_ORIGINS', 'whitelistOrigins'],
+  ['UPDATE_REQUIRE_SECRET_KEY', 'secretKeyRequired'],
+])
 
 const DEFAULT_CONFIGURE_STATE = {
-  appName: "",
-  selectedNetwork: "",
+  appName: '',
+  selectedNetwork: '',
   whitelistUserAgents: [],
   whitelistOrigins: [],
   secretKeyRequired: false,
-};
+}
 
 function loadConfigureState() {
-  const appConfigData = localStorage.getItem(APP_CONFIG_DATA_KEY);
-  const screenIndex = localStorage.getItem(APP_CONFIG_SCREEN_KEY);
+  const appConfigData = localStorage.getItem(APP_CONFIG_DATA_KEY)
+  const screenIndex = localStorage.getItem(APP_CONFIG_SCREEN_KEY)
 
   try {
     const deserializedConfigData =
-      JSON.parse(appConfigData) ?? DEFAULT_CONFIGURE_STATE;
-    const deserializedScreenIndex = JSON.parse(screenIndex) ?? 0;
+      JSON.parse(appConfigData) ?? DEFAULT_CONFIGURE_STATE
+    const deserializedScreenIndex = JSON.parse(screenIndex) ?? 0
 
     return {
       appConfigData: deserializedConfigData,
       screenIndex: Number(deserializedScreenIndex),
-    };
+    }
   } catch (err) {
     // This might look weird at first, but we've got no good way to tell if
     // failure to deserialize this data is a browser issue, or just people
     // cleaning their localStorage data, so we just assume the happy path.
-    return DEFAULT_CONFIGURE_STATE;
+    return DEFAULT_CONFIGURE_STATE
   }
 }
 
 function useConfigureState() {
-  const [appConfigData, setAppConfigData] = useState(DEFAULT_CONFIGURE_STATE);
-  const [prevScreenIndex, setPrevScreenIndex] = useState(-1);
-  const [screenIndex, setScreenIndex] = useState(0);
+  const [appConfigData, setAppConfigData] = useState(DEFAULT_CONFIGURE_STATE)
+  const [prevScreenIndex, setPrevScreenIndex] = useState(-1)
+  const [screenIndex, setScreenIndex] = useState(0)
 
   useEffect(() => {
-    const { appConfigData, screenIndex } = loadConfigureState();
+    const { appConfigData, screenIndex } = loadConfigureState()
 
-    setAppConfigData(appConfigData);
-    setScreenIndex(screenIndex);
-  }, []);
+    setAppConfigData(appConfigData)
+    setScreenIndex(screenIndex)
+  }, [])
 
   const updateAppConfigData = useCallback(
     (action) => {
-      const keyToUpdate = UPDATE_TYPES.get(action.type);
+      const keyToUpdate = UPDATE_TYPES.get(action.type)
 
       if (!keyToUpdate) {
-        throw new Error(`No key matching ${action.type} was found.`);
+        throw new Error(`No key matching ${action.type} was found.`)
       }
 
       const newAppConfigData = {
         ...appConfigData,
         [keyToUpdate]: action.payload,
-      };
+      }
 
-      log("New App Config Data", newAppConfigData);
+      log('New App Config Data', newAppConfigData)
 
-      setAppConfigData(newAppConfigData);
+      setAppConfigData(newAppConfigData)
     },
     [appConfigData]
-  );
+  )
 
   const incrementScreenIndex = useCallback(() => {
-    setPrevScreenIndex(screenIndex);
-    setScreenIndex((screenIndex) => screenIndex + 1);
-  }, [screenIndex]);
+    setPrevScreenIndex(screenIndex)
+    setScreenIndex((screenIndex) => screenIndex + 1)
+  }, [screenIndex])
 
   const decrementScreenIndex = useCallback(() => {
-    setPrevScreenIndex(screenIndex);
-    setScreenIndex((screenIndex) => screenIndex - 1);
-  }, [screenIndex]);
+    setPrevScreenIndex(screenIndex)
+    setScreenIndex((screenIndex) => screenIndex - 1)
+  }, [screenIndex])
 
   return {
     appConfigData,
@@ -120,11 +120,11 @@ function useConfigureState() {
     prevScreenIndex,
     screenIndex,
     updateAppConfigData,
-  };
+  }
 }
 
 export default function Create() {
-  const history = useHistory();
+  const history = useHistory()
   const {
     appConfigData,
     decrementScreenIndex,
@@ -132,37 +132,37 @@ export default function Create() {
     prevScreenIndex,
     screenIndex,
     updateAppConfigData,
-  } = useConfigureState();
+  } = useConfigureState()
   const {
     appName,
     selectedNetwork,
     whitelistOrigins,
     whitelistUserAgents,
     secretKeyRequired,
-  } = appConfigData;
-  const { appsData, refetchUserApps } = useUserApplications();
+  } = appConfigData
+  const { appsData, refetchUserApps } = useUserApplications()
 
   const {
     isLoading: isChainsLoading,
     isError: isChainsError,
     data: chains,
-  } = useQuery("/network/stakeable-chains", async function getNetworkChains() {
-    const path = `${env("BACKEND_URL")}/api/network/stakeable-chains`;
+  } = useQuery('/network/stakeable-chains', async function getNetworkChains() {
+    const path = `${env('BACKEND_URL')}/api/network/stakeable-chains`
 
     try {
       const res = await axios.get(path, {
         withCredentials: true,
-      });
+      })
 
       const {
         data: { chains },
-      } = res;
+      } = res
 
-      return chains;
+      return chains
     } catch (err) {
-      console.log("?", err);
+      console.log('?', err)
     }
-  });
+  })
 
   const {
     isError: isCreateError,
@@ -171,7 +171,7 @@ export default function Create() {
     mutate,
   } = useMutation(async function createApp() {
     try {
-      const path = `${env("BACKEND_URL")}/api/applications`;
+      const path = `${env('BACKEND_URL')}/api/applications`
 
       const res = await axios.post(
         path,
@@ -187,19 +187,19 @@ export default function Create() {
         {
           withCredentials: true,
         }
-      );
+      )
 
-      await refetchUserApps();
+      await refetchUserApps()
 
       history.push({
         pathname: `/app/${res.data._id}`,
-      });
+      })
 
-      return res;
+      return res
     } catch (err) {
       // TODO: Catch error with Sentry
     }
-  });
+  })
 
   // useEffect(() => {
   //   if (appsData?.length) {
@@ -211,28 +211,28 @@ export default function Create() {
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,
-  ]);
+  ])
 
-  const direction = screenIndex > prevScreenIndex ? 1 : -1;
+  const direction = screenIndex > prevScreenIndex ? 1 : -1
   const transitionProps = useTransition(screenIndex, null, {
     from: {
       opacity: 0,
-      position: "absolute",
+      position: 'absolute',
       transform: `translate3d(${10 * direction}%, 0, 0)`,
     },
     enter: {
       opacity: 1,
-      position: "static",
+      position: 'static',
       transform: `translate3d(0%, 0, 0)`,
     },
     leave: {
       opacity: 0,
-      position: "absolute",
+      position: 'absolute',
       transform: `translate3d(${-10 * direction}%, 0, 0)`,
     },
     config: springs.smooth,
     immediate: screenIndex === 0 && prevScreenIndex === -1,
-  });
+  })
 
   const isCreateDisabled = useMemo(
     () =>
@@ -252,7 +252,7 @@ export default function Create() {
       isCreateLoading,
       isCreateSuccess,
     ]
-  );
+  )
 
   return (
     <FloatUp
@@ -290,7 +290,7 @@ export default function Create() {
         </div>
       )}
     />
-  );
+  )
 }
 
 function BasicSetup({
@@ -304,13 +304,13 @@ function BasicSetup({
   const onSwitchClick = useCallback(
     (chainId) => {
       if (data.selectedNetwork && data.selectedNetwork === chainId) {
-        updateData({ type: "UPDATE_SELECTED_NETWORK", payload: "" });
+        updateData({ type: 'UPDATE_SELECTED_NETWORK', payload: '' })
       } else {
-        updateData({ type: "UPDATE_SELECTED_NETWORK", payload: chainId });
+        updateData({ type: 'UPDATE_SELECTED_NETWORK', payload: chainId })
       }
     },
     [data, updateData]
-  );
+  )
 
   return (
     <>
@@ -319,10 +319,10 @@ function BasicSetup({
           <>
             <Box title="App name">
               <TextInput
-                value={data.appName ?? ""}
+                value={data.appName ?? ''}
                 onChange={(e) =>
                   updateData({
-                    type: "UPDATE_APP_NAME",
+                    type: 'UPDATE_APP_NAME',
                     payload: e.target.value,
                   })
                 }
@@ -333,7 +333,7 @@ function BasicSetup({
             <Spacer size={2 * GU} />
             <Box title="Available networks">
               <DataView
-                fields={["Selected", "Network", "ID", "Ticker"]}
+                fields={['Selected', 'Network', 'ID', 'Ticker']}
                 entries={chains}
                 renderEntry={({
                   description,
@@ -395,71 +395,71 @@ function BasicSetup({
         }
       />
     </>
-  );
+  )
 }
 
 function SecuritySetup({ data, decrementScreen, updateData }) {
-  const [userAgent, setUserAgent] = useState("");
-  const [origin, setOrigin] = useState("");
+  const [userAgent, setUserAgent] = useState('')
+  const [origin, setOrigin] = useState('')
 
   const onWhitelistedUserAgentDelete = useCallback(
     (userAgent) => {
-      const whitelistedUserAgents = data.whitelistUserAgents ?? [];
+      const whitelistedUserAgents = data.whitelistUserAgents ?? []
 
       const filteredWhitelistedUserAgents = whitelistedUserAgents.filter(
         (u) => u !== userAgent
-      );
+      )
 
       updateData({
-        type: "UPDATE_WHITELISTED_USER_AGENTS",
+        type: 'UPDATE_WHITELISTED_USER_AGENTS',
         payload: filteredWhitelistedUserAgents,
-      });
+      })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [updateData]
-  );
+  )
   const onWhitelistedOriginDelete = useCallback(
     (origin) => {
-      const whitelistedOrigins = data.whitelistOrigins ?? [];
+      const whitelistedOrigins = data.whitelistOrigins ?? []
 
       const filteredWhitelistedOrigins = whitelistedOrigins.filter(
         (o) => o !== origin
-      );
+      )
 
       updateData({
-        type: "UPDATE_WHITELISTED_ORIGINS",
+        type: 'UPDATE_WHITELISTED_ORIGINS',
         payload: filteredWhitelistedOrigins,
-      });
+      })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [updateData]
-  );
+  )
   const setWhitelistedUserAgent = useCallback(() => {
-    const whitelistedUserAgents = data.whitelistUserAgents ?? [];
+    const whitelistedUserAgents = data.whitelistUserAgents ?? []
 
     if (whitelistedUserAgents.indexOf(userAgent) !== -1) {
-      return;
+      return
     }
 
     updateData({
-      type: "UPDATE_WHITELISTED_USER_AGENTS",
+      type: 'UPDATE_WHITELISTED_USER_AGENTS',
       payload: [...whitelistedUserAgents, userAgent],
-    });
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, updateData, userAgent]);
+  }, [data, updateData, userAgent])
   const setWhitelistedOrigin = useCallback(() => {
-    const whitelistedOrigins = data.whitelistOrigins ?? [];
+    const whitelistedOrigins = data.whitelistOrigins ?? []
 
     if (whitelistedOrigins.indexOf(origin) !== -1) {
-      return;
+      return
     }
 
     updateData({
-      type: "UPDATE_WHITELISTED_ORIGINS",
+      type: 'UPDATE_WHITELISTED_ORIGINS',
       payload: [...whitelistedOrigins, origin],
-    });
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, origin, updateData]);
+  }, [data, origin, updateData])
 
   return (
     <>
@@ -468,7 +468,7 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
           <Box>
             <p
               css={`
-                ${textStyle("body2")}
+                ${textStyle('body2')}
                 margin-bottom: ${2 * GU}px;
               `}
             >
@@ -501,7 +501,7 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
               >
                 <h3
                   css={`
-                    ${textStyle("body2")}
+                    ${textStyle('body2')}
                   `}
                 >
                   Secret key required
@@ -518,7 +518,7 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
                 checked={data.secretKeyRequired ?? false}
                 onChange={() =>
                   updateData({
-                    type: "UPDATE_REQUIRE_SECRET_KEY",
+                    type: 'UPDATE_REQUIRE_SECRET_KEY',
                     payload: !data.secretKeyRequired,
                   })
                 }
@@ -616,5 +616,5 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
         </ul>
       </Box>
     </>
-  );
+  )
 }

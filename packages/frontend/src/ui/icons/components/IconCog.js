@@ -1,9 +1,9 @@
-import React from "react";
-import useIconSize from "../icon-size";
-import IconPropTypes from "../IconPropTypes";
+import React from 'react'
+import useIconSize from '../icon-size'
+import IconPropTypes from '../IconPropTypes'
 
 function IconCog({ size, ...props }) {
-  const sizeValue = useIconSize(size);
+  const sizeValue = useIconSize(size)
 
   return (
     <svg
@@ -26,8 +26,8 @@ function IconCog({ size, ...props }) {
         clipRule="evenodd"
       />
     </svg>
-  );
+  )
 }
 
-IconCog.propTypes = IconPropTypes;
-export default IconCog;
+IconCog.propTypes = IconPropTypes
+export default IconCog

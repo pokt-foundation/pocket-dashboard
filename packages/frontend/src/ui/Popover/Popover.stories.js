@@ -1,18 +1,18 @@
-import React from "react";
-import "styled-components/macro";
-import Button from "ui/Button/Button";
-import Popover from "ui/Popover/Popover";
+import React from 'react'
+import 'styled-components/macro'
+import Button from 'ui/Button/Button'
+import Popover from 'ui/Popover/Popover'
 
 export default {
-  title: "pocketUI/Popover",
+  title: 'pocketUI/Popover',
   component: Popover,
   argTypes: {
-    visible: { control: "boolean", defaultValue: false },
+    visible: { control: 'boolean', defaultValue: false },
   },
-};
+}
 
 const Template = (args) => {
-  const opener = React.createRef();
+  const opener = React.createRef()
 
   return (
     <div>
@@ -27,7 +27,7 @@ const Template = (args) => {
         Hey
       </Popover>
     </div>
-  );
-};
+  )
+}
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

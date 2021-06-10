@@ -1,17 +1,17 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Inside } from "use-inside";
-import { useViewport } from "use-viewport";
-import "styled-components/macro";
-import { GU } from "ui/style";
+import React from 'react'
+import PropTypes from 'prop-types'
+import { Inside } from 'use-inside'
+import { useViewport } from 'use-viewport'
+import 'styled-components/macro'
+import { GU } from 'ui/style'
 
 function Split({ primary, secondary, invert, secondaryWidth, ...props }) {
-  const { within } = useViewport();
-  const oneColumn = within(-1, "medium");
+  const { within } = useViewport()
+  const oneColumn = within(-1, 'medium')
 
   const inverted =
-    (!oneColumn && invert === "horizontal") ||
-    (oneColumn && invert === "vertical");
+    (!oneColumn && invert === 'horizontal') ||
+    (oneColumn && invert === 'vertical')
 
   const primaryContent = (
     <Inside name="Split:primary">
@@ -25,7 +25,7 @@ function Split({ primary, secondary, invert, secondaryWidth, ...props }) {
         {primary}
       </div>
     </Inside>
-  );
+  )
 
   const secondaryContent = (
     <Inside name="Split:secondary">
@@ -36,7 +36,7 @@ function Split({ primary, secondary, invert, secondaryWidth, ...props }) {
           width: ${secondaryWidth && !oneColumn
             ? secondaryWidth
             : oneColumn
-            ? "100%"
+            ? '100%'
             : `${46 * GU}px`};
           margin-left: ${!oneColumn && !inverted ? 4 * GU : 0}px;
           padding-top: ${oneColumn && !inverted ? 4 * GU : 0}px;
@@ -45,13 +45,13 @@ function Split({ primary, secondary, invert, secondaryWidth, ...props }) {
         {secondary}
       </div>
     </Inside>
-  );
+  )
 
   return (
     <Inside name="Split">
       <div
         css={`
-          display: ${oneColumn ? "block" : "flex"};
+          display: ${oneColumn ? 'block' : 'flex'};
           width: 100%;
         `}
         {...props}
@@ -60,19 +60,19 @@ function Split({ primary, secondary, invert, secondaryWidth, ...props }) {
         {inverted ? primaryContent : secondaryContent}
       </div>
     </Inside>
-  );
+  )
 }
 
 Split.propTypes = {
-  invert: PropTypes.oneOf(["none", "horizontal", "vertical"]),
+  invert: PropTypes.oneOf(['none', 'horizontal', 'vertical']),
   primary: PropTypes.node,
   secondary: PropTypes.node,
   secondaryWidth: PropTypes.string,
-};
+}
 
 Split.defaultProps = {
-  invert: "none",
-};
+  invert: 'none',
+}
 
-export { Split };
-export default Split;
+export { Split }
+export default Split

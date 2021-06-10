@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useHistory, useRouteMatch } from "react-router";
-import { animated, useSpring } from "react-spring";
-import * as dayjs from "dayjs";
-import * as dayJsutcPlugin from "dayjs/plugin/utc";
-import { useViewport } from "use-viewport";
-import "styled-components/macro";
+import React, { useCallback, useMemo, useState } from 'react'
+import { useHistory, useRouteMatch } from 'react-router'
+import { animated, useSpring } from 'react-spring'
+import * as dayjs from 'dayjs'
+import * as dayJsutcPlugin from 'dayjs/plugin/utc'
+import { useViewport } from 'use-viewport'
+import 'styled-components/macro'
 import {
   Banner,
   BarChart,
@@ -23,30 +23,24 @@ import {
   useToast,
   GU,
   RADIUS,
-} from "ui";
-import AppStatus from "components/AppStatus/AppStatus";
-import Box from "components/Box/Box";
-import FloatUp from "components/FloatUp/FloatUp";
-import SuccessIndicator from "views/Dashboard/ApplicationDetail/SuccessIndicator";
-import { useLatestRelays } from "views/Dashboard/application-hooks";
-import { prefixFromChainId } from "lib/chain-utils";
-import { norm } from "lib/math-utils";
-import { getThresholdsPerStake } from "lib/pocket-utils";
+} from 'ui'
+import AppStatus from 'components/AppStatus/AppStatus'
+import Box from 'components/Box/Box'
+import FloatUp from 'components/FloatUp/FloatUp'
+import SuccessIndicator from 'views/Dashboard/ApplicationDetail/SuccessIndicator'
+import { useLatestRelays } from 'views/Dashboard/application-hooks'
+import { prefixFromChainId } from 'lib/chain-utils'
+import { norm } from 'lib/math-utils'
+import { getThresholdsPerStake } from 'lib/pocket-utils'
 
-const MAX_RELAYS_PER_SESSION = 40000;
-const ONE_MILLION = 1000000;
-const ONE_SECOND = 1; // Data for graphs come in second
-const PER_PAGE = 10;
+const MAX_RELAYS_PER_SESSION = 40000
+const ONE_MILLION = 1000000
+const ONE_SECOND = 1 // Data for graphs come in second
+const PER_PAGE = 10
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const HIGHLIGHT_COLORS = [
-  "#D27E31",
-  "#55B02B",
-  "#BB31D2",
-  "#31ABD2",
-  "#D2CC31",
-];
+const HIGHLIGHT_COLORS = ['#D27E31', '#55B02B', '#BB31D2', '#31ABD2', '#D2CC31']
 
 const DEFAULT_EMPTY_RELAYS = [
   {
@@ -55,33 +49,33 @@ const DEFAULT_EMPTY_RELAYS = [
   {
     dailyRelays: 0,
   },
-];
+]
 
-const FALLBACK_COLOR = "#C4C4C4";
+const FALLBACK_COLOR = '#C4C4C4'
 
 function useUsageColor(usage) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   if (usage <= 0.25) {
-    return theme.positive;
+    return theme.positive
   }
 
   if (usage <= 0.5) {
-    return theme.yellow;
+    return theme.yellow
   }
 
   if (usage <= 0.75) {
-    return theme.warning;
+    return theme.warning
   }
 
-  return theme.negative;
+  return theme.negative
 }
 
 function useSuccessRateColor(successRate) {
   if (successRate >= 0.8) {
-    return ["#034200", "#55b02b"];
+    return ['#034200', '#55b02b']
   } else {
-    return ["#881d26", "#ff0003"];
+    return ['#881d26', '#ff0003']
   }
 }
 
@@ -90,15 +84,15 @@ function formatDailyRelaysForGraphing(
   upperBound = ONE_MILLION
 ) {
   const labels = dailyRelays
-    .map(({ bucket }) => bucket.split("T")[0])
-    .map((bucket) => DAYS[new Date(bucket).getUTCDay()]);
+    .map(({ bucket }) => bucket.split('T')[0])
+    .map((bucket) => DAYS[new Date(bucket).getUTCDay()])
 
   const processedDailyRelays =
     dailyRelays.length === 1
       ? [...dailyRelays, { dailyRelays: 0 }]
       : dailyRelays.length === 0
       ? DEFAULT_EMPTY_RELAYS
-      : dailyRelays;
+      : dailyRelays
 
   const lines = [
     {
@@ -107,33 +101,33 @@ function formatDailyRelaysForGraphing(
         norm(dailyRelays, 0, upperBound)
       ),
     },
-  ];
+  ]
 
   return {
     labels,
     lines,
-  };
+  }
 }
 
 const DEFAULT_LATENCY_LABELS = Array(24)
-  .fill("")
-  .map((_) => "00");
+  .fill('')
+  .map((_) => '00')
 
 const DEFAULT_LATENCY_SCALE = [
-  { label: "0ms" },
-  { label: "250ms" },
-  { label: "500ms" },
-  { label: "750ms" },
-  { label: "1000ms", highlightColor: "#AE1515" },
-  { label: "" },
-];
+  { label: '0ms' },
+  { label: '250ms' },
+  { label: '500ms' },
+  { label: '750ms' },
+  { label: '1000ms', highlightColor: '#AE1515' },
+  { label: '' },
+]
 
 const DEFAULT_LATENCY_VALUES = [
   {
     id: 1,
     values: Array(24).fill(0),
   },
-];
+]
 
 function formatLatencyValuesForGraphing(
   hourlyLatency = [],
@@ -144,32 +138,32 @@ function formatLatencyValuesForGraphing(
       barValues: DEFAULT_LATENCY_VALUES,
       labels: DEFAULT_LATENCY_LABELS,
       scales: DEFAULT_LATENCY_SCALE,
-    };
+    }
   }
 
-  dayjs.extend(dayJsutcPlugin);
+  dayjs.extend(dayJsutcPlugin)
 
   const labels =
     hourlyLatency.length > 0
       ? hourlyLatency
           .map(({ bucket }) => {
-            return bucket.split("T")[1];
+            return bucket.split('T')[1]
           })
           .map((bucket) => bucket.substring(0, 2))
       : Array(24)
-          .fill("")
-          .map(() => "00");
+          .fill('')
+          .map(() => '00')
 
   while (labels.length < 24) {
-    labels.push("--");
+    labels.push('--')
   }
 
   const boundedLatencyValues = hourlyLatency.map(({ latency }) =>
     norm(latency, 0, upperBound)
-  );
+  )
 
   while (boundedLatencyValues.length < 24) {
-    boundedLatencyValues.push(0);
+    boundedLatencyValues.push(0)
   }
 
   const barValues = [
@@ -177,15 +171,15 @@ function formatLatencyValuesForGraphing(
       id: 1,
       values: boundedLatencyValues,
     },
-  ];
+  ]
 
-  const scales = DEFAULT_LATENCY_SCALE;
+  const scales = DEFAULT_LATENCY_SCALE
 
   return {
     barValues,
     labels,
     scales,
-  };
+  }
 }
 
 export default function AppInfo({
@@ -198,89 +192,89 @@ export default function AppInfo({
   weeklyRelayData,
   latestLatencyData,
 }) {
-  const [networkModalVisible, setNetworkModalVisible] = useState(false);
+  const [networkModalVisible, setNetworkModalVisible] = useState(false)
   const [networkDenialModalVisible, setNetworkDenialModalVisible] = useState(
     false
-  );
-  const history = useHistory();
-  const { url } = useRouteMatch();
-  const { within } = useViewport();
+  )
+  const history = useHistory()
+  const { url } = useRouteMatch()
+  const { within } = useViewport()
 
-  const compactMode = within(-1, "medium");
-  const { staked_tokens: stakedTokens } = appOnChainData;
+  const compactMode = within(-1, 'medium')
+  const { staked_tokens: stakedTokens } = appOnChainData
   const {
     freeTierApplicationAccount: { publicKey },
-  } = appData;
-  const { graphThreshold, maxRelays } = getThresholdsPerStake(stakedTokens);
+  } = appData
+  const { graphThreshold, maxRelays } = getThresholdsPerStake(stakedTokens)
 
   const successRate = useMemo(() => {
     return weeklyRelayData.weeklyAppRelays === 0
       ? 0
       : successfulRelayData.successfulWeeklyRelays /
-          weeklyRelayData.weeklyAppRelays;
-  }, [weeklyRelayData, successfulRelayData]);
+          weeklyRelayData.weeklyAppRelays
+  }, [weeklyRelayData, successfulRelayData])
   const previousSuccessRate = useMemo(() => {
     return previousSuccessfulRelays.previousTotalRelays === 0
       ? 0
       : previousSuccessfulRelays.successfulWeeklyRelays /
-          previousSuccessfulRelays.previousTotalRelays;
-  }, [previousSuccessfulRelays]);
+          previousSuccessfulRelays.previousTotalRelays
+  }, [previousSuccessfulRelays])
 
   const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
     () => formatDailyRelaysForGraphing(dailyRelayData, graphThreshold),
     [dailyRelayData, graphThreshold]
-  );
+  )
   const {
     labels: latencyLabels = [],
     barValues = [],
     scales: latencyScales = [],
   } = useMemo(() => formatLatencyValuesForGraphing(latestLatencyData, 1.25), [
     latestLatencyData,
-  ]);
+  ])
 
   const isSwitchable = useMemo(() => {
-    dayjs.extend(dayJsutcPlugin);
-    const today = dayjs.utc();
-    const appCreationDate = dayjs.utc(appData.createdAt);
+    dayjs.extend(dayJsutcPlugin)
+    const today = dayjs.utc()
+    const appCreationDate = dayjs.utc(appData.createdAt)
 
-    const diff = today.diff(appCreationDate, "day");
+    const diff = today.diff(appCreationDate, 'day')
 
-    return diff >= 7;
-  }, [appData]);
+    return diff >= 7
+  }, [appData])
 
   const exceedsMaxRelays = useMemo(() => {
     const todaysRelays = dailyRelayData[dailyRelayData.length - 1] ?? {
       dailyRelays: 0,
-    };
-    const { dailyRelays = 0 } = todaysRelays;
+    }
+    const { dailyRelays = 0 } = todaysRelays
 
-    return dailyRelays >= maxRelays;
-  }, [dailyRelayData, maxRelays]);
+    return dailyRelays >= maxRelays
+  }, [dailyRelayData, maxRelays])
 
   const exceedsSessionRelays = useMemo(() => {
-    return currentSessionRelays >= MAX_RELAYS_PER_SESSION;
-  }, [currentSessionRelays]);
+    return currentSessionRelays >= MAX_RELAYS_PER_SESSION
+  }, [currentSessionRelays])
 
   const onCloseNetworkModal = useCallback(
     () => setNetworkModalVisible(false),
     []
-  );
+  )
   const onCloseDenialModal = useCallback(
     () => setNetworkDenialModalVisible(false),
     []
-  );
+  )
 
   const onOpenModal = useCallback(() => {
     if (!isSwitchable) {
-      setNetworkDenialModalVisible(true);
+      setNetworkDenialModalVisible(true)
     } else {
-      setNetworkModalVisible(true);
+      setNetworkModalVisible(true)
     }
-  }, [isSwitchable]);
+  }, [isSwitchable])
 
   const onSwitchChains = useCallback(() => {
-    history.push(`${url}/chains`);
-  }, [history, url]);
+    history.push(`${url}/chains`)
+  }, [history, url])
 
   return (
     <FloatUp
@@ -322,9 +316,9 @@ export default function AppInfo({
                 <div
                   css={`
                     width: 100%;
-                    height: ${compactMode ? "auto" : "250px"};
+                    height: ${compactMode ? 'auto' : '250px'};
                     display: grid;
-                    grid-template-columns: ${compactMode ? "1fr" : "1fr 1fr"};
+                    grid-template-columns: ${compactMode ? '1fr' : '1fr 1fr'};
                     grid-column-gap: ${2 * GU}px;
                   `}
                 >
@@ -374,7 +368,7 @@ export default function AppInfo({
                 <AppDetails
                   id={appData._id}
                   pubkey={appData.freeTierApplicationAccount.publicKey}
-                  secret={appData.gatewaySettings?.secretKey ?? ""}
+                  secret={appData.gatewaySettings?.secretKey ?? ''}
                 />
               </>
             }
@@ -391,13 +385,13 @@ export default function AppInfo({
         </>
       )}
     />
-  );
+  )
 }
 
 function SwitchInfoModal({ onClose, onSwitch, visible }) {
-  const { within } = useViewport();
+  const { within } = useViewport()
 
-  const compactMode = within(-1, "medium");
+  const compactMode = within(-1, 'medium')
 
   return (
     <Modal visible={visible} onClose={onClose}>
@@ -452,13 +446,13 @@ function SwitchInfoModal({ onClose, onSwitch, visible }) {
         <Spacer size={4 * GU} />
       </div>
     </Modal>
-  );
+  )
 }
 
 function SwitchDenialModal({ onClose, visible }) {
-  const { within } = useViewport();
+  const { within } = useViewport()
 
-  const compactMode = within(-1, "medium");
+  const compactMode = within(-1, 'medium')
 
   return (
     <Modal visible={visible} onClose={onClose}>
@@ -491,13 +485,13 @@ function SwitchDenialModal({ onClose, visible }) {
         <Spacer size={4 * GU} />
       </div>
     </Modal>
-  );
+  )
 }
 
 function EndpointDetails({ chainId, appId }) {
-  const toast = useToast();
-  const { prefix, name } = prefixFromChainId(chainId);
-  const endpoint = `https://${prefix}.gateway.pokt.network/v1/${appId}`;
+  const toast = useToast()
+  const { prefix, name } = prefixFromChainId(chainId)
+  const endpoint = `https://${prefix}.gateway.pokt.network/v1/${appId}`
 
   return (
     <Box>
@@ -511,7 +505,7 @@ function EndpointDetails({ chainId, appId }) {
       >
         <h3
           css={`
-            ${textStyle("title2")}
+            ${textStyle('title2')}
             margin-bottom: ${3 * GU}px;
           `}
         >
@@ -519,7 +513,7 @@ function EndpointDetails({ chainId, appId }) {
         </h3>
         <h4
           css={`
-            ${textStyle("body3")}
+            ${textStyle('body3')}
             font-weight: 600;
             margin-bottom: ${3 * GU}px;
           `}
@@ -532,29 +526,29 @@ function EndpointDetails({ chainId, appId }) {
         css={`
           width: 100%;
         `}
-        onCopy={() => toast("Endpoint copied to clipboard")}
+        onCopy={() => toast('Endpoint copied to clipboard')}
       />
     </Box>
-  );
+  )
 }
 
 function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
-  const history = useHistory();
-  const { url } = useRouteMatch();
+  const history = useHistory()
+  const { url } = useRouteMatch()
   const numberProps = useSpring({
     number: Math.min(successRate * 100, 100),
     from: { number: 0 },
-  });
+  })
   const [primarySuccessColor, secondarySuccessColor] = useSuccessRateColor(
     successRate
-  );
-  const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } });
+  )
+  const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } })
   const successRateDelta = useMemo(
     () => (((successRate - previousSuccessRate) / 1) * 100).toFixed(2),
     [previousSuccessRate, successRate]
-  );
+  )
 
-  const mode = successRateDelta > 0 ? "positive" : "negative";
+  const mode = successRateDelta > 0 ? 'positive' : 'negative'
 
   return (
     <Box
@@ -577,7 +571,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
       >
         <animated.h2
           css={`
-            ${textStyle("title1")}
+            ${textStyle('title1')}
             font-size: ${6 * GU}px;
           `}
         >
@@ -613,7 +607,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
         >
           <h3
             css={`
-              ${textStyle("title2")}
+              ${textStyle('title2')}
             `}
           >
             Success Rate
@@ -631,7 +625,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
                 align-items: center;
               `}
             >
-              {totalRequests ? <SuccessIndicator mode={mode} /> : ""}
+              {totalRequests ? <SuccessIndicator mode={mode} /> : ''}
               <Spacer size={GU / 2} />
               <span
                 css={`
@@ -643,7 +637,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
             </div>
             <p
               css={`
-                ${textStyle("body4")}
+                ${textStyle('body4')}
               `}
             >
               Last 7 days
@@ -661,7 +655,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
         >
           <h3
             css={`
-              ${textStyle("title3")}
+              ${textStyle('title3')}
               font-weight: 700;
             `}
           >
@@ -669,7 +663,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
           </h3>
           <h4
             css={`
-              ${textStyle("title3")}
+              ${textStyle('title3')}
             `}
           >
             {Intl.NumberFormat().format(totalRequests)}
@@ -692,11 +686,11 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
         More Details
       </ButtonBase>
     </Box>
-  );
+  )
 }
 
 function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <Box>
@@ -710,14 +704,14 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
       >
         <h3
           css={`
-            ${textStyle("title2")}
+            ${textStyle('title2')}
           `}
         >
           AVG Latency
         </h3>
         <p
           css={`
-            ${textStyle("body1")}
+            ${textStyle('body1')}
           `}
         >
           {(avgLatency * 1000).toFixed(0)}ms
@@ -733,12 +727,12 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
         />
       </div>
     </Box>
-  );
+  )
 }
 
 function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
-  const usageColor = useUsageColor(sessionRelays / MAX_RELAYS_PER_SESSION);
-  const theme = useTheme();
+  const usageColor = useUsageColor(sessionRelays / MAX_RELAYS_PER_SESSION)
+  const theme = useTheme()
 
   return (
     <Box>
@@ -768,7 +762,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
         >
           <h3
             css={`
-              ${textStyle("title2")}
+              ${textStyle('title2')}
             `}
           >
             Current usage
@@ -782,7 +776,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
           <Spacer size={2 * GU} />
           <h4
             css={`
-              ${textStyle("title2")}
+              ${textStyle('title2')}
               text-align: center;
             `}
           >
@@ -790,7 +784,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
             <span
               css={`
                 display: block;
-                ${textStyle("body3")}
+                ${textStyle('body3')}
                 font-weight: 700;
               `}
             >
@@ -805,7 +799,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
         >
           <h3
             css={`
-              ${textStyle("title2")}
+              ${textStyle('title2')}
               text-align: right;
             `}
           >
@@ -815,68 +809,68 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
             lines={chartLines}
             label={(i) => chartLabels[i]}
             height={300}
-            color={() => "#31A1D2"}
+            color={() => '#31A1D2'}
             renderCheckpoints
             dotRadius={GU / 1.5}
             threshold
             scales={[
-              { label: "0" },
-              { label: "250K" },
-              { label: "500K" },
-              { label: "750K" },
-              { label: "1M", highlightColor: theme.negative },
-              "",
+              { label: '0' },
+              { label: '250K' },
+              { label: '500K' },
+              { label: '750K' },
+              { label: '1M', highlightColor: theme.negative },
+              '',
             ]}
           />
         </div>
       </div>
     </Box>
-  );
+  )
 }
 
 function LatestRequests({ publicKey }) {
-  const [page, setPage] = useState(0);
-  const { within } = useViewport();
+  const [page, setPage] = useState(0)
+  const { within } = useViewport()
   const { isLatestRelaysLoading, latestRelayData } = useLatestRelays(
     publicKey,
     page
-  );
+  )
 
-  const onPageChange = useCallback((page) => setPage(page), []);
+  const onPageChange = useCallback((page) => setPage(page), [])
   const [colorsByMethod, countByColor, colorValues] = useMemo(() => {
     if (isLatestRelaysLoading) {
-      return [];
+      return []
     }
-    const { latestRelays: latestRequests = [] } = latestRelayData;
-    const colorsByMethod = new Map();
-    const countByColor = new Map();
-    let id = 0;
+    const { latestRelays: latestRequests = [] } = latestRelayData
+    const colorsByMethod = new Map()
+    const countByColor = new Map()
+    let id = 0
 
     for (const { method } of latestRequests) {
       if (!colorsByMethod.has(method)) {
-        colorsByMethod.set(method, HIGHLIGHT_COLORS[id]);
+        colorsByMethod.set(method, HIGHLIGHT_COLORS[id])
         if (id < HIGHLIGHT_COLORS.length - 1) {
-          id++;
+          id++
         }
       }
 
-      const methodColor = colorsByMethod.get(method);
+      const methodColor = colorsByMethod.get(method)
 
       countByColor.has(methodColor)
         ? countByColor.set(methodColor, countByColor.get(methodColor) + 1)
-        : countByColor.set(methodColor, 1);
+        : countByColor.set(methodColor, 1)
     }
 
-    const colorValues = [...colorsByMethod.values()];
+    const colorValues = [...colorsByMethod.values()]
 
-    return [colorsByMethod, countByColor, colorValues];
-  }, [isLatestRelaysLoading, latestRelayData]);
+    return [colorsByMethod, countByColor, colorValues]
+  }, [isLatestRelaysLoading, latestRelayData])
 
-  const compactMode = within(-1, "medium");
+  const compactMode = within(-1, 'medium')
 
   const latestRelays = useMemo(() => {
-    return latestRelayData ? latestRelayData.latestRelays : [];
-  }, [latestRelayData]);
+    return latestRelayData ? latestRelayData.latestRelays : []
+  }, [latestRelayData])
 
   return (
     <Box
@@ -909,19 +903,19 @@ function LatestRequests({ publicKey }) {
                   box-shadow: ${val} 0px 2px 8px 0px;
                 `}
               />
-            );
+            )
           })}
         </div>
         <DataView
-          mode={compactMode ? "list" : "table"}
+          mode={compactMode ? 'list' : 'table'}
           fields={[
-            "Request Type",
-            "Data transferred",
-            "Result",
-            "Time Elapsed",
+            'Request Type',
+            'Data transferred',
+            'Result',
+            'Time Elapsed',
           ]}
           entries={latestRelays}
-          status={isLatestRelaysLoading ? "loading" : "default"}
+          status={isLatestRelaysLoading ? 'loading' : 'default'}
           renderEntry={({
             bytes,
             method,
@@ -929,7 +923,7 @@ function LatestRequests({ publicKey }) {
             elapsed_time: elapsedTime,
           }) => {
             return [
-              <p>{method ? method : "Unknown"}</p>,
+              <p>{method ? method : 'Unknown'}</p>,
               <p>
                 <span
                   css={`
@@ -946,7 +940,7 @@ function LatestRequests({ publicKey }) {
               </p>,
               <p>{result}</p>,
               <p>{(elapsedTime * 1000).toFixed(0)}ms</p>,
-            ];
+            ]
           }}
         />
         <Pagination
@@ -959,11 +953,11 @@ function LatestRequests({ publicKey }) {
         />
       </div>
     </Box>
-  );
+  )
 }
 
 function AppDetails({ id, pubkey, secret }) {
-  const toast = useToast();
+  const toast = useToast()
 
   return (
     <Box
@@ -983,7 +977,7 @@ function AppDetails({ id, pubkey, secret }) {
       >
         <h3
           css={`
-            ${textStyle("body1")};
+            ${textStyle('body1')};
             font-weight: 600;
             margin-bottom: ${2 * GU}px;
           `}
@@ -992,7 +986,7 @@ function AppDetails({ id, pubkey, secret }) {
         </h3>
         <TextCopy
           value={id}
-          onCopy={() => toast("Gateway ID copied to clipboard")}
+          onCopy={() => toast('Gateway ID copied to clipboard')}
         />
       </div>
       <div
@@ -1004,7 +998,7 @@ function AppDetails({ id, pubkey, secret }) {
       >
         <h3
           css={`
-            ${textStyle("body1")};
+            ${textStyle('body1')};
             font-weight: 600;
             margin-bottom: ${2 * GU}px;
           `}
@@ -1013,7 +1007,7 @@ function AppDetails({ id, pubkey, secret }) {
         </h3>
         <TextCopy
           value={pubkey}
-          onCopy={() => toast("App public key copied to clipboard")}
+          onCopy={() => toast('App public key copied to clipboard')}
         />
       </div>
       {secret && (
@@ -1026,7 +1020,7 @@ function AppDetails({ id, pubkey, secret }) {
         >
           <h3
             css={`
-              ${textStyle("body1")};
+              ${textStyle('body1')};
               font-weight: 600;
               margin-bottom: ${2 * GU}px;
             `}
@@ -1035,10 +1029,10 @@ function AppDetails({ id, pubkey, secret }) {
           </h3>
           <TextCopy
             value={secret}
-            onCopy={() => toast("Secret key copied to clipboard")}
+            onCopy={() => toast('Secret key copied to clipboard')}
           />
         </div>
       )}
     </Box>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react'
 
-function IconApp({ color = "currentColor", ...props }) {
+function IconApp({ color = 'currentColor', ...props }) {
   return (
     <svg
       width="22"
@@ -14,7 +14,7 @@ function IconApp({ color = "currentColor", ...props }) {
         fill={color}
       />
     </svg>
-  );
+  )
 }
 
-export default IconApp;
+export default IconApp

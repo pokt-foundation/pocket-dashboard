@@ -1,62 +1,62 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
-import PropTypes from "prop-types";
-import { animated, useSpring } from "react-spring";
-import { useViewport } from "use-viewport";
-import "styled-components/macro";
-import { ButtonBase, Spacer, useTheme, springs, GU, RADIUS } from "ui";
-import IconApp from "components/MenuPanel/IconApp";
-import IconNetwork from "components/MenuPanel/IconNetwork";
-import PocketLogo from "assets/pnlogo.svg";
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useHistory, useLocation } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import { animated, useSpring } from 'react-spring'
+import { useViewport } from 'use-viewport'
+import 'styled-components/macro'
+import { ButtonBase, Spacer, useTheme, springs, GU, RADIUS } from 'ui'
+import IconApp from 'components/MenuPanel/IconApp'
+import IconNetwork from 'components/MenuPanel/IconNetwork'
+import PocketLogo from 'assets/pnlogo.svg'
 
-const CHILD_INSTANCE_HEIGHT = 4 * GU;
+const CHILD_INSTANCE_HEIGHT = 4 * GU
 
 const MENU_ROUTES = [
   {
     icon: IconNetwork,
-    id: "/home",
-    label: "Network",
+    id: '/home',
+    label: 'Network',
   },
   {
     icon: IconApp,
-    id: "/apps",
-    label: "My Apps",
+    id: '/apps',
+    label: 'My Apps',
   },
-];
+]
 
 const CREATE_APP_ROUTE = [
   {
-    id: "/create",
-    label: "Create",
+    id: '/create',
+    label: 'Create',
   },
-];
+]
 
 function useActiveRouteName() {
-  const { pathname } = useLocation();
-  const [activeId, setActiveId] = useState(pathname);
+  const { pathname } = useLocation()
+  const [activeId, setActiveId] = useState(pathname)
 
   useEffect(() => {
-    const id = pathname;
+    const id = pathname
 
-    setActiveId(id);
-  }, [pathname]);
+    setActiveId(id)
+  }, [pathname])
 
   return {
     activeId,
-  };
+  }
 }
 
 export default function MenuPanel({ appsLoading = true, userApps = [] }) {
-  const theme = useTheme();
-  const { within } = useViewport();
-  const { activeId } = useActiveRouteName();
+  const theme = useTheme()
+  const { within } = useViewport()
+  const { activeId } = useActiveRouteName()
 
-  const compactMode = within(-1, "medium");
+  const compactMode = within(-1, 'medium')
 
   const instanceGroups = useMemo(() => {
-    const groups = [[MENU_ROUTES[0]]];
+    const groups = [[MENU_ROUTES[0]]]
 
-    groups.push([MENU_ROUTES[1]]);
+    groups.push([MENU_ROUTES[1]])
 
     if (userApps.length) {
       groups[1].push(
@@ -64,20 +64,20 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
           label: appName,
           id: `/app/${appId}`,
         }))
-      );
+      )
     }
 
     if (!userApps.length) {
-      groups[1].push(...CREATE_APP_ROUTE);
+      groups[1].push(...CREATE_APP_ROUTE)
     }
 
-    return groups;
-  }, [userApps]);
+    return groups
+  }, [userApps])
 
   const renderInstanceGroup = useCallback(
     (group) => {
-      const activeIndex = group.findIndex(({ id }) => activeId.includes(id));
-      const isActive = activeIndex !== -1;
+      const activeIndex = group.findIndex(({ id }) => activeId.includes(id))
+      const isActive = activeIndex !== -1
 
       return (
         <MenuPanelGroup
@@ -87,10 +87,10 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
           instances={group}
           key={group[0].id}
         />
-      );
+      )
     },
     [activeId, appsLoading]
-  );
+  )
 
   return (
     !compactMode && (
@@ -136,7 +136,7 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
         </div>
       </div>
     )
-  );
+  )
 }
 
 function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
@@ -144,26 +144,26 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
     from: { openProgress: Number(appsLoading) },
     to: { openProgress: Number(active) },
     config: springs.smooth,
-  });
-  const history = useHistory();
-  const theme = useTheme();
+  })
+  const history = useHistory()
+  const theme = useTheme()
 
-  const [primaryInstance, ...childInstances] = instances;
+  const [primaryInstance, ...childInstances] = instances
 
   const handleInstanceClick = useCallback(() => {
     if (!childInstances.length) {
       history.push({
         pathname: `${primaryInstance.id}`,
-      });
-      return;
+      })
+      return
     }
 
-    const [nextInstance] = childInstances;
+    const [nextInstance] = childInstances
 
     history.push({
       pathname: `${nextInstance.id}`,
-    });
-  }, [childInstances, history, primaryInstance]);
+    })
+  }, [childInstances, history, primaryInstance])
 
   return (
     <div
@@ -171,7 +171,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
         position: relative;
         width: 100%;
         min-height: ${10 * GU}px;
-        background: ${active ? theme.surfacePressedInverted : "transparent"};
+        background: ${active ? theme.surfacePressedInverted : 'transparent'};
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -230,7 +230,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
                   text-align: left;
                   height: ${4 * GU}px;
                   width: 100%;
-                  color: ${activeIndex - 1 === index ? theme.accent : "black"};
+                  color: ${activeIndex - 1 === index ? theme.accent : 'black'};
                 `}
               >
                 <span
@@ -248,16 +248,16 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
           ))}
         </animated.ul>
       ) : (
-        ""
+        ''
       )}
     </div>
-  );
+  )
 }
 
 function MenuPanelButton({ active, instance, onClick, ...props }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
-  const InstanceIcon = instance.icon;
+  const InstanceIcon = instance.icon
 
   return (
     <ButtonBase
@@ -266,7 +266,7 @@ function MenuPanelButton({ active, instance, onClick, ...props }) {
         height: ${10 * GU}px;
         padding-top: ${1 * GU}px;
         border-radius: 0px;
-        color: ${active ? theme.accent : "black"};
+        color: ${active ? theme.accent : 'black'};
         transition: background 150ms ease-in-out;
       `}
       onClick={onClick}
@@ -286,16 +286,16 @@ function MenuPanelButton({ active, instance, onClick, ...props }) {
           }
         `}
       >
-        <InstanceIcon color={active ? theme.accent : "black"} />
+        <InstanceIcon color={active ? theme.accent : 'black'} />
         <Spacer size={1 * GU} />
         {instance.label}
       </div>
     </ButtonBase>
-  );
+  )
 }
 
 MenuPanelButton.propTypes = {
   icon: PropTypes.string,
   label: PropTypes.string,
   onClcik: PropTypes.func,
-};
+}

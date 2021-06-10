@@ -13,16 +13,16 @@ export function formatIntegerRange(
   value = -1,
   min = 0,
   max = 99,
-  maxSuffix = ""
+  maxSuffix = ''
 ) {
-  value = parseInt(value, 10);
+  value = parseInt(value, 10)
   if (value <= min) {
-    return `${parseInt(min, 10)}`;
+    return `${parseInt(min, 10)}`
   }
   if (value > max) {
-    return `${parseInt(max, 10)}${maxSuffix}`;
+    return `${parseInt(max, 10)}${maxSuffix}`
   }
-  return String(value);
+  return String(value)
 }
 
 /**
@@ -35,13 +35,13 @@ export function formatIntegerRange(
  * @returns {string}
  */
 export function formatNumber(number) {
-  const numAsString = String(number);
-  const [integer, decimals] = numAsString.split(".");
+  const numAsString = String(number)
+  const [integer, decimals] = numAsString.split('.')
 
   return [...integer].reverse().reduce(
     (result, digit, index) => {
-      return digit + (index > 0 && index % 3 === 0 ? "," : "") + result;
+      return digit + (index > 0 && index % 3 === 0 ? ',' : '') + result
     },
-    decimals ? `.${decimals}` : ""
-  );
+    decimals ? `.${decimals}` : ''
+  )
 }

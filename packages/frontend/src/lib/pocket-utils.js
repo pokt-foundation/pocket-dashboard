@@ -2,18 +2,18 @@ export const STAKING_STATUSES = {
   Unstaked: 0,
   Unstaking: 1,
   Staked: 2,
-};
+}
 
 const STAKING_STATUSES_LABELS = {
-  0: "Unstaked",
-  1: "Unstaking",
-  2: "Staked",
-};
+  0: 'Unstaked',
+  1: 'Unstaking',
+  2: 'Staked',
+}
 
-const TWO_MILLION_RELAYS_STAKE = 50000000000;
-const ONE_MILLION_RELAYS_STAKE = 24950100000;
-const ONE_MILLION_FLAT_RELAYS_STAKE = 25000000000;
-const ONE_HUNDRED_THOUSAND_RELAYS_STAKE = 2495010000;
+const TWO_MILLION_RELAYS_STAKE = 50000000000
+const ONE_MILLION_RELAYS_STAKE = 24950100000
+const ONE_MILLION_FLAT_RELAYS_STAKE = 25000000000
+const ONE_HUNDRED_THOUSAND_RELAYS_STAKE = 2495010000
 
 const THRESHOLDS_PER_STAKE = new Map([
   [
@@ -21,7 +21,7 @@ const THRESHOLDS_PER_STAKE = new Map([
     {
       maxRelays: 1000000,
       graphThreshold: 1250000,
-      legibleMaxRelays: "1M",
+      legibleMaxRelays: '1M',
     },
   ],
   [
@@ -29,7 +29,7 @@ const THRESHOLDS_PER_STAKE = new Map([
     {
       maxRelays: 1000000,
       graphThreshold: 1250000,
-      legibleMaxRelays: "1M",
+      legibleMaxRelays: '1M',
     },
   ],
   [
@@ -37,7 +37,7 @@ const THRESHOLDS_PER_STAKE = new Map([
     {
       maxRelays: 100000,
       graphThreshold: 150000,
-      legibleMaxRelays: "100K",
+      legibleMaxRelays: '100K',
     },
   ],
   [
@@ -45,21 +45,21 @@ const THRESHOLDS_PER_STAKE = new Map([
     {
       maxRelays: 2000000,
       graphThreshold: 2500000,
-      legibleMaxRelays: "2M",
+      legibleMaxRelays: '2M',
     },
   ],
-]);
+])
 
 export function getStakingStatus(status) {
-  return STAKING_STATUSES_LABELS[status];
+  return STAKING_STATUSES_LABELS[status]
 }
 
 export function getThresholdsPerStake(stake) {
   if (!THRESHOLDS_PER_STAKE.has(stake)) {
-    throw new Error("Unknown stake");
+    throw new Error('Unknown stake')
   }
 
-  return THRESHOLDS_PER_STAKE.get(stake);
+  return THRESHOLDS_PER_STAKE.get(stake)
 }
 
 /**
@@ -76,17 +76,17 @@ export function getThresholdsPerStake(stake) {
  * @returns {string} The shortened address
  */
 export function shortenAddress(address, charsLength = 4) {
-  const prefixLength = 2; // "0x"
+  const prefixLength = 2 // "0x"
 
   if (!address) {
-    return "";
+    return ''
   }
   if (address.length < charsLength * 2 + prefixLength) {
-    return address;
+    return address
   }
   return (
     address.slice(0, charsLength + prefixLength) +
-    "…" +
+    '…' +
     address.slice(-charsLength)
-  );
+  )
 }

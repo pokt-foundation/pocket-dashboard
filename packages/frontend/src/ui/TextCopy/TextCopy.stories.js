@@ -1,15 +1,15 @@
-import React from "react";
-import TextCopy from "ui/TextCopy/TextCopy";
+import React from 'react'
+import TextCopy from 'ui/TextCopy/TextCopy'
 
 export default {
-  title: "pocketUI/TextCopy",
+  title: 'pocketUI/TextCopy',
   component: TextCopy,
   argTypes: {
-    value: { control: "text", defaultValue: "Log in" },
-    monospace: { control: "boolean", defaultValue: false },
+    value: { control: 'text', defaultValue: 'Log in' },
+    monospace: { control: 'boolean', defaultValue: false },
   },
-};
+}
 
-const Template = (args) => <TextCopy {...args} />;
+const Template = (args) => <TextCopy {...args} />
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

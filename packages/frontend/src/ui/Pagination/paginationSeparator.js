@@ -1,10 +1,10 @@
-import React from "react";
-import "styled-components/macro";
-import { useTheme } from "ui";
-import IconEllipsis from "ui/icons/components/IconEllipsis";
+import React from 'react'
+import 'styled-components/macro'
+import { useTheme } from 'ui'
+import IconEllipsis from 'ui/icons/components/IconEllipsis'
 
 const PaginationSeparator = React.memo(function PaginationSeparator() {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <div
@@ -20,7 +20,7 @@ const PaginationSeparator = React.memo(function PaginationSeparator() {
         `}
       />
     </div>
-  );
-});
+  )
+})
 
-export { PaginationSeparator };
+export { PaginationSeparator }

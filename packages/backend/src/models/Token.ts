@@ -1,16 +1,16 @@
-import { Schema, model, Model, Document, Types } from "mongoose";
+import { Schema, model, Model, Document, Types } from 'mongoose'
 
 export const TOKEN_TYPES = {
-  verification: "TOKEN_VERIFICATION",
-  reset: "TOKEN_RESET",
-};
+  verification: 'TOKEN_VERIFICATION',
+  reset: 'TOKEN_RESET',
+}
 
 export interface IToken extends Document {
-  createdAt: Date;
-  token: string;
-  type: "TOKEN_VERIFICATION" | "TOKEN_RESET";
-  userId: Types.ObjectId;
-  email: string;
+  createdAt: Date
+  token: string
+  type: 'TOKEN_VERIFICATION' | 'TOKEN_RESET'
+  userId: Types.ObjectId
+  email: string
 }
 
 const tokenSchema = new Schema(
@@ -25,13 +25,13 @@ const tokenSchema = new Schema(
     userId: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "User",
+      ref: 'User',
     },
     email: String,
   },
-  { collection: "Tokens" }
-);
+  { collection: 'Tokens' }
+)
 
-const TokenModel: Model<IToken> = model("Token", tokenSchema);
+const TokenModel: Model<IToken> = model('Token', tokenSchema)
 
-export default TokenModel;
+export default TokenModel

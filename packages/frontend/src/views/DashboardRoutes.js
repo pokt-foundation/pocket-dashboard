@@ -1,25 +1,25 @@
-import React from "react";
-import { Route, Switch } from "react-router-dom";
-import { useViewport } from "use-viewport";
-import { ErrorBoundary } from "@sentry/react";
-import "styled-components/macro";
-import { useTheme } from "ui";
-import Create from "views/Dashboard/Create/Create";
-import Dashboard from "views/Dashboard/Dashboard";
-import Fallback from "views/Fallback";
-import ForgotPassword from "views/Onboarding/ForgotPassword";
-import NetworkStatus from "views/Dashboard/Network/NetworkStatus";
-import MyApp from "views/Dashboard/ApplicationDetail/ApplicationDetail";
-import NewPassword from "views/Onboarding/NewPassword";
-import Login from "views/Onboarding/Login";
-import Signup from "views/Onboarding/Signup";
-import Validate from "views/Onboarding/Validate";
+import React from 'react'
+import { Route, Switch } from 'react-router-dom'
+import { useViewport } from 'use-viewport'
+import { ErrorBoundary } from '@sentry/react'
+import 'styled-components/macro'
+import { useTheme } from 'ui'
+import Create from 'views/Dashboard/Create/Create'
+import Dashboard from 'views/Dashboard/Dashboard'
+import Fallback from 'views/Fallback'
+import ForgotPassword from 'views/Onboarding/ForgotPassword'
+import NetworkStatus from 'views/Dashboard/Network/NetworkStatus'
+import MyApp from 'views/Dashboard/ApplicationDetail/ApplicationDetail'
+import NewPassword from 'views/Onboarding/NewPassword'
+import Login from 'views/Onboarding/Login'
+import Signup from 'views/Onboarding/Signup'
+import Validate from 'views/Onboarding/Validate'
 
 export default function DashboardRoutes() {
-  const { within } = useViewport();
-  const theme = useTheme();
+  const { within } = useViewport()
+  const theme = useTheme()
 
-  const compactMode = within(-1, "medium");
+  const compactMode = within(-1, 'medium')
 
   return (
     <div
@@ -82,5 +82,5 @@ export default function DashboardRoutes() {
         </Switch>
       </ErrorBoundary>
     </div>
-  );
+  )
 }

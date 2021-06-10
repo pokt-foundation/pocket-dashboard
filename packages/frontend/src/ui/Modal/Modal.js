@@ -1,16 +1,16 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { useViewport } from "use-viewport";
-import { Transition, animated } from "react-spring/renderprops";
-import "styled-components/macro";
-import { cssPx, noop } from "../utils";
-import { springs, useTheme, GU, RADIUS } from "ui";
-import { IconCross } from "../icons";
-import ButtonIcon from "../Button/ButtonIcon";
-import EscapeOutside from "../EscapeOutside/EscapeOutside";
-import RootPortal from "../Root/RootPortal";
+import React from 'react'
+import PropTypes from 'prop-types'
+import { useViewport } from 'use-viewport'
+import { Transition, animated } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import { cssPx, noop } from '../utils'
+import { springs, useTheme, GU, RADIUS } from 'ui'
+import { IconCross } from '../icons'
+import ButtonIcon from '../Button/ButtonIcon'
+import EscapeOutside from '../EscapeOutside/EscapeOutside'
+import RootPortal from '../Root/RootPortal'
 
-const SPACE_AROUND = 4 * GU;
+const SPACE_AROUND = 4 * GU
 
 function Modal({
   children,
@@ -22,8 +22,8 @@ function Modal({
   closeButton,
   ...props
 }) {
-  const theme = useTheme();
-  const viewport = useViewport();
+  const theme = useTheme()
+  const viewport = useViewport()
 
   return (
     <RootPortal>
@@ -35,7 +35,7 @@ function Modal({
         leave={{ opacity: 0, scale: 0.98 }}
         config={{ ...springs.smooth, precision: 0.001 }}
         onDestroyed={(destroyed) => {
-          destroyed && onClosed();
+          destroyed && onClosed()
         }}
       >
         {
@@ -69,7 +69,7 @@ function Modal({
                     overflow: auto;
                   `}
                   style={{
-                    pointerEvents: visible ? "auto" : "none",
+                    pointerEvents: visible ? 'auto' : 'none',
                     transform: scale.interpolate(
                       (v) => `scale3d(${v}, ${v}, 1)`
                     ),
@@ -94,7 +94,7 @@ function Modal({
                       `}
                       style={{
                         width: cssPx(
-                          typeof width === "function" ? width(viewport) : width
+                          typeof width === 'function' ? width(viewport) : width
                         ),
                         borderRadius: `${RADIUS}px`,
                       }}
@@ -116,7 +116,7 @@ function Modal({
                       <div
                         style={{
                           padding: cssPx(
-                            typeof padding === "function"
+                            typeof padding === 'function'
                               ? padding(viewport)
                               : padding
                           ),
@@ -137,7 +137,7 @@ function Modal({
         }
       </Transition>
     </RootPortal>
-  );
+  )
 }
 
 Modal.propTypes = {
@@ -156,7 +156,7 @@ Modal.propTypes = {
     PropTypes.number,
     PropTypes.string,
   ]),
-};
+}
 
 Modal.defaultProps = {
   closeButton: true,
@@ -164,6 +164,6 @@ Modal.defaultProps = {
   onClosed: noop,
   padding: 3 * GU,
   width: (viewport) => Math.min(viewport.width - SPACE_AROUND * 2, 600),
-};
+}
 
-export default Modal;
+export default Modal

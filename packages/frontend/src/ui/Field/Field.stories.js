@@ -1,19 +1,19 @@
-import React from "react";
-import "styled-components/macro";
-import Field from "ui/Field/Field";
-import TextInput from "ui/TextInput/TextInput";
+import React from 'react'
+import 'styled-components/macro'
+import Field from 'ui/Field/Field'
+import TextInput from 'ui/TextInput/TextInput'
 
 export default {
-  title: "pocketUI/Field",
+  title: 'pocketUI/Field',
   component: Field,
   argTypes: {
-    label: { control: "text", defaultValue: "POKT Address" },
-    required: { control: "boolean", defaultValue: "false" },
+    label: { control: 'text', defaultValue: 'POKT Address' },
+    required: { control: 'boolean', defaultValue: 'false' },
   },
-};
+}
 
 const Template = (args) => {
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState('')
 
   return (
     <Field {...args}>
@@ -26,7 +26,7 @@ const Template = (args) => {
         />
       )}
     </Field>
-  );
-};
+  )
+}
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})

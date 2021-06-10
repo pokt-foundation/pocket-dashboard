@@ -1,12 +1,12 @@
-import React from "react";
-import PropTypes from "prop-types";
-import "styled-components/macro";
-import { Spring, animated } from "react-spring/renderprops";
-import { springs } from "ui/style";
-import { useTheme } from "ui";
+import React from 'react'
+import PropTypes from 'prop-types'
+import 'styled-components/macro'
+import { Spring, animated } from 'react-spring/renderprops'
+import { springs } from 'ui/style'
+import { useTheme } from 'ui'
 
 function OpenedSurfaceBorder({ opened, ...props }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <Spring
@@ -33,11 +33,11 @@ function OpenedSurfaceBorder({ opened, ...props }) {
         />
       )}
     </Spring>
-  );
+  )
 }
 
 OpenedSurfaceBorder.propTypes = {
   opened: PropTypes.bool,
-};
+}
 
-export { OpenedSurfaceBorder };
+export { OpenedSurfaceBorder }

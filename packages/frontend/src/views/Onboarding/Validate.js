@@ -1,41 +1,41 @@
-import React, { useEffect } from "react";
-import { Link as RouterLink, useLocation } from "react-router-dom";
-import { useMutation } from "react-query";
-import axios from "axios";
-import "styled-components/macro";
-import { Link, Spacer, textStyle, useTheme, GU, RADIUS } from "ui";
-import OnboardingHeader from "components/OnboardingHeader/OnboardingHeader";
-import env from "environment";
-import PoktShape from "assets/poktshape.png";
+import React, { useEffect } from 'react'
+import { Link as RouterLink, useLocation } from 'react-router-dom'
+import { useMutation } from 'react-query'
+import axios from 'axios'
+import 'styled-components/macro'
+import { Link, Spacer, textStyle, useTheme, GU, RADIUS } from 'ui'
+import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
+import env from 'environment'
+import PoktShape from 'assets/poktshape.png'
 
 export default function Validate() {
-  const theme = useTheme();
-  const { search } = useLocation();
+  const theme = useTheme()
+  const { search } = useLocation()
 
-  const token = new URLSearchParams(search).get("token");
-  const rawEmail = new URLSearchParams(search).get("email");
-  const email = decodeURIComponent(rawEmail);
+  const token = new URLSearchParams(search).get('token')
+  const rawEmail = new URLSearchParams(search).get('email')
+  const email = decodeURIComponent(rawEmail)
 
   const { isError, isLoading, isSuccess, mutate } = useMutation(
     async function validate() {
       try {
-        const path = `${env("BACKEND_URL")}/api/users/validate-user`;
+        const path = `${env('BACKEND_URL')}/api/users/validate-user`
 
         await axios.post(path, {
           plainToken: token,
           email,
-        });
+        })
       } catch (err) {
         // TODO: Set err on UI AND send to sentry.
-        throw err;
+        throw err
       }
     }
-  );
+  )
 
   useEffect(() => {
     // TODO: Actually implement exponential back-off retries
-    mutate();
-  }, [mutate]);
+    mutate()
+  }, [mutate])
 
   return (
     <div
@@ -79,7 +79,7 @@ export default function Validate() {
           <Spacer size={8 * GU} />
           <h2
             css={`
-              ${textStyle("title2")}
+              ${textStyle('title2')}
               margin-bottom: ${6 * GU}px;
               align-self: flex-start;
             `}
@@ -104,7 +104,7 @@ export default function Validate() {
           {isLoading && (
             <p
               css={`
-                ${textStyle("body2")}
+                ${textStyle('body2')}
               `}
             >
               Verifying...
@@ -113,13 +113,13 @@ export default function Validate() {
           {isSuccess && (
             <p
               css={`
-                ${textStyle("body2")}
+                ${textStyle('body2')}
               `}
             >
               Your email has been verified! You can now&nbsp;
               <RouterLink
                 to={{
-                  pathname: "/login",
+                  pathname: '/login',
                 }}
                 component={Link}
                 external={false}
@@ -132,7 +132,7 @@ export default function Validate() {
           {isError && (
             <p
               css={`
-                ${textStyle("body2")}
+                ${textStyle('body2')}
               `}
             >
               Something went wrong while validating your email. Contact support
@@ -142,5 +142,5 @@ export default function Validate() {
         </main>
       </div>
     </div>
-  );
+  )
 }

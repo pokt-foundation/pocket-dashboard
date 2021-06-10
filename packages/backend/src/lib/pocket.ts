@@ -15,8 +15,8 @@ import {
   typeGuard,
   UnlockedAccount,
   RawTxRequest,
-} from "@pokt-network/pocket-js";
-import env, { PocketNetworkKeys } from "../environment";
+} from '@pokt-network/pocket-js'
+import env, { PocketNetworkKeys } from '../environment'
 
 const {
   blockTime,
@@ -30,7 +30,7 @@ const {
   providerType,
   requestTimeout,
   transactionFee,
-} = env("POCKET_NETWORK") as PocketNetworkKeys;
+} = env('POCKET_NETWORK') as PocketNetworkKeys
 
 const POCKET_CONFIGURATION = new Configuration(
   Number(maxDispatchers),
@@ -43,112 +43,112 @@ const POCKET_CONFIGURATION = new Configuration(
   undefined,
   undefined,
   false
-);
+)
 
 export const POKT_DENOMINATIONS = {
   pokt: 0,
   upokt: 6,
-};
+}
 
 function getPocketDispatchers() {
-  if (dispatchers === "") {
-    return [];
+  if (dispatchers === '') {
+    return []
   }
-  return dispatchers.split(",").map(function (dispatcherUri) {
-    return new URL(dispatcherUri);
-  });
+  return dispatchers.split(',').map(function (dispatcherUri) {
+    return new URL(dispatcherUri)
+  })
 }
 
 function getHttpRPCProvider(): HttpRpcProvider {
-  if (!httpProviderNode || httpProviderNode === "") {
-    throw new Error(`Invalid HTTP Provider Node: ${httpProviderNode}`);
+  if (!httpProviderNode || httpProviderNode === '') {
+    throw new Error(`Invalid HTTP Provider Node: ${httpProviderNode}`)
   }
-  return new HttpRpcProvider(new URL(httpProviderNode));
+  return new HttpRpcProvider(new URL(httpProviderNode))
 }
 
 function getRPCProvider(): HttpRpcProvider | PocketRpcProvider {
-  if (providerType.toLowerCase() === "http") {
-    return getHttpRPCProvider();
+  if (providerType.toLowerCase() === 'http') {
+    return getHttpRPCProvider()
   } else {
-    return getHttpRPCProvider();
+    return getHttpRPCProvider()
   }
 }
 
 export async function getNodes(status: number): Promise<Node[]> {
-  let page = 1;
-  const nodeList = [];
-  const perPage = 100;
-  const pocketRpcProvider = getRPCProvider();
+  let page = 1
+  const nodeList = []
+  const perPage = 100
+  const pocketRpcProvider = getRPCProvider()
   const pocketInstance = new Pocket(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
+  )
   const nodesResponse = await pocketInstance
     .rpc(pocketRpcProvider)
-    .query.getNodes(status, undefined, BigInt(0), undefined, page, perPage);
+    .query.getNodes(status, undefined, BigInt(0), undefined, page, perPage)
 
   if (nodesResponse instanceof RpcError) {
-    return [];
+    return []
   }
-  const totalPages = nodesResponse.totalPages;
+  const totalPages = nodesResponse.totalPages
 
   nodesResponse.nodes.forEach((node) => {
-    nodeList.push(node);
-  });
-  page++;
+    nodeList.push(node)
+  })
+  page++
   while (page <= totalPages) {
     const response = await pocketInstance
       .rpc(pocketRpcProvider)
-      .query.getNodes(status, undefined, BigInt(0), undefined, page, perPage);
+      .query.getNodes(status, undefined, BigInt(0), undefined, page, perPage)
 
     // Increment page variable
-    page++;
+    page++
     if (response instanceof RpcError) {
-      page = totalPages;
-      return;
+      page = totalPages
+      return
     }
     response.nodes.forEach((node) => {
-      nodeList.push(node);
-    });
+      nodeList.push(node)
+    })
   }
-  return nodesResponse.nodes;
+  return nodesResponse.nodes
 }
 
 export async function getApplications(status: number): Promise<Application[]> {
-  let page = 1;
-  const applicationList = [];
-  const pocketRpcProvider = getRPCProvider();
-  const perPage = 100;
+  let page = 1
+  const applicationList = []
+  const pocketRpcProvider = getRPCProvider()
+  const perPage = 100
   const pocketInstance = new Pocket(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
+  )
   const applicationsResponse = await pocketInstance
     .rpc(pocketRpcProvider)
-    .query.getApps(status, BigInt(0), undefined, page, perPage);
+    .query.getApps(status, BigInt(0), undefined, page, perPage)
 
   if (applicationsResponse instanceof RpcError) {
-    return [];
+    return []
   }
-  const totalPages = applicationsResponse.totalPages;
+  const totalPages = applicationsResponse.totalPages
 
   while (page <= totalPages) {
     const response = await pocketInstance
       .rpc(pocketRpcProvider)
-      .query.getApps(status, BigInt(0), undefined, page, perPage);
+      .query.getApps(status, BigInt(0), undefined, page, perPage)
 
-    page++;
+    page++
     if (response instanceof RpcError) {
-      page = totalPages;
-      return;
+      page = totalPages
+      return
     }
     response.applications.forEach((app) => {
-      applicationList.push(app);
-    });
+      applicationList.push(app)
+    })
   }
-  return applicationList;
+  return applicationList
 }
 
 export async function transferFromFreeTierFund(
@@ -156,42 +156,42 @@ export async function transferFromFreeTierFund(
   customerAddress: string
 ): Promise<string> {
   if (!transactionFee) {
-    throw new Error("Can't transfer from free tier: transaction fee missing");
+    throw new Error("Can't transfer from free tier: transaction fee missing")
   }
   if (!chainId) {
-    throw new Error("Can't transfer from free tier: chainID missing");
+    throw new Error("Can't transfer from free tier: chainID missing")
   }
   if (!amount) {
-    throw new Error("Can't transfer from free tier: no amount provided");
+    throw new Error("Can't transfer from free tier: no amount provided")
   }
   if (!customerAddress) {
     throw new Error(
       "Can't transfer from free tier: no customer address provided"
-    );
+    )
   }
-  const totalAmount = BigInt(Number(amount) + Number(transactionFee));
+  const totalAmount = BigInt(Number(amount) + Number(transactionFee))
 
   if (!totalAmount) {
-    throw "Can't transfer from free tier: failed to calculate totalAmount";
+    throw "Can't transfer from free tier: failed to calculate totalAmount"
   }
   const pocketInstance = new Pocket(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
-  const pocketRpcProvider = getRPCProvider();
+  )
+  const pocketRpcProvider = getRPCProvider()
 
-  pocketInstance.rpc(pocketRpcProvider);
+  pocketInstance.rpc(pocketRpcProvider)
   const rawTxResponse = await (pocketInstance.withPrivateKey(
     freeTierFundAccount
   ) as ITransactionSender)
     .send(freeTierFundAddress, customerAddress, totalAmount.toString())
-    .submit(chainId, transactionFee);
+    .submit(chainId, transactionFee)
 
   if (typeGuard(rawTxResponse, RpcError)) {
-    throw new Error(rawTxResponse.message);
+    throw new Error(rawTxResponse.message)
   }
-  return rawTxResponse.hash;
+  return rawTxResponse.hash
 }
 
 export async function createUnlockedAccount(
@@ -201,19 +201,19 @@ export async function createUnlockedAccount(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
-  const account = await pocketInstance.keybase.createAccount(passphrase);
+  )
+  const account = await pocketInstance.keybase.createAccount(passphrase)
   const unlockedAccountOrError = await pocketInstance.keybase.getUnlockedAccount(
     (account as UnlockedAccount & Error).addressHex,
     passphrase
-  );
+  )
 
   if (typeGuard(unlockedAccountOrError, Error)) {
-    throw new Error(unlockedAccountOrError.message);
+    throw new Error(unlockedAccountOrError.message)
   } else if (typeGuard(unlockedAccountOrError, UnlockedAccount)) {
-    return unlockedAccountOrError;
+    return unlockedAccountOrError
   } else {
-    throw new Error("Unknown error while creating an unlocked account");
+    throw new Error('Unknown error while creating an unlocked account')
   }
 }
 
@@ -224,13 +224,13 @@ export async function getBalance(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
-  const pocketRpcProvider = getRPCProvider();
+  )
+  const pocketRpcProvider = getRPCProvider()
   const applicationResponse = await pocketInstance
     .rpc(pocketRpcProvider)
-    .query.getBalance(addressHex);
+    .query.getBalance(addressHex)
 
-  return applicationResponse;
+  return applicationResponse
 }
 
 export async function getTX(
@@ -240,13 +240,13 @@ export async function getTX(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
-  const pocketRpcProvider = getRPCProvider();
+  )
+  const pocketRpcProvider = getRPCProvider()
   const applicationResponse = await pocketInstance
     .rpc(pocketRpcProvider)
-    .query.getTX(addressHex);
+    .query.getTX(addressHex)
 
-  return applicationResponse;
+  return applicationResponse
 }
 
 export async function getAccount(
@@ -256,13 +256,13 @@ export async function getAccount(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
-  const pocketRpcProvider = getRPCProvider();
+  )
+  const pocketRpcProvider = getRPCProvider()
   const applicationResponse = await pocketInstance
     .rpc(pocketRpcProvider)
-    .query.getAccount(addressHex);
+    .query.getAccount(addressHex)
 
-  return applicationResponse;
+  return applicationResponse
 }
 
 export async function getApp(
@@ -272,13 +272,13 @@ export async function getApp(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
-  const pocketRpcProvider = getRPCProvider();
+  )
+  const pocketRpcProvider = getRPCProvider()
   const applicationResponse = await pocketInstance
     .rpc(pocketRpcProvider)
-    .query.getApp(addressHex);
+    .query.getApp(addressHex)
 
-  return applicationResponse;
+  return applicationResponse
 }
 
 export async function createAppStakeTx(
@@ -291,30 +291,30 @@ export async function createAppStakeTx(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
+  )
   const unlockedAccount = await pocketInstance.keybase.importAccount(
     privateKey,
     passphrase
-  );
+  )
 
   if (unlockedAccount instanceof Error) {
-    throw unlockedAccount;
+    throw unlockedAccount
   }
   const senderAccount = await pocketInstance.withImportedAccount(
     unlockedAccount.addressHex,
     passphrase
-  );
+  )
 
   // @ts-ignore
-  const { unlockedAccount: account } = senderAccount;
+  const { unlockedAccount: account } = senderAccount
 
   return await (senderAccount as ITransactionSender)
-    .appStake(account.publicKey.toString("hex"), chains, stakeAmount.toString())
-    .createTransaction(chainId, transactionFee);
+    .appStake(account.publicKey.toString('hex'), chains, stakeAmount.toString())
+    .createTransaction(chainId, transactionFee)
 }
 
 export async function getPocketInstance(): Promise<Pocket> {
-  return new Pocket(getPocketDispatchers(), undefined, POCKET_CONFIGURATION);
+  return new Pocket(getPocketDispatchers(), undefined, POCKET_CONFIGURATION)
 }
 
 export async function submitRawTransaction(
@@ -325,14 +325,14 @@ export async function submitRawTransaction(
     getPocketDispatchers(),
     undefined,
     POCKET_CONFIGURATION
-  );
-  const pocketRpcProvider = getRPCProvider();
+  )
+  const pocketRpcProvider = getRPCProvider()
   const rawTxResponse = await pocketInstance
     .rpc(pocketRpcProvider)
-    .client.rawtx(fromAddress, rawTxBytes);
+    .client.rawtx(fromAddress, rawTxBytes)
 
   if (typeGuard(rawTxResponse, RpcError)) {
-    throw new Error(rawTxResponse.message);
+    throw new Error(rawTxResponse.message)
   }
-  return rawTxResponse.hash;
+  return rawTxResponse.hash
 }

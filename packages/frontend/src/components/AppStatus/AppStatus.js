@@ -1,15 +1,15 @@
-import React, { useMemo } from "react";
-import TokenAmount from "token-amount";
-import "styled-components/macro";
-import Box from "components/Box/Box";
-import { Spacer, Tag, textStyle, GU } from "ui";
-import { getStakingStatus, getThresholdsPerStake } from "lib/pocket-utils";
+import React, { useMemo } from 'react'
+import TokenAmount from 'token-amount'
+import 'styled-components/macro'
+import Box from 'components/Box/Box'
+import { Spacer, Tag, textStyle, GU } from 'ui'
+import { getStakingStatus, getThresholdsPerStake } from 'lib/pocket-utils'
 
 export default function AppStatus({ appOnChainStatus }) {
-  const { status, staked_tokens: stakedTokens } = appOnChainStatus;
-  const { legibleMaxRelays } = getThresholdsPerStake(stakedTokens);
+  const { status, staked_tokens: stakedTokens } = appOnChainStatus
+  const { legibleMaxRelays } = getThresholdsPerStake(stakedTokens)
 
-  const stakingStatus = useMemo(() => getStakingStatus(status), [status]);
+  const stakingStatus = useMemo(() => getStakingStatus(status), [status])
 
   return (
     <Box
@@ -27,7 +27,7 @@ export default function AppStatus({ appOnChainStatus }) {
           li {
             display: flex;
             justify-content: space-between;
-            ${textStyle("body1")}
+            ${textStyle('body1')}
             font-weight: 600;
             span {
               font-weight: 400;
@@ -53,7 +53,7 @@ export default function AppStatus({ appOnChainStatus }) {
           Amount
           <span>
             {TokenAmount.format(stakedTokens, 6, {
-              symbol: "POKT",
+              symbol: 'POKT',
             })}
           </span>
         </li>
@@ -63,5 +63,5 @@ export default function AppStatus({ appOnChainStatus }) {
         </li>
       </ul>
     </Box>
-  );
+  )
 }

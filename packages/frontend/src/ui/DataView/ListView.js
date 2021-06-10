@@ -1,12 +1,12 @@
-import React, { useCallback, useState } from "react";
-import PropTypes from "prop-types";
-import { Transition, animated } from "react-spring/renderprops";
-import "styled-components/macro";
-import { GU, springs, textStyle } from "ui/style";
-import { useTheme } from "ui/theme";
-import { CheckBox } from "ui";
-import { ToggleButton } from "./ToggleButton";
-import { OpenedSurfaceBorder } from "./OpenedSurfaceBorder";
+import React, { useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
+import { Transition, animated } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import { GU, springs, textStyle } from 'ui/style'
+import { useTheme } from 'ui/theme'
+import { CheckBox } from 'ui'
+import { ToggleButton } from './ToggleButton'
+import { OpenedSurfaceBorder } from './OpenedSurfaceBorder'
 
 function ListView({
   allSelected,
@@ -19,20 +19,20 @@ function ListView({
   selectable,
   rowHeight,
 }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
-  const [opened, setOpened] = useState(-1);
+  const [opened, setOpened] = useState(-1)
 
   const toggleEntry = useCallback((index) => {
-    setOpened((opened) => (opened === index ? -1 : index));
-  }, []);
+    setOpened((opened) => (opened === index ? -1 : index))
+  }, [])
 
-  const sideSpace = selectable || hasAnyExpansion;
+  const sideSpace = selectable || hasAnyExpansion
 
   return (
     <React.Fragment>
       {entries.map((entry, index) => {
-        const hasExpansion = entry.expansion.content.length > 0;
+        const hasExpansion = entry.expansion.content.length > 0
 
         return (
           <div
@@ -45,7 +45,7 @@ function ListView({
               border-bottom: ${Number(index !== entries.length - 1)}px solid
                 ${theme.tableBorder};
               transition: background 150ms ease-in-out;
-              background: ${entry.selected ? theme.surfaceSelected : "none"};
+              background: ${entry.selected ? theme.surfaceSelected : 'none'};
             `}
           >
             <OpenedSurfaceBorder opened={entry.index === opened} />
@@ -114,7 +114,7 @@ function ListView({
                         display: flex;
                         align-items: center;
                         margin: ${2 * GU}px 0 ${1 * GU}px;
-                        ${textStyle("body2")};
+                        ${textStyle('body2')};
                         font-weight: 600;
                       `}
                     >
@@ -133,10 +133,10 @@ function ListView({
               />
             )}
           </div>
-        );
+        )
       })}
     </React.Fragment>
-  );
+  )
 }
 
 ListView.propTypes = {
@@ -149,26 +149,26 @@ ListView.propTypes = {
   renderSelectionCount: PropTypes.func.isRequired,
   rowHeight: PropTypes.number.isRequired,
   selectable: PropTypes.bool.isRequired,
-};
+}
 
 // Disable prop types check for internal components
 /* eslint-disable react/prop-types */
 
 function EntryExpansion({ expansion, opened, rowHeight }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   // Handles the height of the expansion in free layout mode
-  const [freeLayoutContentHeight, setFreeLayoutContentHeight] = useState(0);
+  const [freeLayoutContentHeight, setFreeLayoutContentHeight] = useState(0)
 
   const handleFreeLayoutContentRef = useCallback((element) => {
     if (element) {
-      setFreeLayoutContentHeight(element.getBoundingClientRect().height);
+      setFreeLayoutContentHeight(element.getBoundingClientRect().height)
     }
-  }, []);
+  }, [])
 
   const height = expansion.freeLayout
     ? freeLayoutContentHeight
-    : rowHeight * expansion.content.length;
+    : rowHeight * expansion.content.length
 
   return (
     <Transition
@@ -203,7 +203,7 @@ function EntryExpansion({ expansion, opened, rowHeight }) {
                 css={`
                   display: flex;
                   align-items: center;
-                  height: ${expansion.freeLayout ? "auto" : `${rowHeight}px`};
+                  height: ${expansion.freeLayout ? 'auto' : `${rowHeight}px`};
                   padding-right: ${3 * GU}px;
                 `}
               >
@@ -214,20 +214,20 @@ function EntryExpansion({ expansion, opened, rowHeight }) {
         ))
       }
     </Transition>
-  );
+  )
 }
 
 function Select({ index, selected, onSelect }) {
   const change = useCallback(
     (check) => {
-      onSelect(index, check);
+      onSelect(index, check)
     },
     [index, onSelect]
-  );
+  )
 
-  return <CheckBox onChange={change} checked={selected} />;
+  return <CheckBox onChange={change} checked={selected} />
 }
 
 /* eslint-enable react/prop-types */
 
-export { ListView };
+export { ListView }

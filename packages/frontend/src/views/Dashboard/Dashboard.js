@@ -1,19 +1,19 @@
-import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import "styled-components/macro";
-import { Spacer, useTheme, GU } from "ui";
-import NavigationBar from "views/Dashboard/NavigationBar";
-import MenuPanel from "components/MenuPanel/MenuPanel";
-import { useUserApplications } from "views/Dashboard/application-hooks";
+import React, { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import 'styled-components/macro'
+import { Spacer, useTheme, GU } from 'ui'
+import NavigationBar from 'views/Dashboard/NavigationBar'
+import MenuPanel from 'components/MenuPanel/MenuPanel'
+import { useUserApplications } from 'views/Dashboard/application-hooks'
 
 export default function DashboardView({ children }) {
-  const location = useLocation();
-  const { isAppsLoading, appsData } = useUserApplications();
-  const theme = useTheme();
+  const location = useLocation()
+  const { isAppsLoading, appsData } = useUserApplications()
+  const theme = useTheme()
 
   useEffect(() => {
-    document.body.scrollTop = 0;
-  }, [location]);
+    document.body.scrollTop = 0
+  }, [location])
 
   return (
     <div
@@ -50,5 +50,5 @@ export default function DashboardView({ children }) {
         <Spacer size={2 * GU} />
       </main>
     </div>
-  );
+  )
 }

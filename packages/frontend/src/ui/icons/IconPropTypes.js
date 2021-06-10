@@ -1,5 +1,5 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
 export default {
-  size: PropTypes.oneOf(["large", "medium", "small", "tiny"]),
-};
+  size: PropTypes.oneOf(['large', 'medium', 'small', 'tiny']),
+}

@@ -16,7 +16,7 @@
  * @returns {Number}
  */
 export function map(value, istart, istop, ostart, ostop) {
-  return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+  return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
 }
 
 /**
@@ -34,7 +34,7 @@ export function map(value, istart, istop, ostart, ostop) {
  * @returns {Number}
  */
 export function norm(aNumber, low, high) {
-  return (aNumber - low) / (high - low);
+  return (aNumber - low) / (high - low)
 }
 
 /**
@@ -52,7 +52,7 @@ export function norm(aNumber, low, high) {
  * @returns {Number}
  */
 export function lerp(progress, value1, value2) {
-  return (value2 - value1) * progress + value1;
+  return (value2 - value1) * progress + value1
 }
 
 /**
@@ -66,7 +66,7 @@ export function lerp(progress, value1, value2) {
  * @returns {Number}
  */
 export function clamp(value, min = 0, max = 1) {
-  return Math.min(max, Math.max(min, value));
+  return Math.min(max, Math.max(min, value))
 }
 
 /**
@@ -80,9 +80,9 @@ export function clamp(value, min = 0, max = 1) {
  * @returns {Number}
  */
 export function randomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min)) + min
 }
 
 /**
@@ -95,5 +95,5 @@ export function randomInt(min, max) {
  * @returns {Number}
  */
 export function random(min = 0, max = 1) {
-  return Math.floor(Math.random() * (max - min)) + min;
+  return Math.floor(Math.random() * (max - min)) + min
 }

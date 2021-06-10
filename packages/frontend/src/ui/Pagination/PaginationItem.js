@@ -1,15 +1,15 @@
-import React, { useCallback } from "react";
-import PropTypes from "prop-types";
-import "styled-components/macro";
-import { css } from "styled-components";
-import { ButtonBase, useTheme, GU, RADIUS } from "ui";
+import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
+import 'styled-components/macro'
+import { css } from 'styled-components'
+import { ButtonBase, useTheme, GU, RADIUS } from 'ui'
 
 function PaginationItem({ touchMode, selected, index, onChange }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   const handleClick = useCallback(() => {
-    onChange(index);
-  }, [index, onChange]);
+    onChange(index)
+  }, [index, onChange])
 
   return (
     <div>
@@ -45,7 +45,7 @@ function PaginationItem({ touchMode, selected, index, onChange }) {
         </span>
       </ButtonBase>
     </div>
-  );
+  )
 }
 
 PaginationItem.propTypes = {
@@ -53,6 +53,6 @@ PaginationItem.propTypes = {
   onChange: PropTypes.func.isRequired,
   selected: PropTypes.bool.isRequired,
   touchMode: PropTypes.bool.isRequired,
-};
+}
 
-export { PaginationItem };
+export { PaginationItem }

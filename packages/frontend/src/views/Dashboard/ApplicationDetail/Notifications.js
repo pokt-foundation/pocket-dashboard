@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
-import { useMutation } from "react-query";
-import axios from "axios";
-import { useViewport } from "use-viewport";
-import Styled from "styled-components/macro";
+import React, { useCallback, useMemo, useState } from 'react'
+import { useHistory, useParams } from 'react-router-dom'
+import { useMutation } from 'react-query'
+import axios from 'axios'
+import { useViewport } from 'use-viewport'
+import Styled from 'styled-components/macro'
 import {
   Button,
   CircleGraph,
@@ -15,38 +15,38 @@ import {
   useTheme,
   useToast,
   GU,
-} from "ui";
-import Box from "components/Box/Box";
-import FloatUp from "components/FloatUp/FloatUp";
-import { getThresholdsPerStake } from "lib/pocket-utils";
-import env from "environment";
+} from 'ui'
+import Box from 'components/Box/Box'
+import FloatUp from 'components/FloatUp/FloatUp'
+import { getThresholdsPerStake } from 'lib/pocket-utils'
+import env from 'environment'
 
-const MAX_RELAYS = 1000000;
-const GRAPH_SIZE = 130;
+const MAX_RELAYS = 1000000
+const GRAPH_SIZE = 130
 
 const DEFAULT_PERCENTAGES = {
   quarter: false,
   half: false,
   threeQuarters: false,
   full: false,
-};
+}
 
 function useUsageColor(usage) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   if (usage <= 0.25) {
-    return theme.positive;
+    return theme.positive
   }
 
   if (usage <= 0.5) {
-    return theme.yellow;
+    return theme.yellow
   }
 
   if (usage <= 0.75) {
-    return theme.warning;
+    return theme.warning
   }
 
-  return theme.negative;
+  return theme.negative
 }
 
 export default function Notifications({
@@ -56,19 +56,19 @@ export default function Notifications({
 }) {
   const [chosenPercentages, setChosenPercentages] = useState(
     appData?.notificationSettings ?? DEFAULT_PERCENTAGES
-  );
-  const [hasChanged, setHasChanged] = useState(false);
-  const history = useHistory();
-  const { within } = useViewport();
-  const toast = useToast();
-  const { appId } = useParams();
+  )
+  const [hasChanged, setHasChanged] = useState(false)
+  const history = useHistory()
+  const { within } = useViewport()
+  const toast = useToast()
+  const { appId } = useParams()
   const { isLoading: isNotificationsLoading, mutate } = useMutation(
     async function updateNotificationSettings() {
       const path = `${env(
-        "BACKEND_URL"
-      )}/api/applications/notifications/${appId}`;
+        'BACKEND_URL'
+      )}/api/applications/notifications/${appId}`
 
-      const { quarter, half, threeQuarters, full } = chosenPercentages;
+      const { quarter, half, threeQuarters, full } = chosenPercentages
 
       try {
         await axios.put(
@@ -82,18 +82,18 @@ export default function Notifications({
           {
             withCredentials: true,
           }
-        );
+        )
 
-        setHasChanged(false);
-        toast("Notification preferences updated");
-        history.goBack();
+        setHasChanged(false)
+        toast('Notification preferences updated')
+        history.goBack()
       } catch (err) {
-        console.log("??", Object.entries(err));
+        console.log('??', Object.entries(err))
       }
     }
-  );
+  )
 
-  const compactMode = within(-1, "medium");
+  const compactMode = within(-1, 'medium')
 
   const highestDailyAmount = useMemo(
     () =>
@@ -102,7 +102,7 @@ export default function Notifications({
         0
       ),
     [dailyRelayData]
-  );
+  )
 
   const lowestDailyAmount = useMemo(
     () =>
@@ -113,7 +113,7 @@ export default function Notifications({
             Number.POSITIVE_INFINITY
           ),
     [dailyRelayData]
-  );
+  )
 
   const totalDailyRelays = useMemo(() => {
     return dailyRelayData.length === 0
@@ -121,31 +121,31 @@ export default function Notifications({
       : dailyRelayData.reduce(
           (sum, { dailyRelays = 0 }) => sum + dailyRelays,
           0
-        ) / dailyRelayData.length;
-  }, [dailyRelayData]);
+        ) / dailyRelayData.length
+  }, [dailyRelayData])
 
-  const averageUsageColor = useUsageColor(totalDailyRelays / MAX_RELAYS);
-  const maxUsageColor = useUsageColor(highestDailyAmount / MAX_RELAYS);
-  const minUsageColor = useUsageColor(lowestDailyAmount / MAX_RELAYS);
+  const averageUsageColor = useUsageColor(totalDailyRelays / MAX_RELAYS)
+  const maxUsageColor = useUsageColor(highestDailyAmount / MAX_RELAYS)
+  const minUsageColor = useUsageColor(lowestDailyAmount / MAX_RELAYS)
 
   const onChosePercentageChange = useCallback(
     (chosenPercentage) => {
-      setHasChanged(true);
+      setHasChanged(true)
       setChosenPercentages({
         ...chosenPercentages,
         [chosenPercentage]: !chosenPercentages[chosenPercentage],
-      });
+      })
     },
     [chosenPercentages]
-  );
+  )
 
   const isSubmitDisabled = useMemo(
     () => isNotificationsLoading || !hasChanged,
     [hasChanged, isNotificationsLoading]
-  );
+  )
 
-  const { staked_tokens: stakedTokens } = appOnChainData;
-  const { legibleMaxRelays } = getThresholdsPerStake(stakedTokens);
+  const { staked_tokens: stakedTokens } = appOnChainData
+  const { legibleMaxRelays } = getThresholdsPerStake(stakedTokens)
 
   return (
     <FloatUp
@@ -157,7 +157,7 @@ export default function Notifications({
               <Box>
                 <p
                   css={`
-                    ${textStyle("body2")}
+                    ${textStyle('body2')}
                   `}
                 >
                   Set up your usage alert notifications so you're always aware
@@ -181,7 +181,7 @@ export default function Notifications({
                 >
                   <h2
                     css={`
-                      ${textStyle("title2")}
+                      ${textStyle('title2')}
                     `}
                   >
                     Weekly bandwith usage
@@ -206,13 +206,13 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("body3")}
+                          ${textStyle('body3')}
                         `}
                       >
                         <span
                           css={`
                             display: block;
-                            ${textStyle("title3")}
+                            ${textStyle('title3')}
                             font-weight: 700;
                           `}
                         >
@@ -220,7 +220,7 @@ export default function Notifications({
                         </span>
                         {Intl.NumberFormat().format(
                           totalDailyRelays.toFixed(0)
-                        )}{" "}
+                        )}{' '}
                         Relays
                       </h3>
                     </Stack>
@@ -241,13 +241,13 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("body3")}
+                          ${textStyle('body3')}
                         `}
                       >
                         <span
                           css={`
                             display: block;
-                            ${textStyle("title3")}
+                            ${textStyle('title3')}
                             font-weight: 700;
                           `}
                         >
@@ -273,13 +273,13 @@ export default function Notifications({
                     >
                       <h3
                         css={`
-                          ${textStyle("body3")}
+                          ${textStyle('body3')}
                         `}
                       >
                         <span
                           css={`
                             display: block;
-                            ${textStyle("title3")}
+                            ${textStyle('title3')}
                             font-weight: 700;
                           `}
                         >
@@ -293,7 +293,7 @@ export default function Notifications({
                 <Spacer size={2 * GU} />
                 <p
                   css={`
-                    ${textStyle("body4")}
+                    ${textStyle('body4')}
                   `}
                 >
                   These values are calculated on a period of 7 days.
@@ -302,14 +302,14 @@ export default function Notifications({
               <Spacer size={2.5 * GU} />
               <p
                 css={`
-                  ${textStyle("body3")}
+                  ${textStyle('body3')}
                 `}
               >
                 If you need more relays for your application or you are looking
-                to stake your own POKT or please{" "}
+                to stake your own POKT or please{' '}
                 <Link href="https://pocketnetwork.typeform.com/to/UPb0xJhS">
                   contact us
-                </Link>{" "}
+                </Link>{' '}
                 and our team will find a solution for you.
               </p>
             </>
@@ -332,7 +332,7 @@ export default function Notifications({
               <Box title="Notification preferences">
                 <p
                   css={`
-                    ${textStyle("body2")}
+                    ${textStyle('body2')}
                   `}
                 >
                   Whenever an app reaches one of the bandwith thresholds defined
@@ -343,28 +343,28 @@ export default function Notifications({
               <NotificationPreference
                 level="quarter"
                 checked={chosenPercentages.quarter}
-                onChange={() => onChosePercentageChange("quarter")}
+                onChange={() => onChosePercentageChange('quarter')}
                 maxRelays={legibleMaxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="half"
                 checked={chosenPercentages.half}
-                onChange={() => onChosePercentageChange("half")}
+                onChange={() => onChosePercentageChange('half')}
                 maxRelays={legibleMaxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="threeQuarters"
                 checked={chosenPercentages.threeQuarters}
-                onChange={() => onChosePercentageChange("threeQuarters")}
+                onChange={() => onChosePercentageChange('threeQuarters')}
                 maxRelays={legibleMaxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="full"
                 checked={chosenPercentages.full}
-                onChange={() => onChosePercentageChange("full")}
+                onChange={() => onChosePercentageChange('full')}
                 maxRelays={legibleMaxRelays}
               />
             </>
@@ -372,35 +372,35 @@ export default function Notifications({
         />
       )}
     />
-  );
+  )
 }
 
 function NotificationPreference({ level, checked, onChange, maxRelays }) {
-  const theme = useTheme();
+  const theme = useTheme()
 
   const backgroundColor = useMemo(() => {
-    if (level === "quarter") {
-      return theme.positive;
-    } else if (level === "half") {
-      return theme.yellow;
-    } else if (level === "threeQuarters") {
-      return theme.warning;
+    if (level === 'quarter') {
+      return theme.positive
+    } else if (level === 'half') {
+      return theme.yellow
+    } else if (level === 'threeQuarters') {
+      return theme.warning
     } else {
-      return theme.negative;
+      return theme.negative
     }
-  }, [level, theme]);
+  }, [level, theme])
 
   const usagePercentage = useMemo(() => {
-    if (level === "quarter") {
-      return "25%";
-    } else if (level === "half") {
-      return "50%";
-    } else if (level === "threeQuarters") {
-      return "75%";
+    if (level === 'quarter') {
+      return '25%'
+    } else if (level === 'half') {
+      return '50%'
+    } else if (level === 'threeQuarters') {
+      return '75%'
     } else {
-      return "100%";
+      return '100%'
     }
-  }, [level]);
+  }, [level])
 
   return (
     <Box padding={[2 * GU, 2 * GU, 2 * GU, 4 * GU]}>
@@ -424,13 +424,13 @@ function NotificationPreference({ level, checked, onChange, maxRelays }) {
       >
         <h3
           css={`
-            ${textStyle("title3")}
+            ${textStyle('title3')}
           `}
         >
           {usagePercentage}&nbsp;
           <span
             css={`
-              ${textStyle("body3")}
+              ${textStyle('body3')}
             `}
           >
             of {maxRelays} relays
@@ -439,12 +439,12 @@ function NotificationPreference({ level, checked, onChange, maxRelays }) {
         <Switch checked={checked} onChange={onChange} />
       </div>
     </Box>
-  );
+  )
 }
 
 function Inline({ children }) {
-  const { within } = useViewport();
-  const compactMode = within(-1, "medium");
+  const { within } = useViewport()
+  const compactMode = within(-1, 'medium')
 
   return (
     <div
@@ -462,15 +462,15 @@ function Inline({ children }) {
     >
       {children}
     </div>
-  );
+  )
 }
 
 const GraphContainer = Styled.div`
   display: flex;
   flex-direction: column;
-`;
+`
 
 const Stack = Styled.div`
   display: flex;
   flex-direction: column;
-`;
+`

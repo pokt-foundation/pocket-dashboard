@@ -1,46 +1,40 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Spring } from "react-spring/renderprops";
-import "styled-components/macro";
-import PropTypes from "ui/prop-types";
-import { GU, springs } from "ui/style";
-import { unselectable } from "ui";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Spring } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import PropTypes from 'ui/prop-types'
+import { GU, springs } from 'ui/style'
+import { unselectable } from 'ui'
 
-const LABELS_HEIGHT = 30;
-const WIDTH_DEFAULT = 300;
+const LABELS_HEIGHT = 30
+const WIDTH_DEFAULT = 300
 
 function useMeasuredWidth() {
-  const ref = useRef();
-  const [measuredWidth, setMeasuredWidth] = useState(WIDTH_DEFAULT);
+  const ref = useRef()
+  const [measuredWidth, setMeasuredWidth] = useState(WIDTH_DEFAULT)
 
   const onResize = useCallback(() => {
     if (ref.current) {
-      setMeasuredWidth(ref.current.clientWidth);
+      setMeasuredWidth(ref.current.clientWidth)
     }
-  }, []);
+  }, [])
 
   const onRef = useCallback(
     (element) => {
-      ref.current = element;
-      onResize();
+      ref.current = element
+      onResize()
     },
     [onResize]
-  );
+  )
 
   useEffect(() => {
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [onResize]);
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [onResize])
 
-  return [measuredWidth, onRef];
+  return [measuredWidth, onRef]
 }
 
-const OFFSET = 50;
+const OFFSET = 50
 
 function LineChart({
   animDelay,
@@ -60,56 +54,56 @@ function LineChart({
   width: widthProps,
   ...props
 }) {
-  const [width, onSvgRef] = useMeasuredWidth();
+  const [width, onSvgRef] = useMeasuredWidth()
 
   const lines = useMemo(() => {
     return linesProps.map((lineOrValues) =>
       Array.isArray(lineOrValues) ? { values: lineOrValues } : lineOrValues
-    );
-  }, [linesProps]);
+    )
+  }, [linesProps])
 
   // the count of provided values
   const valuesCount = useMemo(() => {
     // All the values have the same length, so we can use the first one.
-    return lines[0] ? lines[0].values.length : 0;
-  }, [lines]);
+    return lines[0] ? lines[0].values.length : 0
+  }, [lines])
 
   // the total amount of values
   const totalCount = useMemo(() => {
     // If no total is provided, the total is the number of provided values.
-    return total > 0 && total > valuesCount ? total : valuesCount;
-  }, [valuesCount, total]);
+    return total > 0 && total > valuesCount ? total : valuesCount
+  }, [valuesCount, total])
 
   const getX = useCallback(
     (index) => {
-      return (width / Math.max(1, totalCount - 1)) * index;
+      return (width / Math.max(1, totalCount - 1)) * index
     },
     [width, totalCount]
-  );
+  )
 
   const getY = useCallback(
     (percentage, progress, height) => {
-      const padding = dotRadius + 2;
+      const padding = dotRadius + 2
 
-      return height - padding - (height - padding * 2) * percentage * progress;
+      return height - padding - (height - padding * 2) * percentage * progress
     },
     [dotRadius]
-  );
+  )
 
   const getLabelPosition = useCallback((index, length) => {
     if (index === 0) {
-      return "start";
+      return 'start'
     }
     if (index === length - 1) {
-      return "end";
+      return 'end'
     }
-    return "middle";
-  }, []);
+    return 'middle'
+  }, [])
 
   const labels =
-    label && totalCount > 0 ? [...Array(totalCount).keys()].map(label) : null;
+    label && totalCount > 0 ? [...Array(totalCount).keys()].map(label) : null
 
-  const chartHeight = height - (labels ? LABELS_HEIGHT : 0);
+  const chartHeight = height - (labels ? LABELS_HEIGHT : 0)
 
   return (
     <Spring
@@ -123,7 +117,7 @@ function LineChart({
         <svg
           ref={onSvgRef}
           viewBox={`0 0 ${width + OFFSET} ${height + GU}`}
-          width={widthProps || "auto"}
+          width={widthProps || 'auto'}
           height="auto"
           css="display: block"
           {...props}
@@ -137,7 +131,7 @@ function LineChart({
                       `${path} M ${getX(index)},${
                         !index ? 0 : chartHeight
                       } l 0,-8`,
-                    ""
+                    ''
                   )}
                 `}
                 stroke={borderColor}
@@ -159,9 +153,9 @@ function LineChart({
                         return `L
                            ${getX((index + 1) * progress)},
                            ${getY(val, progress, chartHeight, index)}
-                          `;
+                          `
                       })
-                      .join("")}
+                      .join('')}
                   `}
                     fill="transparent"
                     stroke={line.color || color(lineIndex, { lines })}
@@ -179,10 +173,10 @@ function LineChart({
                           stroke={line.color || color(lineIndex, { lines })}
                           strokeWidth="1"
                         />
-                      );
+                      )
                     })}
                 </g>
-              );
+              )
             })}
           </g>
           {labels && (
@@ -209,7 +203,7 @@ function LineChart({
           <g transform={`translate(0,${GU})`}>
             {scales &&
               scales.map(({ label, highlightColor }, index) => {
-                const scaleLength = scales.length - 1;
+                const scaleLength = scales.length - 1
 
                 return (
                   <text
@@ -234,7 +228,7 @@ function LineChart({
                   >
                     {label}
                   </text>
-                );
+                )
               })}
           </g>
           {threshold && (
@@ -244,8 +238,8 @@ function LineChart({
                 y1={chartHeight / (scales.length - 1) + GU}
                 x2={width}
                 y2={chartHeight / (scales.length - 1) + GU}
-                style={{ stroke: "#952828", strokeWidth: 2 }}
-              />{" "}
+                style={{ stroke: '#952828', strokeWidth: 2 }}
+              />{' '}
               <defs>
                 <linearGradient id="thresholdFill" x1="0" x2="0" y1="0" y2="1">
                   <stop offset="0%" stop-color="red" stopOpacity="0" />
@@ -264,7 +258,7 @@ function LineChart({
         </svg>
       )}
     </Spring>
-  );
+  )
 }
 
 LineChart.propTypes = {
@@ -293,7 +287,7 @@ LineChart.propTypes = {
   reset: PropTypes.bool,
   threshold: PropTypes.bool,
   color: PropTypes.func,
-};
+}
 
 LineChart.defaultProps = {
   springConfig: springs.lazy,
@@ -303,14 +297,14 @@ LineChart.defaultProps = {
   animDelay: 500,
   rendercheckpoints: false,
   reset: false,
-  borderColor: "rgba(209, 209, 209, 0.5)",
-  labelColor: "white",
+  borderColor: 'rgba(209, 209, 209, 0.5)',
+  labelColor: 'white',
   lines: [],
   scales: [],
   threshold: false,
   label: (index) => index + 1,
   color: (index, { lines }) =>
     `hsl(${(index * (360 / lines.length) + 40) % 360}, 60%, 70%)`,
-};
+}
 
-export default LineChart;
+export default LineChart

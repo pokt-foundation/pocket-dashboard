@@ -9,7 +9,7 @@ export function noop() {}
  * @returns {any}
  */
 export function identity(x) {
-  return x;
+  return x
 }
 
 /**
@@ -21,8 +21,8 @@ export function identity(x) {
 export function pick(obj, keys) {
   return keys.reduce((filtered, key) => {
     if (obj[key] !== undefined) {
-      filtered[key] = obj[key];
+      filtered[key] = obj[key]
     }
-    return filtered;
-  }, {});
+    return filtered
+  }, {})
 }

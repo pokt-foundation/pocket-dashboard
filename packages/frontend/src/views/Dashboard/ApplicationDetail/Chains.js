@@ -1,43 +1,43 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "react-query";
-import axios from "axios";
-import "styled-components/macro";
-import { Button, DataView, Split, Spacer, Switch, useToast, GU } from "ui";
-import Box from "components/Box/Box";
-import FloatUp from "components/FloatUp/FloatUp";
-import { useUserApplications } from "views/Dashboard/application-hooks";
-import env from "environment";
+import React, { useCallback, useMemo, useState } from 'react'
+import { useHistory, useParams } from 'react-router-dom'
+import { useMutation, useQuery } from 'react-query'
+import axios from 'axios'
+import 'styled-components/macro'
+import { Button, DataView, Split, Spacer, Switch, useToast, GU } from 'ui'
+import Box from 'components/Box/Box'
+import FloatUp from 'components/FloatUp/FloatUp'
+import { useUserApplications } from 'views/Dashboard/application-hooks'
+import env from 'environment'
 
 export default function BasicSetup({ appData }) {
-  const [selectedChain, setSelectedChain] = useState("");
-  const history = useHistory();
-  const { appId } = useParams();
-  const toast = useToast();
-  const { refetchUserApps } = useUserApplications();
+  const [selectedChain, setSelectedChain] = useState('')
+  const history = useHistory()
+  const { appId } = useParams()
+  const toast = useToast()
+  const { refetchUserApps } = useUserApplications()
   const { isLoading: isChainsLoading, data: chains } = useQuery(
-    "/network/chains",
+    '/network/chains',
     async function getNetworkChains() {
-      const path = `${env("BACKEND_URL")}/api/network/stakeable-chains`;
+      const path = `${env('BACKEND_URL')}/api/network/stakeable-chains`
 
       try {
         const res = await axios.get(path, {
           withCredentials: true,
-        });
+        })
 
         const {
           data: { chains },
-        } = res;
+        } = res
 
-        return chains;
+        return chains
       } catch (err) {
-        console.log("?", err);
+        console.log('?', err)
       }
     }
-  );
+  )
   const { isLoading: isSwitchLoading, mutate } = useMutation(
     async function switchChains() {
-      const path = `${env("BACKEND_URL")}/api/applications/switch/${appId}`;
+      const path = `${env('BACKEND_URL')}/api/applications/switch/${appId}`
 
       try {
         const res = await axios.post(
@@ -48,34 +48,34 @@ export default function BasicSetup({ appData }) {
           {
             withCredentials: true,
           }
-        );
+        )
 
         const {
           data: { _id },
-        } = res;
+        } = res
 
-        await refetchUserApps();
+        await refetchUserApps()
 
-        toast("Chain successfully switched");
-        history.push(`/app/${_id}`);
+        toast('Chain successfully switched')
+        history.push(`/app/${_id}`)
       } catch (err) {
-        console.log("??", Object.entries(err));
+        console.log('??', Object.entries(err))
       }
     }
-  );
+  )
   const onSwitchClick = useCallback(
     (id) => {
-      setSelectedChain(id === selectedChain ? "" : id);
+      setSelectedChain(id === selectedChain ? '' : id)
     },
     [selectedChain]
-  );
+  )
 
-  const { chain: activeAppChain } = appData;
+  const { chain: activeAppChain } = appData
 
   const isSubmitDisabled = useMemo(() => isSwitchLoading || !selectedChain, [
     isSwitchLoading,
     selectedChain,
-  ]);
+  ])
 
   return (
     <FloatUp
@@ -87,7 +87,7 @@ export default function BasicSetup({ appData }) {
             <>
               <Box title="Available networks">
                 <DataView
-                  fields={["Selected", "Network", "Ticker", "Chain ID"]}
+                  fields={['Selected', 'Network', 'Ticker', 'Chain ID']}
                   entries={chains}
                   renderEntry={({
                     description,
@@ -150,5 +150,5 @@ export default function BasicSetup({ appData }) {
         />
       )}
     />
-  );
+  )
 }

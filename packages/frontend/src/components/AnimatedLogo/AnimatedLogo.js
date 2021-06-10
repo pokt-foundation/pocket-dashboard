@@ -1,27 +1,27 @@
-import React from "react";
-import { keyframes } from "styled-components/macro";
+import React from 'react'
+import { keyframes } from 'styled-components/macro'
 
-const STROKE_WIDTH = 2;
-const LOOP_DURATION = 1800;
-const DONE_TRANSITION_DURATION = 400;
+const STROKE_WIDTH = 2
+const LOOP_DURATION = 1800
+const DONE_TRANSITION_DURATION = 400
 // circumference, found by manually incrementing it :o
 // That comment above was written by @bpierre,
 // and I can say I found this number in the same way :D
-const DASH_ARRAY = 1100;
-const GRADIENT_COLOR_START = "#31A1D2";
-const GRADIENT_COLOR_STOP = "#31A1D2";
-const ANIM_FUNCTION = "cubic-bezier(0.7, 0, 0.3, 1)";
-const GRADIENT_ID = "loading-screen-logo-gradient";
+const DASH_ARRAY = 1100
+const GRADIENT_COLOR_START = '#31A1D2'
+const GRADIENT_COLOR_STOP = '#31A1D2'
+const ANIM_FUNCTION = 'cubic-bezier(0.7, 0, 0.3, 1)'
+const GRADIENT_ID = 'loading-screen-logo-gradient'
 
 const animGradient = keyframes`
   0% { stroke-dashoffset: ${DASH_ARRAY} }
   60%, 100% { stroke-dashoffset: 0 }
-`;
+`
 
 const animMask = keyframes`
   0%, 10% { stroke-dashoffset: ${DASH_ARRAY} }
   90%, 100% { stroke-dashoffset: 0 }
-`;
+`
 
 export default function AnimatedLogo({ done = false }) {
   return (
@@ -36,7 +36,7 @@ export default function AnimatedLogo({ done = false }) {
             ${animGradient};
         `}
         style={{
-          animationPlayState: done ? "paused" : "running",
+          animationPlayState: done ? 'paused' : 'running',
         }}
       />
       <Outline
@@ -46,9 +46,9 @@ export default function AnimatedLogo({ done = false }) {
           animation: ${LOOP_DURATION}ms ${ANIM_FUNCTION} infinite ${animMask};
         `}
         style={{
-          animationPlayState: done ? "paused" : "running",
+          animationPlayState: done ? 'paused' : 'running',
         }}
-      />{" "}
+      />{' '}
       <Outline
         gradient
         css={`
@@ -70,7 +70,7 @@ export default function AnimatedLogo({ done = false }) {
         </linearGradient>
       </defs>
     </svg>
-  );
+  )
 }
 
 function Outline({ gradient = false, ...props }) {
@@ -82,5 +82,5 @@ function Outline({ gradient = false, ...props }) {
       strokeWidth={STROKE_WIDTH}
       {...props}
     />
-  );
+  )
 }

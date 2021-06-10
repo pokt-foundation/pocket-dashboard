@@ -1,29 +1,29 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-import { Spring, animated } from "react-spring/renderprops";
-import "styled-components/macro";
-import { useTheme } from "ui/theme";
-import { noop } from "ui/utils";
-import { springs, GU } from "ui/style";
-import FocusVisible from "ui/FocusVisible/FocusVisible";
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+import { Spring, animated } from 'react-spring/renderprops'
+import 'styled-components/macro'
+import { useTheme } from 'ui/theme'
+import { noop } from 'ui/utils'
+import { springs, GU } from 'ui/style'
+import FocusVisible from 'ui/FocusVisible/FocusVisible'
 
-const BORDER = 1;
-const WRAPPER_WIDTH = 5 * GU;
-const WRAPPER_HEIGHT = 2.25 * GU;
+const BORDER = 1
+const WRAPPER_WIDTH = 5 * GU
+const WRAPPER_HEIGHT = 2.25 * GU
 
 function Switch({ checked, disabled, onChange }) {
-  const theme = useTheme();
-  const [isFocused, setIsFocused] = useState(false);
+  const theme = useTheme()
+  const [isFocused, setIsFocused] = useState(false)
 
-  const handleChange = disabled ? noop : () => onChange(!checked);
+  const handleChange = disabled ? noop : () => onChange(!checked)
 
   return (
     <FocusVisible>
       {({ focusVisible, onFocus }) => (
         <span
           onClick={(e) => {
-            e.preventDefault();
-            handleChange();
+            e.preventDefault()
+            handleChange()
           }}
           css={`
             position: relative;
@@ -37,10 +37,10 @@ function Switch({ checked, disabled, onChange }) {
               : checked
               ? theme.selected
               : theme.control};
-            cursor: ${disabled ? "default" : "pointer"};
+            cursor: ${disabled ? 'default' : 'pointer'};
 
             ${disabled
-              ? ""
+              ? ''
               : `
                   &:active {
                     border-color: ${theme.controlBorderPressed};
@@ -60,14 +60,14 @@ function Switch({ checked, disabled, onChange }) {
                     border: 2px solid ${theme.focus};
                   }
                 `
-              : ""};
+              : ''};
           `}
         >
           <input
             type="checkbox"
             onFocus={() => {
-              setIsFocused(true);
-              onFocus();
+              setIsFocused(true)
+              onFocus()
             }}
             onBlur={() => setIsFocused(false)}
             checked={checked}
@@ -104,8 +104,8 @@ function Switch({ checked, disabled, onChange }) {
                   border-radius: ${WRAPPER_HEIGHT - BORDER * 4}px;
                   background-color: ${theme.controlSurface};
                   box-shadow: ${disabled
-                    ? "none"
-                    : "0px 1px 3px rgba(0, 0, 0, 0.15)"};
+                    ? 'none'
+                    : '0px 1px 3px rgba(0, 0, 0, 0.15)'};
                 `}
               />
             )}
@@ -113,19 +113,19 @@ function Switch({ checked, disabled, onChange }) {
         </span>
       )}
     </FocusVisible>
-  );
+  )
 }
 
 Switch.propTypes = {
   checked: PropTypes.bool,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
-};
+}
 
 Switch.defaultProps = {
   checked: false,
   disabled: false,
   onChange: noop,
-};
+}
 
-export default Switch;
+export default Switch

@@ -1,9 +1,9 @@
-import React from "react";
-import useIconSize from "../icon-size";
-import IconPropTypes from "../IconPropTypes";
+import React from 'react'
+import useIconSize from '../icon-size'
+import IconPropTypes from '../IconPropTypes'
 
 function IconEllipsis({ size, ...props }) {
-  const sizeValue = useIconSize(size);
+  const sizeValue = useIconSize(size)
 
   return (
     <svg
@@ -17,9 +17,9 @@ function IconEllipsis({ size, ...props }) {
       <circle cx={12} cy={12} r={1} fill="currentColor" />
       <circle cx={18} cy={12} r={1} fill="currentColor" />
     </svg>
-  );
+  )
 }
 
-IconEllipsis.propTypes = IconPropTypes;
+IconEllipsis.propTypes = IconPropTypes
 
-export default IconEllipsis;
+export default IconEllipsis

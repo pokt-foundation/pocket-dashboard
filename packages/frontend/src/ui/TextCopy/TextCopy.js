@@ -1,50 +1,50 @@
-import React, { useCallback, useImperativeHandle, useRef } from "react";
-import PropTypes from "prop-types";
-import "styled-components/macro";
-import { IconCopy } from "ui/icons";
-import { GU, textStyle } from "ui/style";
-import { useTheme } from "ui/theme";
-import { noop, warn } from "ui/utils";
-import TextInput from "ui/TextInput/TextInput";
-import ButtonIcon from "ui/Button/ButtonIcon";
+import React, { useCallback, useImperativeHandle, useRef } from 'react'
+import PropTypes from 'prop-types'
+import 'styled-components/macro'
+import { IconCopy } from 'ui/icons'
+import { GU, textStyle } from 'ui/style'
+import { useTheme } from 'ui/theme'
+import { noop, warn } from 'ui/utils'
+import TextInput from 'ui/TextInput/TextInput'
+import ButtonIcon from 'ui/Button/ButtonIcon'
 
-const HEIGHT = 5 * GU;
+const HEIGHT = 5 * GU
 
 const TextCopy = React.memo(
   React.forwardRef(function TextCopy(
     { adornment, autofocus, message, monospace, onCopy, value, ...props },
     ref
   ) {
-    const theme = useTheme();
-    const inputRef = useRef(null);
+    const theme = useTheme()
+    const inputRef = useRef(null)
 
     // Allows to focus the component from the outside
     useImperativeHandle(ref, () => ({
       focus: () => {
-        inputRef.current.focus();
+        inputRef.current.focus()
       },
-    }));
+    }))
 
     // Select the content on focus
     const handleFocus = useCallback(() => {
-      inputRef.current && inputRef.current.select();
-    }, []);
+      inputRef.current && inputRef.current.select()
+    }, [])
 
     // If onCopy is set (either to a function or null), Toast is not used.
-    const onCopyOrToast = onCopy === undefined ? noop : onCopy || noop;
+    const onCopyOrToast = onCopy === undefined ? noop : onCopy || noop
 
     const handleCopy = useCallback(() => {
       if (inputRef.current) {
-        inputRef.current.focus();
+        inputRef.current.focus()
 
         try {
-          document.execCommand("copy");
-          onCopyOrToast(message);
+          document.execCommand('copy')
+          onCopyOrToast(message)
         } catch (err) {
-          warn(err);
+          warn(err)
         }
       }
-    }, [message, onCopyOrToast]);
+    }, [message, onCopyOrToast])
 
     return (
       <div
@@ -54,7 +54,7 @@ const TextCopy = React.memo(
           width: ${52.5 * GU}px;
           max-width: 100%;
           height: ${HEIGHT}px;
-          padding-left: ${adornment ? `${HEIGHT}px` : "0"};
+          padding-left: ${adornment ? `${HEIGHT}px` : '0'};
         `}
         {...props}
       >
@@ -96,8 +96,8 @@ const TextCopy = React.memo(
                   border-bottom-left-radius: 0;
                   border-left: 0;
                 `
-              : ""};
-            ${textStyle("body3")};
+              : ''};
+            ${textStyle('body3')};
             &:read-only {
               color: ${theme.surfaceContent};
               text-shadow: none;
@@ -105,9 +105,9 @@ const TextCopy = React.memo(
           `}
         />
       </div>
-    );
+    )
   })
-);
+)
 
 TextCopy.propTypes = {
   adornment: PropTypes.node,
@@ -116,12 +116,12 @@ TextCopy.propTypes = {
   monospace: PropTypes.bool,
   onCopy: PropTypes.func,
   value: PropTypes.string,
-};
+}
 
 TextCopy.defaultProps = {
   autofocus: false,
-  message: "Copied",
+  message: 'Copied',
   monospace: true,
-};
+}
 
-export default TextCopy;
+export default TextCopy
