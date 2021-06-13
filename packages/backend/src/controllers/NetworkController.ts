@@ -1,9 +1,27 @@
 import express, { Response, Request } from 'express'
+import dayjs from 'dayjs'
+import dayJsutcPlugin from 'dayjs/plugin/utc'
+import { getSdk } from '../graphql/types'
 import Chain from '../models/Blockchains'
 import NetworkData from '../models/NetworkData'
 import ApplicationPool from '../models/PreStakedApp'
 import asyncMiddleware from '../middlewares/async'
 import { authenticate } from '../middlewares/passport-auth'
+import { GraphQLClient } from 'graphql-request'
+import env from '../environment'
+
+function composeSevenDaysUtcDate(): string {
+  // @ts-ignore
+  dayjs.extend(dayJsutcPlugin)
+
+  const sevenDaysAgo = dayjs.utc().subtract(7, 'day')
+
+  const formattedTimestamp = `${sevenDaysAgo.year()}-0${
+    sevenDaysAgo.month() + 1
+  }-${sevenDaysAgo.date()}T00:00:00+00:00`
+
+  return formattedTimestamp
+}
 
 const router = express.Router()
 
@@ -41,6 +59,7 @@ router.get(
     res.status(200).send({ chains: processedChains })
   })
 )
+
 router.get(
   '/stakeable-chains',
   asyncMiddleware(async (_: Request, res: Response) => {
@@ -75,6 +94,7 @@ router.get(
     res.status(200).send({ chains: formattedChains })
   })
 )
+
 router.get(
   '/summary',
   asyncMiddleware(async (_: Request, res: Response) => {
@@ -93,4 +113,74 @@ router.get(
     })
   })
 )
+
+router.get(
+  '/daily-relays',
+  asyncMiddleware(async (_: Request, res: Response) => {
+    const gqlClient = getSdk(
+      new GraphQLClient(env('HASURA_URL') as string, {
+        // @ts-ignore
+        headers: {
+          'x-hasura-admin-secret': env('HASURA_SECRET'),
+        },
+      })
+    )
+
+    const networkRelays = await gqlClient.getDailyNetworkRelays()
+
+    res.status(200).send(networkRelays.relays_daily)
+  })
+)
+
+router.get(
+  '/weekly-successful-relays',
+  asyncMiddleware(async (_: Request, res: Response) => {
+    const gqlClient = getSdk(
+      new GraphQLClient(env('HASURA_URL') as string, {
+        // @ts-ignore
+        headers: {
+          'x-hasura-admin-secret': env('HASURA_SECRET'),
+        },
+      })
+    )
+
+    // @ts-ignore
+    dayjs.extend(dayJsutcPlugin)
+
+    const sevenDaysAgo = composeSevenDaysUtcDate()
+
+    const networkRelays = await gqlClient.getTotalSuccesfulNetworkRelays({
+      _gte: sevenDaysAgo,
+    })
+
+    res
+      .status(200)
+      .send(networkRelays.relay_apps_hourly_aggregate.aggregate.sum)
+  })
+)
+
+router.get(
+  '/total-weekly-relays',
+  asyncMiddleware(async (_: Request, res: Response) => {
+    const gqlClient = getSdk(
+      new GraphQLClient(env('HASURA_URL') as string, {
+        // @ts-ignore
+        headers: {
+          'x-hasura-admin-secret': env('HASURA_SECRET'),
+        },
+      })
+    )
+
+    const sevenDaysAgo = composeSevenDaysUtcDate()
+
+    const networkRelays = await gqlClient.getTotalNetworkRelays({
+      _gte: sevenDaysAgo,
+    })
+
+    res
+      .status(200)
+      .send(networkRelays.relay_apps_hourly_aggregate.aggregate.sum)
+  })
+)
+
 export default router

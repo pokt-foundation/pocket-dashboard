@@ -15,7 +15,12 @@ module.exports = {
   overwrite: true,
   generates: {
     './src/graphql/types.ts': {
-      plugins: ['typescript', 'typescript-document-nodes'],
+      plugins: [
+        'typescript',
+        'typescript-document-nodes',
+        'typescript-graphql-request',
+        'typescript-operations',
+      ],
     },
   },
 }
