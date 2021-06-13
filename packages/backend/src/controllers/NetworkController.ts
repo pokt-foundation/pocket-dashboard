@@ -1,27 +1,13 @@
 import express, { Response, Request } from 'express'
-import dayjs from 'dayjs'
-import dayJsutcPlugin from 'dayjs/plugin/utc'
+import { GraphQLClient } from 'graphql-request'
+import env from '../environment'
 import { getSdk } from '../graphql/types'
 import Chain from '../models/Blockchains'
 import NetworkData from '../models/NetworkData'
 import ApplicationPool from '../models/PreStakedApp'
 import asyncMiddleware from '../middlewares/async'
 import { authenticate } from '../middlewares/passport-auth'
-import { GraphQLClient } from 'graphql-request'
-import env from '../environment'
-
-function composeSevenDaysUtcDate(): string {
-  // @ts-ignore
-  dayjs.extend(dayJsutcPlugin)
-
-  const sevenDaysAgo = dayjs.utc().subtract(7, 'day')
-
-  const formattedTimestamp = `${sevenDaysAgo.year()}-0${
-    sevenDaysAgo.month() + 1
-  }-${sevenDaysAgo.date()}T00:00:00+00:00`
-
-  return formattedTimestamp
-}
+import { composeSevenDaysUtcDate } from '../lib/date-utils'
 
 const router = express.Router()
 

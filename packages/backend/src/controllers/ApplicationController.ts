@@ -350,4 +350,5 @@ router.put(
     return res.status(204).send()
   })
 )
+
 export default router
