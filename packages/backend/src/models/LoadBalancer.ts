@@ -4,7 +4,7 @@ export interface ILoadBalancer extends Document {
   user: Types.ObjectId
   name: string
   requestTimeOut: string
-  applicationIDs: string
+  applicationIDs: string[]
   createdAt: Date | number
 }
 
