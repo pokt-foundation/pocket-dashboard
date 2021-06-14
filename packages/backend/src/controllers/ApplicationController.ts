@@ -1,5 +1,4 @@
 import express, { Response, Request } from 'express'
-import crypto from 'crypto'
 import asyncMiddleware from '../middlewares/async'
 import { authenticate } from '../middlewares/passport-auth'
 import Application, { IApplication } from '../models/Application'
@@ -9,13 +8,6 @@ import HttpError from '../errors/http-error'
 import MailgunService from '../services/MailgunService'
 import { getApp } from '../lib/pocket'
 import { APPLICATION_STATUSES } from '../application-statuses'
-
-const DEFAULT_GATEWAY_SETTINGS = {
-  secretKey: '',
-  secretKeyRequired: false,
-  whitelistOrigins: [],
-  whitelistUserAgents: [],
-}
 
 const router = express.Router()
 
@@ -106,81 +98,6 @@ router.get(
     const app = await getApp(application.freeTierApplicationAccount.address)
 
     res.status(200).send(app)
-  })
-)
-
-router.post(
-  '',
-  asyncMiddleware(async (req: Request, res: Response) => {
-    const { name, chain, gatewaySettings = DEFAULT_GATEWAY_SETTINGS } = req.body
-
-    try {
-      const id = (req.user as IUser)._id
-      // const isNewAppRequestInvalid = await Application.exists({
-      //   status: APPLICATION_STATUSES.READY,
-      //   user: id,
-      // });
-
-      // if (isNewAppRequestInvalid) {
-      //   throw HttpError.BAD_REQUEST({
-      //     errors: [
-      //       {
-      //         id: "ALREADY_EXISTING",
-      //         message: "User already has an existing free tier app",
-      //       },
-      //     ],
-      //   });
-      // }
-      const preStakedApp: IPreStakedApp = await ApplicationPool.findOne({
-        status: APPLICATION_STATUSES.READY,
-        chain,
-      })
-
-      if (!preStakedApp) {
-        throw HttpError.BAD_REQUEST({
-          errors: [
-            {
-              id: 'POOL_EMPTY',
-              message: 'No pre-staked apps available for this chain.',
-            },
-          ],
-        })
-      }
-      const application = new Application({
-        chain,
-        name,
-        user: id,
-        status: APPLICATION_STATUSES.READY,
-        lastChangedStatusAt: new Date(Date.now()),
-        // We enforce every app to be treated as a free-tier app for now.
-        freeTier: true,
-        freeTierApplicationAccount: preStakedApp.freeTierApplicationAccount,
-        gatewayAAT: preStakedApp.gatewayAAT,
-        gatewaySettings: {
-          ...gatewaySettings,
-        },
-      })
-
-      application.gatewaySettings.secretKey = crypto
-        .randomBytes(16)
-        .toString('hex')
-      await application.save()
-      const { ok } = await ApplicationPool.deleteOne({ _id: preStakedApp._id })
-
-      if (Number(ok) !== 1) {
-        throw HttpError.INTERNAL_SERVER_ERROR({
-          errors: [
-            {
-              id: 'DB_ERROR',
-              message: 'There was an error while updating the DB',
-            },
-          ],
-        })
-      }
-      res.status(200).send(application)
-    } catch (err) {
-      throw HttpError.INTERNAL_SERVER_ERROR(err)
-    }
   })
 )
 

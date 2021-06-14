@@ -1,10 +1,12 @@
-import express, { Response, Request } from 'express'
+import express, { Response, Request, NextFunction } from 'express'
+import crypto from 'crypto'
 import { GraphQLClient } from 'graphql-request'
 import env from '../environment'
 import { getSdk } from '../graphql/types'
 import asyncMiddleware from '../middlewares/async'
 import { authenticate } from '../middlewares/passport-auth'
 import Application, { IApplication } from '../models/Application'
+import ApplicationPool, { IPreStakedApp } from '../models/PreStakedApp'
 import LoadBalancer, { ILoadBalancer } from '../models/LoadBalancer'
 import { IUser } from '../models/User'
 import {
@@ -12,13 +14,387 @@ import {
   composeHoursFromNowUtcDate,
   composeTodayUtcDate,
 } from '../lib/date-utils'
+import { getApp } from '../lib/pocket'
 import HttpError from '../errors/http-error'
+import MailgunService from '../services/MailgunService'
+import { APPLICATION_STATUSES } from '../application-statuses'
 
+const DEFAULT_GATEWAY_SETTINGS = {
+  secretKey: '',
+  secretKeyRequired: false,
+  whitelistOrigins: [],
+  whitelistUserAgents: [],
+}
+const DEFAULT_TIMEOUT = 2000
 const BUCKETS_PER_HOUR = 2
+const MAX_LB_SWITCH_THRESHOLD = 2
 
 const router = express.Router()
 
 router.use(authenticate)
+
+router.get(
+  '',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const id = (req.user as IUser)._id
+    const application = await LoadBalancer.find({
+      user: id,
+    })
+
+    if (!application) {
+      throw HttpError.NOT_FOUND({
+        errors: [
+          {
+            id: 'NONEXISTENT_APPLICATION',
+            message: 'User does not have an active application',
+          },
+        ],
+      })
+    }
+
+    res.status(200).send(application)
+  })
+)
+
+router.post(
+  '',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const { name, chain, gatewaySettings = DEFAULT_GATEWAY_SETTINGS } = req.body
+
+    try {
+      const id = (req.user as IUser)._id
+      const isNewAppRequestInvalid = await Application.exists({
+        status: APPLICATION_STATUSES.READY,
+        user: id,
+      })
+
+      if (isNewAppRequestInvalid) {
+        throw HttpError.BAD_REQUEST({
+          errors: [
+            {
+              id: 'ALREADY_EXISTING',
+              message: 'User already has an existing free tier app',
+            },
+          ],
+        })
+      }
+      const preStakedApp: IPreStakedApp = await ApplicationPool.findOne({
+        status: APPLICATION_STATUSES.READY,
+        chain,
+      })
+
+      if (!preStakedApp) {
+        throw HttpError.BAD_REQUEST({
+          errors: [
+            {
+              id: 'POOL_EMPTY',
+              message: 'No pre-staked apps available for this chain.',
+            },
+          ],
+        })
+      }
+      const application = new Application({
+        chain,
+        name,
+        user: id,
+        status: APPLICATION_STATUSES.READY,
+        lastChangedStatusAt: new Date(Date.now()),
+        // We enforce every app to be treated as a free-tier app for now.
+        freeTier: true,
+        freeTierApplicationAccount: preStakedApp.freeTierApplicationAccount,
+        gatewayAAT: preStakedApp.gatewayAAT,
+        gatewaySettings: {
+          ...gatewaySettings,
+        },
+      })
+
+      application.gatewaySettings.secretKey = crypto
+        .randomBytes(16)
+        .toString('hex')
+
+      await application.save()
+
+      const { ok } = await ApplicationPool.deleteOne({ _id: preStakedApp._id })
+
+      if (ok !== 1) {
+        throw HttpError.INTERNAL_SERVER_ERROR({
+          errors: [
+            {
+              id: 'DB_ERROR',
+              message: 'There was an error while updating the DB',
+            },
+          ],
+        })
+      }
+      const loadBalancer = new LoadBalancer({
+        user: id,
+        name,
+        requestTimeOut: DEFAULT_TIMEOUT,
+        applicationIDs: [application._id.toString()],
+      })
+
+      await loadBalancer.save()
+
+      res.status(200).send(application)
+    } catch (err) {
+      throw HttpError.INTERNAL_SERVER_ERROR(err)
+    }
+  })
+)
+
+router.put(
+  '/:lbId',
+  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    const { gatewaySettings } = req.body
+    const { lbId } = req.params
+    const userId = (req.user as IUser)._id
+
+    try {
+      const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
+
+      if (!loadBalancer) {
+        throw HttpError.BAD_REQUEST({
+          errors: [
+            { id: 'NONEXISTENT_APPLICATION', message: 'Application not found' },
+          ],
+        })
+      }
+
+      if (loadBalancer.user.toString() !== userId.toString()) {
+        throw HttpError.BAD_REQUEST({
+          errors: [
+            {
+              id: 'UNAUTHORIZED_ACCESS',
+              message: 'Application does not belong to user',
+            },
+          ],
+        })
+      }
+
+      await Promise.all(
+        loadBalancer.applicationIDs.map(async function changeSettings(
+          applicationId
+        ) {
+          const application: IApplication = await Application.findById(
+            applicationId
+          )
+
+          application.gatewaySettings = gatewaySettings
+          await application.save()
+        })
+      )
+      res.status(204).send()
+    } catch (err) {
+      next(err)
+    }
+  })
+)
+
+router.get(
+  '/status/:lbId',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id
+    const { lbId } = req.params
+    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
+
+    if (!loadBalancer) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          { id: 'NONEXISTENT_APPLICATION', message: 'Application not found' },
+        ],
+      })
+    }
+
+    if (loadBalancer.user.toString() !== userId.toString()) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'Application does not belong to user',
+          },
+        ],
+      })
+    }
+
+    const apps = await Promise.all(
+      loadBalancer.applicationIDs.map(async function getApps(applicationId) {
+        const application: IApplication = await Application.findById(
+          applicationId
+        )
+
+        return await getApp(application.freeTierApplicationAccount.address)
+      })
+    )
+
+    res.status(200).send(apps)
+  })
+)
+
+router.put(
+  '/notifications/:lbId',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id
+    const { lbId } = req.params
+    const { quarter, half, threeQuarters, full } = req.body
+    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
+
+    if (!loadBalancer) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          { id: 'NONEXISTENT_APPLICATION', message: 'Application not found' },
+        ],
+      })
+    }
+
+    if (loadBalancer.user.toString() !== userId.toString()) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'Application does not belong to user',
+          },
+        ],
+      })
+    }
+    const emailService = new MailgunService()
+    const isSignedUp = (loadBalancer as ILoadBalancer).notificationSettings
+      .signedUp
+    const hasOptedOut = !(quarter || half || threeQuarters || full)
+
+    ;(loadBalancer as ILoadBalancer).notificationSettings = {
+      signedUp: hasOptedOut ? false : true,
+      quarter,
+      half,
+      threeQuarters,
+      full,
+    }
+    await loadBalancer.save()
+    if (!isSignedUp) {
+      emailService.send({
+        templateName: 'NotificationSignup',
+        toEmail: (req.user as IUser).email,
+      })
+    } else {
+      emailService.send({
+        templateName: 'NotificationChange',
+        toEmail: (req.user as IUser).email,
+      })
+    }
+    return res.status(204).send()
+  })
+)
+
+router.post(
+  '/switch/:lbId',
+  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = (req.user as IUser)._id
+    const { chain } = req.body
+    const { lbId } = req.params
+    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
+
+    if (!loadBalancer) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          { id: 'NONEXISTENT_APPLICATION', message: 'Application not found' },
+        ],
+      })
+    }
+
+    if (loadBalancer.user.toString() !== userId.toString()) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'Application does not belong to user',
+          },
+        ],
+      })
+    }
+
+    if (loadBalancer.applicationIDs.length > MAX_LB_SWITCH_THRESHOLD) {
+      next(
+        HttpError.BAD_REQUEST({
+          errors: [
+            {
+              id: 'TOO_MANY_APPS',
+              message: 'Too many applications in Load Balancer',
+            },
+          ],
+        })
+      )
+    }
+
+    const newAppIds = await Promise.all(
+      loadBalancer.applicationIDs.map(async function switchApp(applicationId) {
+        const replacementApplication: IPreStakedApp = await ApplicationPool.findOne(
+          {
+            chain,
+            status: APPLICATION_STATUSES.READY,
+          }
+        )
+
+        if (!replacementApplication) {
+          throw new Error('No application for the selected chain is available')
+        }
+        const oldApplication: IApplication = await Application.findById(
+          applicationId
+        )
+
+        if (!oldApplication) {
+          throw new Error('Cannot find application')
+        }
+        if (
+          oldApplication.user.toString() !== (req.user as IUser)._id.toString()
+        ) {
+          throw HttpError.FORBIDDEN({
+            errors: [
+              {
+                id: 'FOREIGN_APPLICATION',
+                message: 'Application does not belong to user',
+              },
+            ],
+          })
+        }
+
+        oldApplication.status = APPLICATION_STATUSES.AWAITING_GRACE_PERIOD
+        oldApplication.lastChangedStatusAt = Date.now()
+        await oldApplication.save()
+        // Create a new Application for the user and copy the previous user config
+        const newReplacementApplication = new Application({
+          // As we're moving to a new chain, everything related to the account and gateway AAT
+          // information will change, so we use all the data from the application that we took
+          // from the pool.
+          chain: replacementApplication.chain,
+          freeTierApplicationAccount:
+            replacementApplication.freeTierApplicationAccount,
+          gatewayAAT: replacementApplication.gatewayAAT,
+          status: APPLICATION_STATUSES.READY,
+          lastChangedStatusAt: Date.now(),
+          freeTier: true,
+          // We wanna preserve user-related configuration fields, so we just copy them over
+          // from the old application.
+          name: oldApplication.name,
+          user: oldApplication.user,
+          gatewaySettings: oldApplication.gatewaySettings,
+        })
+
+        await newReplacementApplication.save()
+
+        return newReplacementApplication._id.toString()
+      })
+    )
+
+    loadBalancer.applicationIDs = newAppIds
+
+    await loadBalancer.save()
+
+    try {
+      res.status(200).send(loadBalancer)
+    } catch (err) {
+      throw HttpError.INTERNAL_SERVER_ERROR(err)
+    }
+  })
+)
 
 router.get(
   '/total-relays/:lbId',
