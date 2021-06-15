@@ -37,11 +37,11 @@ router.get(
   '',
   asyncMiddleware(async (req: Request, res: Response) => {
     const id = (req.user as IUser)._id
-    const application = await LoadBalancer.find({
+    const lbs = await LoadBalancer.find({
       user: id,
     })
 
-    if (!application) {
+    if (!lbs) {
       throw HttpError.NOT_FOUND({
         errors: [
           {
@@ -52,7 +52,7 @@ router.get(
       })
     }
 
-    res.status(200).send(application)
+    res.status(200).send(lbs)
   })
 )
 

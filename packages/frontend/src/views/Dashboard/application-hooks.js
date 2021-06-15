@@ -152,7 +152,7 @@ const LATEST_LATENCY_VALUES_QUERY = gql`
       where: {
         app_pub_key: { _eq: $_eq }
         bucket: { _gte: $_gte }
-        elapsed_time: { _lte: "3" }
+        elapsed_time: { _lte: "2" }
       }
       order_by: { bucket: desc }
     ) {
@@ -193,6 +193,42 @@ export function useUserApplications() {
     appsData,
     isAppsError,
     isAppsLoading,
+    refetchUserApps,
+  }
+}
+
+export function useUserLoadBalancers() {
+  const {
+    isLoading: isLbLoading,
+    isError: isLbError,
+    data: lbData,
+    refetch: refetchUserApps,
+  } = useQuery('user/lbs', async function getUserLoadBalancers() {
+    const path = `${env('BACKEND_URL')}/api/lb`
+
+    try {
+      const { data } = await axios.get(path, {
+        withCredentials: true,
+      })
+
+      const userApps = data.map(({ name, _id, ...rest }) => ({
+        appName: name,
+        appId: _id,
+        isLb: true,
+        ...rest,
+      }))
+
+      return userApps
+    } catch (err) {
+      // TODO: Send to sentry
+      console.log(err, 'rip')
+    }
+  })
+
+  return {
+    lbData,
+    isLbError,
+    isLbLoading,
     refetchUserApps,
   }
 }

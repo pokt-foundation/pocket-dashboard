@@ -9,7 +9,7 @@ import Dashboard from 'views/Dashboard/Dashboard'
 import Fallback from 'views/Fallback'
 import ForgotPassword from 'views/Onboarding/ForgotPassword'
 import NetworkStatus from 'views/Dashboard/Network/NetworkStatus'
-import MyApp from 'views/Dashboard/ApplicationDetail/ApplicationDetail'
+import ApplicationDetail from 'views/Dashboard/ApplicationDetail/ApplicationDetail'
 import NewPassword from 'views/Onboarding/NewPassword'
 import Login from 'views/Onboarding/Login'
 import Signup from 'views/Onboarding/Signup'
@@ -73,7 +73,7 @@ export default function DashboardRoutes() {
               <NetworkStatus />
             </Route>
             <Route path={`/app/:appId`}>
-              <MyApp />
+              <ApplicationDetail />
             </Route>
             <Route exact path={`/create`}>
               <Create />

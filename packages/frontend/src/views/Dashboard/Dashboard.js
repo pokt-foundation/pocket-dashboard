@@ -4,11 +4,11 @@ import 'styled-components/macro'
 import { Spacer, useTheme, GU } from 'ui'
 import NavigationBar from 'views/Dashboard/NavigationBar'
 import MenuPanel from 'components/MenuPanel/MenuPanel'
-import { useUserApplications } from 'views/Dashboard/application-hooks'
+import { AppsContextProvider, useUserApps } from 'contexts/AppsContext'
 
-export default function DashboardView({ children }) {
+function DashboardView({ children }) {
   const location = useLocation()
-  const { isAppsLoading, appsData } = useUserApplications()
+  const { appsLoading, userApps } = useUserApps()
   const theme = useTheme()
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function DashboardView({ children }) {
         overflow-x: hidden;
       `}
     >
-      <MenuPanel appsLoading={isAppsLoading} userApps={appsData} />
+      <MenuPanel appsLoading={appsLoading} userApps={userApps} />
       <main
         css={`
           height: auto;
@@ -44,11 +44,19 @@ export default function DashboardView({ children }) {
           scrollbar-width: none; /* Firefox */
         `}
       >
-        <NavigationBar applications={appsData} />
+        <NavigationBar applications={userApps} />
         <Spacer size={5 * GU} />
         {children}
         <Spacer size={2 * GU} />
       </main>
     </div>
+  )
+}
+
+export default function Dashboard({ children }) {
+  return (
+    <AppsContextProvider>
+      <DashboardView>{children}</DashboardView>
+    </AppsContextProvider>
   )
 }

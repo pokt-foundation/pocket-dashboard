@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Switch, Route, useParams, useRouteMatch } from 'react-router'
+import { useQueries } from 'react-query'
+import axios from 'axios'
 import 'styled-components/macro'
 import { Spacer, textStyle, GU } from 'ui'
 import AnimatedLogo from 'components/AnimatedLogo/AnimatedLogo'
 import AppInfo from 'views/Dashboard/ApplicationDetail/AppInfo'
 import Chains from 'views/Dashboard/ApplicationDetail/Chains'
 import Notifications from 'views/Dashboard/ApplicationDetail/Notifications'
+import LoadBalancerDetail from "views/Dashboard/ApplicationDetail/LoadBalancerDetail"
 import Security from 'views/Dashboard/ApplicationDetail/Security'
 import SuccessDetails from 'views/Dashboard/ApplicationDetail/SuccessDetails'
 import {
@@ -19,12 +22,64 @@ import {
   useWeeklyAppRelaysInfo,
 } from 'views/Dashboard/application-hooks'
 import env from 'environment'
+import { useUserApps } from 'contexts/AppsContext'
 
-// Ethers.js
+// Earnifi #1 app
 const TEST_APP_PUB_KEY =
-  '2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74'
+  'a3edc0d94701ce5e0692754b519ab125c921c704f11439638834894a5ec5fa53'
 
-export default function ApplicationDetail() {
+export default function AppDetailWrapper() {
+  const { appsLoading, userApps } = useUserApps()
+  const { appId } = useParams()
+
+  const isLb = useMemo(
+    () => userApps.find((app) => appId === app.appId && app?.isLb),
+    [appId, userApps]
+  )
+
+  const activeApplication = useMemo(
+    () => userApps.find((app) => appId === app.appId),
+    [appId, userApps]
+  )
+
+  if (appsLoading) {
+    return <AnimatedLoader />
+  }
+
+  return isLb ? (
+    <LoadBalancerDetail activeApplication={activeApplication} />
+  ) : (
+    <ApplicationDetail activeApplication={activeApplication} />
+  )
+}
+
+function LoadBalancerDetail({ activeApplication }) {
+  const { appId } = activeApplication
+  const results = useQueries([
+    {
+      queryKey: 'lb/active-application',
+      queryFn: async function getActiveApplication() {
+        const path = `${env('BACKEND_URL')}/api/lb/${appId}`
+
+        try {
+          const { data } = await axios.get(path, {
+            withCredentials: true,
+          })
+
+          return data
+        } catch (err) {
+          console.log(err)
+        }
+      },
+    },
+  ])
+
+  console.log(results, 'res')
+
+  return <div>plakata plakata</div>
+}
+
+function ApplicationDetail() {
   const { appId } = useParams()
   const { path } = useRouteMatch()
   const { appData, isAppLoading, refetchActiveAppData } = useActiveApplication()
@@ -80,28 +135,7 @@ export default function ApplicationDetail() {
     isLatestLatencyLoading
 
   return appLoading ? (
-    <div
-      css={`
-        position: relative;
-        width: 100%;
-        /* TODO: This is leaky. fix up with a permanent component */
-        height: 60vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      `}
-    >
-      <AnimatedLogo />
-      <Spacer size={2 * GU} />
-      <p
-        css={`
-          ${textStyle('body2')}
-        `}
-      >
-        Loading application...
-      </p>
-    </div>
+    <AnimatedLoader />
   ) : (
     <Switch>
       <Route exact path={path}>
@@ -140,5 +174,32 @@ export default function ApplicationDetail() {
         <Chains appData={appData} />
       </Route>
     </Switch>
+  )
+}
+
+function AnimatedLoader() {
+  return (
+    <div
+      css={`
+        position: relative;
+        width: 100%;
+        /* TODO: This is leaky. fix up with a permanent component */
+        height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      `}
+    >
+      <AnimatedLogo />
+      <Spacer size={2 * GU} />
+      <p
+        css={`
+          ${textStyle('body2')}
+        `}
+      >
+        Loading application...
+      </p>
+    </div>
   )
 }

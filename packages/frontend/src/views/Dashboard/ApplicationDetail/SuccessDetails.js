@@ -83,7 +83,7 @@ export default function SuccessDetails({
 
   const compactMode = within(-1, 'medium')
 
-  const { public_key: publicKey } = appOnChainData
+  const { public_key: publicKey = env('TEST_APP_PUB_KEY') } = appOnChainData
 
   const { isLoading, data } = useQuery(
     [`user/applications/${publicKey}/success-details`, page],
