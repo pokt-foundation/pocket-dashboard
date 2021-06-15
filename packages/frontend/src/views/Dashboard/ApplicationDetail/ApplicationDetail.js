@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { Switch, Route, useParams, useRouteMatch } from 'react-router'
-import { useQueries } from 'react-query'
 import axios from 'axios'
 import 'styled-components/macro'
 import { Spacer, textStyle, GU } from 'ui'
@@ -8,7 +7,7 @@ import AnimatedLogo from 'components/AnimatedLogo/AnimatedLogo'
 import AppInfo from 'views/Dashboard/ApplicationDetail/AppInfo'
 import Chains from 'views/Dashboard/ApplicationDetail/Chains'
 import Notifications from 'views/Dashboard/ApplicationDetail/Notifications'
-import LoadBalancerDetail from "views/Dashboard/ApplicationDetail/LoadBalancerDetail"
+import LoadBalancerInfo from 'views/Dashboard/ApplicationDetail/LoadBalancerDetail'
 import Security from 'views/Dashboard/ApplicationDetail/Security'
 import SuccessDetails from 'views/Dashboard/ApplicationDetail/SuccessDetails'
 import {
@@ -21,6 +20,7 @@ import {
   useSucessfulWeeklyRelays,
   useWeeklyAppRelaysInfo,
 } from 'views/Dashboard/application-hooks'
+import { useAppMetrics } from 'views/Dashboard/ApplicationDetail/useAppMetrics'
 import env from 'environment'
 import { useUserApps } from 'contexts/AppsContext'
 
@@ -46,6 +46,8 @@ export default function AppDetailWrapper() {
     return <AnimatedLoader />
   }
 
+  console.log(isLb)
+
   return isLb ? (
     <LoadBalancerDetail activeApplication={activeApplication} />
   ) : (
@@ -54,29 +56,32 @@ export default function AppDetailWrapper() {
 }
 
 function LoadBalancerDetail({ activeApplication }) {
-  const { appId } = activeApplication
-  const results = useQueries([
-    {
-      queryKey: 'lb/active-application',
-      queryFn: async function getActiveApplication() {
-        const path = `${env('BACKEND_URL')}/api/lb/${appId}`
+  const { metricsLoading, metrics } = useAppMetrics({ activeApplication })
+  const [
+    _,
+    { data: totalRelays },
+    { data: successfulRelays },
+    { data: dailyRelays },
+    { data: sessionRelays },
+    { data: latestRelays },
+    { data: previousSuccessfulRelays },
+    { data: hourlyLatency },
+  ] = metrics
 
-        try {
-          const { data } = await axios.get(path, {
-            withCredentials: true,
-          })
-
-          return data
-        } catch (err) {
-          console.log(err)
-        }
-      },
-    },
-  ])
-
-  console.log(results, 'res')
-
-  return <div>plakata plakata</div>
+  return metricsLoading ? (
+    <AnimatedLoader />
+  ) : (
+    <LoadBalancerInfo
+      appData={activeApplication}
+      currentSessionRelays={sessionRelays.session_relays}
+      dailyRelayData={dailyRelays.daily_relays}
+      previousSuccessfulRelays={previousSuccessfulRelays}
+      successfulRelayData={successfulRelays}
+      weeklyRelayData={totalRelays}
+      latestLatencyData={hourlyLatency}
+      latestRelays={latestRelays.session_relays}
+    />
+  )
 }
 
 function ApplicationDetail() {

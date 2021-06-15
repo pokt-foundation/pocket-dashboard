@@ -28,6 +28,7 @@ const DEFAULT_GATEWAY_SETTINGS = {
 const DEFAULT_TIMEOUT = 2000
 const BUCKETS_PER_HOUR = 2
 const MAX_LB_SWITCH_THRESHOLD = 2
+const RELAYS_PER_APP = 10
 
 const router = express.Router()
 
@@ -131,11 +132,12 @@ router.post(
         name,
         requestTimeOut: DEFAULT_TIMEOUT,
         applicationIDs: [application._id.toString()],
+        chain,
       })
 
       await loadBalancer.save()
 
-      res.status(200).send(application)
+      res.status(200).send(loadBalancer)
     } catch (err) {
       throw HttpError.INTERNAL_SERVER_ERROR(err)
     }
@@ -757,120 +759,48 @@ router.get(
       })
     )
 
-    const today = composeTodayUtcDate()
-
-    const sessionRelaysPerApp = await Promise.all(
+    const latestRelaysPerApp = await Promise.all(
       appIds.map(async function getData(applicationId) {
         const application: IApplication = await Application.findById(
           applicationId
         )
 
-        const result = await gqlClient.getLastSessionAppRelays({
+        const result = await gqlClient.getLatestRelays({
           _eq: application.freeTierApplicationAccount.publicKey,
-          _gte: today,
-          _buckets: BUCKETS_PER_HOUR,
+          limit: RELAYS_PER_APP,
+          offset: 0,
         })
 
-        const totalSessionRelays = result.relay_app_hourly.reduce(
-          (total, { total_relays: totalRelays }) => total + totalRelays,
-          0
-        )
-
-        return totalSessionRelays
+        return result
       })
     )
 
-    const totalSessionRelays = sessionRelaysPerApp.reduce(function sumRelays(
-      total,
-      sessionRelays
-    ) {
-      return total + sessionRelays
-    },
-    0)
+    const relays = []
+
+    latestRelaysPerApp.map((relayBatch) => {
+      for (const relay of relayBatch.relay) {
+        relays.push(relay)
+      }
+    })
+
+    relays
+      .sort((a, b) => {
+        const dateA = new Date(a.timestamp)
+        const dateB = new Date(b.timestamp)
+
+        // @ts-ignore
+        return dateA - dateB
+      })
+      .reverse()
 
     res.status(200).send({
-      session_relays: totalSessionRelays,
+      session_relays: relays.slice(0, 10),
     })
   })
 )
 
 router.get(
   '/previous-successful-relays/:lbId',
-  asyncMiddleware(async (req: Request, res: Response) => {
-    const userId = (req.user as IUser)._id
-    const { lbId } = req.params
-
-    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
-
-    if (!loadBalancer) {
-      throw HttpError.BAD_REQUEST({
-        errors: [
-          {
-            id: 'NONEXISTENT_LOADBALANCER',
-            message: 'User does not have an active Load Balancer',
-          },
-        ],
-      })
-    }
-    if (loadBalancer.user.toString() !== userId.toString()) {
-      throw HttpError.FORBIDDEN({
-        errors: [
-          {
-            id: 'UNAUTHORIZED_ACCESS',
-            message: 'User does not have access to this load balancer',
-          },
-        ],
-      })
-    }
-
-    const appIds = loadBalancer.applicationIDs
-
-    const gqlClient = getSdk(
-      new GraphQLClient(env('HASURA_URL') as string, {
-        // @ts-ignore
-        headers: {
-          'x-hasura-admin-secret': env('HASURA_SECRET'),
-        },
-      })
-    )
-
-    const fourteenDaysAgo = composeDaysFromNowUtcDate(14)
-    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
-
-    const previousSuccessfulRelaysPerApp = await Promise.all(
-      appIds.map(async function getData(applicationId) {
-        const application: IApplication = await Application.findById(
-          applicationId
-        )
-
-        const result = await gqlClient.getTotalSuccessfulRangedRelays({
-          _eq: application.freeTierApplicationAccount.publicKey,
-          _gte: fourteenDaysAgo,
-          _lte: sevenDaysAgo,
-        })
-
-        return {
-          successful_relays:
-            result.relay_apps_daily_aggregate.aggregate.sum.total_relays ?? 0,
-        }
-      })
-    )
-
-    const totalSuccessfulRelays = previousSuccessfulRelaysPerApp.reduce(
-      function sumRelays(total, app) {
-        return total + app.successful_relays
-      },
-      0
-    )
-
-    res.status(200).send({
-      successful_relays: totalSuccessfulRelays,
-    })
-  })
-)
-
-router.get(
-  '/-successful-relays/:lbId',
   asyncMiddleware(async (req: Request, res: Response) => {
     const userId = (req.user as IUser)._id
     const { lbId } = req.params

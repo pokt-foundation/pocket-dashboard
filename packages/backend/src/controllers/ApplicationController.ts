@@ -44,7 +44,7 @@ router.get(
     const application: IApplication = await Application.findById(applicationId)
 
     if (!application) {
-      throw HttpError.NOT_FOUND({
+      throw HttpError.BAD_REQUEST({
         errors: [
           {
             id: 'NONEXISTENT_APPLICATION',
@@ -53,6 +53,8 @@ router.get(
         ],
       })
     }
+
+    console.log(userId, application?.user, 'alo')
     if (application.user.toString() !== userId.toString()) {
       throw HttpError.FORBIDDEN({
         errors: [

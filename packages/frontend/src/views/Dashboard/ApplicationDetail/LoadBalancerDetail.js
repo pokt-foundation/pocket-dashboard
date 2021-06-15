@@ -28,7 +28,6 @@ import AppStatus from 'components/AppStatus/AppStatus'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import SuccessIndicator from 'views/Dashboard/ApplicationDetail/SuccessIndicator'
-import { useLatestRelays } from 'views/Dashboard/application-hooks'
 import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
 import { getThresholdsPerStake } from 'lib/pocket-utils'
@@ -183,7 +182,7 @@ function formatLatencyValuesForGraphing(
   }
 }
 
-export default function AppInfo({
+export default function LoadBalancerInfo({
   appData,
   appOnChainData,
   currentSessionRelays,
@@ -192,7 +191,19 @@ export default function AppInfo({
   successfulRelayData,
   weeklyRelayData,
   latestLatencyData,
+  latestRelays,
 }) {
+  console.log(
+    appData,
+    appOnChainData,
+    currentSessionRelays,
+    dailyRelayData,
+    previousSuccessfulRelays,
+    successfulRelayData,
+    weeklyRelayData,
+    latestLatencyData,
+    latestRelays
+  )
   const [networkModalVisible, setNetworkModalVisible] = useState(false)
   const [networkDenialModalVisible, setNetworkDenialModalVisible] = useState(
     false
@@ -202,12 +213,8 @@ export default function AppInfo({
   const { within } = useViewport()
 
   const compactMode = within(-1, 'medium')
-  const { staked_tokens: stakedTokens } = appOnChainData
-  const {
-    freeTierApplicationAccount: { publicKey = env('TEST_APP_PUB_KEY') },
-  } = appData
-
-  const { graphThreshold, maxRelays } = getThresholdsPerStake(stakedTokens)
+  // const { staked_tokens: stakedTokens } = appOnChainData
+  const { graphThreshold, maxRelays } = getThresholdsPerStake(24950100000)
 
   const successRate = useMemo(() => {
     return weeklyRelayData.weeklyAppRelays === 0
@@ -234,15 +241,15 @@ export default function AppInfo({
     latestLatencyData,
   ])
 
-  const isSwitchable = useMemo(() => {
-    dayjs.extend(dayJsutcPlugin)
-    const today = dayjs.utc()
-    const appCreationDate = dayjs.utc(appData.createdAt)
+  // const isSwitchable = useMemo(() => {
+  // dayjs.extend(dayJsutcPlugin)
+  // const today = dayjs.utc()
+  // const appCreationDate = dayjs.utc(appData.createdAt)
 
-    const diff = today.diff(appCreationDate, 'day')
+  // const diff = today.diff(appCreationDate, 'day')
 
-    return diff >= 7
-  }, [appData])
+  // return diff >= 7
+  // }, [appData])
 
   const exceedsMaxRelays = useMemo(() => {
     const todaysRelays = dailyRelayData[dailyRelayData.length - 1] ?? {
@@ -265,6 +272,8 @@ export default function AppInfo({
     () => setNetworkDenialModalVisible(false),
     []
   )
+
+  const isSwitchable = true
 
   const onOpenModal = useCallback(() => {
     if (!isSwitchable) {
@@ -345,7 +354,7 @@ export default function AppInfo({
                   threshold={graphThreshold}
                 />
                 <Spacer size={2 * GU} />
-                <LatestRequests publicKey={publicKey} />
+                <LatestRequests latestRelayData={latestRelays} />
               </>
             }
             secondary={
@@ -365,11 +374,10 @@ export default function AppInfo({
                   Notifications
                 </Button>
                 <Spacer size={2 * GU} />
-                <AppStatus appOnChainStatus={appOnChainData} />
+              {/*<AppStatus appOnChainStatus={appOnChainData} />*/}
                 <Spacer size={2 * GU} />
                 <AppDetails
                   id={appData._id}
-                  pubkey={appData.freeTierApplicationAccount.publicKey}
                   secret={appData.gatewaySettings?.secretKey ?? ''}
                 />
               </>
@@ -830,25 +838,21 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   )
 }
 
-function LatestRequests({ publicKey = env('TEST_APP_PUB_KEY') }) {
+function LatestRequests({ latestRelayData }) {
   const [page, setPage] = useState(0)
   const { within } = useViewport()
-  const { isLatestRelaysLoading, latestRelayData } = useLatestRelays(
-    publicKey,
-    page
-  )
 
   const onPageChange = useCallback((page) => setPage(page), [])
+  const latestRelays = useMemo(() => {
+    return latestRelayData ? latestRelayData : []
+  }, [latestRelayData])
+
   const [colorsByMethod, countByColor, colorValues] = useMemo(() => {
-    if (isLatestRelaysLoading) {
-      return []
-    }
-    const { latestRelays: latestRequests = [] } = latestRelayData
     const colorsByMethod = new Map()
     const countByColor = new Map()
     let id = 0
 
-    for (const { method } of latestRequests) {
+    for (const { method } of latestRelayData) {
       if (!colorsByMethod.has(method)) {
         colorsByMethod.set(method, HIGHLIGHT_COLORS[id])
         if (id < HIGHLIGHT_COLORS.length - 1) {
@@ -866,13 +870,9 @@ function LatestRequests({ publicKey = env('TEST_APP_PUB_KEY') }) {
     const colorValues = [...colorsByMethod.values()]
 
     return [colorsByMethod, countByColor, colorValues]
-  }, [isLatestRelaysLoading, latestRelayData])
+  }, [latestRelayData])
 
   const compactMode = within(-1, 'medium')
-
-  const latestRelays = useMemo(() => {
-    return latestRelayData ? latestRelayData.latestRelays : []
-  }, [latestRelayData])
 
   return (
     <Box
@@ -917,7 +917,6 @@ function LatestRequests({ publicKey = env('TEST_APP_PUB_KEY') }) {
             'Time Elapsed',
           ]}
           entries={latestRelays}
-          status={isLatestRelaysLoading ? 'loading' : 'default'}
           renderEntry={({
             bytes,
             method,
@@ -958,7 +957,7 @@ function LatestRequests({ publicKey = env('TEST_APP_PUB_KEY') }) {
   )
 }
 
-function AppDetails({ id, pubkey, secret }) {
+function AppDetails({ id, secret }) {
   const toast = useToast()
 
   return (
@@ -989,27 +988,6 @@ function AppDetails({ id, pubkey, secret }) {
         <TextCopy
           value={id}
           onCopy={() => toast('Gateway ID copied to clipboard')}
-        />
-      </div>
-      <div
-        css={`
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-        `}
-      >
-        <h3
-          css={`
-            ${textStyle('body1')};
-            font-weight: 600;
-            margin-bottom: ${2 * GU}px;
-          `}
-        >
-          App public key
-        </h3>
-        <TextCopy
-          value={pubkey}
-          onCopy={() => toast('App public key copied to clipboard')}
         />
       </div>
       {secret && (

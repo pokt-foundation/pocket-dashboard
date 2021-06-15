@@ -20,6 +20,7 @@ export interface ILoadBalancer extends Document {
   applicationIDs: string[]
   notificationSettings: INotificationSettings
   createdAt: Date | number
+  chain: string
 }
 
 const LoadBalancerSchema = new Schema(
@@ -27,6 +28,7 @@ const LoadBalancerSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     name: String,
     requestTimeOut: String,
+    chain: String,
     applicationIDs: [],
     notificationSettings: {
       signedUp: Boolean,
