@@ -1,8 +1,8 @@
 {
   "name": "@pokt-network/dashboard-monorepo",
-  "description": "Pocket Network's dashboard monorepo—the place to manage your apps visually.",
-  "repository": "https://github.com/pokt-network/pocket-dashboard",
-  "author": "Pocket Network <hola@pokt.network>",
+  "description": "Pocket Network's dashboard monorepo: decentralized infrastructure, just a few clicks away.",
+  "repository": "https://github.com/pokt-foundation/portal-frontend",
+  "author": "Pocket Foundation <hola@pokt.network>",
   "contributors": ["Enrique Ortiz <hi@enriqueortiz.dev>"],
   "license": "MIT",
   "private": true,
