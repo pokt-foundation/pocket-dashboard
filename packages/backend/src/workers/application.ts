@@ -119,7 +119,7 @@ export async function fillAppPool(ctx): Promise<void> {
   //   (prev, { limit }) => prev + limit,
   //   0
   // );
-  const totalPoolSize = 38
+  const totalPoolSize = 42
   const appPool = await PreStakedApp.find()
 
   ctx.logger.log(
