@@ -35,16 +35,16 @@ const TEST_CHAINS = {
 }
 
 const MAIN_CHAINS = {
-  // ETHEREUM_GOERLI_FULL: {
-  //   ticker: "ETH",
-  //   id: "0026",
-  //   limit: 3,
-  // },
-  // ETHEREUM_KOVAN_FULL: {
-  //   ticker: "POA",
-  //   id: "0024",
-  //   limit: 2,
-  // },
+   ETHEREUM_GOERLI_FULL: {
+     ticker: "ETH",
+     id: "0026",
+     limit: 3,
+   },
+   ETHEREUM_KOVAN_FULL: {
+     ticker: "POA",
+     id: "0024",
+     limit: 2,
+   },
   ETHEREUM_MAINNET_ARCHIVAL: {
     ticker: 'ETH',
     id: '0022',
