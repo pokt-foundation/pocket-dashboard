@@ -11,14 +11,14 @@ const cryptoKey = (env('PERSISTENCE') as PersistenceKeys).dbEncryptionKey
 const encryptor = new Encryptor({ key: cryptoKey })
 const decryptor = new Decryptor({ key: cryptoKey })
 
-interface IGatewaySettings {
+export interface IGatewaySettings {
   secretKey: string
   secretKeyRequired: boolean
   whitelistOrigins: string[]
   whitelistuserAgents: string[]
 }
 
-interface INotificationSettings {
+export interface INotificationSettings {
   signedUp: boolean
   quarter: boolean
   quarterLastSent?: Date | number

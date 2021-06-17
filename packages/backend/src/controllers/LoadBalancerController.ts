@@ -1,6 +1,7 @@
 import express, { Response, Request, NextFunction } from 'express'
 import crypto from 'crypto'
 import { GraphQLClient } from 'graphql-request'
+import { IAppInfo, GetApplicationQuery } from './types'
 import env from '../environment'
 import { getSdk } from '../graphql/types'
 import asyncMiddleware from '../middlewares/async'
@@ -27,7 +28,7 @@ const DEFAULT_GATEWAY_SETTINGS = {
 }
 const DEFAULT_TIMEOUT = 2000
 const BUCKETS_PER_HOUR = 2
-const MAX_LB_SWITCH_THRESHOLD = 2
+const MAX_LB_SWITCH_THRESHOLD = 1
 const RELAYS_PER_APP = 10
 
 const router = express.Router()
@@ -36,7 +37,7 @@ router.use(authenticate)
 
 router.get(
   '',
-  asyncMiddleware(async (req: Request, res: Response) => {
+  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     const id = (req.user as IUser)._id
     const lbs = await LoadBalancer.find({
       user: id,
@@ -53,7 +54,52 @@ router.get(
       })
     }
 
-    res.status(200).send(lbs)
+    const processedLbs = await Promise.all(
+      lbs.map(async (lb) => {
+        if (lb.applicationIDs.length) {
+          next(
+            HttpError.INTERNAL_SERVER_ERROR({
+              errors: [
+                {
+                  id: 'MALFORMED_LB',
+                  message: 'Malformed load balancer',
+                },
+              ],
+            })
+          )
+        }
+
+        const apps: IAppInfo[] = []
+
+        for (const appId of lb.applicationIDs) {
+          const app = await Application.findById(appId)
+
+          apps.push({
+            appId: app._id.toString(),
+            address: app.freeTierApplicationAccount.address,
+            publicKey: app.freeTierApplicationAccount.publicKey,
+          })
+        }
+
+        const app = await Application.findById(lb.applicationIDs[0])
+
+        const processedLb: GetApplicationQuery = {
+          apps,
+          chain: app.chain,
+          createdAt: new Date(Date.now()),
+          freeTier: app.freeTier,
+          gatewaySettings: app.gatewaySettings,
+          notificationSettings: app.notificationSettings,
+          name: lb.name,
+          id: lb._id.toString(),
+          status: app.status,
+        }
+
+        return processedLb
+      })
+    )
+
+    res.status(200).send(processedLbs)
   })
 )
 
@@ -107,6 +153,13 @@ router.post(
         gatewaySettings: {
           ...gatewaySettings,
         },
+        notificationSettings: {
+          signedUp: false,
+          quarter: false,
+          half: false,
+          threeQuarters: false,
+          full: false,
+        },
       })
 
       application.gatewaySettings.secretKey = crypto
@@ -132,12 +185,29 @@ router.post(
         name,
         requestTimeOut: DEFAULT_TIMEOUT,
         applicationIDs: [application._id.toString()],
-        chain,
       })
 
       await loadBalancer.save()
 
-      res.status(200).send(loadBalancer)
+      const processedLb: GetApplicationQuery = {
+        chain: application.chain,
+        createdAt: new Date(Date.now()),
+        name: loadBalancer.name,
+        id: loadBalancer._id.toString(),
+        freeTier: true,
+        status: application.status,
+        apps: [
+          {
+            appId: application._id.toString(),
+            address: application.freeTierApplicationAccount.address,
+            publicKey: application.freeTierApplicationAccount.publicKey,
+          },
+        ],
+        gatewaySettings: application.gatewaySettings,
+        notificationSettings: application.notificationSettings,
+      }
+
+      res.status(200).send(processedLb)
     } catch (err) {
       throw HttpError.INTERNAL_SERVER_ERROR(err)
     }
@@ -228,7 +298,17 @@ router.get(
       })
     )
 
-    res.status(200).send(apps)
+    // @ts-ignore
+    const appsStatus = apps.reduce((status, app) => {
+      return {
+        // @ts-ignore
+        stake: app.staked_tokens + status.stake,
+        // @ts-ignore
+        relays: app.max_relays + status.relays,
+      }
+    })
+
+    res.status(200).send(appsStatus)
   })
 )
 
@@ -259,29 +339,31 @@ router.put(
       })
     }
     const emailService = new MailgunService()
-    const isSignedUp = (loadBalancer as ILoadBalancer).notificationSettings
-      .signedUp
     const hasOptedOut = !(quarter || half || threeQuarters || full)
 
-    ;(loadBalancer as ILoadBalancer).notificationSettings = {
+    const notificationSettings = {
       signedUp: hasOptedOut ? false : true,
       quarter,
       half,
       threeQuarters,
       full,
     }
-    await loadBalancer.save()
-    if (!isSignedUp) {
-      emailService.send({
-        templateName: 'NotificationSignup',
-        toEmail: (req.user as IUser).email,
+
+    await Promise.all(
+      loadBalancer.applicationIDs.map(async (id) => {
+        const app = await Application.findById(id)
+
+        app.notificationSettings = notificationSettings
+
+        await app.save()
       })
-    } else {
-      emailService.send({
-        templateName: 'NotificationChange',
-        toEmail: (req.user as IUser).email,
-      })
-    }
+    )
+
+    emailService.send({
+      templateName: 'NotificationChange',
+      toEmail: (req.user as IUser).email,
+    })
+
     return res.status(204).send()
   })
 )
@@ -326,7 +408,7 @@ router.post(
       )
     }
 
-    const newAppIds = await Promise.all(
+    const newApps = await Promise.all(
       loadBalancer.applicationIDs.map(async function switchApp(applicationId) {
         const replacementApplication: IPreStakedApp = await ApplicationPool.findOne(
           {
@@ -382,16 +464,34 @@ router.post(
 
         await newReplacementApplication.save()
 
-        return newReplacementApplication._id.toString()
+        return {
+          appId: newReplacementApplication._id.toString(),
+          address: newReplacementApplication.freeTierApplicationAccount.address,
+          publicKey:
+            newReplacementApplication.freeTierApplicationAccount.publicKey,
+        }
       })
     )
 
-    loadBalancer.applicationIDs = newAppIds
+    loadBalancer.applicationIDs = newApps.map((app) => app.appId)
 
     await loadBalancer.save()
+    const newestApp = await Application.findById(loadBalancer.applicationIDs[0])
+
+    const processedLb: GetApplicationQuery = {
+      chain: newestApp.chain,
+      name: loadBalancer.name,
+      apps: newApps,
+      createdAt: new Date(Date.now()),
+      freeTier: true,
+      id: loadBalancer._id.toString(),
+      gatewaySettings: newestApp.gatewaySettings,
+      notificationSettings: newestApp.notificationSettings,
+      status: newestApp.status,
+    }
 
     try {
-      res.status(200).send(loadBalancer)
+      res.status(200).send(processedLb)
     } catch (err) {
       throw HttpError.INTERNAL_SERVER_ERROR(err)
     }
@@ -453,9 +553,9 @@ router.get(
 
         return {
           total_relays:
-            result.relay_apps_daily_aggregate.aggregate.sum.total_relays,
+            result.relay_apps_daily_aggregate.aggregate.sum.total_relays ?? 0,
           elapsed_time:
-            result.relay_apps_daily_aggregate.aggregate.avg.elapsed_time,
+            result.relay_apps_daily_aggregate.aggregate.avg.elapsed_time ?? 0,
         }
       })
     )
@@ -533,9 +633,9 @@ router.get(
 
         return {
           total_relays:
-            result.relay_apps_daily_aggregate.aggregate.sum.total_relays,
+            result.relay_apps_daily_aggregate.aggregate.sum.total_relays ?? 0,
           elapsed_time:
-            result.relay_apps_daily_aggregate.aggregate.avg.elapsed_time,
+            result.relay_apps_daily_aggregate.aggregate.avg.elapsed_time ?? 0,
         }
       })
     )
@@ -546,6 +646,10 @@ router.get(
           total_relays: prev.total_relays + cur.total_relays,
           elapsed_time: prev.elapsed_time + cur.elapsed_time,
         }
+      },
+      {
+        total_relays: 0,
+        elapsed_time: 0,
       }
     )
 
@@ -617,7 +721,7 @@ router.get(
           total_relays: dailyRelayCount,
         } of result.relay_apps_daily) {
           if (!dailyRelays.has(bucket)) {
-            dailyRelays.set(bucket, dailyRelayCount)
+            dailyRelays.set(bucket, dailyRelayCount ?? 0)
           } else {
             const currentCount = dailyRelays.get(bucket)
 
@@ -800,6 +904,81 @@ router.get(
 )
 
 router.get(
+  '/ranged-relays/:lbId',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id
+    const { lbId } = req.params
+
+    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
+
+    if (!loadBalancer) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'NONEXISTENT_LOADBALANCER',
+            message: 'User does not have an active Load Balancer',
+          },
+        ],
+      })
+    }
+    if (loadBalancer.user.toString() !== userId.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'User does not have access to this load balancer',
+          },
+        ],
+      })
+    }
+
+    const appIds = loadBalancer.applicationIDs
+
+    const gqlClient = getSdk(
+      new GraphQLClient(env('HASURA_URL') as string, {
+        // @ts-ignore
+        headers: {
+          'x-hasura-admin-secret': env('HASURA_SECRET'),
+        },
+      })
+    )
+
+    const fourteenDaysAgo = composeDaysFromNowUtcDate(14)
+    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
+
+    const previousSuccessfulRelaysPerApp = await Promise.all(
+      appIds.map(async function getData(applicationId) {
+        const application: IApplication = await Application.findById(
+          applicationId
+        )
+
+        const result = await gqlClient.getTotalRangedRelaysAndLatency({
+          _eq: application.freeTierApplicationAccount.publicKey,
+          _gte: fourteenDaysAgo,
+          _lte: sevenDaysAgo,
+        })
+
+        return {
+          total_relays:
+            result.relay_apps_daily_aggregate.aggregate.sum.total_relays ?? 0,
+        }
+      })
+    )
+
+    const totalRangedRelays = previousSuccessfulRelaysPerApp.reduce(
+      function sumRelays(total, app): number {
+        return total + app.total_relays
+      },
+      0
+    )
+
+    res.status(200).send({
+      total_relays: totalRangedRelays,
+    })
+  })
+)
+
+router.get(
   '/previous-successful-relays/:lbId',
   asyncMiddleware(async (req: Request, res: Response) => {
     const userId = (req.user as IUser)._id
@@ -933,7 +1112,7 @@ router.get(
           elapsed_time: elapsedTime,
         } of result.relay_app_hourly) {
           if (!hourlyLatency.has(bucket)) {
-            hourlyLatency.set(bucket, elapsedTime)
+            hourlyLatency.set(bucket, elapsedTime ?? 0)
           } else {
             const currentCount = hourlyLatency.get(bucket)
 
