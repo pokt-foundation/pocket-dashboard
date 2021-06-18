@@ -280,7 +280,11 @@ export default function AppInfo({
           <Split
             primary={
               <>
-                <EndpointDetails chainId={appData.chain} appId={appData.id} />
+                <EndpointDetails
+                  chainId={appData.chain}
+                  appId={appData.id}
+                  isLb={appData.isLb}
+                />
                 <Spacer size={2 * GU} />
                 {exceedsMaxRelays && (
                   <>
@@ -485,10 +489,12 @@ function SwitchDenialModal({ onClose, visible }) {
   )
 }
 
-function EndpointDetails({ chainId, appId }) {
+function EndpointDetails({ chainId, appId, isLb }) {
   const toast = useToast()
   const { prefix, name } = prefixFromChainId(chainId)
-  const endpoint = `https://${prefix}.gateway.pokt.network/v1/${appId}`
+  const endpoint = `https://${prefix}.gateway.pokt.network/v1/${
+    isLb ? 'lb/' : ''
+  }${appId}`
 
   return (
     <Box>
