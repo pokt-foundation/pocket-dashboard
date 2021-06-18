@@ -2,8 +2,9 @@ import axios from 'axios'
 import { useQueries } from 'react-query'
 import env from 'environment'
 
-export function useAppMetrics({ activeApplication, type = 'lb' }) {
-  const { id: appId } = activeApplication
+export function useAppMetrics({ activeApplication }) {
+  const { id: appId = '', isLb = false } = activeApplication
+  const type = isLb ? 'lb' : 'applications'
 
   const results = useQueries([
     {

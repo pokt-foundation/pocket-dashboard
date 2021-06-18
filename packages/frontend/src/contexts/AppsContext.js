@@ -35,8 +35,8 @@ export function AppsContextProvider({ children }) {
   const appsLoading = isAppsLoading || isLbLoading
 
   const refetchApps = useCallback(async () => {
-    await refetchUserApps()
     await refetchLoadBalancers()
+    await refetchUserApps()
   }, [refetchLoadBalancers, refetchUserApps])
 
   const userApps = useMemo(() => {

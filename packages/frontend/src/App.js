@@ -4,13 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { AppWrapper } from 'ui'
 import DashboardRoutes from 'views/DashboardRoutes'
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-})
+const queryClient = new QueryClient()
 
 function App() {
   return (

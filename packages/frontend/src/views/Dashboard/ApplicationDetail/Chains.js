@@ -6,7 +6,7 @@ import 'styled-components/macro'
 import { Button, DataView, Split, Spacer, Switch, useToast, GU } from 'ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
-import { useUserApplications } from 'views/Dashboard/application-hooks'
+import { useUserApps } from "contexts/AppsContext"
 import env from 'environment'
 
 export default function BasicSetup({ appData }) {
@@ -14,7 +14,7 @@ export default function BasicSetup({ appData }) {
   const history = useHistory()
   const { appId } = useParams()
   const toast = useToast()
-  const { refetchUserApps } = useUserApplications()
+  const { refetchApps } = useUserApps()
   const { isLoading: isChainsLoading, data: chains } = useQuery(
     '/network/chains',
     async function getNetworkChains() {
@@ -51,13 +51,13 @@ export default function BasicSetup({ appData }) {
         )
 
         const {
-          data: { _id },
+          data: { id },
         } = res
 
-        await refetchUserApps()
+        await refetchApps()
 
         toast('Chain successfully switched')
-        history.push(`/app/${_id}`)
+        history.push(`/app/${id}`)
       } catch (err) {
         console.log('??', Object.entries(err))
       }

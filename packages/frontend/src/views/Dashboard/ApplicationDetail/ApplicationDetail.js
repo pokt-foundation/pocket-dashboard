@@ -26,7 +26,7 @@ export default function AppDetailWrapper() {
     [appId, userApps]
   )
 
-  if (appsLoading) {
+  if (appsLoading || !activeApplication) {
     return <AnimatedLoader />
   }
 
@@ -42,7 +42,6 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
   const { path } = useRouteMatch()
   const { metricsLoading, metrics } = useAppMetrics({
     activeApplication,
-    type: activeApplication.isLb ? 'lb' : 'applications',
   })
   const [
     { data: totalRelays },
