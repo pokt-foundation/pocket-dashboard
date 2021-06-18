@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useQuery } from 'react-query'
 import { GraphQLClient, gql } from 'graphql-request'
+import axios from 'axios'
 import { useViewport } from 'use-viewport'
 import Styled from 'styled-components/macro'
 import {
@@ -27,50 +28,12 @@ import { shortenAddress } from 'lib/pocket-utils'
 const FAILED_RELAYS_KEY = 'failedRelays'
 const SUCCESSFUL_CODE = 200
 const SUCCESSFUL_RELAYS_KEY = 'successfulRelays'
-const SKIP_AMOUNT = 10
-
-const gqlClient = new GraphQLClient(env('HASURA_URL'), {
-  headers: {
-    'x-hasura-admin-secret': env('HASURA_SECRET'),
-  },
-})
-
-const LATEST_SUCCESFUL_QUERIES = gql`
-  query LATEST_FILTERED_RELAYS($_eq: String, $_eq1: numeric, $offset: Int) {
-    relay(
-      limit: 10
-      where: { app_pub_key: { _eq: $_eq }, result: { _eq: $_eq1 } }
-      order_by: { timestamp: desc }
-      offset: $offset
-    ) {
-      method
-      result
-      elapsed_time
-      bytes
-      service_node
-    }
-  }
-`
-
-const LATEST_FAILING_QUERIES = gql`
-  query LATEST_FILTERED_RELAYS($_eq: String, $_eq1: numeric, $offset: Int) {
-    relay(
-      limit: 10
-      where: { app_pub_key: { _eq: $_eq }, result: { _neq: $_eq1 } }
-      order_by: { timestamp: desc }
-      offset: $offset
-    ) {
-      method
-      result
-      elapsed_time
-      bytes
-      service_node
-    }
-  }
-`
+const PER_PAGE = 10
 
 export default function SuccessDetails({
   appOnChainData,
+  id,
+  isLb,
   successfulRelayData,
   weeklyRelayData,
 }) {
@@ -83,35 +46,49 @@ export default function SuccessDetails({
 
   const compactMode = within(-1, 'medium')
 
-  const { public_key: publicKey } = appOnChainData
-
-  const { isLoading, data } = useQuery(
-    [`user/applications/${publicKey}/success-details`, page],
+  const { isLoading, data, ...rest } = useQuery(
+    [`user/applications/${id}/latest-filtered-details`, page],
     async function getFilteredRelays() {
-      if (!publicKey) {
+      const successfulPath = `${env('BACKEND_URL')}/api/${
+        isLb ? 'lb' : 'applications'
+      }/latest-successful-relays`
+      const failingPath = `${env('BACKEND_URL')}/api/${
+        isLb ? 'lb' : 'applications'
+      }/latest-failing-relays`
+
+      if (!id) {
         return []
       }
 
       try {
-        const { relay: successfulRelays } = await gqlClient.request(
-          LATEST_SUCCESFUL_QUERIES,
+        const { data: successfulData } = await axios.post(
+          successfulPath,
           {
-            _eq: publicKey,
-            _eq1: SUCCESSFUL_CODE,
-            offset: page * SKIP_AMOUNT,
+            id,
+            limit: PER_PAGE,
+            offset: page * PER_PAGE,
+          },
+          {
+            withCredentials: true,
           }
         )
 
-        const { relay: failedRelays } = await gqlClient.request(
-          LATEST_FAILING_QUERIES,
+        const { data: failedData } = await axios.post(
+          failingPath,
           {
-            _eq: publicKey,
-            _eq1: SUCCESSFUL_CODE,
-            offset: page * SKIP_AMOUNT,
+            id,
+            limit: PER_PAGE,
+            offset: page * PER_PAGE,
+          },
+          {
+            withCredentials: true,
           }
         )
 
-        return { successfulRelays, failedRelays }
+        return {
+          successfulRelays: successfulData.session_relays,
+          failedRelays: failedData.session_relays,
+        }
       } catch (err) {
         console.log(Object.entries(err))
       }
@@ -127,17 +104,15 @@ export default function SuccessDetails({
   )
   const onFailedClick = useCallback(() => setActiveKey(FAILED_RELAYS_KEY), [])
   const successRate = useMemo(() => {
-    return weeklyRelayData.weeklyAppRelays === 0
+    return weeklyRelayData.total_relays === 0
       ? 0
-      : successfulRelayData.successfulWeeklyRelays /
-          weeklyRelayData.weeklyAppRelays
+      : successfulRelayData.total_relays / weeklyRelayData.total_relays
   }, [weeklyRelayData, successfulRelayData])
   const failureRate = useMemo(() => {
-    return weeklyRelayData.weeklyAppRelays === 0
+    return weeklyRelayData.total_relays === 0
       ? 0
-      : (weeklyRelayData.weeklyAppRelays -
-          successfulRelayData.successfulWeeklyRelays) /
-          weeklyRelayData.weeklyAppRelays
+      : (weeklyRelayData.total_relays - successfulRelayData.total_relays) /
+          weeklyRelayData.total_relays
   }, [successfulRelayData, weeklyRelayData])
   const onPageChange = useCallback((page) => setPage(page), [])
 
@@ -181,9 +156,7 @@ export default function SuccessDetails({
                         ${textStyle('title1')}
                       `}
                     >
-                      {Intl.NumberFormat().format(
-                        weeklyRelayData.weeklyAppRelays
-                      )}
+                      {Intl.NumberFormat().format(weeklyRelayData.total_relays)}
                       <span
                         css={`
                           display: block;
@@ -215,7 +188,7 @@ export default function SuccessDetails({
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          successfulRelayData.successfulWeeklyRelays
+                          successfulRelayData.total_relays
                         )}
                         <span
                           css={`
@@ -249,8 +222,8 @@ export default function SuccessDetails({
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          weeklyRelayData.weeklyAppRelays -
-                            successfulRelayData.successfulWeeklyRelays
+                          weeklyRelayData.total_relays -
+                            successfulRelayData.total_relays
                         )}
                         <span
                           css={`

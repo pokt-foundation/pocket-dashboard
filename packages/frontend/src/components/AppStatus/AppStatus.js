@@ -52,7 +52,7 @@ export default function AppStatus({ appOnChainStatus }) {
         <li>
           Amount
           <span>
-            {TokenAmount.format(stakedTokens, 6, {
+            {TokenAmount.format(stakedTokens ?? 0n, 6, {
               symbol: 'POKT',
             })}
           </span>

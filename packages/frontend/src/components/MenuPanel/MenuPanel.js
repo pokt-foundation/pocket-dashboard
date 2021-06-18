@@ -60,9 +60,9 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
 
     if (userApps.length) {
       groups[1].push(
-        ...userApps.map(({ appName, appId }) => ({
-          label: appName,
-          id: `/app/${appId}`,
+        ...userApps.map(({ name, id }) => ({
+          label: name,
+          id: `/app/${id}`,
         }))
       )
     }

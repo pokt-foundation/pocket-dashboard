@@ -22,7 +22,7 @@ import {
 } from 'ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
-import { useUserApplications } from 'views/Dashboard/application-hooks'
+import { useUserApps } from 'contexts/AppsContext'
 import { log } from 'lib/utils'
 import env from 'environment'
 
@@ -140,7 +140,7 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData
-  const { appsData, refetchUserApps } = useUserApplications()
+  const { appsData, refetchApps } = useUserApps()
 
   const {
     isLoading: isChainsLoading,
@@ -171,7 +171,7 @@ export default function Create() {
     mutate,
   } = useMutation(async function createApp() {
     try {
-      const path = `${env('BACKEND_URL')}/api/applications`
+      const path = `${env('BACKEND_URL')}/api/lb`
 
       const res = await axios.post(
         path,
@@ -189,10 +189,10 @@ export default function Create() {
         }
       )
 
-      await refetchUserApps()
+      await refetchApps()
 
       history.push({
-        pathname: `/app/${res.data._id}`,
+        pathname: `/app/${res.data.id}`,
       })
 
       return res
@@ -201,13 +201,13 @@ export default function Create() {
     }
   })
 
-  // useEffect(() => {
-  //   if (appsData?.length) {
-  //     const [userApp] = appsData;
+  useEffect(() => {
+    if (appsData?.length) {
+      const [userApp] = appsData
 
-  //     history.push(`/app/${userApp.appId}`);
-  //   }
-  // }, [appsData, history]);
+      history.push(`/app/${userApp.appId}`)
+    }
+  }, [appsData, history])
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,

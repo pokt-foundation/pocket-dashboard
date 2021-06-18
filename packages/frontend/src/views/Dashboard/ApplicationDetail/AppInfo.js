@@ -32,6 +32,7 @@ import { useLatestRelays } from 'views/Dashboard/application-hooks'
 import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
 import { getThresholdsPerStake } from 'lib/pocket-utils'
+import env from '../../../environment'
 
 const MAX_RELAYS_PER_SESSION = 40000
 const ONE_MILLION = 1000000
@@ -188,6 +189,7 @@ export default function AppInfo({
   currentSessionRelays,
   dailyRelayData,
   previousSuccessfulRelays,
+  previousRelays,
   successfulRelayData,
   weeklyRelayData,
   latestLatencyData,
@@ -202,23 +204,19 @@ export default function AppInfo({
 
   const compactMode = within(-1, 'medium')
   const { staked_tokens: stakedTokens } = appOnChainData
-  const {
-    freeTierApplicationAccount: { publicKey },
-  } = appData
+
   const { graphThreshold, maxRelays } = getThresholdsPerStake(stakedTokens)
 
   const successRate = useMemo(() => {
-    return weeklyRelayData.weeklyAppRelays === 0
+    return weeklyRelayData.total_relays === 0
       ? 0
-      : successfulRelayData.successfulWeeklyRelays /
-          weeklyRelayData.weeklyAppRelays
+      : successfulRelayData.total_relays / weeklyRelayData.total_relays
   }, [weeklyRelayData, successfulRelayData])
   const previousSuccessRate = useMemo(() => {
-    return previousSuccessfulRelays.previousTotalRelays === 0
+    return previousSuccessfulRelays === 0
       ? 0
-      : previousSuccessfulRelays.successfulWeeklyRelays /
-          previousSuccessfulRelays.previousTotalRelays
-  }, [previousSuccessfulRelays])
+      : previousSuccessfulRelays / previousRelays
+  }, [previousSuccessfulRelays, previousRelays])
 
   const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
     () => formatDailyRelaysForGraphing(dailyRelayData, graphThreshold),
@@ -235,9 +233,11 @@ export default function AppInfo({
   const isSwitchable = useMemo(() => {
     dayjs.extend(dayJsutcPlugin)
     const today = dayjs.utc()
-    const appCreationDate = dayjs.utc(appData.createdAt)
+    const appLastUpdated = dayjs.utc(appData.updatedAt ?? appData.createdAt)
 
-    const diff = today.diff(appCreationDate, 'day')
+    const diff = today.diff(appLastUpdated, 'day')
+
+    console.log(diff, appData.updatedAt)
 
     return diff >= 7
   }, [appData])
@@ -283,7 +283,11 @@ export default function AppInfo({
           <Split
             primary={
               <>
-                <EndpointDetails chainId={appData.chain} appId={appData._id} />
+                <EndpointDetails
+                  chainId={appData.chain}
+                  appId={appData.id}
+                  isLb={appData.isLb}
+                />
                 <Spacer size={2 * GU} />
                 {exceedsMaxRelays && (
                   <>
@@ -323,13 +327,13 @@ export default function AppInfo({
                   `}
                 >
                   <SuccessRate
-                    appId={appData._id}
+                    appId={appData.id}
                     previousSuccessRate={previousSuccessRate}
                     successRate={successRate}
-                    totalRequests={weeklyRelayData.weeklyAppRelays}
+                    totalRequests={weeklyRelayData.total_relays}
                   />
                   <AvgLatency
-                    avgLatency={successfulRelayData.avgLatency}
+                    avgLatency={successfulRelayData.elapsed_time}
                     chartLines={barValues}
                     chartLabels={latencyLabels}
                     chartScales={latencyScales}
@@ -343,7 +347,7 @@ export default function AppInfo({
                   threshold={graphThreshold}
                 />
                 <Spacer size={2 * GU} />
-                <LatestRequests publicKey={publicKey} />
+                <LatestRequests id={appData.id} isLb={appData.isLb} />
               </>
             }
             secondary={
@@ -366,9 +370,9 @@ export default function AppInfo({
                 <AppStatus appOnChainStatus={appOnChainData} />
                 <Spacer size={2 * GU} />
                 <AppDetails
-                  id={appData._id}
-                  pubkey={appData.freeTierApplicationAccount.publicKey}
-                  secret={appData.gatewaySettings?.secretKey ?? ''}
+                  apps={appData.apps}
+                  id={appData.id}
+                  secret={appData.gatewaySettings.secretKey}
                 />
               </>
             }
@@ -488,10 +492,12 @@ function SwitchDenialModal({ onClose, visible }) {
   )
 }
 
-function EndpointDetails({ chainId, appId }) {
+function EndpointDetails({ chainId, appId, isLb }) {
   const toast = useToast()
   const { prefix, name } = prefixFromChainId(chainId)
-  const endpoint = `https://${prefix}.gateway.pokt.network/v1/${appId}`
+  const endpoint = `https://${prefix}.gateway.pokt.network/v1/${
+    isLb ? 'lb/' : ''
+  }${appId}`
 
   return (
     <Box>
@@ -828,12 +834,15 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   )
 }
 
-function LatestRequests({ publicKey }) {
+function LatestRequests({ id, isLb }) {
   const [page, setPage] = useState(0)
   const { within } = useViewport()
-  const { isLatestRelaysLoading, latestRelayData } = useLatestRelays(
-    publicKey,
-    page
+  const { isLoading: isLatestRelaysLoading, latestRelayData } = useLatestRelays(
+    {
+      id,
+      page,
+      isLb: isLb,
+    }
   )
 
   const onPageChange = useCallback((page) => setPage(page), [])
@@ -841,7 +850,7 @@ function LatestRequests({ publicKey }) {
     if (isLatestRelaysLoading) {
       return []
     }
-    const { latestRelays: latestRequests = [] } = latestRelayData
+    const latestRequests = latestRelayData
     const colorsByMethod = new Map()
     const countByColor = new Map()
     let id = 0
@@ -869,7 +878,7 @@ function LatestRequests({ publicKey }) {
   const compactMode = within(-1, 'medium')
 
   const latestRelays = useMemo(() => {
-    return latestRelayData ? latestRelayData.latestRelays : []
+    return latestRelayData ? latestRelayData : []
   }, [latestRelayData])
 
   return (
@@ -914,8 +923,8 @@ function LatestRequests({ publicKey }) {
             'Result',
             'Time Elapsed',
           ]}
-          entries={latestRelays}
           status={isLatestRelaysLoading ? 'loading' : 'default'}
+          entries={latestRelays}
           renderEntry={({
             bytes,
             method,
@@ -956,7 +965,7 @@ function LatestRequests({ publicKey }) {
   )
 }
 
-function AppDetails({ id, pubkey, secret }) {
+function AppDetails({ apps, id, secret }) {
   const toast = useToast()
 
   return (
@@ -1003,12 +1012,14 @@ function AppDetails({ id, pubkey, secret }) {
             margin-bottom: ${2 * GU}px;
           `}
         >
-          App public key
+          App public key(s)
         </h3>
-        <TextCopy
-          value={pubkey}
-          onCopy={() => toast('App public key copied to clipboard')}
-        />
+        {apps.map(({ publicKey }) => (
+          <TextCopy
+            value={publicKey}
+            onCopy={() => toast('App public key copied to clipboard')}
+          />
+        ))}
       </div>
       {secret && (
         <div

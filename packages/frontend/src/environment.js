@@ -20,6 +20,9 @@ const ENV_VARS = {
   USE_TEST_APP() {
     return process.env.REACT_APP_USE_TEST_APP === 'true' ?? false
   },
+  TEST_APP_PUB_KEY() {
+    return process.env.REACT_APP_TEST_APP_PUB_KEY?.trim() ?? ''
+  },
   SENTRY_DSN() {
     return process.env.REACT_APP_SENTRY_DSN?.trim() ?? ''
   },

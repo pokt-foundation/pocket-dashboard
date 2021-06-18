@@ -58,7 +58,9 @@ export default function Security({ appData, refetchActiveAppData }) {
   }, [appData])
 
   const { mutate } = useMutation(async function updateApplicationSettings() {
-    const path = `${env('BACKEND_URL')}/api/applications/${appData._id}`
+    const path = `${env('BACKEND_URL')}/api/${
+      appData.isLb ? 'lb' : 'applications'
+    }/${appData.id}`
 
     try {
       await axios.put(

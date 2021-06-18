@@ -92,16 +92,26 @@ async function createNewVerificationToken(
  */
 router.post(
   '/login',
-  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
+  asyncMiddleware(async (req: Request, res: Response, next) => {
     passport.authenticate(
       'login',
       { session: false },
       async (err, user: IUser) => {
         if (err) {
-          return next(err)
+          console.log('aqui miop?')
+          next(
+            HttpError.BAD_REQUEST({
+              errors: [
+                {
+                  id: 'INVALID_CREDENTIALS',
+                  message: 'No account for this user found.',
+                },
+              ],
+            })
+          )
         }
         if (!user) {
-          return next(
+          next(
             HttpError.BAD_REQUEST({
               errors: [
                 {
@@ -133,13 +143,11 @@ router.post(
             templateName: 'SignUp',
             toEmail: user.email,
           })
-          return next(
-            HttpError.BAD_REQUEST({
-              errors: [
-                { id: 'NOT_VALIDATED', message: 'Please verify your email' },
-              ],
-            })
-          )
+          throw HttpError.BAD_REQUEST({
+            errors: [
+              { id: 'NOT_VALIDATED', message: 'Please verify your email' },
+            ],
+          })
         }
 
         createCookieFromToken(user, 200, req, res)
@@ -156,10 +164,10 @@ router.post(
   asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('signup', { session: false }, async (err, user) => {
       if (err) {
-        return next(err)
+        next(err)
       }
       if (!user) {
-        return next(
+        next(
           HttpError.INTERNAL_SERVER_ERROR({
             errors: [
               {

@@ -11,14 +11,14 @@ const cryptoKey = (env('PERSISTENCE') as PersistenceKeys).dbEncryptionKey
 const encryptor = new Encryptor({ key: cryptoKey })
 const decryptor = new Decryptor({ key: cryptoKey })
 
-interface IGatewaySettings {
+export interface IGatewaySettings {
   secretKey: string
   secretKeyRequired: boolean
   whitelistOrigins: string[]
   whitelistuserAgents: string[]
 }
 
-interface INotificationSettings {
+export interface INotificationSettings {
   signedUp: boolean
   quarter: boolean
   quarterLastSent?: Date | number
@@ -42,6 +42,8 @@ export interface IApplication extends Document {
   gatewayAAT: IGatewayAAT
   gatewaySettings: IGatewaySettings
   notificationSettings: INotificationSettings
+  createdAt?: Date | number
+  updatedAt?: Date | number
 }
 
 const applicationSchema = new Schema(
@@ -82,6 +84,10 @@ const applicationSchema = new Schema(
       fullLastSent: Date,
     },
     createdAt: {
+      type: Date,
+      default: new Date(Date.now()),
+    },
+    updatedAt: {
       type: Date,
       default: new Date(Date.now()),
     },

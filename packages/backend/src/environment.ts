@@ -48,7 +48,7 @@ export const ENV_VARS = {
     return process.env.ALLOWED_DOMAINS?.split(',') ?? ['http://localhost:3000']
   },
   ENABLE_WORKERS(): boolean {
-    return Boolean(process.env.ENABLE_WORKERS) || false
+    return process.env.ENABLE_WORKERS === 'true' || false
   },
   HASURA_SECRET(): string {
     return process.env.HASURA_ADMIN_SECRET || ''

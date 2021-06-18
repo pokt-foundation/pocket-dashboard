@@ -1,3 +1,5 @@
+import env from '../environment'
+
 export const STAKING_STATUSES = {
   Unstaked: 0,
   Unstaking: 1,
@@ -55,6 +57,9 @@ export function getStakingStatus(status) {
 }
 
 export function getThresholdsPerStake(stake) {
+  if (env('USE_TEST_APP')) {
+    return THRESHOLDS_PER_STAKE.get(ONE_MILLION_RELAYS_STAKE)
+  }
   if (!THRESHOLDS_PER_STAKE.has(stake)) {
     throw new Error('Unknown stake')
   }

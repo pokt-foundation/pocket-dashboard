@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Switch, Route, useParams, useRouteMatch } from 'react-router'
 import 'styled-components/macro'
 import { Spacer, textStyle, GU } from 'ui'
@@ -8,78 +8,100 @@ import Chains from 'views/Dashboard/ApplicationDetail/Chains'
 import Notifications from 'views/Dashboard/ApplicationDetail/Notifications'
 import Security from 'views/Dashboard/ApplicationDetail/Security'
 import SuccessDetails from 'views/Dashboard/ApplicationDetail/SuccessDetails'
-import {
-  useActiveApplication,
-  useAppOnChainStatus,
-  useCurrentSessionRelayCount,
-  useDailyRelayCount,
-  useLatestLatencyValues,
-  usePreviousSuccessfulRelays,
-  useSucessfulWeeklyRelays,
-  useWeeklyAppRelaysInfo,
-} from 'views/Dashboard/application-hooks'
+import { useAppMetrics } from 'views/Dashboard/ApplicationDetail/useAppMetrics'
 import env from 'environment'
+import { useUserApps } from 'contexts/AppsContext'
 
-// Ethers.js
-const TEST_APP_PUB_KEY =
-  '2cf38013f8cbe524db3172ec507967ec551fd14cea8209cf4c9da2a490cecf74'
+const appOnChainStatus = {
+  status: 'Staked',
+  staked_tokens: 24950100000,
+}
 
-export default function ApplicationDetail() {
+export default function AppDetailWrapper() {
+  const { appsLoading, refetchApps, userApps } = useUserApps()
   const { appId } = useParams()
+
+  const activeApplication = useMemo(
+    () => userApps.find((app) => appId === app.id),
+    [appId, userApps]
+  )
+
+  if (appsLoading || !activeApplication) {
+    return <AnimatedLoader />
+  }
+
+  return (
+    <ApplicationDetail
+      activeApplication={activeApplication}
+      refetchActiveAppData={refetchApps}
+    />
+  )
+}
+
+function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
   const { path } = useRouteMatch()
-  const { appData, isAppLoading, refetchActiveAppData } = useActiveApplication()
-  const { appOnChainData, isAppOnChainLoading } = useAppOnChainStatus(appId)
-  const { isWeeklyAppRelaysLoading, weeklyRelaysData } = useWeeklyAppRelaysInfo(
-    !env('USE_TEST_APP')
-      ? appData?.freeTierApplicationAccount?.publicKey
-      : TEST_APP_PUB_KEY
-  )
-  const {
-    isSuccesfulWeeklyRelaysLoading,
-    successfulWeeklyRelaysData,
-  } = useSucessfulWeeklyRelays(
-    !env('USE_TEST_APP')
-      ? appData?.freeTierApplicationAccount?.publicKey
-      : TEST_APP_PUB_KEY
-  )
-  const { isDailyRelayCountLoading, dailyRelayCountData } = useDailyRelayCount(
-    !env('USE_TEST_APP')
-      ? appData?.freeTierApplicationAccount?.publicKey
-      : TEST_APP_PUB_KEY
-  )
-  const {
-    isCurrentSessionRelaysLoading,
-    currentSessionRelayCount,
-  } = useCurrentSessionRelayCount(
-    !env('USE_TEST_APP')
-      ? appData?.freeTierApplicationAccount?.publicKey
-      : TEST_APP_PUB_KEY
-  )
-  const { isLatestLatencyLoading, latestLatencyData } = useLatestLatencyValues(
-    !env('USE_TEST_APP')
-      ? appData?.freeTierApplicationAccount?.publicKey
-      : TEST_APP_PUB_KEY
-  )
-  const {
-    isPreviousSuccessfulRelaysLoading,
-    previousSucessfulRelaysData,
-  } = usePreviousSuccessfulRelays(
-    !env('USE_TEST_APP')
-      ? appData?.freeTierApplicationAccount?.publicKey
-      : TEST_APP_PUB_KEY
-  )
+  const { metricsLoading, metrics } = useAppMetrics({
+    activeApplication,
+  })
+  const [
+    { data: totalRelays },
+    { data: successfulRelays },
+    { data: dailyRelays },
+    { data: sessionRelays },
+    { data: previousSuccessfulRelays },
+    { data: previousRangedRelays },
+    { data: hourlyLatency },
+    { data: appOnChainData },
+  ] = metrics
 
-  const appLoading =
-    isAppLoading ||
-    isAppOnChainLoading ||
-    isPreviousSuccessfulRelaysLoading ||
-    isWeeklyAppRelaysLoading ||
-    isSuccesfulWeeklyRelaysLoading ||
-    isDailyRelayCountLoading ||
-    isCurrentSessionRelaysLoading ||
-    isLatestLatencyLoading
+  return metricsLoading ? (
+    <AnimatedLoader />
+  ) : (
+    <Switch>
+      <Route exact path={path}>
+        <AppInfo
+          appData={activeApplication}
+          appOnChainData={appOnChainStatus}
+          currentSessionRelays={sessionRelays.session_relays}
+          dailyRelayData={dailyRelays.daily_relays}
+          previousSuccessfulRelays={previousSuccessfulRelays.successful_relays}
+          previousRelays={previousRangedRelays.total_relays}
+          successfulRelayData={successfulRelays}
+          weeklyRelayData={totalRelays}
+          latestLatencyData={hourlyLatency.hourly_latency}
+        />
+      </Route>
+      <Route path={`${path}/security`}>
+        <Security
+          appData={activeApplication}
+          refetchActiveAppData={refetchActiveAppData}
+        />
+      </Route>
+      <Route path={`${path}/success-details`}>
+        <SuccessDetails
+          id={activeApplication.id}
+          isLb={activeApplication.isLb}
+          appOnChainData={appOnChainStatus}
+          weeklyRelayData={totalRelays}
+          successfulRelayData={successfulRelays}
+        />
+      </Route>
+      <Route path={`${path}/notifications`}>
+        <Notifications
+          appData={activeApplication}
+          appOnChainData={appOnChainStatus}
+          dailyRelayData={dailyRelays.daily_relays}
+        />
+      </Route>
+      <Route path={`${path}/chains`}>
+        <Chains appData={activeApplication} />
+      </Route>
+    </Switch>
+  )
+}
 
-  return appLoading ? (
+function AnimatedLoader() {
+  return (
     <div
       css={`
         position: relative;
@@ -102,43 +124,5 @@ export default function ApplicationDetail() {
         Loading application...
       </p>
     </div>
-  ) : (
-    <Switch>
-      <Route exact path={path}>
-        <AppInfo
-          appData={appData}
-          appOnChainData={appOnChainData}
-          currentSessionRelays={currentSessionRelayCount}
-          dailyRelayData={dailyRelayCountData}
-          previousSuccessfulRelays={previousSucessfulRelaysData}
-          successfulRelayData={successfulWeeklyRelaysData}
-          weeklyRelayData={weeklyRelaysData}
-          latestLatencyData={latestLatencyData}
-        />
-      </Route>
-      <Route path={`${path}/security`}>
-        <Security
-          appData={appData}
-          refetchActiveAppData={refetchActiveAppData}
-        />
-      </Route>
-      <Route path={`${path}/success-details`}>
-        <SuccessDetails
-          appOnChainData={appOnChainData}
-          weeklyRelayData={weeklyRelaysData}
-          successfulRelayData={successfulWeeklyRelaysData}
-        />
-      </Route>
-      <Route path={`${path}/notifications`}>
-        <Notifications
-          appData={appData}
-          appOnChainData={appOnChainData}
-          dailyRelayData={dailyRelayCountData}
-        />
-      </Route>
-      <Route path={`${path}/chains`}>
-        <Chains appData={appData} />
-      </Route>
-    </Switch>
   )
 }

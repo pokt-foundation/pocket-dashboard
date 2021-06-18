@@ -1,0 +1,28 @@
+query getDailyNetworkRelays {
+  relays_daily(limit: 8, order_by: { bucket: desc }) {
+    bucket
+    total_relays
+  }
+}
+
+query getTotalSuccesfulNetworkRelays($_gte: timestamptz!) {
+  relay_apps_hourly_aggregate(
+    where: { bucket: { _gte: $_gte }, result: { _eq: "200" } }
+  ) {
+    aggregate {
+      sum {
+        total_relays
+      }
+    }
+  }
+}
+
+query getTotalNetworkRelays($_gte: timestamptz!) {
+  relay_apps_hourly_aggregate(where: { bucket: { _gte: $_gte } }) {
+    aggregate {
+      sum {
+        total_relays
+      }
+    }
+  }
+}

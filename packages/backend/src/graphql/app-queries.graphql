@@ -1,0 +1,157 @@
+query getTotalRelaysAndLatency($_eq: String, $_gte: timestamptz) {
+  relay_apps_daily_aggregate(
+    where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
+    order_by: { bucket: desc }
+  ) {
+    aggregate {
+      sum {
+        total_relays
+      }
+      avg {
+        elapsed_time
+      }
+    }
+  }
+}
+
+query getTotalRangedRelaysAndLatency(
+  $_eq: String
+  $_gte: timestamptz
+  $_lte: timestamptz
+) {
+  relay_apps_daily_aggregate(
+    where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte, _lte: $_lte } }
+    order_by: { bucket: desc }
+  ) {
+    aggregate {
+      sum {
+        total_relays
+      }
+      avg {
+        elapsed_time
+      }
+    }
+  }
+}
+
+query getTotalSuccessfulRelays($_eq: String, $_gte: timestamptz) {
+  relay_apps_daily_aggregate(
+    where: {
+      app_pub_key: { _eq: $_eq }
+      bucket: { _gte: $_gte }
+      result: { _eq: "200" }
+    }
+    order_by: { bucket: desc }
+  ) {
+    aggregate {
+      sum {
+        total_relays
+      }
+      avg {
+        elapsed_time
+      }
+    }
+  }
+}
+
+query getTotalSuccessfulRangedRelays(
+  $_eq: String
+  $_gte: timestamptz
+  $_lte: timestamptz
+) {
+  relay_apps_daily_aggregate(
+    where: {
+      app_pub_key: { _eq: $_eq }
+      bucket: { _gte: $_gte, _lte: $_lte }
+      result: { _eq: "200" }
+    }
+    order_by: { bucket: desc }
+  ) {
+    aggregate {
+      sum {
+        total_relays
+      }
+    }
+  }
+}
+
+query getDailyTotalRelays($_eq: String, $_gte: timestamptz) {
+  relay_apps_daily(
+    where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
+    order_by: { bucket: desc }
+  ) {
+    bucket
+    total_relays
+  }
+}
+
+query getLastSessionAppRelays($_eq: String, $_gte: timestamptz, $_buckets: Int) {
+  relay_app_hourly(
+    where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
+    order_by: { bucket: desc }
+    limit: $_buckets
+  ) {
+    bucket
+    total_relays
+  }
+}
+
+query getLatestRelays($_eq: String, $limit: Int, $offset: Int) {
+  relay(
+    limit: $limit
+    offset: $offset
+    order_by: { timestamp: desc }
+    where: { app_pub_key: { _eq: $_eq } }
+  ) {
+    service_node
+    method
+    result
+    bytes
+    timestamp
+    elapsed_time
+  }
+}
+
+query getTotalRelayDuration($_eq: String, $_gte: timestamptz) {
+  relay_app_hourly(
+    where: {
+      app_pub_key: { _eq: $_eq }
+      bucket: { _gte: $_gte }
+      elapsed_time: { _lte: "3" }
+    }
+    order_by: { bucket: desc }
+  ) {
+    elapsed_time
+    bucket
+  }
+}
+
+query getLatestSuccessfulRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+  relay(
+    limit: 10
+    where: { app_pub_key: { _eq: $_eq }, result: { _eq: $_eq1 } }
+    order_by: { timestamp: desc }
+    offset: $offset
+  ) {
+    method
+    result
+    elapsed_time
+    bytes
+    service_node
+  }
+}
+
+query getLatestFailingRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+  relay(
+    limit: 10
+    where: { app_pub_key: { _eq: $_eq }, result: { _neq: $_eq1 } }
+    order_by: { timestamp: desc }
+    offset: $offset
+  ) {
+    method
+    result
+    elapsed_time
+    bytes
+    service_node
+  }
+}

@@ -64,9 +64,9 @@ export default function Notifications({
   const { appId } = useParams()
   const { isLoading: isNotificationsLoading, mutate } = useMutation(
     async function updateNotificationSettings() {
-      const path = `${env(
-        'BACKEND_URL'
-      )}/api/applications/notifications/${appId}`
+      const path = `${env('BACKEND_URL')}/api/${
+        appData.isLb ? 'lb' : 'applications'
+      }/notifications/${appId}`
 
       const { quarter, half, threeQuarters, full } = chosenPercentages
 
