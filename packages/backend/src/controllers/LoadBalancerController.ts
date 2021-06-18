@@ -56,7 +56,7 @@ router.get(
 
     const processedLbs = await Promise.all(
       lbs.map(async (lb) => {
-        if (lb.applicationIDs.length) {
+        if (!lb.applicationIDs.length) {
           next(
             HttpError.INTERNAL_SERVER_ERROR({
               errors: [
@@ -505,6 +505,8 @@ router.get(
     const { lbId } = req.params
 
     const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
+
+    console.log(lbId, loadBalancer)
 
     if (!loadBalancer) {
       throw HttpError.BAD_REQUEST({

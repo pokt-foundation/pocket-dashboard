@@ -2314,7 +2314,7 @@ export const GetTotalRelayDurationDocument = gql`
       where: {
         app_pub_key: { _eq: $_eq }
         bucket: { _gte: $_gte }
-        elapsed_time: { _lte: "3" }
+        elapsed_time: { _lte: "2" }
       }
       order_by: { bucket: desc }
     ) {

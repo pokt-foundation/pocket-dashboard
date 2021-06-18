@@ -127,17 +127,15 @@ export default function SuccessDetails({
   )
   const onFailedClick = useCallback(() => setActiveKey(FAILED_RELAYS_KEY), [])
   const successRate = useMemo(() => {
-    return weeklyRelayData.weeklyAppRelays === 0
+    return weeklyRelayData.total_relays === 0
       ? 0
-      : successfulRelayData.successfulWeeklyRelays /
-          weeklyRelayData.weeklyAppRelays
+      : successfulRelayData.total_relays / weeklyRelayData.total_relays
   }, [weeklyRelayData, successfulRelayData])
   const failureRate = useMemo(() => {
-    return weeklyRelayData.weeklyAppRelays === 0
+    return weeklyRelayData.total_relays === 0
       ? 0
-      : (weeklyRelayData.weeklyAppRelays -
-          successfulRelayData.successfulWeeklyRelays) /
-          weeklyRelayData.weeklyAppRelays
+      : (weeklyRelayData.total_relays - successfulRelayData.total_relays) /
+          weeklyRelayData.total_relays
   }, [successfulRelayData, weeklyRelayData])
   const onPageChange = useCallback((page) => setPage(page), [])
 
@@ -181,9 +179,7 @@ export default function SuccessDetails({
                         ${textStyle('title1')}
                       `}
                     >
-                      {Intl.NumberFormat().format(
-                        weeklyRelayData.weeklyAppRelays
-                      )}
+                      {Intl.NumberFormat().format(weeklyRelayData.total_relays)}
                       <span
                         css={`
                           display: block;
@@ -215,7 +211,7 @@ export default function SuccessDetails({
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          successfulRelayData.successfulWeeklyRelays
+                          successfulRelayData.total_relays
                         )}
                         <span
                           css={`
@@ -249,8 +245,8 @@ export default function SuccessDetails({
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          weeklyRelayData.weeklyAppRelays -
-                            successfulRelayData.successfulWeeklyRelays
+                          weeklyRelayData.total_relays -
+                            successfulRelayData.total_relays
                         )}
                         <span
                           css={`

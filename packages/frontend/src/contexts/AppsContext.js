@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import {
   useUserApplications,
   useUserLoadBalancers,
@@ -24,22 +24,37 @@ export function useUserApps() {
 }
 
 export function AppsContextProvider({ children }) {
-  const { isAppsLoading, appsData } = useUserApplications()
-  const { lbData, isLbLoading } = useUserLoadBalancers()
+  const { isAppsLoading, appsData, refetchUserApps } = useUserApplications()
+  const {
+    lbData,
+    isLbLoading,
+    refetchUserApps: refetchLoadBalancers,
+  } = useUserLoadBalancers()
 
   const appsLoading = isAppsLoading || isLbLoading
+
+  const refetchApps = useCallback(async () => {
+    await refetchUserApps()
+    await refetchLoadBalancers()
+  }, [refetchLoadBalancers, refetchUserApps])
 
   const userApps = useMemo(() => {
     if (appsLoading) {
       return DEFAULT_APP_STATE
     }
-    const filteredApps = appsData.filter(
-      (app) =>
-        !lbData.reduce((_, lb) => lb.applicationIDs.includes(app.appId), false)
-    )
 
-    return { appsLoading, userApps: [...lbData, ...filteredApps] }
-  }, [appsData, appsLoading, lbData])
+    const filteredApps = appsData.filter((app) => {
+      for (const { apps } of lbData) {
+        if (apps.find((lbApp) => lbApp.appId === app.id)) {
+          return false
+        }
+      }
+
+      return true
+    })
+
+    return { appsLoading, userApps: [...lbData, ...filteredApps], refetchApps }
+  }, [appsData, appsLoading, lbData, refetchApps])
 
   return (
     <AppsContext.Provider value={userApps}>{children}</AppsContext.Provider>

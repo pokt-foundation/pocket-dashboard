@@ -2,37 +2,14 @@ import axios from 'axios'
 import { useQueries } from 'react-query'
 import env from 'environment'
 
-export function useAppMetrics({ activeApplication }) {
-  const { appId } = activeApplication
+export function useAppMetrics({ activeApplication, type = 'lb' }) {
+  const { id: appId } = activeApplication
+
   const results = useQueries([
     {
-      queryKey: `lb/${appId}/active-application`,
-      queryFn: async function getActiveApplication() {
-        const { applicationIDs } = activeApplication
-        const results = await Promise.all(
-          applicationIDs.map(async (appId) => {
-            console.log(appId, 'dios')
-            const path = `${env('BACKEND_URL')}/api/applications/${appId}`
-
-            try {
-              const { data } = await axios.get(path, {
-                withCredentials: true,
-              })
-
-              return data
-            } catch (err) {
-              console.log(err)
-            }
-          })
-        )
-
-        return results
-      },
-    },
-    {
-      queryKey: `lb/${appId}/total-weekly-relays-avg-latency`,
+      queryKey: `${type}/${appId}/total-weekly-relays-avg-latency`,
       queryFn: async function getTotalWeeklyRelaysAndLatency() {
-        const path = `${env('BACKEND_URL')}/api/lb/total-relays/${appId}`
+        const path = `${env('BACKEND_URL')}/api/${type}/total-relays/${appId}`
 
         try {
           const { data } = await axios.get(path, {
@@ -46,9 +23,11 @@ export function useAppMetrics({ activeApplication }) {
       },
     },
     {
-      queryKey: `lb/${appId}/successful-weekly-relays-avg-latency`,
+      queryKey: `${type}/${appId}/successful-weekly-relays-avg-latency`,
       queryFn: async function getSuccessfulWeeklyRelaysAndLatency() {
-        const path = `${env('BACKEND_URL')}/api/lb/successful-relays/${appId}`
+        const path = `${env(
+          'BACKEND_URL'
+        )}/api/${type}/successful-relays/${appId}`
 
         try {
           const { data } = await axios.get(path, {
@@ -62,9 +41,9 @@ export function useAppMetrics({ activeApplication }) {
       },
     },
     {
-      queryKey: `lb/${appId}/daily-relays`,
+      queryKey: `${type}/${appId}/daily-relays`,
       queryFn: async function getDailyRelays() {
-        const path = `${env('BACKEND_URL')}/api/lb/daily-relays/${appId}`
+        const path = `${env('BACKEND_URL')}/api/${type}/daily-relays/${appId}`
 
         try {
           const { data } = await axios.get(path, {
@@ -78,9 +57,9 @@ export function useAppMetrics({ activeApplication }) {
       },
     },
     {
-      queryKey: `lb/${appId}/session-relays`,
+      queryKey: `${type}/${appId}/session-relays`,
       queryFn: async function getTotalSessionRelays() {
-        const path = `${env('BACKEND_URL')}/api/lb/session-relays/${appId}`
+        const path = `${env('BACKEND_URL')}/api/${type}/session-relays/${appId}`
 
         try {
           const { data } = await axios.get(path, {
@@ -94,9 +73,9 @@ export function useAppMetrics({ activeApplication }) {
       },
     },
     {
-      queryKey: `lb/${appId}/latest-relays`,
+      queryKey: `${type}/${appId}/latest-relays`,
       queryFn: async function getLatestRelays() {
-        const path = `${env('BACKEND_URL')}/api/lb/latest-relays/${appId}`
+        const path = `${env('BACKEND_URL')}/api/${type}/latest-relays/${appId}`
 
         try {
           const { data } = await axios.get(path, {
@@ -110,11 +89,11 @@ export function useAppMetrics({ activeApplication }) {
       },
     },
     {
-      queryKey: `lb/${appId}/previous-successful-relays`,
+      queryKey: `${type}/${appId}/previous-successful-relays`,
       queryFn: async function getPreviousSuccessfulRelays() {
         const path = `${env(
           'BACKEND_URL'
-        )}/api/lb/previous-successful-relays/${appId}`
+        )}/api/${type}/previous-successful-relays/${appId}`
 
         try {
           const { data } = await axios.get(path, {
@@ -128,9 +107,9 @@ export function useAppMetrics({ activeApplication }) {
       },
     },
     {
-      queryKey: `lb/${appId}/hourly-latency`,
+      queryKey: `${type}/${appId}/ranged-relays`,
       queryFn: async function getTotalWeeklyRelaysAndLatency() {
-        const path = `${env('BACKEND_URL')}/api/lb/hourly-latency/${appId}`
+        const path = `${env('BACKEND_URL')}/api/${type}/ranged-relays/${appId}`
 
         try {
           const { data } = await axios.get(path, {
@@ -140,6 +119,33 @@ export function useAppMetrics({ activeApplication }) {
           return data
         } catch (err) {
           console.log(err)
+        }
+      },
+    },
+    {
+      queryKey: `${type}/${appId}/hourly-latency`,
+      queryFn: async function getTotalWeeklyRelaysAndLatency() {
+        const path = `${env('BACKEND_URL')}/api/${type}/hourly-latency/${appId}`
+
+        try {
+          const { data } = await axios.get(path, {
+            withCredentials: true,
+          })
+
+          return data
+        } catch (err) {
+          console.log(err)
+        }
+      },
+    },
+    {
+      queryKey: `${type}/${appId}/on-chain-data`,
+      queryFn: async function getTotalWeeklyRelaysAndLatency() {
+        return {
+          data: {
+            status: 'Staked',
+            staked_tokens: 24950100000,
+          },
         }
       },
     },
