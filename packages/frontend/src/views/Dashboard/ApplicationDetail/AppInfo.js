@@ -28,6 +28,7 @@ import AppStatus from 'components/AppStatus/AppStatus'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import SuccessIndicator from 'views/Dashboard/ApplicationDetail/SuccessIndicator'
+import { useLatestRelays } from 'views/Dashboard/application-hooks'
 import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
 import { getThresholdsPerStake } from 'lib/pocket-utils'
@@ -232,9 +233,11 @@ export default function AppInfo({
   const isSwitchable = useMemo(() => {
     dayjs.extend(dayJsutcPlugin)
     const today = dayjs.utc()
-    const appCreationDate = dayjs.utc(appData.createdAt)
+    const appLastUpdated = dayjs.utc(appData.updatedAt ?? appData.createdAt)
 
-    const diff = today.diff(appCreationDate, 'day')
+    const diff = today.diff(appLastUpdated, 'day')
+
+    console.log(diff, appData.updatedAt)
 
     return diff >= 7
   }, [appData])
@@ -344,7 +347,7 @@ export default function AppInfo({
                   threshold={graphThreshold}
                 />
                 <Spacer size={2 * GU} />
-                <LatestRequests />
+                <LatestRequests id={appData.id} isLb={appData.isLb} />
               </>
             }
             secondary={
@@ -831,26 +834,23 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
   )
 }
 
-function useLatestRelays() {
-  return {
-    isLatestRelaysLoading: false,
-    latestRelayData: {
-      latestRelays: [],
-    },
-  }
-}
-
-function LatestRequests() {
+function LatestRequests({ id, isLb }) {
   const [page, setPage] = useState(0)
   const { within } = useViewport()
-  const { isLatestRelaysLoading, latestRelayData } = useLatestRelays()
+  const { isLoading: isLatestRelaysLoading, latestRelayData } = useLatestRelays(
+    {
+      id,
+      page,
+      isLb: isLb,
+    }
+  )
 
   const onPageChange = useCallback((page) => setPage(page), [])
   const [colorsByMethod, countByColor, colorValues] = useMemo(() => {
     if (isLatestRelaysLoading) {
       return []
     }
-    const { latestRelays: latestRequests = [] } = latestRelayData
+    const latestRequests = latestRelayData
     const colorsByMethod = new Map()
     const countByColor = new Map()
     let id = 0
@@ -878,7 +878,7 @@ function LatestRequests() {
   const compactMode = within(-1, 'medium')
 
   const latestRelays = useMemo(() => {
-    return latestRelayData ? latestRelayData.latestRelays : []
+    return latestRelayData ? latestRelayData : []
   }, [latestRelayData])
 
   return (
@@ -923,8 +923,8 @@ function LatestRequests() {
             'Result',
             'Time Elapsed',
           ]}
-          entries={latestRelays}
           status={isLatestRelaysLoading ? 'loading' : 'default'}
+          entries={latestRelays}
           renderEntry={({
             bytes,
             method,

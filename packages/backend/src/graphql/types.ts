@@ -2147,6 +2147,38 @@ export const GetTotalRelayDuration = gql`
     }
   }
 `
+export const GetLatestSuccessfulRelays = gql`
+  query getLatestSuccessfulRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+    relay(
+      limit: 10
+      where: { app_pub_key: { _eq: $_eq }, result: { _eq: $_eq1 } }
+      order_by: { timestamp: desc }
+      offset: $offset
+    ) {
+      method
+      result
+      elapsed_time
+      bytes
+      service_node
+    }
+  }
+`
+export const GetLatestFailingRelays = gql`
+  query getLatestFailingRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+    relay(
+      limit: 10
+      where: { app_pub_key: { _eq: $_eq }, result: { _neq: $_eq1 } }
+      order_by: { timestamp: desc }
+      offset: $offset
+    ) {
+      method
+      result
+      elapsed_time
+      bytes
+      service_node
+    }
+  }
+`
 export const GetDailyNetworkRelays = gql`
   query getDailyNetworkRelays {
     relays_daily(limit: 8, order_by: { bucket: desc }) {
@@ -2315,11 +2347,44 @@ export const GetTotalRelayDurationDocument = gql`
         app_pub_key: { _eq: $_eq }
         bucket: { _gte: $_gte }
         elapsed_time: { _lte: "2" }
+        result: { _eq: 200 }
       }
       order_by: { bucket: desc }
     ) {
       elapsed_time
       bucket
+    }
+  }
+`
+export const GetLatestSuccessfulRelaysDocument = gql`
+  query getLatestSuccessfulRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+    relay(
+      limit: 10
+      where: { app_pub_key: { _eq: $_eq }, result: { _eq: $_eq1 } }
+      order_by: { timestamp: desc }
+      offset: $offset
+    ) {
+      method
+      result
+      elapsed_time
+      bytes
+      service_node
+    }
+  }
+`
+export const GetLatestFailingRelaysDocument = gql`
+  query getLatestFailingRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+    relay(
+      limit: 10
+      where: { app_pub_key: { _eq: $_eq }, result: { _neq: $_eq1 } }
+      order_by: { timestamp: desc }
+      offset: $offset
+    ) {
+      method
+      result
+      elapsed_time
+      bytes
+      service_node
     }
   }
 `
@@ -2478,6 +2543,34 @@ export function getSdk(
             { ...requestHeaders, ...wrappedRequestHeaders }
           ),
         'getTotalRelayDuration'
+      )
+    },
+    getLatestSuccessfulRelays(
+      variables?: GetLatestSuccessfulRelaysQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetLatestSuccessfulRelaysQuery> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<GetLatestSuccessfulRelaysQuery>(
+            GetLatestSuccessfulRelaysDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getLatestSuccessfulRelays'
+      )
+    },
+    getLatestFailingRelays(
+      variables?: GetLatestFailingRelaysQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetLatestFailingRelaysQuery> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<GetLatestFailingRelaysQuery>(
+            GetLatestFailingRelaysDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getLatestFailingRelays'
       )
     },
     getDailyNetworkRelays(
@@ -2688,6 +2781,36 @@ export type GetTotalRelayDurationQuery = { __typename?: 'query_root' } & {
     { __typename?: 'relay_app_hourly' } & Pick<
       Relay_App_Hourly,
       'elapsed_time' | 'bucket'
+    >
+  >
+}
+
+export type GetLatestSuccessfulRelaysQueryVariables = Exact<{
+  _eq?: Maybe<Scalars['String']>
+  _eq1?: Maybe<Scalars['numeric']>
+  offset?: Maybe<Scalars['Int']>
+}>
+
+export type GetLatestSuccessfulRelaysQuery = { __typename?: 'query_root' } & {
+  relay: Array<
+    { __typename?: 'relay' } & Pick<
+      Relay,
+      'method' | 'result' | 'elapsed_time' | 'bytes' | 'service_node'
+    >
+  >
+}
+
+export type GetLatestFailingRelaysQueryVariables = Exact<{
+  _eq?: Maybe<Scalars['String']>
+  _eq1?: Maybe<Scalars['numeric']>
+  offset?: Maybe<Scalars['Int']>
+}>
+
+export type GetLatestFailingRelaysQuery = { __typename?: 'query_root' } & {
+  relay: Array<
+    { __typename?: 'relay' } & Pick<
+      Relay,
+      'method' | 'result' | 'elapsed_time' | 'bytes' | 'service_node'
     >
   >
 }

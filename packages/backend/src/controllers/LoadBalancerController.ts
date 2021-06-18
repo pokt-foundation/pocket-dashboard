@@ -28,8 +28,6 @@ const DEFAULT_GATEWAY_SETTINGS = {
 }
 const DEFAULT_TIMEOUT = 2000
 const BUCKETS_PER_HOUR = 2
-const MAX_LB_SWITCH_THRESHOLD = 1
-const RELAYS_PER_APP = 10
 
 const router = express.Router()
 
@@ -69,6 +67,11 @@ router.get(
           )
         }
 
+        if (!lb.updatedAt) {
+          lb.updatedAt = new Date(Date.now())
+
+          await lb.save()
+        }
         const apps: IAppInfo[] = []
 
         for (const appId of lb.applicationIDs) {
@@ -87,6 +90,7 @@ router.get(
           apps,
           chain: app.chain,
           createdAt: new Date(Date.now()),
+          updatedAt: lb.updatedAt,
           freeTier: app.freeTier,
           gatewaySettings: app.gatewaySettings,
           notificationSettings: app.notificationSettings,
@@ -110,10 +114,14 @@ router.post(
 
     try {
       const id = (req.user as IUser)._id
-      const isNewAppRequestInvalid = await Application.exists({
-        status: APPLICATION_STATUSES.READY,
-        user: id,
-      })
+      const isNewAppRequestInvalid =
+        (await Application.exists({
+          status: APPLICATION_STATUSES.READY,
+          user: id,
+        })) ||
+        (await LoadBalancer.exists({
+          user: id,
+        }))
 
       if (isNewAppRequestInvalid) {
         throw HttpError.BAD_REQUEST({
@@ -180,11 +188,12 @@ router.post(
           ],
         })
       }
-      const loadBalancer = new LoadBalancer({
+      const loadBalancer: ILoadBalancer = new LoadBalancer({
         user: id,
         name,
         requestTimeOut: DEFAULT_TIMEOUT,
         applicationIDs: [application._id.toString()],
+        updatedAt: new Date(Date.now()),
       })
 
       await loadBalancer.save()
@@ -192,6 +201,7 @@ router.post(
       const processedLb: GetApplicationQuery = {
         chain: application.chain,
         createdAt: new Date(Date.now()),
+        updatedAt: loadBalancer.updatedAt,
         name: loadBalancer.name,
         id: loadBalancer._id.toString(),
         freeTier: true,
@@ -243,6 +253,24 @@ router.put(
         })
       }
 
+      const existingSettings = await Promise.all(
+        loadBalancer.applicationIDs.map(async function changeSettings(
+          applicationId
+        ) {
+          const application: IApplication = await Application.findById(
+            applicationId
+          )
+
+          return application.gatewaySettings
+        })
+      )
+
+      const { secretKey = '' } = existingSettings.find(
+        (settings) => settings?.secretKey !== ''
+      )
+
+      gatewaySettings.secretKey = secretKey
+
       await Promise.all(
         loadBalancer.applicationIDs.map(async function changeSettings(
           applicationId
@@ -255,6 +283,7 @@ router.put(
           await application.save()
         })
       )
+
       res.status(204).send()
     } catch (err) {
       next(err)
@@ -376,6 +405,11 @@ router.post(
     const { lbId } = req.params
     const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
 
+    const appsInPool = await ApplicationPool.find({
+      chain,
+      status: APPLICATION_STATUSES.READY,
+    })
+
     if (!loadBalancer) {
       throw HttpError.BAD_REQUEST({
         errors: [
@@ -395,7 +429,7 @@ router.post(
       })
     }
 
-    if (loadBalancer.applicationIDs.length > MAX_LB_SWITCH_THRESHOLD) {
+    if (loadBalancer.applicationIDs.length > appsInPool.length) {
       next(
         HttpError.BAD_REQUEST({
           errors: [
@@ -410,12 +444,7 @@ router.post(
 
     const newApps = await Promise.all(
       loadBalancer.applicationIDs.map(async function switchApp(applicationId) {
-        const replacementApplication: IPreStakedApp = await ApplicationPool.findOne(
-          {
-            chain,
-            status: APPLICATION_STATUSES.READY,
-          }
-        )
+        const replacementApplication: IPreStakedApp = appsInPool.pop()
 
         if (!replacementApplication) {
           throw new Error('No application for the selected chain is available')
@@ -474,6 +503,7 @@ router.post(
     )
 
     loadBalancer.applicationIDs = newApps.map((app) => app.appId)
+    loadBalancer.updatedAt = new Date(Date.now())
 
     await loadBalancer.save()
     const newestApp = await Application.findById(loadBalancer.applicationIDs[0])
@@ -482,7 +512,8 @@ router.post(
       chain: newestApp.chain,
       name: loadBalancer.name,
       apps: newApps,
-      createdAt: new Date(Date.now()),
+      createdAt: loadBalancer.createdAt,
+      updatedAt: loadBalancer.updatedAt,
       freeTier: true,
       id: loadBalancer._id.toString(),
       gatewaySettings: newestApp.gatewaySettings,
@@ -505,8 +536,6 @@ router.get(
     const { lbId } = req.params
 
     const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
-
-    console.log(lbId, loadBalancer)
 
     if (!loadBalancer) {
       throw HttpError.BAD_REQUEST({
@@ -825,13 +854,13 @@ router.get(
   })
 )
 
-router.get(
-  '/latest-relays/:lbId',
+router.post(
+  '/latest-relays',
   asyncMiddleware(async (req: Request, res: Response) => {
     const userId = (req.user as IUser)._id
-    const { lbId } = req.params
+    const { id, limit, offset } = req.body
 
-    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(lbId)
+    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(id)
 
     if (!loadBalancer) {
       throw HttpError.BAD_REQUEST({
@@ -873,8 +902,169 @@ router.get(
 
         const result = await gqlClient.getLatestRelays({
           _eq: application.freeTierApplicationAccount.publicKey,
-          limit: RELAYS_PER_APP,
-          offset: 0,
+          limit,
+          offset,
+        })
+
+        return result
+      })
+    )
+
+    const relays = []
+
+    latestRelaysPerApp.map((relayBatch) => {
+      for (const relay of relayBatch.relay) {
+        relays.push(relay)
+      }
+    })
+
+    relays
+      .sort((a, b) => {
+        const dateA = new Date(a.timestamp)
+        const dateB = new Date(b.timestamp)
+
+        // @ts-ignore
+        return dateA - dateB
+      })
+      .reverse()
+
+    res.status(200).send({
+      session_relays: relays.slice(0, 10),
+    })
+  })
+)
+
+router.post(
+  '/latest-successful-relays',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id
+
+    const { id, limit, offset } = req.body
+
+    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(id)
+
+    if (!loadBalancer) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'NONEXISTENT_LOADBALANCER',
+            message: 'User does not have an active Load Balancer',
+          },
+        ],
+      })
+    }
+    if (loadBalancer.user.toString() !== userId.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'User does not have access to this load balancer',
+          },
+        ],
+      })
+    }
+
+    const appIds = loadBalancer.applicationIDs
+
+    const gqlClient = getSdk(
+      new GraphQLClient(env('HASURA_URL') as string, {
+        // @ts-ignore
+        headers: {
+          'x-hasura-admin-secret': env('HASURA_SECRET'),
+        },
+      })
+    )
+
+    const latestRelaysPerApp = await Promise.all(
+      appIds.map(async function getData(applicationId) {
+        const application: IApplication = await Application.findById(
+          applicationId
+        )
+
+        const result = await gqlClient.getLatestSuccessfulRelays({
+          _eq: application.freeTierApplicationAccount.publicKey,
+          _eq1: 200,
+          offset,
+        })
+
+        return result
+      })
+    )
+
+    const relays = []
+
+    latestRelaysPerApp.map((relayBatch) => {
+      for (const relay of relayBatch.relay) {
+        relays.push(relay)
+      }
+    })
+
+    relays
+      .sort((a, b) => {
+        const dateA = new Date(a.timestamp)
+        const dateB = new Date(b.timestamp)
+
+        // @ts-ignore
+        return dateA - dateB
+      })
+      .reverse()
+
+    res.status(200).send({
+      session_relays: relays.slice(0, 10),
+    })
+  })
+)
+
+router.post(
+  '/latest-failing-relays',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id
+    const { id, limit, offset } = req.body
+
+    const loadBalancer: ILoadBalancer = await LoadBalancer.findById(id)
+
+    if (!loadBalancer) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'NONEXISTENT_LOADBALANCER',
+            message: 'User does not have an active Load Balancer',
+          },
+        ],
+      })
+    }
+    if (loadBalancer.user.toString() !== userId.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'User does not have access to this load balancer',
+          },
+        ],
+      })
+    }
+
+    const appIds = loadBalancer.applicationIDs
+
+    const gqlClient = getSdk(
+      new GraphQLClient(env('HASURA_URL') as string, {
+        // @ts-ignore
+        headers: {
+          'x-hasura-admin-secret': env('HASURA_SECRET'),
+        },
+      })
+    )
+
+    const latestRelaysPerApp = await Promise.all(
+      appIds.map(async function getData(applicationId) {
+        const application: IApplication = await Application.findById(
+          applicationId
+        )
+
+        const result = await gqlClient.getLatestFailingRelays({
+          _eq: application.freeTierApplicationAccount.publicKey,
+          _eq1: 200,
+          offset,
         })
 
         return result

@@ -125,3 +125,33 @@ query getTotalRelayDuration($_eq: String, $_gte: timestamptz) {
     bucket
   }
 }
+
+query getLatestSuccessfulRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+  relay(
+    limit: 10
+    where: { app_pub_key: { _eq: $_eq }, result: { _eq: $_eq1 } }
+    order_by: { timestamp: desc }
+    offset: $offset
+  ) {
+    method
+    result
+    elapsed_time
+    bytes
+    service_node
+  }
+}
+
+query getLatestFailingRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+  relay(
+    limit: 10
+    where: { app_pub_key: { _eq: $_eq }, result: { _neq: $_eq1 } }
+    order_by: { timestamp: desc }
+    offset: $offset
+  ) {
+    method
+    result
+    elapsed_time
+    bytes
+    service_node
+  }
+}

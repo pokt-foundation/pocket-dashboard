@@ -3,6 +3,7 @@ import {
   useUserApplications,
   useUserLoadBalancers,
 } from 'views/Dashboard/application-hooks'
+import { log } from 'lib/utils'
 
 const DEFAULT_APP_STATE = {
   appsLoading: true,
@@ -55,6 +56,8 @@ export function AppsContextProvider({ children }) {
 
     return { appsLoading, userApps: [...lbData, ...filteredApps], refetchApps }
   }, [appsData, appsLoading, lbData, refetchApps])
+
+  log('USER APPS:', userApps)
 
   return (
     <AppsContext.Provider value={userApps}>{children}</AppsContext.Provider>

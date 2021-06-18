@@ -20,6 +20,7 @@ export interface ILoadBalancer extends Document {
   applicationIDs: string[]
   notificationSettings: INotificationSettings
   createdAt: Date | number
+  updatedAt?: Date | number
   chain: string
 }
 
@@ -32,6 +33,9 @@ const LoadBalancerSchema = new Schema(
     createdAt: {
       type: Date,
       default: new Date(Date.now()),
+    },
+    updatedAt: {
+      type: Date,
     },
   },
   { collection: 'LoadBalancers' }

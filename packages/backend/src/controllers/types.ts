@@ -9,7 +9,8 @@ export type IAppInfo = {
 export type GetApplicationQuery = {
   apps: IAppInfo[]
   chain: string
-  createdAt?: Date
+  createdAt?: Date | number
+  updatedAt?: Date | number
   freeTier: boolean
   gatewaySettings: IGatewaySettings
   name: string

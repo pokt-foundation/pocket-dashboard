@@ -2,6 +2,8 @@ import axios from 'axios'
 import { useQuery } from 'react-query'
 import env from 'environment'
 
+const PER_PAGE = 10
+
 export function useUserApplications() {
   const {
     isLoading: isAppsLoading,
@@ -67,5 +69,51 @@ export function useUserLoadBalancers() {
     isLbError,
     isLbLoading,
     refetchUserApps,
+  }
+}
+
+export function useLatestRelays({
+  id = '',
+  page = 0,
+  limit = 10,
+  isLb = true,
+}) {
+  const { isLoading, isError, data: latestRelayData } = useQuery(
+    [`user/${id}/latest-relays`, page],
+    async function getLatestRelays() {
+      if (!id) {
+        return []
+      }
+      const path = `${env('BACKEND_URL')}/api/${
+        isLb ? 'lb' : 'applications'
+      }/latest-relays`
+
+      try {
+        const { data } = await axios.post(
+          path,
+          {
+            id,
+            limit,
+            offset: page * PER_PAGE,
+          },
+          {
+            withCredentials: true,
+          }
+        )
+
+        return data.session_relays
+      } catch (err) {
+        console.log(err, 'rip')
+      }
+    },
+    {
+      keepPreviousData: true,
+    }
+  )
+
+  return {
+    isLoading,
+    isError,
+    latestRelayData,
   }
 }

@@ -37,7 +37,7 @@ export default function BasicSetup({ appData }) {
   )
   const { isLoading: isSwitchLoading, mutate } = useMutation(
     async function switchChains() {
-      const path = `${env('BACKEND_URL')}/api/applications/switch/${appId}`
+      const path = `${env('BACKEND_URL')}/api/lb/switch/${appId}`
 
       try {
         const res = await axios.post(

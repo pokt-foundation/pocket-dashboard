@@ -73,22 +73,6 @@ export function useAppMetrics({ activeApplication, type = 'lb' }) {
       },
     },
     {
-      queryKey: `${type}/${appId}/latest-relays`,
-      queryFn: async function getLatestRelays() {
-        const path = `${env('BACKEND_URL')}/api/${type}/latest-relays/${appId}`
-
-        try {
-          const { data } = await axios.get(path, {
-            withCredentials: true,
-          })
-
-          return data
-        } catch (err) {
-          console.log(err)
-        }
-      },
-    },
-    {
       queryKey: `${type}/${appId}/previous-successful-relays`,
       queryFn: async function getPreviousSuccessfulRelays() {
         const path = `${env(

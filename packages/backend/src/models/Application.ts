@@ -42,6 +42,8 @@ export interface IApplication extends Document {
   gatewayAAT: IGatewayAAT
   gatewaySettings: IGatewaySettings
   notificationSettings: INotificationSettings
+  createdAt?: Date | number
+  updatedAt?: Date | number
 }
 
 const applicationSchema = new Schema(
@@ -82,6 +84,10 @@ const applicationSchema = new Schema(
       fullLastSent: Date,
     },
     createdAt: {
+      type: Date,
+      default: new Date(Date.now()),
+    },
+    updatedAt: {
       type: Date,
       default: new Date(Date.now()),
     },

@@ -49,7 +49,6 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
     { data: successfulRelays },
     { data: dailyRelays },
     { data: sessionRelays },
-    { data: latestRelays },
     { data: previousSuccessfulRelays },
     { data: previousRangedRelays },
     { data: hourlyLatency },
@@ -71,7 +70,6 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
           successfulRelayData={successfulRelays}
           weeklyRelayData={totalRelays}
           latestLatencyData={hourlyLatency.hourly_latency}
-          latestRelays={latestRelays.session_relays}
         />
       </Route>
       <Route path={`${path}/security`}>
@@ -82,6 +80,8 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
       </Route>
       <Route path={`${path}/success-details`}>
         <SuccessDetails
+          id={activeApplication.id}
+          isLb={activeApplication.isLb}
           appOnChainData={appOnChainStatus}
           weeklyRelayData={totalRelays}
           successfulRelayData={successfulRelays}

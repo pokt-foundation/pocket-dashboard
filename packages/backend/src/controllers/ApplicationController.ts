@@ -19,7 +19,6 @@ import { getApp } from '../lib/pocket'
 import { APPLICATION_STATUSES } from '../application-statuses'
 
 const BUCKETS_PER_HOUR = 2
-const RELAYS_PER_APP = 10
 
 const router = express.Router()
 
@@ -45,6 +44,28 @@ router.get(
       })
     }
 
+    application.map((application) => {
+      if (application.user.toString() !== id.toString()) {
+        throw HttpError.FORBIDDEN({
+          errors: [
+            {
+              id: 'UNAUTHORIZED_ACCESS',
+              message: 'User does not have access to this application',
+            },
+          ],
+        })
+      }
+    })
+
+    await Promise.all(
+      application.map(async (application) => {
+        if (!application.updatedAt) {
+          application.updatedAt = new Date(Date.now())
+          await application.save()
+        }
+      })
+    )
+
     const processedApplications = application.map(
       (app): GetApplicationQuery => ({
         apps: [
@@ -61,6 +82,7 @@ router.get(
         name: app.name,
         id: app._id.toString(),
         status: app.status,
+        updatedAt: app.updatedAt,
       })
     )
 
@@ -97,6 +119,11 @@ router.get(
       })
     }
 
+    if (!application.updatedAt) {
+      application.updatedAt = new Date(Date.now())
+      await application.save()
+    }
+
     const processedApplication: GetApplicationQuery = {
       apps: [
         {
@@ -112,6 +139,7 @@ router.get(
       notificationSettings: application.notificationSettings,
       id: application._id.toString(),
       status: application.status,
+      updatedAt: application.updatedAt,
     }
 
     res.status(200).send(processedApplication)
@@ -250,6 +278,7 @@ router.post(
         status: APPLICATION_STATUSES.READY,
         lastChangedStatusAt: Date.now(),
         freeTier: true,
+        updatedAt: new Date(Date.now()),
         // We wanna preserve user-related configuration fields, so we just copy them over
         // from the old application.
         name: oldApplication.name,
@@ -276,6 +305,7 @@ router.post(
         notificationSettings: newReplacementApplication.notificationSettings,
         id: newReplacementApplication._id.toString(),
         status: newReplacementApplication.status,
+        updatedAt: newReplacementApplication.updatedAt,
       }
 
       res.status(200).send(processedApplication)
@@ -585,15 +615,15 @@ router.get(
   })
 )
 
-router.get(
-  '/latest-relays/:applicationId',
+router.post(
+  '/latest-relays',
   asyncMiddleware(async (req: Request, res: Response) => {
     const userId = (req.user as IUser)._id
-    const { applicationId } = req.params
+    const { id, limit, offset } = req.body
 
-    const application: IApplication = await Application.findById(applicationId)
+    const application: IApplication = await Application.findById(id)
 
-    if (!applicationId) {
+    if (!id) {
       throw HttpError.BAD_REQUEST({
         errors: [
           {
@@ -625,11 +655,145 @@ router.get(
 
     const result = await gqlClient.getLatestRelays({
       _eq: application.freeTierApplicationAccount.publicKey,
-      limit: RELAYS_PER_APP,
-      offset: 0,
+      limit,
+      offset,
     })
 
     const relays = result.relay
+
+    relays
+      .sort((a, b) => {
+        const dateA = new Date(a.timestamp)
+        const dateB = new Date(b.timestamp)
+
+        // @ts-ignore
+        return dateA - dateB
+      })
+      .reverse()
+
+    res.status(200).send({
+      session_relays: relays.slice(0, 10),
+    })
+  })
+)
+
+router.post(
+  '/latest-successful-relays',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id
+
+    const { id, limit, offset } = req.body
+
+    const application: IApplication = await Application.findById(id)
+
+    if (!application) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'NONEXISTENT_LOADBALANCER',
+            message: 'User does not have an active application',
+          },
+        ],
+      })
+    }
+    if (application.user.toString() !== userId.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'User does not have access to this load balancer',
+          },
+        ],
+      })
+    }
+
+    const gqlClient = getSdk(
+      new GraphQLClient(env('HASURA_URL') as string, {
+        // @ts-ignore
+        headers: {
+          'x-hasura-admin-secret': env('HASURA_SECRET'),
+        },
+      })
+    )
+
+    const latestSuccessfulRelays = await gqlClient.getLatestSuccessfulRelays({
+      _eq: application.freeTierApplicationAccount.publicKey,
+      _eq1: 200,
+      offset,
+    })
+
+    const relays = []
+
+    latestSuccessfulRelays.relay.map((relayBatch) => {
+      relays.push(relayBatch)
+    })
+
+    relays
+      .sort((a, b) => {
+        const dateA = new Date(a.timestamp)
+        const dateB = new Date(b.timestamp)
+
+        // @ts-ignore
+        return dateA - dateB
+      })
+      .reverse()
+
+    res.status(200).send({
+      session_relays: relays.slice(0, 10),
+    })
+  })
+)
+
+router.post(
+  '/latest-failing-relays',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const userId = (req.user as IUser)._id
+
+    const { id, offset } = req.body
+
+    const application: IApplication = await Application.findById(id)
+
+    if (!application) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'NONEXISTENT_LOADBALANCER',
+            message: 'User does not have an active application',
+          },
+        ],
+      })
+    }
+    if (application.user.toString() !== userId.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'User does not have access to this load balancer',
+          },
+        ],
+      })
+    }
+
+    const gqlClient = getSdk(
+      new GraphQLClient(env('HASURA_URL') as string, {
+        // @ts-ignore
+        headers: {
+          'x-hasura-admin-secret': env('HASURA_SECRET'),
+        },
+      })
+    )
+
+    const latestSuccessfulRelays = await gqlClient.getLatestFailingRelays({
+      _eq: application.freeTierApplicationAccount.publicKey,
+      _eq1: 200,
+      offset,
+    })
+
+    const relays = []
+
+    latestSuccessfulRelays.relay.map((relayBatch) => {
+      relays.push(relayBatch)
+    })
 
     relays
       .sort((a, b) => {
