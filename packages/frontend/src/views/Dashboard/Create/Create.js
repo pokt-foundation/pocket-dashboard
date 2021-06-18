@@ -140,7 +140,7 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData
-  const { appsData, refetchUserApps } = useUserApplications()
+  const { refetchUserApps } = useUserApplications()
 
   const {
     isLoading: isChainsLoading,
@@ -171,7 +171,7 @@ export default function Create() {
     mutate,
   } = useMutation(async function createApp() {
     try {
-      const path = `${env('BACKEND_URL')}/api/applications`
+      const path = `${env('BACKEND_URL')}/api/lb`
 
       const res = await axios.post(
         path,
