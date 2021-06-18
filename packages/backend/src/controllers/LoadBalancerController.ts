@@ -317,16 +317,14 @@ router.get(
       })
     )
 
-    console.log(apps)
-
     // @ts-ignore
     const appsStatus = apps.reduce(
       (status, app) => {
         return {
           // @ts-ignore
-          stake: app.staked_tokens + status.stake,
+          stake: app.stakedTokens + status.stake,
           // @ts-ignore
-          relays: app.max_relays + status.relays,
+          relays: app.maxRelays + status.relays,
         }
       },
       {
