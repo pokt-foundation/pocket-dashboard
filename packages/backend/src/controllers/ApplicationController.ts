@@ -190,39 +190,33 @@ router.put(
     const { gatewaySettings } = req.body
     const { applicationId } = req.params
 
-    try {
-      const application: IApplication = await Application.findById(
-        applicationId
-      )
+    const application: IApplication = await Application.findById(applicationId)
 
-      if (!application) {
-        throw HttpError.BAD_REQUEST({
-          errors: [
-            { id: 'NONEXISTENT_APPLICATION', message: 'Application not found' },
-          ],
-        })
-      }
-      const userId = (req.user as IUser)._id
-
-      if (application.user.toString() !== userId.toString()) {
-        throw HttpError.BAD_REQUEST({
-          errors: [
-            {
-              id: 'UNAUTHORIZED_ACCESS',
-              message: 'Application does not belong to user',
-            },
-          ],
-        })
-      }
-      application.gatewaySettings = gatewaySettings
-      await application.save()
-      // lodash's merge mutates the target object passed in.
-      // This is what we want, as we don't want to lose any of the mongoose functionality
-      // while at the same time updating the model itself
-      res.status(204).send()
-    } catch (err) {
-      throw HttpError.INTERNAL_SERVER_ERROR(err)
+    if (!application) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          { id: 'NONEXISTENT_APPLICATION', message: 'Application not found' },
+        ],
+      })
     }
+    const userId = (req.user as IUser)._id
+
+    if (application.user.toString() !== userId.toString()) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'UNAUTHORIZED_ACCESS',
+            message: 'Application does not belong to user',
+          },
+        ],
+      })
+    }
+    application.gatewaySettings = gatewaySettings
+    await application.save()
+    // lodash's merge mutates the target object passed in.
+    // This is what we want, as we don't want to lose any of the mongoose functionality
+    // while at the same time updating the model itself
+    res.status(204).send()
   })
 )
 
@@ -232,86 +226,79 @@ router.post(
     const { chain } = req.body
     const { applicationId } = req.params
 
-    try {
-      const replacementApplication: IPreStakedApp = await ApplicationPool.findOne(
-        {
-          chain,
-          status: APPLICATION_STATUSES.READY,
-        }
-      )
-
-      if (!replacementApplication) {
-        throw new Error('No application for the selected chain is available')
-      }
-      const oldApplication: IApplication = await Application.findById(
-        applicationId
-      )
-
-      if (!oldApplication) {
-        throw new Error('Cannot find application')
-      }
-      if (
-        oldApplication.user.toString() !== (req.user as IUser)._id.toString()
-      ) {
-        throw HttpError.FORBIDDEN({
-          errors: [
-            {
-              id: 'FOREIGN_APPLICATION',
-              message: 'Application does not belong to user',
-            },
-          ],
-        })
-      }
-
-      oldApplication.status = APPLICATION_STATUSES.AWAITING_GRACE_PERIOD
-      oldApplication.lastChangedStatusAt = Date.now()
-      await oldApplication.save()
-      // Create a new Application for the user and copy the previous user config
-      const newReplacementApplication = new Application({
-        // As we're moving to a new chain, everything related to the account and gateway AAT
-        // information will change, so we use all the data from the application that we took
-        // from the pool.
-        chain: replacementApplication.chain,
-        freeTierApplicationAccount:
-          replacementApplication.freeTierApplicationAccount,
-        gatewayAAT: replacementApplication.gatewayAAT,
+    const replacementApplication: IPreStakedApp = await ApplicationPool.findOne(
+      {
+        chain,
         status: APPLICATION_STATUSES.READY,
-        lastChangedStatusAt: Date.now(),
-        freeTier: true,
-        updatedAt: new Date(Date.now()),
-        // We wanna preserve user-related configuration fields, so we just copy them over
-        // from the old application.
-        name: oldApplication.name,
-        user: oldApplication.user,
-        gatewaySettings: oldApplication.gatewaySettings,
-      })
+      }
+    )
 
-      await newReplacementApplication.save()
+    if (!replacementApplication) {
+      throw new Error('No application for the selected chain is available')
+    }
+    const oldApplication: IApplication = await Application.findById(
+      applicationId
+    )
 
-      const processedApplication: GetApplicationQuery = {
-        chain: newReplacementApplication.chain,
-        name: newReplacementApplication.name,
-        apps: [
+    if (!oldApplication) {
+      throw new Error('Cannot find application')
+    }
+    if (oldApplication.user.toString() !== (req.user as IUser)._id.toString()) {
+      throw HttpError.FORBIDDEN({
+        errors: [
           {
-            address:
-              newReplacementApplication.freeTierApplicationAccount.address,
-            appId: newReplacementApplication._id.toString(),
-            publicKey:
-              newReplacementApplication.freeTierApplicationAccount.publicKey,
+            id: 'FOREIGN_APPLICATION',
+            message: 'Application does not belong to user',
           },
         ],
-        freeTier: newReplacementApplication.freeTier,
-        gatewaySettings: newReplacementApplication.gatewaySettings,
-        notificationSettings: newReplacementApplication.notificationSettings,
-        id: newReplacementApplication._id.toString(),
-        status: newReplacementApplication.status,
-        updatedAt: newReplacementApplication.updatedAt,
-      }
-
-      res.status(200).send(processedApplication)
-    } catch (err) {
-      throw HttpError.INTERNAL_SERVER_ERROR(err)
+      })
     }
+
+    oldApplication.status = APPLICATION_STATUSES.AWAITING_GRACE_PERIOD
+    oldApplication.lastChangedStatusAt = Date.now()
+    await oldApplication.save()
+    // Create a new Application for the user and copy the previous user config
+    const newReplacementApplication = new Application({
+      // As we're moving to a new chain, everything related to the account and gateway AAT
+      // information will change, so we use all the data from the application that we took
+      // from the pool.
+      chain: replacementApplication.chain,
+      freeTierApplicationAccount:
+        replacementApplication.freeTierApplicationAccount,
+      gatewayAAT: replacementApplication.gatewayAAT,
+      status: APPLICATION_STATUSES.READY,
+      lastChangedStatusAt: Date.now(),
+      freeTier: true,
+      updatedAt: new Date(Date.now()),
+      // We wanna preserve user-related configuration fields, so we just copy them over
+      // from the old application.
+      name: oldApplication.name,
+      user: oldApplication.user,
+      gatewaySettings: oldApplication.gatewaySettings,
+    })
+
+    await newReplacementApplication.save()
+
+    const processedApplication: GetApplicationQuery = {
+      chain: newReplacementApplication.chain,
+      name: newReplacementApplication.name,
+      apps: [
+        {
+          address: newReplacementApplication.freeTierApplicationAccount.address,
+          appId: newReplacementApplication._id.toString(),
+          publicKey:
+            newReplacementApplication.freeTierApplicationAccount.publicKey,
+        },
+      ],
+      freeTier: newReplacementApplication.freeTier,
+      gatewaySettings: newReplacementApplication.gatewaySettings,
+      notificationSettings: newReplacementApplication.notificationSettings,
+      id: newReplacementApplication._id.toString(),
+      status: newReplacementApplication.status,
+      updatedAt: newReplacementApplication.updatedAt,
+    }
+
+    res.status(200).send(processedApplication)
   })
 )
 

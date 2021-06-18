@@ -7,7 +7,7 @@ import NetworkData from '../models/NetworkData'
 import ApplicationPool from '../models/PreStakedApp'
 import asyncMiddleware from '../middlewares/async'
 import { authenticate } from '../middlewares/passport-auth'
-import { composeSevenDaysUtcDate } from '../lib/date-utils'
+import { composeDaysFromNowUtcDate } from '../lib/date-utils'
 
 const router = express.Router()
 
@@ -19,6 +19,7 @@ router.get(
   '/chains',
   asyncMiddleware(async (_: Request, res: Response) => {
     const chains = await Chain.find({ nodeCount: { $exists: true } })
+
     const processedChains = await Promise.all(
       chains.map(async function processChain({
         _id,
@@ -133,7 +134,7 @@ router.get(
     // @ts-ignore
     dayjs.extend(dayJsutcPlugin)
 
-    const sevenDaysAgo = composeSevenDaysUtcDate()
+    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
 
     const networkRelays = await gqlClient.getTotalSuccesfulNetworkRelays({
       _gte: sevenDaysAgo,
@@ -157,7 +158,7 @@ router.get(
       })
     )
 
-    const sevenDaysAgo = composeSevenDaysUtcDate()
+    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
 
     const networkRelays = await gqlClient.getTotalNetworkRelays({
       _gte: sevenDaysAgo,

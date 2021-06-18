@@ -3,8 +3,9 @@ import HttpError, { IContent } from '../errors/http-error'
 
 export const errorHandler = () => (
   err: Error | HttpError,
-  _: Request,
-  res: Response
+  req: Request,
+  res: Response,
+  next
 ): void => {
   let code: number
   let body: IContent
