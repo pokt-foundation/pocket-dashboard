@@ -126,11 +126,16 @@ export function useAppMetrics({ activeApplication }) {
     {
       queryKey: `${type}/${appId}/on-chain-data`,
       queryFn: async function getTotalWeeklyRelaysAndLatency() {
-        return {
-          data: {
-            status: 'Staked',
-            staked_tokens: 24950100000,
-          },
+        const path = `${env('BACKEND_URL')}/api/${type}/status/${appId}`
+
+        try {
+          const { data } = await axios.get(path, {
+            withCredentials: true,
+          })
+
+          return data
+        } catch (err) {
+          console.log(err)
         }
       },
     },

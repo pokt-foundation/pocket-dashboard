@@ -175,6 +175,8 @@ router.get(
     }
     const app = await getApp(application.freeTierApplicationAccount.address)
 
+    console.log(app)
+
     res.status(200).send({
       // @ts-ignore
       stake: app.staked_tokens,
