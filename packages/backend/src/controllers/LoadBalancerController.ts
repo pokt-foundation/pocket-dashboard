@@ -336,16 +336,13 @@ router.get(
       })
     }
 
-    const readableApps = apps.map((app) => app.toJSON())
+    const readableApps = apps.map((app: QueryAppResponse) => app.toJSON())
 
-    // @ts-ignore
     const appsStatus = readableApps.reduce(
       (status, app) => {
         return {
-          // @ts-ignore
           stake: app.staked_tokens + status.stake,
-          // @ts-ignore
-          relays: app.maxRelays + status.relays,
+          relays: app.max_relays + status.relays,
         }
       },
       {
