@@ -2,17 +2,7 @@ import axios from 'axios'
 import { useQueries } from 'react-query'
 import env from 'environment'
 import { log } from 'lib/utils'
-
-export const KNOWN_QUERY_SUFFIXES = {
-  WEEKLY_TOTAL_METRICS: 'WEEKLY_TOTAL_METRICS',
-  WEEKLY_SUCCESSFUL_METRICS: 'WEEKLY_SUCCESSFUL_METRICS',
-  DAILY_BREAKDOWN_METRICS: 'DAILY_BREAKDOWN_METRICS',
-  SESSION_METRICS: 'SESSION_METRICS',
-  PREVIOUS_SUCCESSFUL_METRICS: 'PREVIOUS_SUCCESSFUL_METRICS',
-  PREVIOUS_TOTAL_METRICS: 'PREVIOUS_TOTAL_METRICS',
-  HOURLY_LATENCY_METRICS: 'HOURLY_LATENCY_METRICS',
-  ONCHAIN_DATA: 'ONCHAIN_DATA',
-}
+import { KNOWN_QUERY_SUFFIXES } from '../known-query-suffixes'
 
 export function useAppMetrics({ activeApplication }) {
   const { id: appId = '', isLb = false } = activeApplication
