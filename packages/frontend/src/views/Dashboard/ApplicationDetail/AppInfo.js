@@ -31,7 +31,6 @@ import SuccessIndicator from 'views/Dashboard/ApplicationDetail/SuccessIndicator
 import { useLatestRelays } from 'hooks/application-hooks'
 import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
-import { getThresholdsPerStake } from 'lib/pocket-utils'
 import { formatNumberToSICompact } from 'lib/formatting-utils'
 
 const MAX_RELAYS_PER_SESSION = 40000
@@ -107,11 +106,11 @@ function formatDailyRelaysForGraphing(
 
   const scales = [
     { label: '0' },
-    { label: formatNumberToSICompact(upperBound * 0.25).toString() },
-    { label: formatNumberToSICompact(upperBound * 0.5).toString() },
-    { label: formatNumberToSICompact(upperBound * 0.75).toString() },
+    { label: formatNumberToSICompact(upperBound * 0.25) },
+    { label: formatNumberToSICompact(upperBound * 0.5) },
+    { label: formatNumberToSICompact(upperBound * 0.75) },
     {
-      label: formatNumberToSICompact(upperBound).toString(),
+      label: formatNumberToSICompact(upperBound),
       highlightColor: '#AE1515',
     },
     { label: '' },

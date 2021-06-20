@@ -11,11 +11,6 @@ import SuccessDetails from 'views/Dashboard/ApplicationDetail/SuccessDetails'
 import { useAppMetrics } from 'hooks/useAppMetrics'
 import { useUserApps } from 'contexts/AppsContext'
 
-const appOnChainStatus = {
-  status: 'Staked',
-  staked_tokens: 24950100000,
-}
-
 export default function AppDetailWrapper() {
   const { appsLoading, refetchApps, userApps } = useUserApps()
   const { appId } = useParams()
