@@ -22,7 +22,7 @@ const THRESHOLDS_PER_STAKE = new Map([
     ONE_MILLION_RELAYS_STAKE,
     {
       maxRelays: 1000000,
-      graphThreshold: 1250000,
+      graphThreshold: 1000000,
       legibleMaxRelays: '1M',
     },
   ],
@@ -60,11 +60,11 @@ export function getThresholdsPerStake(stake) {
   if (env('USE_TEST_APP')) {
     return THRESHOLDS_PER_STAKE.get(ONE_MILLION_RELAYS_STAKE)
   }
-  if (!THRESHOLDS_PER_STAKE.has(stake)) {
+  if (!THRESHOLDS_PER_STAKE.has(24950100000)) {
     throw new Error('Unknown stake')
   }
 
-  return THRESHOLDS_PER_STAKE.get(stake)
+  return THRESHOLDS_PER_STAKE.get(24950100000)
 }
 
 /**

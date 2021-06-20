@@ -18,11 +18,10 @@ import {
 } from 'ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
-import { getThresholdsPerStake } from 'lib/pocket-utils'
 import env from 'environment'
 import { KNOWN_QUERY_SUFFIXES } from '../../../known-query-suffixes'
+import { formatNumberToSICompact } from 'lib/formatting-utils'
 
-const MAX_RELAYS = 1000000
 const GRAPH_SIZE = 130
 
 const DEFAULT_PERCENTAGES = {
@@ -127,9 +126,13 @@ export default function Notifications({
         ) / dailyRelayData.length
   }, [dailyRelayData])
 
-  const averageUsageColor = useUsageColor(totalDailyRelays / MAX_RELAYS)
-  const maxUsageColor = useUsageColor(highestDailyAmount / MAX_RELAYS)
-  const minUsageColor = useUsageColor(lowestDailyAmount / MAX_RELAYS)
+  const { relays: maxRelaysPerSession } = appOnChainData
+
+  const maxDailyRelays = maxRelaysPerSession * 24
+
+  const averageUsageColor = useUsageColor(totalDailyRelays / maxDailyRelays)
+  const maxUsageColor = useUsageColor(highestDailyAmount / maxDailyRelays)
+  const minUsageColor = useUsageColor(lowestDailyAmount / maxDailyRelays)
 
   const onChosePercentageChange = useCallback(
     (chosenPercentage) => {
@@ -147,8 +150,7 @@ export default function Notifications({
     [hasChanged, isNotificationsLoading]
   )
 
-  const { staked_tokens: stakedTokens } = appOnChainData
-  const { legibleMaxRelays } = getThresholdsPerStake(stakedTokens)
+  const maxRelays = formatNumberToSICompact(maxDailyRelays)
 
   return (
     <FloatUp
@@ -190,13 +192,13 @@ export default function Notifications({
                     Weekly bandwith usage
                   </h2>
                   {compactMode && <Spacer size={1 * GU} />}
-                  <h3>Max relays per day: {legibleMaxRelays}</h3>
+                  <h3>Max relays per day: {maxRelays}</h3>
                 </div>
                 <Spacer size={2 * GU} />
                 <Inline>
                   <GraphContainer>
                     <CircleGraph
-                      value={Math.min(totalDailyRelays / MAX_RELAYS, 1)}
+                      value={Math.min(totalDailyRelays / maxDailyRelays, 1)}
                       size={GRAPH_SIZE}
                       color={averageUsageColor}
                     />
@@ -231,7 +233,7 @@ export default function Notifications({
                   <Spacer size={2 * GU} />
                   <GraphContainer>
                     <CircleGraph
-                      value={Math.min(highestDailyAmount / MAX_RELAYS, 1)}
+                      value={Math.min(highestDailyAmount / maxDailyRelays, 1)}
                       size={GRAPH_SIZE}
                       color={maxUsageColor}
                     />
@@ -263,7 +265,7 @@ export default function Notifications({
                   <Spacer size={2 * GU} />
                   <GraphContainer>
                     <CircleGraph
-                      value={lowestDailyAmount / MAX_RELAYS}
+                      value={lowestDailyAmount / maxDailyRelays}
                       size={GRAPH_SIZE}
                       color={minUsageColor}
                     />
@@ -347,28 +349,28 @@ export default function Notifications({
                 level="quarter"
                 checked={chosenPercentages.quarter}
                 onChange={() => onChosePercentageChange('quarter')}
-                maxRelays={legibleMaxRelays}
+                maxRelays={maxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="half"
                 checked={chosenPercentages.half}
                 onChange={() => onChosePercentageChange('half')}
-                maxRelays={legibleMaxRelays}
+                maxRelays={maxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="threeQuarters"
                 checked={chosenPercentages.threeQuarters}
                 onChange={() => onChosePercentageChange('threeQuarters')}
-                maxRelays={legibleMaxRelays}
+                maxRelays={maxRelays}
               />
               <Spacer size={2 * GU} />
               <NotificationPreference
                 level="full"
                 checked={chosenPercentages.full}
                 onChange={() => onChosePercentageChange('full')}
-                maxRelays={legibleMaxRelays}
+                maxRelays={maxRelays}
               />
             </>
           }

@@ -1,15 +1,11 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import TokenAmount from 'token-amount'
 import 'styled-components/macro'
 import Box from 'components/Box/Box'
 import { Spacer, Tag, textStyle, GU } from 'ui'
-import { getStakingStatus, getThresholdsPerStake } from 'lib/pocket-utils'
 
 export default function AppStatus({ appOnChainStatus }) {
-  const { status, staked_tokens: stakedTokens } = appOnChainStatus
-  const { legibleMaxRelays } = getThresholdsPerStake(stakedTokens)
-
-  const stakingStatus = useMemo(() => getStakingStatus(status), [status])
+  const { stake: stakedTokens, relays: maxRelaysPerSession } = appOnChainStatus
 
   return (
     <Box
@@ -44,7 +40,7 @@ export default function AppStatus({ appOnChainStatus }) {
               color="white"
               background="#1A4008"
             >
-              {stakingStatus}
+              Staked
             </Tag>
           </span>
         </li>
@@ -59,7 +55,13 @@ export default function AppStatus({ appOnChainStatus }) {
         </li>
         <Spacer size={2 * GU} />
         <li>
-          Max relays per day<span>{legibleMaxRelays}</span>
+          Max relays per day
+          <span>
+            {new Intl.NumberFormat('en-US', {
+              notation: 'compact',
+              compactDisplay: 'short',
+            }).format(maxRelaysPerSession * 24)}
+          </span>
         </li>
       </ul>
     </Box>

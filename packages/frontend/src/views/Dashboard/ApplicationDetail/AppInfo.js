@@ -32,10 +32,12 @@ import { useLatestRelays } from 'hooks/application-hooks'
 import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
 import { getThresholdsPerStake } from 'lib/pocket-utils'
+import { formatNumberToSICompact } from 'lib/formatting-utils'
 
 const MAX_RELAYS_PER_SESSION = 40000
 const ONE_MILLION = 1000000
 const ONE_SECOND = 1 // Data for graphs come in second
+const ONE_DAY = 24
 const PER_PAGE = 10
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -103,9 +105,22 @@ function formatDailyRelaysForGraphing(
     },
   ]
 
+  const scales = [
+    { label: '0' },
+    { label: formatNumberToSICompact(upperBound * 0.25).toString() },
+    { label: formatNumberToSICompact(upperBound * 0.5).toString() },
+    { label: formatNumberToSICompact(upperBound * 0.75).toString() },
+    {
+      label: formatNumberToSICompact(upperBound).toString(),
+      highlightColor: '#AE1515',
+    },
+    { label: '' },
+  ]
+
   return {
     labels,
     lines,
+    scales,
   }
 }
 
@@ -202,9 +217,9 @@ export default function AppInfo({
   const { within } = useViewport()
 
   const compactMode = within(-1, 'medium')
-  const { staked_tokens: stakedTokens } = appOnChainData
+  const { relays } = appOnChainData
 
-  const { graphThreshold, maxRelays } = getThresholdsPerStake(stakedTokens)
+  const maxDailyRelays = relays * 24
 
   const successRate = useMemo(() => {
     return weeklyRelayData.total_relays === 0
@@ -217,10 +232,19 @@ export default function AppInfo({
       : previousSuccessfulRelays / previousRelays
   }, [previousSuccessfulRelays, previousRelays])
 
-  const { labels: usageLabels = [], lines: usageLines = [] } = useMemo(
-    () => formatDailyRelaysForGraphing(dailyRelayData, graphThreshold),
-    [dailyRelayData, graphThreshold]
+  const {
+    labels: usageLabels = [],
+    lines: usageLines = [],
+    scales: usageScales,
+  } = useMemo(
+    () =>
+      formatDailyRelaysForGraphing(
+        dailyRelayData,
+        appOnChainData.relays * ONE_DAY
+      ),
+    [appOnChainData, dailyRelayData]
   )
+
   const {
     labels: latencyLabels = [],
     barValues = [],
@@ -236,8 +260,6 @@ export default function AppInfo({
 
     const diff = today.diff(appLastUpdated, 'day')
 
-    console.log(diff, appData.updatedAt)
-
     return diff >= 7
   }, [appData])
 
@@ -247,8 +269,8 @@ export default function AppInfo({
     }
     const { dailyRelays = 0 } = todaysRelays
 
-    return dailyRelays >= maxRelays
-  }, [dailyRelayData, maxRelays])
+    return dailyRelays >= maxDailyRelays
+  }, [dailyRelayData, maxDailyRelays])
 
   const exceedsSessionRelays = useMemo(() => {
     return currentSessionRelays >= MAX_RELAYS_PER_SESSION
@@ -342,8 +364,9 @@ export default function AppInfo({
                 <UsageTrends
                   chartLabels={usageLabels}
                   chartLines={usageLines}
+                  chartScales={usageScales}
+                  maxSessionRelays={appOnChainData.relays}
                   sessionRelays={currentSessionRelays}
-                  threshold={graphThreshold}
                 />
                 <Spacer size={2 * GU} />
                 <LatestRequests id={appData.id} isLb={appData.isLb} />
@@ -735,8 +758,14 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
   )
 }
 
-function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
-  const usageColor = useUsageColor(sessionRelays / MAX_RELAYS_PER_SESSION)
+function UsageTrends({
+  chartLabels,
+  chartLines,
+  chartScales,
+  maxSessionRelays,
+  sessionRelays,
+}) {
+  const usageColor = useUsageColor(sessionRelays / maxSessionRelays)
   const theme = useTheme()
 
   return (
@@ -774,7 +803,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
           </h3>
           <Spacer size={2 * GU} />
           <CircleGraph
-            value={Math.min(1, sessionRelays / MAX_RELAYS_PER_SESSION)}
+            value={Math.min(1, sessionRelays / maxSessionRelays)}
             size={125}
             color={usageColor}
           />
@@ -818,14 +847,7 @@ function UsageTrends({ chartLabels, chartLines, sessionRelays }) {
             renderCheckpoints
             dotRadius={GU / 1.5}
             threshold
-            scales={[
-              { label: '0' },
-              { label: '250K' },
-              { label: '500K' },
-              { label: '750K' },
-              { label: '1M', highlightColor: theme.negative },
-              '',
-            ]}
+            scales={chartScales}
           />
         </div>
       </div>

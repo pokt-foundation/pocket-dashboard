@@ -60,7 +60,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
       <Route exact path={path}>
         <AppInfo
           appData={activeApplication}
-          appOnChainData={appOnChainStatus}
+          appOnChainData={appOnChainData}
           currentSessionRelays={sessionRelays.session_relays}
           dailyRelayData={dailyRelays.daily_relays}
           previousSuccessfulRelays={previousSuccessfulRelays.successful_relays}
@@ -80,7 +80,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
         <SuccessDetails
           id={activeApplication.id}
           isLb={activeApplication.isLb}
-          appOnChainData={appOnChainStatus}
+          appOnChainData={appOnChainData}
           weeklyRelayData={totalRelays}
           successfulRelayData={successfulRelays}
         />
@@ -88,7 +88,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
       <Route path={`${path}/notifications`}>
         <Notifications
           appData={activeApplication}
-          appOnChainData={appOnChainStatus}
+          appOnChainData={appOnChainData}
           dailyRelayData={dailyRelays.daily_relays}
         />
       </Route>
