@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { useQueryClient, useMutation, useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import axios from 'axios'
 import 'styled-components/macro'
 import { Button, DataView, Split, Spacer, Switch, useToast, GU } from 'ui'
