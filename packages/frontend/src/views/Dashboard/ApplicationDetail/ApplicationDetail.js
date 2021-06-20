@@ -11,11 +11,6 @@ import SuccessDetails from 'views/Dashboard/ApplicationDetail/SuccessDetails'
 import { useAppMetrics } from 'hooks/useAppMetrics'
 import { useUserApps } from 'contexts/AppsContext'
 
-const appOnChainStatus = {
-  status: 'Staked',
-  staked_tokens: 24950100000,
-}
-
 export default function AppDetailWrapper() {
   const { appsLoading, refetchApps, userApps } = useUserApps()
   const { appId } = useParams()
@@ -60,7 +55,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
       <Route exact path={path}>
         <AppInfo
           appData={activeApplication}
-          appOnChainData={appOnChainStatus}
+          appOnChainData={appOnChainData}
           currentSessionRelays={sessionRelays.session_relays}
           dailyRelayData={dailyRelays.daily_relays}
           previousSuccessfulRelays={previousSuccessfulRelays.successful_relays}
@@ -80,7 +75,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
         <SuccessDetails
           id={activeApplication.id}
           isLb={activeApplication.isLb}
-          appOnChainData={appOnChainStatus}
+          appOnChainData={appOnChainData}
           weeklyRelayData={totalRelays}
           successfulRelayData={successfulRelays}
         />
@@ -88,7 +83,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
       <Route path={`${path}/notifications`}>
         <Notifications
           appData={activeApplication}
-          appOnChainData={appOnChainStatus}
+          appOnChainData={appOnChainData}
           dailyRelayData={dailyRelays.daily_relays}
         />
       </Route>
