@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import { animated, useTransition } from 'react-spring'
-import { useMutation, useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import axios from 'axios'
+import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import {
   Button,
@@ -25,6 +26,8 @@ import FloatUp from 'components/FloatUp/FloatUp'
 import { useUserApps } from 'contexts/AppsContext'
 import { log } from 'lib/utils'
 import env from 'environment'
+import { KNOWN_QUERY_SUFFIXES } from 'known-query-suffixes'
+import { sentryEnabled } from 'sentry'
 
 const SCREENS = new Map([
   [0, BasicSetup],
@@ -140,29 +143,36 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData
-  const { appsData, refetchApps } = useUserApps()
+  const { appsData } = useUserApps()
+  const queryClient = useQueryClient()
 
   const {
     isLoading: isChainsLoading,
     isError: isChainsError,
     data: chains,
-  } = useQuery('/network/stakeable-chains', async function getNetworkChains() {
-    const path = `${env('BACKEND_URL')}/api/network/stakeable-chains`
+  } = useQuery(
+    KNOWN_QUERY_SUFFIXES.STAKEABLE_CHAINS,
+    async function getNetworkChains() {
+      const path = `${env('BACKEND_URL')}/api/network/stakeable-chains`
 
-    try {
-      const res = await axios.get(path, {
-        withCredentials: true,
-      })
+      try {
+        const res = await axios.get(path, {
+          withCredentials: true,
+        })
 
-      const {
-        data: { chains },
-      } = res
+        const {
+          data: { chains },
+        } = res
 
-      return chains
-    } catch (err) {
-      console.log('?', err)
+        return chains
+      } catch (err) {
+        if (sentryEnabled) {
+          Sentry.captureException(err)
+        }
+        throw err
+      }
     }
-  })
+  )
 
   const {
     isError: isCreateError,
@@ -189,7 +199,7 @@ export default function Create() {
         }
       )
 
-      await refetchApps()
+      queryClient.invalidateQueries(KNOWN_QUERY_SUFFIXES.USER_APPS)
 
       history.push({
         pathname: `/app/${res.data.id}`,
@@ -197,7 +207,10 @@ export default function Create() {
 
       return res
     } catch (err) {
-      // TODO: Catch error with Sentry
+      if (sentryEnabled) {
+        Sentry.captureException(err)
+      }
+      throw err
     }
   })
 
