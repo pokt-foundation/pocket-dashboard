@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
-import { useMutation } from 'react-query'
+import { useQueryClient, useMutation } from 'react-query'
 import axios from 'axios'
+import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import {
   Button,
@@ -20,8 +21,10 @@ import {
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import env from 'environment'
+import { KNOWN_QUERY_SUFFIXES } from 'known-query-suffixes'
+import { sentryEnabled } from 'sentry'
 
-export default function Security({ appData, refetchActiveAppData }) {
+export default function Security({ appData }) {
   const [origin, setOrigin] = useState('')
   const [origins, setOrigins] = useState([])
   const [secretKeyRequired, setSecretKeyRequired] = useState(false)
@@ -29,6 +32,7 @@ export default function Security({ appData, refetchActiveAppData }) {
   const [userAgents, setUserAgents] = useState([])
   const history = useHistory()
   const toast = useToast()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     setUserAgents((agents) => {
@@ -77,13 +81,15 @@ export default function Security({ appData, refetchActiveAppData }) {
         }
       )
 
-      await refetchActiveAppData()
+      queryClient.invalidateQueries(KNOWN_QUERY_SUFFIXES.USER_APPS)
 
       toast('Security preferences updated')
       history.goBack()
     } catch (err) {
-      // TODO: Log with sentry
-      console.log('err', err)
+      if (sentryEnabled) {
+        Sentry.captureException(err)
+      }
+      throw err
     }
   })
 

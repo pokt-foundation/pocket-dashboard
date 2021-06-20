@@ -1,20 +1,20 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { useMutation, useQuery } from 'react-query'
+import { useQueryClient, useMutation, useQuery } from 'react-query'
 import axios from 'axios'
 import 'styled-components/macro'
 import { Button, DataView, Split, Spacer, Switch, useToast, GU } from 'ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
-import { useUserApps } from "contexts/AppsContext"
 import env from 'environment'
+import { KNOWN_QUERY_SUFFIXES } from 'known-query-suffixes'
 
 export default function BasicSetup({ appData }) {
   const [selectedChain, setSelectedChain] = useState('')
   const history = useHistory()
   const { appId } = useParams()
   const toast = useToast()
-  const { refetchApps } = useUserApps()
+  const queryClient = useQueryClient()
   const { isLoading: isChainsLoading, data: chains } = useQuery(
     '/network/chains',
     async function getNetworkChains() {
@@ -54,7 +54,7 @@ export default function BasicSetup({ appData }) {
           data: { id },
         } = res
 
-        await refetchApps()
+        queryClient.invalidateQueries(KNOWN_QUERY_SUFFIXES.USER_APPS)
 
         toast('Chain successfully switched')
         history.push(`/app/${id}`)

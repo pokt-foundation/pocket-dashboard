@@ -20,7 +20,7 @@ import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import { getThresholdsPerStake } from 'lib/pocket-utils'
 import env from 'environment'
-import { KNOWN_QUERY_SUFFIXES } from './useAppMetrics'
+import { KNOWN_QUERY_SUFFIXES } from '../../../known-query-suffixes'
 
 const MAX_RELAYS = 1000000
 const GRAPH_SIZE = 130
@@ -84,6 +84,8 @@ export default function Notifications({
             withCredentials: true,
           }
         )
+
+        queryClient.invalidateQueries(KNOWN_QUERY_SUFFIXES.USER_APPS)
 
         setHasChanged(false)
         toast('Notification preferences updated')
