@@ -1,6 +1,7 @@
 import express, { Response, Request } from 'express'
 import crypto from 'crypto'
 import { GraphQLClient } from 'graphql-request'
+import { typeGuard, QueryAppResponse } from '@pokt-network/pocket-js'
 import { IAppInfo, GetApplicationQuery } from './types'
 import env from '../environment'
 import { getSdk } from '../graphql/types'
@@ -313,18 +314,35 @@ router.get(
           applicationId
         )
 
-        return await getApp(application.freeTierApplicationAccount.address)
+        return await await getApp(
+          application.freeTierApplicationAccount.address
+        )
       })
     )
 
-    // @ts-ignore
-    const appsStatus = apps.reduce(
+    const isAppResponseOk = apps.reduce(
+      (ok, app) => ok || typeGuard(app, QueryAppResponse),
+      true
+    )
+
+    if (!isAppResponseOk) {
+      throw HttpError.INTERNAL_SERVER_ERROR({
+        errors: [
+          {
+            id: 'POCKET_JS_ERROR',
+            message: 'Application could not be fetched.',
+          },
+        ],
+      })
+    }
+
+    const readableApps = apps.map((app: QueryAppResponse) => app.toJSON())
+
+    const appsStatus = readableApps.reduce(
       (status, app) => {
         return {
-          // @ts-ignore
-          stake: app.stakedTokens + status.stake,
-          // @ts-ignore
-          relays: app.maxRelays + status.relays,
+          stake: app.staked_tokens + status.stake,
+          relays: app.max_relays + status.relays,
         }
       },
       {
