@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import axios from 'axios'
 import { useViewport } from 'use-viewport'
 import Styled from 'styled-components/macro'
@@ -20,6 +20,7 @@ import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import { getThresholdsPerStake } from 'lib/pocket-utils'
 import env from 'environment'
+import { KNOWN_QUERY_SUFFIXES } from '../../../known-query-suffixes'
 
 const MAX_RELAYS = 1000000
 const GRAPH_SIZE = 130
@@ -62,11 +63,11 @@ export default function Notifications({
   const { within } = useViewport()
   const toast = useToast()
   const { appId } = useParams()
+  const queryClient = useQueryClient()
   const { isLoading: isNotificationsLoading, mutate } = useMutation(
     async function updateNotificationSettings() {
-      const path = `${env('BACKEND_URL')}/api/${
-        appData.isLb ? 'lb' : 'applications'
-      }/notifications/${appId}`
+      const type = appData.isLb ? 'lb' : 'applications'
+      const path = `${env('BACKEND_URL')}/api/${type}/notifications/${appId}`
 
       const { quarter, half, threeQuarters, full } = chosenPercentages
 
@@ -83,6 +84,8 @@ export default function Notifications({
             withCredentials: true,
           }
         )
+
+        queryClient.invalidateQueries(KNOWN_QUERY_SUFFIXES.USER_APPS)
 
         setHasChanged(false)
         toast('Notification preferences updated')

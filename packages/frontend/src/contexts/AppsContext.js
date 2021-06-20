@@ -1,8 +1,5 @@
 import React, { useCallback, useContext, useMemo } from 'react'
-import {
-  useUserApplications,
-  useUserLoadBalancers,
-} from 'views/Dashboard/application-hooks'
+import { useUserApplications } from 'hooks/application-hooks'
 import { log } from 'lib/utils'
 
 const DEFAULT_APP_STATE = {
@@ -26,36 +23,20 @@ export function useUserApps() {
 
 export function AppsContextProvider({ children }) {
   const { isAppsLoading, appsData, refetchUserApps } = useUserApplications()
-  const {
-    lbData,
-    isLbLoading,
-    refetchUserApps: refetchLoadBalancers,
-  } = useUserLoadBalancers()
 
-  const appsLoading = isAppsLoading || isLbLoading
+  const appsLoading = isAppsLoading
 
   const refetchApps = useCallback(async () => {
-    await refetchLoadBalancers()
     await refetchUserApps()
-  }, [refetchLoadBalancers, refetchUserApps])
+  }, [refetchUserApps])
 
   const userApps = useMemo(() => {
     if (appsLoading) {
       return DEFAULT_APP_STATE
     }
 
-    const filteredApps = appsData.filter((app) => {
-      for (const { apps } of lbData) {
-        if (apps.find((lbApp) => lbApp.appId === app.id)) {
-          return false
-        }
-      }
-
-      return true
-    })
-
-    return { appsLoading, userApps: [...lbData, ...filteredApps], refetchApps }
-  }, [appsData, appsLoading, lbData, refetchApps])
+    return { appsLoading, userApps: appsData, refetchApps }
+  }, [appsData, appsLoading, refetchApps])
 
   log('USER APPS:', userApps)
 

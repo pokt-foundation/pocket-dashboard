@@ -8,8 +8,7 @@ import Chains from 'views/Dashboard/ApplicationDetail/Chains'
 import Notifications from 'views/Dashboard/ApplicationDetail/Notifications'
 import Security from 'views/Dashboard/ApplicationDetail/Security'
 import SuccessDetails from 'views/Dashboard/ApplicationDetail/SuccessDetails'
-import { useAppMetrics } from 'views/Dashboard/ApplicationDetail/useAppMetrics'
-import env from 'environment'
+import { useAppMetrics } from 'hooks/useAppMetrics'
 import { useUserApps } from 'contexts/AppsContext'
 
 const appOnChainStatus = {

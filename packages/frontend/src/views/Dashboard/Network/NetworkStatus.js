@@ -20,7 +20,7 @@ import {
   useTotalWeeklyRelays,
   useNetworkSummary,
   useChains,
-} from 'views/Dashboard/Network/network-hooks'
+} from 'hooks/network-hooks'
 import { norm } from 'lib/math-utils'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']

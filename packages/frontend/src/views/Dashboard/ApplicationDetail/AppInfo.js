@@ -28,11 +28,10 @@ import AppStatus from 'components/AppStatus/AppStatus'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import SuccessIndicator from 'views/Dashboard/ApplicationDetail/SuccessIndicator'
-import { useLatestRelays } from 'views/Dashboard/application-hooks'
+import { useLatestRelays } from 'hooks/application-hooks'
 import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
 import { getThresholdsPerStake } from 'lib/pocket-utils'
-import env from '../../../environment'
 
 const MAX_RELAYS_PER_SESSION = 40000
 const ONE_MILLION = 1000000
