@@ -32,7 +32,6 @@ import { useLatestRelays } from 'views/Dashboard/application-hooks'
 import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
 import { getThresholdsPerStake } from 'lib/pocket-utils'
-import env from '../../../environment'
 
 const MAX_RELAYS_PER_SESSION = 40000
 const ONE_MILLION = 1000000

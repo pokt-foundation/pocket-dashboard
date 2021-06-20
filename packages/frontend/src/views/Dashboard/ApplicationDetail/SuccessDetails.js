@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useQuery } from 'react-query'
-import { GraphQLClient, gql } from 'graphql-request'
 import axios from 'axios'
 import { useViewport } from 'use-viewport'
 import Styled from 'styled-components/macro'
@@ -26,7 +25,6 @@ import env from 'environment'
 import { shortenAddress } from 'lib/pocket-utils'
 
 const FAILED_RELAYS_KEY = 'failedRelays'
-const SUCCESSFUL_CODE = 200
 const SUCCESSFUL_RELAYS_KEY = 'successfulRelays'
 const PER_PAGE = 10
 
@@ -46,7 +44,7 @@ export default function SuccessDetails({
 
   const compactMode = within(-1, 'medium')
 
-  const { isLoading, data, ...rest } = useQuery(
+  const { isLoading, data } = useQuery(
     [`user/applications/${id}/latest-filtered-details`, page],
     async function getFilteredRelays() {
       const successfulPath = `${env('BACKEND_URL')}/api/${
