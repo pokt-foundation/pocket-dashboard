@@ -4,6 +4,7 @@ import { useQuery } from 'react-query'
 import axios from 'axios'
 import { useViewport } from 'use-viewport'
 import Styled from 'styled-components/macro'
+import * as Sentry from '@sentry/react'
 import {
   Button,
   ButtonBase,
@@ -22,11 +23,18 @@ import AppStatus from 'components/AppStatus/AppStatus'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import env from 'environment'
+import { log } from 'lib/utils'
+import { sentryEnabled } from 'sentry'
 import { shortenAddress } from 'lib/pocket-utils'
+import { KNOWN_QUERY_SUFFIXES } from 'known-query-suffixes'
 
+const DEFAULT_FILTERED_STATE = {
+  failedRelays: [],
+  successfulRelays: [],
+}
 const FAILED_RELAYS_KEY = 'failedRelays'
-const SUCCESSFUL_RELAYS_KEY = 'successfulRelays'
 const PER_PAGE = 10
+const SUCCESSFUL_RELAYS_KEY = 'successfulRelays'
 
 export default function SuccessDetails({
   appOnChainData,
@@ -45,7 +53,7 @@ export default function SuccessDetails({
   const compactMode = within(-1, 'medium')
 
   const { isLoading, data } = useQuery(
-    [`user/applications/${id}/latest-filtered-details`, page],
+    [KNOWN_QUERY_SUFFIXES.LATEST_FILTERED_DETAILS, page, id, isLb],
     async function getFilteredRelays() {
       const successfulPath = `${env('BACKEND_URL')}/api/${
         isLb ? 'lb' : 'applications'
@@ -55,7 +63,7 @@ export default function SuccessDetails({
       }/latest-failing-relays`
 
       if (!id) {
-        return []
+        return DEFAULT_FILTERED_STATE
       }
 
       try {
@@ -88,7 +96,16 @@ export default function SuccessDetails({
           failedRelays: failedData.session_relays,
         }
       } catch (err) {
-        console.log(Object.entries(err))
+        if (sentryEnabled) {
+          Sentry.configureScope((scope) => {
+            scope.setTransactionName(
+              KNOWN_QUERY_SUFFIXES.LATEST_FILTERED_DETAILS
+            )
+          })
+          Sentry.captureException(err)
+        }
+        log('SUCCESS DETAILS ERROR', Object.entries(err))
+        throw err
       }
     },
     {

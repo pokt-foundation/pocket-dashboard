@@ -4,6 +4,7 @@ import axios from 'axios'
 import { isEmail, isStrongPassword } from 'validator'
 import styled from 'styled-components/macro'
 import { useViewport } from 'use-viewport'
+import * as Sentry from '@sentry/react'
 import {
   Button,
   Field,
@@ -20,6 +21,7 @@ import {
 import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
 import env from 'environment'
 import PoktShape from 'assets/poktshape.png'
+import { sentryEnabled } from 'sentry'
 
 const InlineLink = styled(Link)`
   display: inline;
@@ -54,7 +56,11 @@ export default function Login() {
 
         setErrors(() => [...errors])
 
-        throw new Error(errors)
+        if (sentryEnabled) {
+          Sentry.captureException(err)
+        }
+
+        throw err
       }
     }
   )

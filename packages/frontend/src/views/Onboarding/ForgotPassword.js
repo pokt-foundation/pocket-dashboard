@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import {
   Button,
@@ -16,6 +17,8 @@ import {
 } from 'ui'
 import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
 import env from 'environment'
+import { KNOWN_MUTATION_SUFFIXES } from 'known-query-suffixes'
+import { sentryEnabled } from 'sentry'
 import PoktShape from 'assets/poktshape.png'
 
 export default function ForgotPassword() {
@@ -31,6 +34,14 @@ export default function ForgotPassword() {
           email,
         })
       } catch (err) {
+        if (sentryEnabled) {
+          Sentry.configureScope((scope) => {
+            scope.setTransactionName(
+              KNOWN_MUTATION_SUFFIXES.SEND_RESET_EMAIL_MUTATION
+            )
+          })
+          Sentry.captureException(err)
+        }
         throw new Error(err)
       }
     }

@@ -1,4 +1,4 @@
-import { init as initSentry, captureMessage } from '@sentry/browser'
+import { init as initSentry, captureMessage } from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
 import env from 'environment'
 

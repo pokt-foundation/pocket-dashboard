@@ -3,7 +3,9 @@ import { useHistory, useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from 'react-query'
 import axios from 'axios'
 import { useViewport } from 'use-viewport'
+import { sentryEnabled } from 'sentry'
 import Styled from 'styled-components/macro'
+import * as Sentry from '@sentry/react'
 import {
   Button,
   CircleGraph,
@@ -18,8 +20,12 @@ import {
 } from 'ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
+import { log } from 'lib/utils'
 import env from 'environment'
-import { KNOWN_QUERY_SUFFIXES } from '../../../known-query-suffixes'
+import {
+  KNOWN_QUERY_SUFFIXES,
+  KNOWN_MUTATION_SUFFIXES,
+} from '../../../known-query-suffixes'
 import { formatNumberToSICompact } from 'lib/formatting-utils'
 
 const GRAPH_SIZE = 130
@@ -90,7 +96,16 @@ export default function Notifications({
         toast('Notification preferences updated')
         history.goBack()
       } catch (err) {
-        console.log('??', Object.entries(err))
+        if (sentryEnabled) {
+          Sentry.configureScope((scope) => {
+            scope.setTransactionName(
+              `QUERY ${KNOWN_MUTATION_SUFFIXES.SWITCH_CHAINS_MUTATION}`
+            )
+          })
+          Sentry.captureException(err)
+        }
+        log('NOTIFICATION ERROR', Object.entries(err))
+        throw err
       }
     }
   )

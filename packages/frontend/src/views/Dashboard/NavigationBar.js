@@ -1,7 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useMutation } from 'react-query'
+import { sentryEnabled } from 'sentry'
 import { useViewport } from 'use-viewport'
+import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import {
   ButtonBase,
@@ -74,7 +76,10 @@ export default function NavigationBar({ applications = [] }) {
 
       history.push('/login')
     } catch (err) {
-      // TODO: Log to sentry
+      if (sentryEnabled) {
+        Sentry.captureException(err)
+      }
+      throw err
     }
   })
 
