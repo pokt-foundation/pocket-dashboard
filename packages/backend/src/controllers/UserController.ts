@@ -92,7 +92,7 @@ async function createNewVerificationToken(
  */
 router.post(
   '/login',
-  asyncMiddleware(async (req: Request, res: Response, next) => {
+  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate(
       'login',
       { session: false },
@@ -133,11 +133,16 @@ router.post(
             templateName: 'SignUp',
             toEmail: user.email,
           })
-          throw HttpError.BAD_REQUEST({
-            errors: [
-              { id: 'NOT_VALIDATED', message: 'Please verify your email' },
-            ],
-          })
+          next(
+            HttpError.BAD_REQUEST({
+              errors: [
+                {
+                  id: 'NOT_VALIDATED',
+                  message: 'Please verify your email. Check your inbox!',
+                },
+              ],
+            })
+          )
         }
 
         createCookieFromToken(user, 200, req, res)
