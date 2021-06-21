@@ -98,17 +98,7 @@ router.post(
       { session: false },
       async (err, user: IUser) => {
         if (err) {
-          console.log('aqui miop?')
-          next(
-            HttpError.BAD_REQUEST({
-              errors: [
-                {
-                  id: 'INVALID_CREDENTIALS',
-                  message: 'No account for this user found.',
-                },
-              ],
-            })
-          )
+          next(err)
         }
         if (!user) {
           next(
