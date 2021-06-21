@@ -136,7 +136,10 @@ router.post(
           next(
             HttpError.BAD_REQUEST({
               errors: [
-                { id: 'NOT_VALIDATED', message: 'Please verify your email' },
+                {
+                  id: 'NOT_VALIDATED',
+                  message: 'Please verify your email. Check your inbox!',
+                },
               ],
             })
           )
