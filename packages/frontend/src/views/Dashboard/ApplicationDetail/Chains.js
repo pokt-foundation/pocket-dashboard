@@ -2,12 +2,18 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import axios from 'axios'
+import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import { Button, DataView, Split, Spacer, Switch, useToast, GU } from 'ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
+import { log } from 'lib/utils'
 import env from 'environment'
-import { KNOWN_QUERY_SUFFIXES } from 'known-query-suffixes'
+import {
+  KNOWN_MUTATION_SUFFIXES,
+  KNOWN_QUERY_SUFFIXES,
+} from 'known-query-suffixes'
+import { sentryEnabled } from 'sentry'
 
 export default function BasicSetup({ appData }) {
   const [selectedChain, setSelectedChain] = useState('')
@@ -16,7 +22,7 @@ export default function BasicSetup({ appData }) {
   const toast = useToast()
   const queryClient = useQueryClient()
   const { isLoading: isChainsLoading, data: chains } = useQuery(
-    '/network/chains',
+    KNOWN_QUERY_SUFFIXES.STAKEABLE_CHAINS,
     async function getNetworkChains() {
       const path = `${env('BACKEND_URL')}/api/network/stakeable-chains`
 
@@ -31,7 +37,15 @@ export default function BasicSetup({ appData }) {
 
         return chains
       } catch (err) {
-        console.log('?', err)
+        if (sentryEnabled) {
+          Sentry.configureScope((scope) => {
+            scope.setTransactionName(
+              `QUERY ${KNOWN_QUERY_SUFFIXES.STAKEABLE_CHAINS}`
+            )
+          })
+          Sentry.captureException(err)
+        }
+        throw err
       }
     }
   )
@@ -59,7 +73,16 @@ export default function BasicSetup({ appData }) {
         toast('Chain successfully switched')
         history.push(`/app/${id}`)
       } catch (err) {
-        console.log('??', Object.entries(err))
+        if (sentryEnabled) {
+          Sentry.configureScope((scope) => {
+            scope.setTransactionName(
+              `QUERY ${KNOWN_MUTATION_SUFFIXES.SWITCH_CHAINS_MUTATION}`
+            )
+          })
+          Sentry.captureException(err)
+        }
+        log('SWITCH ERROR', Object.entries(err))
+        throw err
       }
     }
   )
@@ -72,10 +95,10 @@ export default function BasicSetup({ appData }) {
 
   const { chain: activeAppChain } = appData
 
-  const isSubmitDisabled = useMemo(
-    () => isSwitchLoading || !selectedChain,
-    [isSwitchLoading, selectedChain]
-  )
+  const isSubmitDisabled = useMemo(() => isSwitchLoading || !selectedChain, [
+    isSwitchLoading,
+    selectedChain,
+  ])
 
   return (
     <FloatUp

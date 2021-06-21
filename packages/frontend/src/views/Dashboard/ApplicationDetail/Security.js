@@ -21,7 +21,10 @@ import {
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import env from 'environment'
-import { KNOWN_QUERY_SUFFIXES } from 'known-query-suffixes'
+import {
+  KNOWN_MUTATION_SUFFIXES,
+  KNOWN_QUERY_SUFFIXES,
+} from 'known-query-suffixes'
 import { sentryEnabled } from 'sentry'
 
 export default function Security({ appData }) {
@@ -87,6 +90,11 @@ export default function Security({ appData }) {
       history.goBack()
     } catch (err) {
       if (sentryEnabled) {
+        Sentry.configureScope((scope) => {
+          scope.setTransactionName(
+            `QUERY ${KNOWN_MUTATION_SUFFIXES.SECURITY_UPDATE_MUTATION}`
+          )
+        })
         Sentry.captureException(err)
       }
       throw err

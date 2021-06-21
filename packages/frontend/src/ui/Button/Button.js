@@ -188,11 +188,19 @@ function BasicButton({
   )
 
   // Size styles
-  const { height, middleSpace, minWidth, padding, textStyleCss, width } =
-    useMemo(
-      () => sizeStyles(size, wide, displayIcon, displayLabel),
-      [size, wide, displayIcon, displayLabel]
-    )
+  const {
+    height,
+    middleSpace,
+    minWidth,
+    padding,
+    textStyleCss,
+    width,
+  } = useMemo(() => sizeStyles(size, wide, displayIcon, displayLabel), [
+    size,
+    wide,
+    displayIcon,
+    displayLabel,
+  ])
 
   // Use the label as a title when only the icon is displayed
   if (displayIcon && !displayLabel && label && typeof label === 'string') {

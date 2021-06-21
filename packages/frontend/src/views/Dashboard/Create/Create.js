@@ -26,7 +26,10 @@ import FloatUp from 'components/FloatUp/FloatUp'
 import { useUserApps } from 'contexts/AppsContext'
 import { log } from 'lib/utils'
 import env from 'environment'
-import { KNOWN_QUERY_SUFFIXES } from 'known-query-suffixes'
+import {
+  KNOWN_MUTATION_SUFFIXES,
+  KNOWN_QUERY_SUFFIXES,
+} from 'known-query-suffixes'
 import { sentryEnabled } from 'sentry'
 
 const SCREENS = new Map([
@@ -167,6 +170,9 @@ export default function Create() {
         return chains
       } catch (err) {
         if (sentryEnabled) {
+          Sentry.configureScope((scope) => {
+            scope.setTransactionName(KNOWN_QUERY_SUFFIXES.STAKEABLE_CHAINS)
+          })
           Sentry.captureException(err)
         }
         throw err
@@ -208,6 +214,11 @@ export default function Create() {
       return res
     } catch (err) {
       if (sentryEnabled) {
+        Sentry.configureScope((scope) => {
+          scope.setTransactionName(
+            KNOWN_MUTATION_SUFFIXES.CREATE_ENDPOINT_MUTATION
+          )
+        })
         Sentry.captureException(err)
       }
       throw err
@@ -222,10 +233,9 @@ export default function Create() {
     }
   }, [appsData, history])
 
-  const ActiveScreen = useMemo(
-    () => SCREENS.get(screenIndex) ?? null,
-    [screenIndex]
-  )
+  const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
+    screenIndex,
+  ])
 
   const direction = screenIndex > prevScreenIndex ? 1 : -1
   const transitionProps = useTransition(screenIndex, null, {

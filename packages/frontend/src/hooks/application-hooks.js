@@ -49,6 +49,9 @@ export function useUserApplications() {
         return [...userLbs, ...filteredApps]
       } catch (err) {
         if (sentryEnabled) {
+          Sentry.configureScope((scope) => {
+            scope.setTransactionName(`QUERY ${KNOWN_QUERY_SUFFIXES.USER_APPS}`)
+          })
           Sentry.captureException(err)
         }
         throw err
@@ -70,11 +73,7 @@ export function useLatestRelays({
   limit = 10,
   isLb = true,
 }) {
-  const {
-    isLoading,
-    isError,
-    data: latestRelayData,
-  } = useQuery(
+  const { isLoading, isError, data: latestRelayData } = useQuery(
     [KNOWN_QUERY_SUFFIXES.LATEST_RELAYS, id, isLb, limit, page],
     async function getLatestRelays() {
       if (!id) {
@@ -100,6 +99,11 @@ export function useLatestRelays({
         return data.session_relays
       } catch (err) {
         if (sentryEnabled) {
+          Sentry.configureScope((scope) => {
+            scope.setTransactionName(
+              `QUERY ${KNOWN_QUERY_SUFFIXES.LATEST_RELAYS}`
+            )
+          })
           Sentry.captureException(err)
         }
         throw err
