@@ -6,8 +6,6 @@ import initializeSentry from 'sentry'
 
 const REACT_AXE_THROTTLE_TIME = 2500
 
-console.log(process.env.npm_package_version)
-
 initializeSentry()
 
 if (!env('PROD') && env('ENABLE_A11Y')) {

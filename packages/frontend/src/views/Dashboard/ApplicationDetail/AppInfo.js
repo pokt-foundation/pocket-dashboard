@@ -208,8 +208,9 @@ export default function AppInfo({
   latestLatencyData,
 }) {
   const [networkModalVisible, setNetworkModalVisible] = useState(false)
-  const [networkDenialModalVisible, setNetworkDenialModalVisible] =
-    useState(false)
+  const [networkDenialModalVisible, setNetworkDenialModalVisible] = useState(
+    false
+  )
   const history = useHistory()
   const { url } = useRouteMatch()
   const { within } = useViewport()
@@ -247,10 +248,9 @@ export default function AppInfo({
     labels: latencyLabels = [],
     barValues = [],
     scales: latencyScales = [],
-  } = useMemo(
-    () => formatLatencyValuesForGraphing(latestLatencyData, 1.25),
-    [latestLatencyData]
-  )
+  } = useMemo(() => formatLatencyValuesForGraphing(latestLatencyData, 1.25), [
+    latestLatencyData,
+  ])
 
   const isSwitchable = useMemo(() => {
     dayjs.extend(dayJsutcPlugin)
@@ -566,8 +566,9 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
     number: Math.min(successRate * 100, 100),
     from: { number: 0 },
   })
-  const [primarySuccessColor, secondarySuccessColor] =
-    useSuccessRateColor(successRate)
+  const [primarySuccessColor, secondarySuccessColor] = useSuccessRateColor(
+    successRate
+  )
   const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } })
   const successRateDelta = useMemo(
     () => (((successRate - previousSuccessRate) / 1) * 100).toFixed(2),

@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import axios from 'axios'
-import { sentryEnabled } from 'sentry'
 import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import { Button, DataView, Split, Spacer, Switch, useToast, GU } from 'ui'
@@ -14,6 +13,7 @@ import {
   KNOWN_MUTATION_SUFFIXES,
   KNOWN_QUERY_SUFFIXES,
 } from 'known-query-suffixes'
+import { sentryEnabled } from 'sentry'
 
 export default function BasicSetup({ appData }) {
   const [selectedChain, setSelectedChain] = useState('')

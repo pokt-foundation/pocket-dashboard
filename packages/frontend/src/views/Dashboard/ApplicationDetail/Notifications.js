@@ -3,7 +3,6 @@ import { useHistory, useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from 'react-query'
 import axios from 'axios'
 import { useViewport } from 'use-viewport'
-import { sentryEnabled } from 'sentry'
 import Styled from 'styled-components/macro'
 import * as Sentry from '@sentry/react'
 import {
@@ -20,13 +19,14 @@ import {
 } from 'ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
+import { formatNumberToSICompact } from 'lib/formatting-utils'
 import { log } from 'lib/utils'
 import env from 'environment'
 import {
   KNOWN_QUERY_SUFFIXES,
   KNOWN_MUTATION_SUFFIXES,
 } from '../../../known-query-suffixes'
-import { formatNumberToSICompact } from 'lib/formatting-utils'
+import { sentryEnabled } from 'sentry'
 
 const GRAPH_SIZE = 130
 
