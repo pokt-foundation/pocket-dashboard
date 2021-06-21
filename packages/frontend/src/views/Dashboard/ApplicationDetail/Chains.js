@@ -72,10 +72,10 @@ export default function BasicSetup({ appData }) {
 
   const { chain: activeAppChain } = appData
 
-  const isSubmitDisabled = useMemo(() => isSwitchLoading || !selectedChain, [
-    isSwitchLoading,
-    selectedChain,
-  ])
+  const isSubmitDisabled = useMemo(
+    () => isSwitchLoading || !selectedChain,
+    [isSwitchLoading, selectedChain]
+  )
 
   return (
     <FloatUp

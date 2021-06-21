@@ -212,12 +212,8 @@ const DataView = React.memo(function DataView({
   const listMode =
     mode === 'list' || (mode !== 'table' && layoutName === 'small')
 
-  const {
-    allSelected,
-    selectAll,
-    toggleEntrySelect,
-    selectedIndexes,
-  } = useSelection(entries, selection, onSelectEntries)
+  const { allSelected, selectAll, toggleEntrySelect, selectedIndexes } =
+    useSelection(entries, selection, onSelectEntries)
 
   const hasAnyActions = Boolean(renderEntryActions)
   const hasAnyExpansion = Boolean(renderEntryExpansion)

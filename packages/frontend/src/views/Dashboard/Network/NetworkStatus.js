@@ -72,7 +72,11 @@ export default function NetworkStatus() {
   const { within } = useViewport()
   const compactMode = within(-1, 'medium')
 
-  const { labels = [], lines = [], scales = [] } = useMemo(
+  const {
+    labels = [],
+    lines = [],
+    scales = [],
+  } = useMemo(
     () =>
       isRelaysLoading || isRelaysError || relayData === undefined
         ? {}

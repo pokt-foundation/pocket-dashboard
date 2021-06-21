@@ -42,9 +42,7 @@ function useMergeBreakpoints(breakpoints) {
 
   // Only compute once by comparing values rather than object references in dependency array
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => ({ ...BREAKPOINTS, ...breakpoints }), [
-    breakpointsAsString,
-  ])
+  return useMemo(() => ({ ...BREAKPOINTS, ...breakpoints }), [breakpoints])
 }
 
 const LayoutContext = React.createContext({})

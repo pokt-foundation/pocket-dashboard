@@ -70,7 +70,11 @@ export function useLatestRelays({
   limit = 10,
   isLb = true,
 }) {
-  const { isLoading, isError, data: latestRelayData } = useQuery(
+  const {
+    isLoading,
+    isError,
+    data: latestRelayData,
+  } = useQuery(
     [KNOWN_QUERY_SUFFIXES.LATEST_RELAYS, id, isLb, limit, page],
     async function getLatestRelays() {
       if (!id) {

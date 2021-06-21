@@ -208,51 +208,52 @@ const ToastList = React.memo(function ToastList({
         {
           (item) =>
             /* eslint-disable react/prop-types */
-            ({ life, ...props }) => (
-              <animated.div
-                style={props}
-                css={`
-                  box-sizing: border-box;
-                  position: relative;
-                  width: ${below('medium') ? '100%' : '32ch'};
-                `}
-              >
-                <div
+            ({ life, ...props }) =>
+              (
+                <animated.div
+                  style={props}
                   css={`
-                    display: flex;
-                    align-items: center;
-                    overflow: hidden;
-                    height: ${6 * GU}px;
-                    margin-top: ${top ? '0' : `${1.25 * GU}px`};
-                    margin-bottom: ${top ? `${1.25 * GU}px` : '0'};
-                    padding: 0 ${2.5 * GU}px;
-                    ${textStyle('body3')};
-                    color: ${theme.floatingContent};
-                    background: ${theme.floating.alpha(0.95)};
-                    border-radius: ${RADIUS}px;
+                    box-sizing: border-box;
+                    position: relative;
+                    width: ${below('medium') ? '100%' : '32ch'};
                   `}
                 >
-                  {showIndicator && (
-                    <animated.div
-                      style={{ right: life }}
-                      css={`
-                        position: absolute;
-                        bottom: ${top ? `${1.25 * GU}px` : '0'};
-                        left: 0;
-                        width: auto;
-                        height: 5px;
-                        background-image: linear-gradient(
-                          130deg,
-                          #00b4e6,
-                          #00f0e0
-                        );
-                      `}
-                    />
-                  )}
-                  <p>{item.msg}</p>
-                </div>
-              </animated.div>
-            )
+                  <div
+                    css={`
+                      display: flex;
+                      align-items: center;
+                      overflow: hidden;
+                      height: ${6 * GU}px;
+                      margin-top: ${top ? '0' : `${1.25 * GU}px`};
+                      margin-bottom: ${top ? `${1.25 * GU}px` : '0'};
+                      padding: 0 ${2.5 * GU}px;
+                      ${textStyle('body3')};
+                      color: ${theme.floatingContent};
+                      background: ${theme.floating.alpha(0.95)};
+                      border-radius: ${RADIUS}px;
+                    `}
+                  >
+                    {showIndicator && (
+                      <animated.div
+                        style={{ right: life }}
+                        css={`
+                          position: absolute;
+                          bottom: ${top ? `${1.25 * GU}px` : '0'};
+                          left: 0;
+                          width: auto;
+                          height: 5px;
+                          background-image: linear-gradient(
+                            130deg,
+                            #00b4e6,
+                            #00f0e0
+                          );
+                        `}
+                      />
+                    )}
+                    <p>{item.msg}</p>
+                  </div>
+                </animated.div>
+              )
           /* eslint-enable react/prop-types */
         }
       </Transition>
