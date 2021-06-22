@@ -88,11 +88,7 @@ function getChainsByEnvironment() {
     }
   }
 }
-/**
- *
- * 24950100000n
- * 8000000000
- */
+
 export const FREE_TIER_STAKE_AMOUNT = 8000000000n
 export const chains = getChainsByEnvironment()
 
