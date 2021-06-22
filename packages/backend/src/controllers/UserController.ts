@@ -320,28 +320,71 @@ router.post(
   asyncMiddleware(async (req: Request, res: Response) => {
     const { plainToken, email } = req.body
 
-    if (!plainToken || !email) {
+    const user = await User.findOne({ email })
+
+    if (!plainToken || !email || !user) {
       throw HttpError.BAD_REQUEST({
         errors: [{ id: 'MISSING_FIELDS', message: 'Invalid request' }],
       })
     }
 
     const processedEmail = decodeURIComponent(email)
-    const storedToken = await Token.findOne({
+    const storedTokens = await Token.find({
       $and: [{ email: processedEmail }, { type: 'TOKEN_VERIFICATION' }],
     })
 
-    if (!storedToken) {
+    if (!storedTokens.length) {
+      const validationToken = await createNewVerificationToken(
+        user._id,
+        user.email
+      )
+      const emailService = new MailgunService()
+      const validationLink = `${env(
+        'FRONTEND_URL'
+      )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
+        user.email
+      )}`
+
+      await emailService.send({
+        templateData: {
+          user_email: user.email,
+          verify_link: validationLink,
+        },
+        templateName: 'SignUp',
+        toEmail: user.email,
+      })
       throw HttpError.BAD_REQUEST({
-        errors: [{ id: 'EXPIRED_TOKEN', message: 'Token has expired' }],
+        errors: [
+          {
+            id: 'EXPIRED_TOKEN',
+            message:
+              'Your verification token has expired. We have sent a new one to your email.',
+          },
+        ],
       })
     }
 
-    const isTokenMatching = await bcrypt.compare(plainToken, storedToken.token)
+    const tokenMatches = await Promise.all(
+      storedTokens.map(
+        async (storedToken) =>
+          await bcrypt.compare(plainToken, storedToken.token)
+      )
+    )
+
+    const isTokenMatching = tokenMatches.reduce(
+      (valid, matches) => valid || matches,
+      false
+    )
 
     if (!isTokenMatching) {
       throw HttpError.BAD_REQUEST({
-        errors: [{ id: 'INVALID_TOKEN', message: 'Token is invalid' }],
+        errors: [
+          {
+            id: 'INVALID_TOKEN',
+            message:
+              'Your verification token seems to be invalid. Did you use the latest email we sent?',
+          },
+        ],
       })
     }
     await User.updateOne(
@@ -351,7 +394,10 @@ router.post(
       { $set: { validated: true } },
       { new: true }
     )
-    await storedToken.deleteOne()
+    await Promise.all(
+      storedTokens.map(async (storedToken) => await storedToken.deleteOne())
+    )
+
     res.status(204).send()
   })
 )

@@ -1,14 +1,18 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import { Link, Spacer, textStyle, useTheme, GU, RADIUS } from 'ui'
 import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
 import env from 'environment'
 import PoktShape from 'assets/poktshape.png'
+import { sentryEnabled } from 'sentry'
+import { KNOWN_MUTATION_SUFFIXES } from 'known-query-suffixes'
 
 export default function Validate() {
+  const [errors, setErrors] = useState([])
   const theme = useTheme()
   const { search } = useLocation()
 
@@ -16,7 +20,7 @@ export default function Validate() {
   const rawEmail = new URLSearchParams(search).get('email')
   const email = decodeURIComponent(rawEmail)
 
-  const { isError, isLoading, isSuccess, mutate } = useMutation(
+  const { isLoading, isSuccess, mutate } = useMutation(
     async function validate() {
       try {
         const path = `${env('BACKEND_URL')}/api/users/validate-user`
@@ -26,8 +30,18 @@ export default function Validate() {
           email,
         })
       } catch (err) {
-        // TODO: Set err on UI AND send to sentry.
-        throw err
+        if (sentryEnabled) {
+          Sentry.configureScope((scope) =>
+            scope.setTransactionName(
+              KNOWN_MUTATION_SUFFIXES.VALIDATE_USER_MUTATION
+            )
+          )
+          Sentry.captureException(err)
+        }
+
+        const { errors = [] } = err?.response?.data
+
+        setErrors(() => [...errors])
       }
     }
   )
@@ -129,16 +143,22 @@ export default function Validate() {
               .
             </p>
           )}
-          {isError && (
-            <p
-              css={`
-                ${textStyle('body2')}
-              `}
-            >
-              Something went wrong while validating your email. Contact support
-              if this issue persists.
-            </p>
-          )}
+          <ul
+            css={`
+              list-style-type: none;
+            `}
+          >
+            {errors.map(({ id, message }) => (
+              <li
+                key={`${id}_${message}`}
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {message}
+              </li>
+            ))}
+          </ul>
         </main>
       </div>
     </div>
