@@ -15,7 +15,6 @@ import HttpError from '../errors/http-error'
 import passport from '../lib/passport-local'
 import MailgunService from '../services/MailgunService'
 import env from '../environment'
-import { token } from 'morgan'
 
 const SALT_ROUNDS = 10
 const TEN_DAYS = 10 * 24 * 60 * 60 * 1000
