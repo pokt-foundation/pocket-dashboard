@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import 'styled-components/macro'
-import { Spacer, useTheme, GU } from 'ui'
+import { Spacer, useTheme, GU } from '@pokt-foundation/ui'
 import NavigationBar from 'views/Dashboard/NavigationBar'
 import MenuPanel from 'components/MenuPanel/MenuPanel'
 import { AppsContextProvider, useUserApps } from 'contexts/AppsContext'

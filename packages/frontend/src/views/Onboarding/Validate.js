@@ -3,7 +3,14 @@ import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import 'styled-components/macro'
-import { Link, Spacer, textStyle, useTheme, GU, RADIUS } from 'ui'
+import {
+  Link,
+  Spacer,
+  textStyle,
+  useTheme,
+  GU,
+  RADIUS,
+} from '@pokt-foundation/ui'
 import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
 import env from 'environment'
 import PoktShape from 'assets/poktshape.png'

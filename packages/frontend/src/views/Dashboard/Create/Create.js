@@ -20,7 +20,7 @@ import {
   springs,
   textStyle,
   GU,
-} from 'ui'
+} from '@pokt-foundation/ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import { useUserApps } from 'contexts/AppsContext'

@@ -18,7 +18,7 @@ import {
   useToast,
   GU,
   TextCopy,
-} from 'ui'
+} from '@pokt-foundation/ui'
 import AppStatus from 'components/AppStatus/AppStatus'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'

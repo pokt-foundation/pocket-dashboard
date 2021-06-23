@@ -17,7 +17,7 @@ import {
   GU,
   RADIUS,
   Info,
-} from 'ui'
+} from '@pokt-foundation/ui'
 import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
 import env from 'environment'
 import PoktShape from 'assets/poktshape.png'
