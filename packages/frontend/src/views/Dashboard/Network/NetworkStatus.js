@@ -11,7 +11,7 @@ import {
   textStyle,
   useTheme,
   GU,
-} from 'ui'
+} from '@pokt-foundation/ui'
 import AnimatedLogo from 'components/AnimatedLogo/AnimatedLogo'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'

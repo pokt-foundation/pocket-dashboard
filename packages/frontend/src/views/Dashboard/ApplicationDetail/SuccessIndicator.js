@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { animated, useSpring } from 'react-spring'
 import 'styled-components/macro'
-import { useTheme, GU } from 'ui'
+import { useTheme, GU } from '@pokt-foundation/ui'
 
 const SVG_SIZE = 2 * GU
 

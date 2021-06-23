@@ -4,7 +4,15 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import axios from 'axios'
 import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
-import { Button, DataView, Split, Spacer, Switch, useToast, GU } from 'ui'
+import {
+  Button,
+  DataView,
+  Split,
+  Spacer,
+  Switch,
+  useToast,
+  GU,
+} from '@pokt-foundation/ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import { log } from 'lib/utils'

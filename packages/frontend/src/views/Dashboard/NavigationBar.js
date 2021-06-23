@@ -16,7 +16,7 @@ import {
   useTheme,
   GU,
   RADIUS,
-} from 'ui'
+} from '@pokt-foundation/ui'
 import env from 'environment'
 import axios from 'axios'
 
@@ -119,10 +119,12 @@ export default function NavigationBar({ applications = [] }) {
           <Link
             href="https://discord.com/invite/uYs6Esum3r"
             css={`
-              color: ${theme.content};
-              text-decoration: none;
-              &:hover {
-                color: ${theme.accent};
+              && {
+                color: ${theme.content};
+                text-decoration: none;
+                &:hover {
+                  color: ${theme.accent};
+                }
               }
             `}
           >
@@ -156,12 +158,14 @@ function SettingsButton({ onLogout }) {
           label="Preferences"
           onClick={handleToggle}
           css={`
-            width: ${4.25 * GU}px;
-            height: ${4.25 * GU}px;
-            padding: ${0.5 * GU}px;
-            background: ${theme.backgroundInverted};
-            height: 100%;
-            border-radius: 50% 50%;
+            && {
+              width: ${4.25 * GU}px;
+              height: ${4.25 * GU}px;
+              padding: ${0.5 * GU}px;
+              background: ${theme.backgroundInverted};
+              height: 100%;
+              border-radius: 50% 50%;
+            }
           `}
         >
           <IconPerson

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Switch, Route, useParams, useRouteMatch } from 'react-router'
 import 'styled-components/macro'
-import { Spacer, textStyle, GU } from 'ui'
+import { Spacer, textStyle, GU } from '@pokt-foundation/ui'
 import AnimatedLogo from 'components/AnimatedLogo/AnimatedLogo'
 import AppInfo from 'views/Dashboard/ApplicationDetail/AppInfo'
 import Chains from 'views/Dashboard/ApplicationDetail/Chains'

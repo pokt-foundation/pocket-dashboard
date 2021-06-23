@@ -1,6 +1,6 @@
 import React from 'react'
 import 'styled-components/macro'
-import { Button, TextInput, textStyle, GU, RADIUS } from 'ui'
+import { Button, TextInput, textStyle, GU, RADIUS } from '@pokt-foundation/ui'
 
 export default function Home() {
   return (

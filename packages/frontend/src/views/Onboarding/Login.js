@@ -13,7 +13,7 @@ import {
   useTheme,
   GU,
   RADIUS,
-} from 'ui'
+} from '@pokt-foundation/ui'
 import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
 import env from 'environment'
 import PoktShape from 'assets/poktshape.png'
@@ -226,8 +226,11 @@ export default function Login() {
               component={Link}
               external={false}
               css={`
-                text-align: left;
-                margin-bottom: ${6 * GU}px;
+                && {
+                  width: auto;
+                  text-align: left;
+                  margin-bottom: ${6 * GU}px;
+                }
               `}
             >
               Forgot your password?

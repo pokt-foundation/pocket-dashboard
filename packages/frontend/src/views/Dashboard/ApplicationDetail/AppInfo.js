@@ -23,7 +23,7 @@ import {
   useToast,
   GU,
   RADIUS,
-} from 'ui'
+} from '@pokt-foundation/ui'
 import AppStatus from 'components/AppStatus/AppStatus'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
@@ -700,13 +700,15 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
 
       <ButtonBase
         css={`
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: ${5 * GU}px;
-          border-top: 2px solid #31a1d2;
-          border-radius: 0 0 ${RADIUS}px ${RADIUS}px;
-          color: #31a1d2;
+          && {
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: ${5 * GU}px;
+            border-top: 2px solid #31a1d2;
+            border-radius: 0 0 ${RADIUS}px ${RADIUS}px;
+            color: #31a1d2;
+          }
         `}
         onClick={() => history.push(`${url}/success-details`)}
       >
