@@ -1,6 +1,6 @@
 import React from 'react'
 import 'styled-components/macro'
-import { textStyle, GU } from 'ui'
+import { textStyle, GU } from '@pokt-foundation/ui'
 import PoktLogo from 'assets/poktlogo.png'
 
 export default function OnboardingHeader() {

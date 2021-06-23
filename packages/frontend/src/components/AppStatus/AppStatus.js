@@ -2,7 +2,7 @@ import React from 'react'
 import TokenAmount from 'token-amount'
 import 'styled-components/macro'
 import Box from 'components/Box/Box'
-import { Spacer, Tag, textStyle, GU } from 'ui'
+import { Spacer, Tag, textStyle, GU } from '@pokt-foundation/ui'
 
 export default function AppStatus({ appOnChainStatus }) {
   const { stake: stakedTokens, relays: maxRelaysPerSession } = appOnChainStatus

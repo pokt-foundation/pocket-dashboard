@@ -4,7 +4,14 @@ import PropTypes from 'prop-types'
 import { animated, useSpring } from 'react-spring'
 import { useViewport } from 'use-viewport'
 import 'styled-components/macro'
-import { ButtonBase, Spacer, useTheme, springs, GU, RADIUS } from 'ui'
+import {
+  ButtonBase,
+  Spacer,
+  useTheme,
+  springs,
+  GU,
+  RADIUS,
+} from '@pokt-foundation/ui'
 import IconApp from 'components/MenuPanel/IconApp'
 import IconNetwork from 'components/MenuPanel/IconNetwork'
 import PocketLogo from 'assets/pnlogo.svg'
@@ -224,13 +231,17 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
               <ButtonBase
                 onClick={() => history.push({ pathname: `${id}` })}
                 css={`
-                  display: flex;
-                  align-items: center;
-                  border-radius: 0px;
-                  text-align: left;
-                  height: ${4 * GU}px;
-                  width: 100%;
-                  color: ${activeIndex - 1 === index ? theme.accent : 'black'};
+                  && {
+                    display: flex;
+                    align-items: center;
+                    border-radius: 0px;
+                    text-align: left;
+                    height: ${4 * GU}px;
+                    width: 100%;
+                    color: ${activeIndex - 1 === index
+                      ? theme.accent
+                      : 'black'};
+                  }
                 `}
               >
                 <span

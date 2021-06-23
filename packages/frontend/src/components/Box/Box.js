@@ -1,6 +1,6 @@
 import React from 'react'
 import 'styled-components/macro'
-import { useTheme, textStyle, GU, RADIUS } from 'ui'
+import { useTheme, textStyle, GU, RADIUS } from '@pokt-foundation/ui'
 
 const DEFAULT_PADDING = 2 * GU
 
