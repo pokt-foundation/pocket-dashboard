@@ -4196,10 +4196,10 @@
     dotenv "^8.2.0"
     graphql-request "^3.4.0"
 
-"@pokt-foundation/ui@^0.1.0-alpha.1":
-  version "0.1.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/@pokt-foundation/ui/-/ui-0.1.0-alpha.1.tgz#48c1a85884ec31f5945a668ab71a150b52bca85a"
-  integrity sha512-b+6Lax1MPOj7MB/EQq4POWUy9ebmw98ppO8Qz4MgrtXli66xaXyMLl+TDcWQ4wiB31BVZL9uMhJpbXpRFkznug==
+"@pokt-foundation/ui@^0.1.0-alpha.2":
+  version "0.1.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/@pokt-foundation/ui/-/ui-0.1.0-alpha.2.tgz#8b1cb79eadfff843365a505f02589ae35bf0d9bc"
+  integrity sha512-QyseCSv3cwt4bMootEdKFuhQy7ibmhlK1Kd0JgOtp46owbEioHOe/0zT+8cv3YENLkOqSiwdskZJYYiaXeYxpA==
   dependencies:
     "@babel/runtime" "^7.3.1"
     "@fontsource/manrope" "^4.4.5"
@@ -4220,7 +4220,7 @@
     react-display-name "^0.2.3"
     react-onclickout "^2.0.8"
     react-spring "^7.2.11"
-    recursive-copy "^3.0.9"
+    recursive-copy "^2.0.9"
     token-amount "^0.1.0"
     use-inside "^0.2.0"
     use-token "^0.2.0"
@@ -20381,7 +20381,7 @@ rechoir@^0.6.2:
   dependencies:
     resolve "^1.1.6"
 
-recursive-copy@^3.0.9:
+recursive-copy@^2.0.9:
   version "2.0.11"
   resolved "https://registry.yarnpkg.com/recursive-copy/-/recursive-copy-2.0.11.tgz#7ed3c0f4b6bb0ffda7cab62bf865a82f5a391c39"
   integrity sha512-DqL2kO10mUne7XK5BPcwRtOJJZKhddD7IrW4UmHmKrwdV3HLPWcw6Jr4Jh12ooddfJOVz7ynFoFYYnPM7De0Og==
