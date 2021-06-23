@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTransition, animated } from 'react-spring'
 import PropTypes from 'prop-types'
-import { GU } from 'ui'
+import { GU } from '@pokt-foundation/ui'
 
 export default function FloatUp({
   content,
