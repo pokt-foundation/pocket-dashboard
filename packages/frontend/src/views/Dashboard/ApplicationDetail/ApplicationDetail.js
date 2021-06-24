@@ -68,6 +68,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
       <Route path={`${path}/security`}>
         <Security
           appData={activeApplication}
+          appOnChainData={appOnChainData}
           refetchActiveAppData={refetchActiveAppData}
         />
       </Route>

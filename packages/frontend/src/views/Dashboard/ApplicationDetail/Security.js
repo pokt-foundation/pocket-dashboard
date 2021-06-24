@@ -26,8 +26,9 @@ import {
   KNOWN_QUERY_SUFFIXES,
 } from 'known-query-suffixes'
 import { sentryEnabled } from 'sentry'
+import AppStatus from 'components/AppStatus/AppStatus'
 
-export default function Security({ appData }) {
+export default function Security({ appData, appOnChainData }) {
   const [origin, setOrigin] = useState('')
   const [origins, setOrigins] = useState([])
   const [secretKeyRequired, setSecretKeyRequired] = useState(false)
@@ -276,6 +277,7 @@ export default function Security({ appData }) {
                   Go back
                 </Button>
                 <Spacer size={2 * GU} />
+                <AppStatus appOnChainStatus={appOnChainData} />
               </>
             }
           />
