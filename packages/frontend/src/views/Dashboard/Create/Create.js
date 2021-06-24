@@ -354,10 +354,26 @@ function BasicSetup({
                 wide
               />
             </Box>
-            <Spacer size={2 * GU} />
+            <Spacer size={3 * GU} />
             <Box title="Available networks">
+              <p
+                css={`
+                  ${textStyle('body3')}
+                `}
+              >
+                Choose the Blockchain you want to connect your app to.{' '}
+                <span
+                  css={`
+                    font-weight: bold;
+                  `}
+                >
+                  Be aware that you will only be able to change this selected
+                  Network once a week.
+                </span>{' '}
+              </p>
+              <Spacer size={2 * GU} />
               <DataView
-                fields={['Selected', 'Network', 'ID', 'Ticker']}
+                fields={['', 'Network', 'ID', 'Ticker']}
                 entries={chains}
                 renderEntry={({
                   description,
@@ -392,29 +408,27 @@ function BasicSetup({
             <Button wide onClick={() => incrementScreen()}>
               Set up app security
             </Button>
+            <Spacer size={3 * GU} />
+            <FreeTierInfo />
+            <Spacer size={3 * GU} />
+            <p
+              css={`
+                ${textStyle('body4')}
+              `}
+            >
+              Launch your application for free for unlimited time subsidised by
+              Pocket Network Inc. for more information read our site T&C of Use.
+            </p>
             <Spacer size={2 * GU} />
-            <Box title="Free-tier info">
-              <ul
-                css={`
-                  list-style: none;
-                  height: 100%;
-                  li {
-                    display: flex;
-                    justify-content: space-between;
-                  }
-                  li:not(:last-child) {
-                    margin-bottom: ${2 * GU}px;
-                  }
-                `}
-              >
-                <li>
-                  Amount of POKT: <span>25,000</span>
-                </li>
-                <li>
-                  Max relays per day: <span>1M</span>
-                </li>
-              </ul>
-            </Box>
+            <p
+              css={`
+                ${textStyle('body4')}
+              `}
+            >
+              If you are looking to stake your own POKT or you need more relays
+              for your application please contact us and our team will find a
+              solution for you.
+            </p>
           </>
         }
       />
@@ -489,25 +503,20 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
     <>
       <Split
         primary={
-          <Box>
-            <p
-              css={`
-                ${textStyle('body2')}
-                margin-bottom: ${2 * GU}px;
-              `}
-            >
-              To maximize security for your application, you may add an
-              additional secret key and/or whitelist user agents and origins.
-              For more information take a look at the Pocket Gateway Docs.
-            </p>
-          </Box>
-        }
-        secondary={
           <>
-            <Button wide onClick={() => decrementScreen()}>
-              Go back
-            </Button>
-            <Spacer size={2 * GU} />
+            <Box>
+              <p
+                css={`
+                  ${textStyle('body2')}
+                  margin-bottom: ${2 * GU}px;
+                `}
+              >
+                To maximize security for your application, you may add an
+                additional secret key and/or whitelist user agents and origins.
+                For more information take a look at the Pocket Gateway Docs.
+              </p>
+            </Box>
+            <Spacer size={3 * GU} />
             <Box
               css={`
                 display: flex;
@@ -525,7 +534,7 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
               >
                 <h3
                   css={`
-                    ${textStyle('body2')}
+                    ${textStyle('title2')}
                   `}
                 >
                   Secret key required
@@ -548,97 +557,133 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
                 }
               />
             </Box>
+            <Spacer size={3 * GU} />
+            <Box
+              title="Whitelisted user-agents"
+              css={`
+                h3 {
+                  margin-bottom: ${1 * GU}px;
+                }
+                margin-bottom: ${3 * GU}px;
+              `}
+            >
+              <TextInput
+                wide
+                value={userAgent}
+                onChange={(e) => setUserAgent(e.target.value)}
+                adornment={
+                  <ButtonBase onClick={setWhitelistedUserAgent}>
+                    <IconPlus />
+                  </ButtonBase>
+                }
+                adornmentPosition="end"
+              />
+              <ul
+                css={`
+                  list-style: none;
+                  margin-top: ${2 * GU}px;
+                  li:not(:last-child) {
+                    margin-bottom: ${2 * GU}px;
+                  }
+                `}
+              >
+                {data.whitelistUserAgents.map((agent) => (
+                  <li key={agent}>
+                    <TextCopy
+                      onCopy={() => onWhitelistedUserAgentDelete(agent)}
+                      adornment={<IconCross />}
+                      value={agent}
+                      css={`
+                        width: 100%;
+                        padding-left: 0;
+                      `}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </Box>
+            <Box
+              title="Whitelisted origins"
+              css={`
+                h3 {
+                  margin-bottom: ${1 * GU}px;
+                }
+              `}
+            >
+              <TextInput
+                wide
+                value={origin}
+                onChange={(e) => setOrigin(e.target.value)}
+                adornment={
+                  <ButtonBase onClick={setWhitelistedOrigin}>
+                    <IconPlus />
+                  </ButtonBase>
+                }
+                adornmentPosition="end"
+              />
+              <ul
+                css={`
+                  list-style: none;
+                  margin-top: ${2 * GU}px;
+                  li:not(:last-child) {
+                    margin-bottom: ${2 * GU}px;
+                  }
+                `}
+              >
+                {data.whitelistOrigins.map((origin) => (
+                  <li key={origin}>
+                    <TextCopy
+                      onCopy={() => onWhitelistedOriginDelete(origin)}
+                      value={origin}
+                      adornment={<IconCross />}
+                      css={`
+                        width: 100%;
+                        padding-left: 0;
+                      `}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </Box>
+          </>
+        }
+        secondary={
+          <>
+            <Button wide onClick={() => decrementScreen()}>
+              Go back
+            </Button>
+            <Spacer size={3 * GU} />
+            <FreeTierInfo />
           </>
         }
       />
-      <Spacer size={2 * GU} />
-      <Box
-        title="Whitelisted user-agents"
-        css={`
-          h3 {
-            margin-bottom: ${1 * GU}px;
-          }
-          margin-bottom: ${3 * GU}px;
-        `}
-      >
-        <TextInput
-          wide
-          value={userAgent}
-          onChange={(e) => setUserAgent(e.target.value)}
-          adornment={
-            <ButtonBase onClick={setWhitelistedUserAgent}>
-              <IconPlus />
-            </ButtonBase>
-          }
-          adornmentPosition="end"
-        />
-        <ul
-          css={`
-            list-style: none;
-            margin-top: ${2 * GU}px;
-            li:not(:last-child) {
-              margin-bottom: ${2 * GU}px;
-            }
-          `}
-        >
-          {data.whitelistUserAgents.map((agent) => (
-            <li key={agent}>
-              <TextCopy
-                onCopy={() => onWhitelistedUserAgentDelete(agent)}
-                adornment={<IconCross />}
-                value={agent}
-                css={`
-                  width: 100%;
-                  padding-left: 0;
-                `}
-              />
-            </li>
-          ))}
-        </ul>
-      </Box>
-      <Box
-        title="Whitelisted origins"
-        css={`
-          h3 {
-            margin-bottom: ${1 * GU}px;
-          }
-        `}
-      >
-        <TextInput
-          wide
-          value={origin}
-          onChange={(e) => setOrigin(e.target.value)}
-          adornment={
-            <ButtonBase onClick={setWhitelistedOrigin}>
-              <IconPlus />
-            </ButtonBase>
-          }
-          adornmentPosition="end"
-        />
-        <ul
-          css={`
-            list-style: none;
-            margin-top: ${2 * GU}px;
-            li:not(:last-child) {
-              margin-bottom: ${2 * GU}px;
-            }
-          `}
-        >
-          {data.whitelistOrigins.map((origin) => (
-            <li key={origin}>
-              <TextCopy
-                onCopy={() => onWhitelistedOriginDelete(origin)}
-                value={origin}
-                adornment={<IconCross />}
-                css={`
-                  width: 100%;
-                  padding-left: 0;
-                `}
-              />
-            </li>
-          ))}
-        </ul>
-      </Box>
     </>
+  )
+}
+
+function FreeTierInfo() {
+  return (
+    <Box title="Free-tier info">
+      <ul
+        css={`
+          list-style: none;
+          height: 100%;
+          li {
+            display: flex;
+            justify-content: space-between;
+          }
+          li:not(:last-child) {
+            margin-bottom: ${2 * GU}px;
+          }
+        `}
+      >
+        <li>
+          Amount of POKT: <span>25,000</span>
+        </li>
+        <li>
+          Max relays per day: <span>1M</span>
+        </li>
+      </ul>
+    </Box>
   )
 }

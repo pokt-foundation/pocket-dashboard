@@ -309,7 +309,7 @@ export default function AppInfo({
                   appId={appData.id}
                   isLb={appData.isLb}
                 />
-                <Spacer size={2 * GU} />
+                <Spacer size={3 * GU} />
                 {exceedsMaxRelays && (
                   <>
                     <Banner
@@ -335,7 +335,7 @@ export default function AppInfo({
                       find the best solution for you and keep your
                       infrastructure running.
                     </Banner>
-                    <Spacer size={2 * GU} />
+                    <Spacer size={3 * GU} />
                   </>
                 )}
                 <div
@@ -344,7 +344,7 @@ export default function AppInfo({
                     height: ${compactMode ? 'auto' : '250px'};
                     display: grid;
                     grid-template-columns: ${compactMode ? '1fr' : '1fr 1fr'};
-                    grid-column-gap: ${2 * GU}px;
+                    grid-column-gap: ${4 * GU}px;
                   `}
                 >
                   <SuccessRate
@@ -360,7 +360,7 @@ export default function AppInfo({
                     chartScales={latencyScales}
                   />
                 </div>
-                <Spacer size={2 * GU} />
+                <Spacer size={3 * GU} />
                 <UsageTrends
                   chartLabels={usageLabels}
                   chartLines={usageLines}
@@ -368,7 +368,7 @@ export default function AppInfo({
                   maxSessionRelays={appOnChainData.relays}
                   sessionRelays={currentSessionRelays}
                 />
-                <Spacer size={2 * GU} />
+                <Spacer size={3 * GU} />
                 <LatestRequests id={appData.id} isLb={appData.isLb} />
               </>
             }
@@ -388,9 +388,9 @@ export default function AppInfo({
                 >
                   Notifications
                 </Button>
-                <Spacer size={2 * GU} />
+                <Spacer size={3 * GU} />
                 <AppStatus appOnChainStatus={appOnChainData} />
-                <Spacer size={2 * GU} />
+                <Spacer size={3 * GU} />
                 <AppDetails
                   apps={appData.apps}
                   id={appData.id}
@@ -861,7 +861,7 @@ function LatestRequests({ id, isLb }) {
   )
 
   const onPageChange = useCallback((page) => setPage(page), [])
-  const [colorsByMethod, countByColor, colorValues] = useMemo(() => {
+  const [colorsByMethod] = useMemo(() => {
     if (isLatestRelaysLoading) {
       return []
     }

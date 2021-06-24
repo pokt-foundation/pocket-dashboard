@@ -16,6 +16,7 @@ import {
   useTheme,
   useToast,
   GU,
+  color,
 } from '@pokt-foundation/ui'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
@@ -429,9 +430,13 @@ function NotificationPreference({ level, checked, onChange, maxRelays }) {
           position: absolute;
           left: 0;
           top: 0;
-          width: ${2 * GU}px;
+          width: ${1.5 * GU}px;
           height: 100%;
-          background: ${backgroundColor};
+          background: linear-gradient(
+            90deg,
+            ${backgroundColor} 2.32%,
+            ${color(backgroundColor).alpha(0)} 88.51%
+          );
           border-radius: ${1 * GU}px 0px 0px ${1 * GU}px;
         `}
       />

@@ -359,19 +359,21 @@ function Tab({ active, children, onClick }) {
     <ButtonBase
       onClick={onClick}
       css={`
-        position: relative;
-        height: ${6 * GU}px;
-        width: 100%;
-        border-radius: 0 0 ${1 * GU}px ${1 * GU}px;
-        color: ${theme.infoSurfaceContent};
-        ${textStyle('body2')}
-        ${active &&
-        `
+        && {
+          position: relative;
+          height: ${6 * GU}px;
+          width: 100%;
+          border-radius: 0 0 ${1 * GU}px ${1 * GU}px;
+          color: ${theme.content};
+          ${textStyle('body3')}
+          ${active &&
+          `
           background: #091828;
           border-top: 2px solid ${theme.accent};
           color: white;
           transition: all 0.080s ease-in;
-        `}
+        `};
+        }
       `}
     >
       {children}
