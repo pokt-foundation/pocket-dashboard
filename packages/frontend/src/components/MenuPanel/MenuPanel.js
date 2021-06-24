@@ -15,8 +15,9 @@ import {
 import IconApp from 'components/MenuPanel/IconApp'
 import IconNetwork from 'components/MenuPanel/IconNetwork'
 import PocketLogo from 'assets/pnlogo.svg'
+import { log } from 'lib/utils'
 
-const CHILD_INSTANCE_HEIGHT = 4 * GU
+const CHILD_INSTANCE_HEIGHT = 6 * GU
 
 const MENU_ROUTES = [
   {
@@ -70,6 +71,7 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
         ...userApps.map(({ name, id }) => ({
           label: name,
           id: `/app/${id}`,
+          appId: id,
         }))
       )
     }
@@ -156,6 +158,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
     to: { openProgress: Number(active) },
     config: springs.smooth,
   })
+  const { pathname } = useLocation()
   const history = useHistory()
   const theme = useTheme()
 
@@ -176,15 +179,33 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
     })
   }, [childInstances, history, primaryInstance])
 
+  const activeChildInstanceIndex = childInstances.reduce(
+    (activeIndex, { appId }, index) => {
+      if (!pathname.includes(appId) && activeIndex === -1) {
+        return -1
+      }
+
+      if (pathname.includes(appId)) {
+        return index
+      }
+
+      if (activeIndex !== -1) {
+        return activeIndex
+      }
+    },
+    -1
+  )
+
+  console.log(activeChildInstanceIndex)
+
+  log(activeIndex, childInstances, 'activeIndeex')
+
   return (
     <div
       css={`
         position: relative;
         width: 100%;
         min-height: ${10 * GU}px;
-        background: ${active
-          ? `linear-gradient(90.3deg, ${theme.accent} -434.38%, rgba(197, 236, 75, 0) 99.62%)`
-          : 'transparent'};
         color: ${theme.content};
         display: flex;
         flex-direction: column;
@@ -197,7 +218,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
           left: 0;
           top: 0;
           width: ${GU / 2}px;
-          height: 100%;
+          height: ${11 * GU}px;
           background: ${theme.accent};
           border-radius: ${RADIUS}px;
         `}
@@ -219,50 +240,55 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
             overflow: hidden;
             list-style: none;
             width: 100%;
-            padding-left: ${6 * GU}px;
           `}
           style={{
             height: openProgress.interpolate(
               (v) =>
-                `${(childInstances.length * CHILD_INSTANCE_HEIGHT + 0) * v}px`
+                `${childInstances.length * (CHILD_INSTANCE_HEIGHT + GU) * v}px`
             ),
           }}
         >
           {childInstances.map(({ id, label }, index) => (
-            <li
-              key={id}
-              css={`
-                width: 100%;
-              `}
-            >
-              <ButtonBase
-                onClick={() => history.push({ pathname: `${id}` })}
+            <>
+              <Spacer size={1 * GU} />
+              <li
+                key={id}
                 css={`
-                  && {
-                    display: flex;
-                    align-items: center;
-                    border-radius: 0px;
-                    text-align: left;
-                    height: ${4 * GU}px;
-                    width: 100%;
-                    color: ${activeIndex - 1 === index
-                      ? theme.accent
-                      : theme.content};
-                  }
+                  width: 100%;
                 `}
               >
-                <span
+                <ButtonBase
+                  onClick={() => history.push({ pathname: `${id}` })}
                   css={`
-                    width: 100%;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
+                    && {
+                      background: ${activeChildInstanceIndex === index
+                        ? `linear-gradient(90.3deg, ${theme.accent} -434.38%, rgba(197, 236, 75, 0) 99.62%)`
+                        : 'transparent'};
+                      display: flex;
+                      align-items: center;
+                      border-radius: 0px;
+                      text-align: left;
+                      height: ${6 * GU}px;
+                      width: 100%;
+                      font-weight: ${active ? 'bold' : 'normal'};
+                      transition: background 150ms ease-in-out;
+                    }
                   `}
                 >
-                  {label}
-                </span>
-              </ButtonBase>
-            </li>
+                  <span
+                    css={`
+                      width: 100%;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      text-align: center;
+                    `}
+                  >
+                    {label}
+                  </span>
+                </ButtonBase>
+              </li>
+            </>
           ))}
         </animated.ul>
       ) : (
@@ -280,12 +306,17 @@ function MenuPanelButton({ active, instance, onClick, ...props }) {
   return (
     <ButtonBase
       css={`
-        width: 100%;
-        height: ${10 * GU}px;
-        padding-top: ${1 * GU}px;
-        border-radius: 0px;
-        color: ${theme.content};
-        transition: background 150ms ease-in-out;
+        && {
+          background: ${active
+            ? `linear-gradient(90.3deg, ${theme.accent} -434.38%, rgba(197, 236, 75, 0) 99.62%)`
+            : 'transparent'};
+          width: 100%;
+          height: ${11 * GU}px;
+          padding-top: ${1 * GU}px;
+          border-radius: 0px;
+          color: ${theme.content};
+          transition: background 150ms ease-in-out;
+        }
       `}
       onClick={onClick}
       {...props}
