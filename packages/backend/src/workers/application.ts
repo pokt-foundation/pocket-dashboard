@@ -4,6 +4,7 @@ import {
   QueryBalanceResponse,
   RawTxRequest,
 } from '@pokt-network/pocket-js'
+import Application from '../models/Application'
 import PreStakedApp, { IPreStakedApp } from '../models/PreStakedApp'
 import { chains, FREE_TIER_STAKE_AMOUNT } from './config'
 import {
@@ -36,7 +37,10 @@ async function createApplicationAndFund(ctx): Promise<void> {
     freeTierApplicationAccount: {
       address: freeTierAccount.addressHex,
       publicKey: freeTierAccount.publicKey.toString('hex'),
-      privateKey: freeTierAccount.privateKey.toString('hex'),
+      // @ts-ignore
+      privateKey: Application.encryptPrivateKey(
+        freeTierAccount.privateKey.toString('hex')
+      ),
       passPhrase: passphrase,
     },
     gatewayAAT: {
@@ -90,9 +94,12 @@ async function stakeApplication(
 
   ctx.logger.log(`Staking app ${address} for chain ${chain}`)
 
+  // @ts-ignore
+  const decryptedPrivateKey = Application.decryptPrivateKey(privateKey)
+
   const stakeTxToSend = await createAppStakeTx(
     passPhrase,
-    Buffer.from(privateKey, 'hex'),
+    Buffer.from(decryptedPrivateKey, 'hex'),
     [chain],
     FREE_TIER_STAKE_AMOUNT.toString()
   )
