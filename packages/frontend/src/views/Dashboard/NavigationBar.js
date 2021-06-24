@@ -39,8 +39,7 @@ function useRouteTitle(applications = []) {
 
   if (pathname.includes('app')) {
     const title = applications.reduce(
-      (title, { appId, appName }) =>
-        pathname.includes(appId) ? appName : title,
+      (title, { id, name }) => (pathname.includes(id) ? name : title),
       DEFAULT_TITLE
     )
 
