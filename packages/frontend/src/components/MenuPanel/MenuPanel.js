@@ -27,7 +27,7 @@ const MENU_ROUTES = [
   {
     icon: IconApp,
     id: '/apps',
-    label: 'My Apps',
+    label: 'Apps',
   },
 ]
 
@@ -117,7 +117,11 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
             top: 0;
             left: 0;
             padding: ${2 * GU}px 0;
-            background: ${theme.backgroundInverted};
+            background: linear-gradient(
+              180deg,
+              ${theme.surfaceGradient1} 0%,
+              ${theme.surfaceGradient2} 100%
+            );
             border-radius: 0px 20px 20px 0;
             display: flex;
             flex-direction: column;
@@ -178,7 +182,10 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
         position: relative;
         width: 100%;
         min-height: ${10 * GU}px;
-        background: ${active ? theme.surfacePressedInverted : 'transparent'};
+        background: ${active
+          ? `linear-gradient(90.3deg, ${theme.accent} -434.38%, rgba(197, 236, 75, 0) 99.62%)`
+          : 'transparent'};
+        color: ${theme.content};
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -240,7 +247,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
                     width: 100%;
                     color: ${activeIndex - 1 === index
                       ? theme.accent
-                      : 'black'};
+                      : theme.content};
                   }
                 `}
               >
@@ -277,7 +284,7 @@ function MenuPanelButton({ active, instance, onClick, ...props }) {
         height: ${10 * GU}px;
         padding-top: ${1 * GU}px;
         border-radius: 0px;
-        color: ${active ? theme.accent : 'black'};
+        color: ${theme.content};
         transition: background 150ms ease-in-out;
       `}
       onClick={onClick}
@@ -297,7 +304,7 @@ function MenuPanelButton({ active, instance, onClick, ...props }) {
           }
         `}
       >
-        <InstanceIcon color={active ? theme.accent : 'black'} />
+        <InstanceIcon color={theme.content} />
         <Spacer size={1 * GU} />
         {instance.label}
       </div>

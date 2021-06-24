@@ -11,7 +11,11 @@ export default function Box({ children, title, className, padding, ...props }) {
     <div
       css={`
         position: relative;
-        background: ${theme.surface};
+        background: linear-gradient(
+          180deg,
+          ${theme.surfaceGradient1} 0%,
+          ${theme.surfaceGradient2} 100%
+        );
         padding: ${padding[0]}px ${padding[1]}px ${padding[2]}px ${padding[3]}px;
         border-radius: ${RADIUS * 2}px;
       `}

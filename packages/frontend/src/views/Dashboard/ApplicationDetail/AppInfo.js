@@ -18,6 +18,7 @@ import {
   Spacer,
   Split,
   TextCopy,
+  color,
   textStyle,
   useTheme,
   useToast,
@@ -562,14 +563,12 @@ function EndpointDetails({ chainId, appId, isLb }) {
 function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
   const history = useHistory()
   const { url } = useRouteMatch()
+  const theme = useTheme()
   const numberProps = useSpring({
     number: Math.min(successRate * 100, 100),
     from: { number: 0 },
   })
-  const [primarySuccessColor, secondarySuccessColor] = useSuccessRateColor(
-    successRate
-  )
-  const numberIndicatorProps = useSpring({ height: 4, from: { height: 0 } })
+  const [primarySuccessColor] = useSuccessRateColor(successRate)
   const successRateDelta = useMemo(
     () => (((successRate - previousSuccessRate) / 1) * 100).toFixed(2),
     [previousSuccessRate, successRate]
@@ -588,7 +587,11 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
       <div
         css={`
           position: relative;
-          background: ${primarySuccessColor};
+          background: linear-gradient(
+            180deg,
+            ${primarySuccessColor} -20.71%,
+            ${color(primarySuccessColor).alpha(0)} 113.05%
+          );
           height: ${12 * GU}px;
           border-radius: ${1 * GU}px ${1 * GU}px 0 0;
           display: flex;
@@ -604,15 +607,6 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
         >
           {numberProps.number.interpolate((x) => `${x.toFixed(2)}%`)}
         </animated.h2>
-        <animated.div
-          css={`
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: ${secondarySuccessColor};
-          `}
-          style={numberIndicatorProps}
-        />
       </div>
       <div
         css={`
@@ -705,9 +699,9 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
             left: 0;
             width: 100%;
             height: ${5 * GU}px;
-            border-top: 2px solid #31a1d2;
+            border-top: 2px solid ${theme.accent};
             border-radius: 0 0 ${RADIUS}px ${RADIUS}px;
-            color: #31a1d2;
+            color: ${theme.accent};
           }
         `}
         onClick={() => history.push(`${url}/success-details`)}
@@ -751,7 +745,7 @@ function AvgLatency({ chartLabels, chartLines, avgLatency, chartScales }) {
           lines={chartLines}
           label={chartLabels}
           height={200}
-          color={() => theme.accent}
+          color={() => theme.accentAlternative}
           scales={chartScales}
         />
       </div>
@@ -835,7 +829,6 @@ function UsageTrends({
           <h3
             css={`
               ${textStyle('title2')}
-              text-align: right;
             `}
           >
             Weekly usage
@@ -844,9 +837,9 @@ function UsageTrends({
             lines={chartLines}
             label={(i) => chartLabels[i]}
             height={300}
-            color={() => '#31A1D2'}
+            color={() => theme.accentAlternative}
             renderCheckpoints
-            dotRadius={GU / 1.5}
+            dotRadius={GU}
             threshold
             scales={chartScales}
           />
@@ -910,79 +903,41 @@ function LatestRequests({ id, isLb }) {
         padding-bottom: ${4 * GU}px;
       `}
     >
-      <div
-        css={`
-          display: grid;
-          grid-template-columns: ${4 * GU}px 1fr;
-        `}
-      >
-        <div
-          css={`
-            width: ${1 * GU}px;
-            height: 100%;
-            overflow-y: hidden;
-          `}
-        >
-          {colorValues?.map((val, i) => {
-            return (
-              <div
-                key={i}
+      <DataView
+        mode={compactMode ? 'list' : 'table'}
+        fields={['Request Type', 'Data transferred', 'Result', 'Time Elapsed']}
+        status={isLatestRelaysLoading ? 'loading' : 'default'}
+        entries={latestRelays}
+        renderEntry={({ bytes, method, result, elapsed_time: elapsedTime }) => {
+          return [
+            <p>{method ? method : 'Unknown'}</p>,
+            <p>
+              <span
                 css={`
-                  background: ${val};
-                  width: 100%;
-                  height: ${(countByColor.get(val) / PER_PAGE) * 100}%;
-                  box-shadow: ${val} 0px 2px 8px 0px;
+                  display: inline-block;
+                  width: ${1.5 * GU}px;
+                  height: ${1.5 * GU}px;
+                  border-radius: 50% 50%;
+                  background: ${colorsByMethod.get(method) ?? FALLBACK_COLOR};
+                  box-shadow: ${colorsByMethod.get(method) ?? FALLBACK_COLOR}
+                    0px 2px 8px 0px;
                 `}
               />
-            )
-          })}
-        </div>
-        <DataView
-          mode={compactMode ? 'list' : 'table'}
-          fields={[
-            'Request Type',
-            'Data transferred',
-            'Result',
-            'Time Elapsed',
-          ]}
-          status={isLatestRelaysLoading ? 'loading' : 'default'}
-          entries={latestRelays}
-          renderEntry={({
-            bytes,
-            method,
-            result,
-            elapsed_time: elapsedTime,
-          }) => {
-            return [
-              <p>{method ? method : 'Unknown'}</p>,
-              <p>
-                <span
-                  css={`
-                    display: inline-block;
-                    width: ${1.5 * GU}px;
-                    height: ${1.5 * GU}px;
-                    border-radius: 50% 50%;
-                    background: ${colorsByMethod.get(method) ?? FALLBACK_COLOR};
-                    box-shadow: ${colorsByMethod.get(method) ?? FALLBACK_COLOR}
-                      0px 2px 8px 0px;
-                  `}
-                />
-                &nbsp;{bytes}B
-              </p>,
-              <p>{result}</p>,
-              <p>{(elapsedTime * 1000).toFixed(0)}ms</p>,
-            ]
-          }}
-        />
-        <Pagination
-          pages={PER_PAGE}
-          selected={page}
-          onChange={onPageChange}
-          css={`
-            grid-column: 2;
-          `}
-        />
-      </div>
+              &nbsp;{bytes}B
+            </p>,
+            <p>{result}</p>,
+            <p>{(elapsedTime * 1000).toFixed(0)}ms</p>,
+          ]
+        }}
+      />
+      <Pagination
+        pages={PER_PAGE}
+        selected={page}
+        onChange={onPageChange}
+        css={`
+          grid-column: 2;
+        `}
+      />
     </Box>
   )
 }
