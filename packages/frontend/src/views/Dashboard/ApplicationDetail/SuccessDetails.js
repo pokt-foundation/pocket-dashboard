@@ -40,6 +40,8 @@ export default function SuccessDetails({
   appOnChainData,
   id,
   isLb,
+  maxDailyRelays,
+  stakedTokens,
   successfulRelayData,
   weeklyRelayData,
 }) {
@@ -343,7 +345,10 @@ export default function SuccessDetails({
                 Back to application
               </Button>
               <Spacer size={2 * GU} />
-              <AppStatus appOnChainStatus={appOnChainData} />
+              <AppStatus
+                maxDailyRelays={maxDailyRelays}
+                stakedTokens={stakedTokens}
+              />
             </>
           }
         />

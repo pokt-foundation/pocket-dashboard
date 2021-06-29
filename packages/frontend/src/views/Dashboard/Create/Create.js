@@ -12,6 +12,7 @@ import {
   Help,
   IconCross,
   IconPlus,
+  Link,
   Spacer,
   Split,
   Switch,
@@ -406,7 +407,7 @@ function BasicSetup({
             </Button>
             <Spacer size={2 * GU} />
             <Button wide onClick={() => incrementScreen()}>
-              Set up app security
+              App Security
             </Button>
             <Spacer size={3 * GU} />
             <FreeTierInfo />
@@ -417,7 +418,11 @@ function BasicSetup({
               `}
             >
               Launch your application for free for unlimited time subsidised by
-              Pocket Network Inc. for more information read our site T&C of Use.
+              Pocket Network Inc. for more information read our site{' '}
+              <Link href="https://dashboard.pokt.network/support/terms-of-service">
+                T&amp;C of Use
+              </Link>
+              .
             </p>
             <Spacer size={2 * GU} />
             <p
@@ -426,8 +431,9 @@ function BasicSetup({
               `}
             >
               If you are looking to stake your own POKT or you need more relays
-              for your application please contact us and our team will find a
-              solution for you.
+              for your application please{' '}
+              <Link href="mailto:sales@pokt.network">contact us</Link> and our
+              team will find a solution for you.
             </p>
           </>
         }
@@ -513,7 +519,6 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
               >
                 To maximize security for your application, you may add an
                 additional secret key and/or whitelist user agents and origins.
-                For more information take a look at the Pocket Gateway Docs.
               </p>
             </Box>
             <Spacer size={3 * GU} />

@@ -199,11 +199,12 @@ function formatLatencyValuesForGraphing(
 
 export default function AppInfo({
   appData,
-  appOnChainData,
   currentSessionRelays,
   dailyRelayData,
+  maxDailyRelays,
   previousSuccessfulRelays,
   previousRelays,
+  stakedTokens,
   successfulRelayData,
   weeklyRelayData,
   latestLatencyData,
@@ -217,9 +218,6 @@ export default function AppInfo({
   const { within } = useViewport()
 
   const compactMode = within(-1, 'medium')
-  const { relays } = appOnChainData
-
-  const maxDailyRelays = relays * 24
 
   const successRate = useMemo(() => {
     return weeklyRelayData.total_relays === 0
@@ -237,12 +235,8 @@ export default function AppInfo({
     lines: usageLines = [],
     scales: usageScales,
   } = useMemo(
-    () =>
-      formatDailyRelaysForGraphing(
-        dailyRelayData,
-        appOnChainData.relays * ONE_DAY
-      ),
-    [appOnChainData, dailyRelayData]
+    () => formatDailyRelaysForGraphing(dailyRelayData, maxDailyRelays),
+    [maxDailyRelays, dailyRelayData]
   )
 
   const {
@@ -365,7 +359,7 @@ export default function AppInfo({
                   chartLabels={usageLabels}
                   chartLines={usageLines}
                   chartScales={usageScales}
-                  maxSessionRelays={appOnChainData.relays}
+                  maxSessionRelays={maxDailyRelays}
                   sessionRelays={currentSessionRelays}
                 />
                 <Spacer size={3 * GU} />
@@ -389,7 +383,10 @@ export default function AppInfo({
                   Notifications
                 </Button>
                 <Spacer size={3 * GU} />
-                <AppStatus appOnChainStatus={appOnChainData} />
+                <AppStatus
+                  stakedTokens={stakedTokens}
+                  maxDailyRelays={maxDailyRelays}
+                />
                 <Spacer size={3 * GU} />
                 <AppDetails
                   apps={appData.apps}

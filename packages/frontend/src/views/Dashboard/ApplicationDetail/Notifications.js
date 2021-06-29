@@ -58,8 +58,9 @@ function useUsageColor(usage) {
 
 export default function Notifications({
   appData,
-  appOnChainData,
-  dailyRelayData,
+  dailyRelays,
+  maxDailyRelays,
+  stakedTokens,
 }) {
   const [chosenPercentages, setChosenPercentages] = useState(
     appData?.notificationSettings ?? DEFAULT_PERCENTAGES
@@ -115,36 +116,30 @@ export default function Notifications({
 
   const highestDailyAmount = useMemo(
     () =>
-      dailyRelayData.reduce(
+      dailyRelays.reduce(
         (highest, { dailyRelays }) => Math.max(highest, dailyRelays),
         0
       ),
-    [dailyRelayData]
+    [dailyRelays]
   )
 
   const lowestDailyAmount = useMemo(
     () =>
-      dailyRelayData.length === 0
+      dailyRelays.length === 0
         ? 0
-        : dailyRelayData.reduce(
+        : dailyRelays.reduce(
             (lowest, { dailyRelays }) => Math.min(lowest, dailyRelays),
             Number.POSITIVE_INFINITY
           ),
-    [dailyRelayData]
+    [dailyRelays]
   )
 
   const totalDailyRelays = useMemo(() => {
-    return dailyRelayData.length === 0
+    return dailyRelays.length === 0
       ? 0
-      : dailyRelayData.reduce(
-          (sum, { dailyRelays = 0 }) => sum + dailyRelays,
-          0
-        ) / dailyRelayData.length
-  }, [dailyRelayData])
-
-  const { relays: maxRelaysPerSession } = appOnChainData
-
-  const maxDailyRelays = maxRelaysPerSession * 24
+      : dailyRelays.reduce((sum, { dailyRelays = 0 }) => sum + dailyRelays, 0) /
+          dailyRelays.length
+  }, [dailyRelays])
 
   const averageUsageColor = useUsageColor(totalDailyRelays / maxDailyRelays)
   const maxUsageColor = useUsageColor(highestDailyAmount / maxDailyRelays)

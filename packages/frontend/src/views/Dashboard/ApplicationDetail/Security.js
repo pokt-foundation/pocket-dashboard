@@ -28,7 +28,7 @@ import {
 import { sentryEnabled } from 'sentry'
 import AppStatus from 'components/AppStatus/AppStatus'
 
-export default function Security({ appData, appOnChainData }) {
+export default function Security({ appData, stakedTokens, maxRelays }) {
   const [origin, setOrigin] = useState('')
   const [origins, setOrigins] = useState([])
   const [secretKeyRequired, setSecretKeyRequired] = useState(false)
@@ -277,7 +277,7 @@ export default function Security({ appData, appOnChainData }) {
                   Go back
                 </Button>
                 <Spacer size={2 * GU} />
-                <AppStatus appOnChainStatus={appOnChainData} />
+                <AppStatus stakedTokens={stakedTokens} maxRelays={maxRelays} />
               </>
             }
           />
