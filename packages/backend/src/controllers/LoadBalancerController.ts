@@ -112,25 +112,25 @@ router.post(
     const { name, chain, gatewaySettings = DEFAULT_GATEWAY_SETTINGS } = req.body
 
     const id = (req.user as IUser)._id
-    const isNewAppRequestInvalid =
-      (await Application.exists({
-        status: APPLICATION_STATUSES.READY,
-        user: id,
-      })) ||
-      (await LoadBalancer.exists({
-        user: id,
-      }))
+    // const isNewAppRequestInvalid =
+    // (await Application.exists({
+    // status: APPLICATION_STATUSES.READY,
+    // user: id,
+    // })) ||
+    // (await LoadBalancer.exists({
+    // user: id,
+    // }))
 
-    if (isNewAppRequestInvalid) {
-      throw HttpError.BAD_REQUEST({
-        errors: [
-          {
-            id: 'ALREADY_EXISTING',
-            message: 'User already has an existing free tier app',
-          },
-        ],
-      })
-    }
+    // if (isNewAppRequestInvalid) {
+    // throw HttpError.BAD_REQUEST({
+    // errors: [
+    // {
+    // id: 'ALREADY_EXISTING',
+    // message: 'User already has an existing free tier app',
+    // },
+    // ],
+    // })
+    // }
     const preStakedApp: IPreStakedApp = await ApplicationPool.findOne({
       status: APPLICATION_STATUSES.READY,
       chain,
