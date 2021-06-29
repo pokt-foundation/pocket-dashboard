@@ -342,7 +342,7 @@ function BasicSetup({
       <Split
         primary={
           <>
-            <Box title="App name">
+            <Box title="App Name">
               <TextInput
                 value={data.appName ?? ''}
                 onChange={(e) =>
@@ -356,7 +356,7 @@ function BasicSetup({
               />
             </Box>
             <Spacer size={3 * GU} />
-            <Box title="Available networks">
+            <Box title="Select Network">
               <p
                 css={`
                   ${textStyle('body3')}
@@ -683,7 +683,7 @@ function FreeTierInfo() {
         `}
       >
         <li>
-          Amount of POKT: <span>25,000</span>
+          Amount of POKT: <span>8,000</span>
         </li>
         <li>
           Max relays per day: <span>1M</span>

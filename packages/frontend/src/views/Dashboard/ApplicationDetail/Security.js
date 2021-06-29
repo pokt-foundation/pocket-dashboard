@@ -136,17 +136,11 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                       margin-bottom: ${2 * GU}px;
                     `}
                   >
-                    To maximize security for your application, you may add an
-                    additional secret key and/or whitelist user agents and
-                    origins. For more information take a look at the Pocket
-                    Gateway Docs.
+                    To maximize security for your application, you may turn on
+                    the secret key requirement and/or whitelist user agents and
+                    origins. Make sure to configure your user-agents and origins
+                    properly to protect your endpoints against unwanted users.
                   </p>
-                  <Spacer size={2 * GU} />
-                  <p>
-                    Make sure to configure your user-agents and origins properly
-                    to protect your endpoints against unwanted users.
-                  </p>
-                  <Spacer size={1 * GU} />
                 </Box>
                 <Spacer size={3 * GU} />
                 <Box
@@ -179,7 +173,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                 </Box>
                 <Spacer size={3 * GU} />
                 <Box
-                  title="Whitelisted user-agents"
+                  title="Whitelisted User-Agents"
                   css={`
                     h3 {
                       margin-bottom: ${1 * GU}px;
@@ -224,7 +218,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                   </ul>
                 </Box>
                 <Box
-                  title="Whitelisted origins"
+                  title="Whitelisted Origins"
                   css={`
                     h3 {
                       margin-bottom: ${1 * GU}px;
