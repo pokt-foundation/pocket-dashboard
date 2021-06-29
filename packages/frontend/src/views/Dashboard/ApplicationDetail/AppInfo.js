@@ -37,7 +37,6 @@ import { formatNumberToSICompact } from 'lib/formatting-utils'
 const MAX_RELAYS_PER_SESSION = 40000
 const ONE_MILLION = 1000000
 const ONE_SECOND = 1 // Data for graphs come in second
-const ONE_DAY = 24
 const PER_PAGE = 10
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']

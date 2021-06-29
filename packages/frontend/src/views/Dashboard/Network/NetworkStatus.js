@@ -141,14 +141,21 @@ export default function NetworkStatus() {
                     >
                       <h4
                         css={`
-                          ${textStyle('title4')}
+                          ${textStyle('title2')}
+                          color: ${theme.accentAlternative};
                         `}
                       >
                         {Intl.NumberFormat().format(
                           relayData.totalWeeklyRelays
                         )}
                       </h4>
-                      <h5>For the past week</h5>
+                      <h5
+                        css={`
+                          ${textStyle('title4')}
+                        `}
+                      >
+                        Last 7 Days Count
+                      </h5>
                     </div>
                   </div>
                   <Spacer size={1 * GU} />
@@ -201,13 +208,13 @@ export default function NetworkStatus() {
                         successRateData.totalSuccessfulWeeklyRelays /
                         relayData.totalWeeklyRelays
                       }
-                      color={theme.positive}
+                      color={theme.accent}
                     />
                     <Spacer size={2 * GU} />
                     <div>
                       <p
                         css={`
-                          ${textStyle('title3')}
+                          ${textStyle('title2')}
                         `}
                       >
                         {Intl.NumberFormat().format(
@@ -234,7 +241,14 @@ export default function NetworkStatus() {
                   <Spacer size={1 * GU} />
                 </Box>
                 <Spacer size={4 * GU} />
-                <Box title="Network Summary">
+                <Box
+                  title="Network Summary"
+                  css={`
+                    h3 {
+                      color: ${theme.accentAlternative};
+                    }
+                  `}
+                >
                   <ul
                     css={`
                       list-style: none;

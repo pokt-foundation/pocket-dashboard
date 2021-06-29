@@ -4,9 +4,7 @@ import 'styled-components/macro'
 import Box from 'components/Box/Box'
 import { Spacer, Tag, textStyle, GU } from '@pokt-foundation/ui'
 
-export default function AppStatus({ appOnChainStatus }) {
-  const { stake: stakedTokens, relays: maxRelaysPerSession } = appOnChainStatus
-
+export default function AppStatus({ stakedTokens, maxDailyRelays }) {
   return (
     <Box
       css={`
@@ -48,7 +46,7 @@ export default function AppStatus({ appOnChainStatus }) {
         <li>
           Amount
           <span>
-            {TokenAmount.format(stakedTokens ?? 0n, 6, {
+            {TokenAmount.format(stakedTokens, 6, {
               symbol: 'POKT',
             })}
           </span>
@@ -60,7 +58,7 @@ export default function AppStatus({ appOnChainStatus }) {
             {new Intl.NumberFormat('en-US', {
               notation: 'compact',
               compactDisplay: 'short',
-            }).format(maxRelaysPerSession * 24)}
+            }).format(maxDailyRelays)}
           </span>
         </li>
       </ul>
