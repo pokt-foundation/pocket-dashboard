@@ -14,7 +14,7 @@ import {
 } from '@pokt-foundation/ui'
 import IconApp from 'components/MenuPanel/IconApp'
 import IconNetwork from 'components/MenuPanel/IconNetwork'
-import PocketLogo from 'assets/pnlogo.svg'
+import PortalLogo from '../../assets/portal_logo.svg'
 import { log } from 'lib/utils'
 
 const CHILD_INSTANCE_HEIGHT = 6 * GU
@@ -131,16 +131,18 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
         >
           <ButtonBase
             css={`
-              width: ${6 * GU}px;
-              height: ${6 * GU}px;
-              position: relative;
-              justify-self: center;
-              &:active {
-                top: 1px;
+              && {
+                width: ${6 * GU}px;
+                height: ${6 * GU}px;
+                position: relative;
+                justify-self: center;
+                &:active {
+                  top: 1px;
+                }
               }
             `}
           >
-            <img src={PocketLogo} alt="Menu Icon" />
+            <img src={PortalLogo} alt="Menu Icon" />
           </ButtonBase>
           <Spacer size={5 * GU} />
           {instanceGroups.map((group) => renderInstanceGroup(group))}

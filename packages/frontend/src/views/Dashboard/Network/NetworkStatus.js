@@ -3,6 +3,7 @@ import { format } from 'd3-format'
 import { useViewport } from 'use-viewport'
 import 'styled-components/macro'
 import {
+  Button,
   CircleGraph,
   DataView,
   LineChart,
@@ -11,7 +12,9 @@ import {
   textStyle,
   useTheme,
   GU,
+  RADIUS,
 } from '@pokt-foundation/ui'
+import VisuallyHidden from '@reach/visually-hidden'
 import AnimatedLogo from 'components/AnimatedLogo/AnimatedLogo'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
@@ -22,6 +25,7 @@ import {
   useChains,
 } from 'hooks/network-hooks'
 import { norm } from 'lib/math-utils'
+import Economics from '../../../assets/economics.png'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -171,6 +175,12 @@ export default function NetworkStatus() {
                     scales={scales}
                   />
                 </Box>
+                {!compactMode && (
+                  <>
+                    <Spacer size={4 * GU} />
+                    <EconomicsSection />
+                  </>
+                )}
                 <Spacer size={4 * GU} />
                 <Box title="Available Networks">
                   <DataView
@@ -260,15 +270,39 @@ export default function NetworkStatus() {
                     `}
                   >
                     <li>
-                      Apps staked <span>{summaryData.appsStaked} </span>
+                      <h2
+                        css={`
+                          ${textStyle('title3')}
+                          font-weight: bold;
+                        `}
+                      >
+                        Apps Staked
+                      </h2>{' '}
+                      <span>{summaryData.appsStaked} </span>
                     </li>
                     <Spacer size={2 * GU} />
                     <li>
-                      Nodes staked <span>{3456}</span>
+                      <h2
+                        css={`
+                          ${textStyle('title3')}
+                          font-weight: bold;
+                        `}
+                      >
+                        Nodes Staked
+                      </h2>{' '}
+                      <span>{3456}</span>
                     </li>
                     <Spacer size={2 * GU} />
                     <li>
-                      POKT staked <span>{242.99}m</span>
+                      <h2
+                        css={`
+                          ${textStyle('title3')}
+                          font-weight: bold;
+                        `}
+                      >
+                        POKT Staked
+                      </h2>{' '}
+                      <span>{242.99}m</span>
                     </li>
                   </ul>
                 </Box>
@@ -278,5 +312,44 @@ export default function NetworkStatus() {
         </>
       )}
     />
+  )
+}
+
+function EconomicsSection() {
+  const theme = useTheme()
+
+  return (
+    <section
+      css={`
+        position: relative;
+        width: 100%;
+        height: 100%;
+        max-height: ${33 * GU}px;
+        background-color: linear-gradient(
+          180deg,
+          ${theme.surfaceGradient1} 0%,
+          ${theme.surfaceGradient2} 100%
+        );
+        background-image: url(${Economics});
+        background-size: cover;
+        background-repeat: no-repeat;
+        border-radius: ${RADIUS}px;
+      `}
+    >
+      <VisuallyHidden>Pocket Economics for App Developers</VisuallyHidden>
+      <Button
+        mode="strong"
+        css={`
+          && {
+            position: absolute;
+            left: ${6 * GU}px;
+            bottom: ${4 * GU}px;
+            min-width: ${20 * GU}px;
+          }
+        `}
+      >
+        Read More
+      </Button>
+    </section>
   )
 }

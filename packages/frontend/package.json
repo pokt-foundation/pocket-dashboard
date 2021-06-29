@@ -14,6 +14,7 @@
     "@fontsource/manrope": "^4.4.5",
     "@pokt-foundation/ui": "^0.1.0-alpha.2",
     "@pokt-network/pocket-js": "^0.6.13-rc",
+    "@reach/visually-hidden": "^0.15.2",
     "@sentry/browser": "^6.7.1",
     "@sentry/react": "^6.7.1",
     "@sentry/tracing": "^6.7.1",
