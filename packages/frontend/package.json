@@ -11,6 +11,7 @@
   "author": "Pocket Network",
   "license": "MIT",
   "dependencies": {
+    "@fontsource/manrope": "^4.4.5",
     "@pokt-foundation/ui": "^0.1.0-alpha.2",
     "@pokt-network/pocket-js": "^0.6.13-rc",
     "@sentry/browser": "^6.7.1",

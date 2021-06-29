@@ -30,7 +30,7 @@ export default function AppStatus({ stakedTokens, maxDailyRelays }) {
         `}
       >
         <li>
-          Status
+          App Status
           <span>
             <Tag
               mode="new"
@@ -44,7 +44,7 @@ export default function AppStatus({ stakedTokens, maxDailyRelays }) {
         </li>
         <Spacer size={2 * GU} />
         <li>
-          Amount
+          Staked Amount
           <span>
             {TokenAmount.format(stakedTokens, 6, {
               symbol: 'POKT',
@@ -53,7 +53,7 @@ export default function AppStatus({ stakedTokens, maxDailyRelays }) {
         </li>
         <Spacer size={2 * GU} />
         <li>
-          Max relays per day
+          Max Relays Per Day
           <span>
             {new Intl.NumberFormat('en-US', {
               notation: 'compact',

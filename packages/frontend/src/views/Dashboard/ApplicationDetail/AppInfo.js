@@ -416,7 +416,15 @@ function SwitchInfoModal({ onClose, onSwitch, visible }) {
   const compactMode = within(-1, 'medium')
 
   return (
-    <Modal visible={visible} onClose={onClose}>
+    <Modal
+      visible={visible}
+      onClose={onClose}
+      css={`
+        & > div > div > div > div {
+          padding: 0 !important;
+        }
+      `}
+    >
       <div
         css={`
           max-width: ${87 * GU}px;
@@ -680,7 +688,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
           </h3>
           <h4
             css={`
-              ${textStyle('title3')}
+              ${textStyle('title4')}
             `}
           >
             {Intl.NumberFormat().format(totalRequests)}
@@ -698,6 +706,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
             border-top: 2px solid ${theme.accent};
             border-radius: 0 0 ${RADIUS}px ${RADIUS}px;
             color: ${theme.accent};
+            font-weight: bold;
           }
         `}
         onClick={() => history.push(`${url}/success-details`)}
