@@ -179,6 +179,10 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
 
   const activeChildInstanceIndex = childInstances.reduce(
     (activeIndex, { appId }, index) => {
+      if (pathname.includes('create')) {
+        return childInstances.length - 1
+      }
+
       if (!pathname.includes(appId) && activeIndex === -1) {
         return -1
       }
