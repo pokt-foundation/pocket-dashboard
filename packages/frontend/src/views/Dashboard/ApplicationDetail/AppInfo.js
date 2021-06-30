@@ -605,8 +605,8 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
       >
         <animated.h2
           css={`
-            ${textStyle('title1')}
             font-size: ${6 * GU}px;
+            font-weight: bold;
           `}
         >
           {numberProps.number.interpolate((x) => `${x.toFixed(2)}%`)}

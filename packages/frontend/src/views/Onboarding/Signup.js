@@ -16,18 +16,13 @@ import {
   textStyle,
   useTheme,
   GU,
-  Info,
 } from '@pokt-foundation/ui'
 import Onboarding from 'components/Onboarding/Onboarding'
+import VerifyResetNotice from 'components/VerifyResetNotice/VerifyResetNotice'
 import env from 'environment'
 import { sentryEnabled } from 'sentry'
 
-const InlineLink = styled(Link)`
-  display: inline;
-  vertical-align: bottom;
-`
-
-export default function Login() {
+export default function Signup() {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState(null)
   const [password, setPassword] = useState('')
@@ -36,11 +31,6 @@ export default function Login() {
   const [repeatedPasswordError, setRepeatedPasswordError] = useState(null)
   const [errors, setErrors] = useState([])
   const [checked, setChecked] = useState(false)
-  const theme = useTheme()
-  const { within } = useViewport()
-
-  const compactMode = within(-1, 'medium')
-
   const { isError, isLoading, isSuccess, mutate, reset } = useMutation(
     async function signup() {
       try {
@@ -168,6 +158,61 @@ export default function Login() {
 
   return (
     <Onboarding>
+      {isSuccess ? (
+        <VerifyResetNotice email={email} />
+      ) : (
+        <SignupForm
+          checked={checked}
+          email={email}
+          emailError={emailError}
+          errors={errors}
+          password={password}
+          passwordError={passwordError}
+          repeatedPassword={repeatedPassword}
+          repeatedPasswordError={repeatedPasswordError}
+          isSubmitDisabled={isSubmitDisabled}
+          onCheckChange={onCheckChange}
+          onEmailBlur={onEmailBlur}
+          onEmailChange={onEmailChange}
+          onInputFocus={onInputFocus}
+          onPasswordBlur={onPasswordBlur}
+          onPasswordChange={onPasswordChange}
+          onRepeatedPasswordBlur={onRepeatedPasswordBlur}
+          onRepeatedPasswordChange={onRepeatedPasswordChange}
+          mutate={mutate}
+        />
+      )}
+    </Onboarding>
+  )
+}
+
+function SignupForm({
+  checked,
+  email,
+  emailError,
+  errors,
+  password,
+  passwordError,
+  repeatedPassword,
+  repeatedPasswordError,
+  isSubmitDisabled,
+  onCheckChange,
+  onEmailBlur,
+  onEmailChange,
+  onInputFocus,
+  onPasswordBlur,
+  onPasswordChange,
+  onRepeatedPasswordBlur,
+  onRepeatedPasswordChange,
+  mutate,
+}) {
+  const theme = useTheme()
+  const { within } = useViewport()
+
+  const compactMode = within(-1, 'medium')
+
+  return (
+    <>
       <h2
         css={`
           ${textStyle('title1')}
@@ -335,30 +380,12 @@ export default function Login() {
             </RouterLink>
           </p>
         </form>
-        {isSuccess && !isError && (
-          <Info>
-            <p
-              css={`
-                ${textStyle('body3')}
-              `}
-            >
-              You're almost there!{' '}
-              <span role="img" aria-label="Rocket Emoji">
-                🚀
-              </span>
-            </p>
-            <Spacer size={1 * GU} />
-            <p
-              css={`
-                ${textStyle('body3')}
-              `}
-            >
-              We've sent a verification email to {email}. Go and check it before
-              it expires!
-            </p>
-          </Info>
-        )}
       </main>
-    </Onboarding>
+    </>
   )
 }
+
+const InlineLink = styled(Link)`
+  display: inline;
+  vertical-align: bottom;
+`

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useViewport } from 'use-viewport'
-import { GU } from '@pokt-foundation/ui'
-import 'styled-components/macro'
+import { Link, GU } from '@pokt-foundation/ui'
+import styled from 'styled-components/macro'
 import PortalLogo from 'assets/portal_logo_full.png'
 
 export default function OnboardingHeader() {
@@ -49,11 +49,33 @@ export default function OnboardingHeader() {
             }
           `}
         >
-          <li>About Pocket</li>
-          <li>Docs</li>
-          <li>Get Started </li>
+          <li>
+            <BasicLink href="https://pokt.network">About Pocket</BasicLink>
+          </li>
+          <li>
+            <BasicLink href="https://docs.pokt.network">Docs</BasicLink>
+          </li>
+          <li>
+            <Link
+              href="https://dashboard.pokt.network"
+              css={`
+                && {
+                  text-decoration: none;
+                }
+              `}
+            >
+              Get Started
+            </Link>{' '}
+          </li>
         </ul>
       )}
     </nav>
   )
 }
+
+const BasicLink = styled(Link)`
+  && {
+    text-decoration: none;
+    color: white;
+  }
+`
