@@ -42,7 +42,8 @@ const POCKET_CONFIGURATION = new Configuration(
   Number(blockTime),
   undefined,
   undefined,
-  false
+  false,
+  true
 )
 
 export const POKT_DENOMINATIONS = {
