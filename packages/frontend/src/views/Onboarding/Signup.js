@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { isEmail, isStrongPassword } from 'validator'
@@ -15,20 +16,13 @@ import {
   textStyle,
   useTheme,
   GU,
-  RADIUS,
-  Info,
 } from '@pokt-foundation/ui'
-import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
+import Onboarding from 'components/Onboarding/Onboarding'
+import VerifyResetNotice from 'components/VerifyResetNotice/VerifyResetNotice'
 import env from 'environment'
-import PoktShape from 'assets/poktshape.png'
 import { sentryEnabled } from 'sentry'
 
-const InlineLink = styled(Link)`
-  display: inline;
-  vertical-align: bottom;
-`
-
-export default function Login() {
+export default function Signup() {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState(null)
   const [password, setPassword] = useState('')
@@ -37,11 +31,6 @@ export default function Login() {
   const [repeatedPasswordError, setRepeatedPasswordError] = useState(null)
   const [errors, setErrors] = useState([])
   const [checked, setChecked] = useState(false)
-  const theme = useTheme()
-  const { within } = useViewport()
-
-  const compactMode = within(-1, 'medium')
-
   const { isError, isLoading, isSuccess, mutate, reset } = useMutation(
     async function signup() {
       try {
@@ -143,249 +132,260 @@ export default function Login() {
 
   const isSubmitDisabled = useMemo(
     () =>
+      !email ||
+      !password ||
+      !repeatedPassword ||
       isLoading ||
       isError ||
       errors.length > 0 ||
       emailError ||
       passwordError ||
+      !checked ||
       repeatedPasswordError,
     [
+      checked,
+      email,
       emailError,
       errors,
       isError,
       isLoading,
+      password,
       passwordError,
+      repeatedPassword,
       repeatedPasswordError,
     ]
   )
 
   return (
-    <div
-      css={`
-        position: relative;
-        width: 100%;
-        min-height: 100vh;
-        height: 100%;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background: #091828;
-      `}
-    >
-      <OnboardingHeader />
-      <img
-        src={PoktShape}
+    <Onboarding>
+      {isSuccess ? (
+        <VerifyResetNotice email={email} />
+      ) : (
+        <SignupForm
+          checked={checked}
+          email={email}
+          emailError={emailError}
+          errors={errors}
+          password={password}
+          passwordError={passwordError}
+          repeatedPassword={repeatedPassword}
+          repeatedPasswordError={repeatedPasswordError}
+          isSubmitDisabled={isSubmitDisabled}
+          onCheckChange={onCheckChange}
+          onEmailBlur={onEmailBlur}
+          onEmailChange={onEmailChange}
+          onInputFocus={onInputFocus}
+          onPasswordBlur={onPasswordBlur}
+          onPasswordChange={onPasswordChange}
+          onRepeatedPasswordBlur={onRepeatedPasswordBlur}
+          onRepeatedPasswordChange={onRepeatedPasswordChange}
+          mutate={mutate}
+        />
+      )}
+    </Onboarding>
+  )
+}
+
+function SignupForm({
+  checked,
+  email,
+  emailError,
+  errors,
+  password,
+  passwordError,
+  repeatedPassword,
+  repeatedPasswordError,
+  isSubmitDisabled,
+  onCheckChange,
+  onEmailBlur,
+  onEmailChange,
+  onInputFocus,
+  onPasswordBlur,
+  onPasswordChange,
+  onRepeatedPasswordBlur,
+  onRepeatedPasswordChange,
+  mutate,
+}) {
+  const theme = useTheme()
+  const { within } = useViewport()
+
+  const compactMode = within(-1, 'medium')
+
+  return (
+    <>
+      <h2
         css={`
-          position: absolute;
-          bottom: 0%;
-          right: -5%;
-          width: 50%;
-          max-width: ${80 * GU}px;
-          height: auto;
-          z-index: 1;
-        `}
-        alt="Ball"
-      />
-      <div
-        css={`
-          width: 100%;
-          max-width: ${87 * GU}px;
+          ${textStyle('title1')}
+          align-self: flex-start;
         `}
       >
-        <div
+        Get started
+      </h2>
+      <Spacer size={4 * GU} />
+      <main
+        css={`
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          height: auto;
+        `}
+      >
+        <form
+          onSubmit={!isSubmitDisabled ? mutate : undefined}
           css={`
-            display: flex;
-          `}
-        >
-          <Spacer size={8 * GU} />
-          <h2
-            css={`
-              ${textStyle('title2')}
-              margin-bottom: ${6 * GU}px;
-              align-self: flex-start;
-            `}
-          >
-            Get started
-          </h2>
-        </div>
-        <main
-          css={`
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            height: auto;
-            max-width: ${120 * GU}px;
-            border-radius: ${RADIUS * 2}px;
-            padding: ${5 * GU}px ${8 * GU}px;
-            background: ${theme.surface};
             display: flex;
             flex-direction: column;
           `}
         >
-          <form
-            onSubmit={!isSubmitDisabled ? mutate : undefined}
+          <Field label="Email" required>
+            <TextInput
+              wide
+              value={email}
+              placeholder="example@pokt.network"
+              onBlur={onEmailBlur}
+              onChange={onEmailChange}
+              onFocus={onInputFocus}
+            />
+            {emailError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {emailError.message}
+              </p>
+            )}
+          </Field>
+          <Field label="Password" required>
+            <TextInput
+              wide
+              value={password}
+              onBlur={onPasswordBlur}
+              onChange={onPasswordChange}
+              onFocus={onInputFocus}
+              type="password"
+            />
+            {passwordError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {passwordError.message}
+              </p>
+            )}
+          </Field>
+          <Field label="Repeat Password" required>
+            <TextInput
+              wide
+              value={repeatedPassword}
+              onBlur={onRepeatedPasswordBlur}
+              onChange={onRepeatedPasswordChange}
+              onFocus={onInputFocus}
+              type="password"
+            />
+            {repeatedPasswordError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {repeatedPasswordError.message}
+              </p>
+            )}
+            <Spacer size={1 * GU} />
+            <p
+              css={`
+                ${textStyle('body4')}
+                color: ${theme.surfaceContentSecondary};
+              `}
+            >
+              A good password has at least 8 characters, 1 uppercase character,
+              1 number and 1 symbol.
+            </p>
+          </Field>
+          <ul
             css={`
-              display: flex;
-              flex-direction: column;
+              list-style-type: none;
             `}
           >
-            <Field label="Email" required>
-              <TextInput
-                wide
-                value={email}
-                placeholder="example@pokt.network"
-                onBlur={onEmailBlur}
-                onChange={onEmailChange}
-                onFocus={onInputFocus}
-              />
-              {emailError && (
-                <p
-                  css={`
-                    color: ${theme.negative};
-                  `}
-                >
-                  {emailError.message}
-                </p>
-              )}
-            </Field>
-            <Field label="Password" required>
-              <TextInput
-                wide
-                value={password}
-                onBlur={onPasswordBlur}
-                onChange={onPasswordChange}
-                onFocus={onInputFocus}
-                type="password"
-              />
-              {passwordError && (
-                <p
-                  css={`
-                    color: ${theme.negative};
-                  `}
-                >
-                  {passwordError.message}
-                </p>
-              )}
-            </Field>
-            <Field label="Repeat Password" required>
-              <TextInput
-                wide
-                value={repeatedPassword}
-                onBlur={onRepeatedPasswordBlur}
-                onChange={onRepeatedPasswordChange}
-                onFocus={onInputFocus}
-                type="password"
-              />
-              {repeatedPasswordError && (
-                <p
-                  css={`
-                    color: ${theme.negative};
-                  `}
-                >
-                  {repeatedPasswordError.message}
-                </p>
-              )}
-              <Spacer size={1 * GU} />
-              <p
+            {errors.map(({ id, message }) => (
+              <li
+                key={`${id}_${message}`}
                 css={`
-                  ${textStyle('body4')}
-                  color: ${theme.surfaceContentSecondary};
+                  color: ${theme.negative};
                 `}
               >
-                A good password has at least 8 characters, 1 uppercase
-                character, 1 number and 1 symbol.
-              </p>
-            </Field>
-            <ul
+                {message}
+              </li>
+            ))}
+          </ul>
+          <label
+            css={`
+              margin-bottom: ${6 * GU}px;
+              ${textStyle('body2')}
+              word-break: ${compactMode ? 'break-word' : 'break-all'};
+            `}
+          >
+            <CheckBox
+              checked={checked}
+              onChange={onCheckChange}
+              aria-label="I agree to the pocket Dashboard terms and conditions"
               css={`
-                list-style-type: none;
+                display: inline-block;
+              `}
+            />
+            <span
+              css={`
+                padding-top: 5px;
+                vertical-align: bottom;
+                margin-left: ${1 * GU}px;
               `}
             >
-              {errors.map(({ id, message }) => (
-                <li
-                  key={`${id}_${message}`}
-                  css={`
-                    color: ${theme.negative};
-                  `}
-                >
-                  {message}
-                </li>
-              ))}
-            </ul>
-            <label
-              css={`
-                margin-bottom: ${6 * GU}px;
-                ${textStyle('body2')}
-                word-break: ${compactMode ? 'break-word' : 'break-all'};
-              `}
-            >
-              <CheckBox
-                checked={checked}
-                onChange={onCheckChange}
-                aria-label="I agree to the pocket Dashboard terms and conditions"
-                css={`
-                  display: inline-block;
-                `}
-              />
-              <span
-                css={`
-                  padding-top: 5px;
-                  vertical-align: bottom;
-                  margin-left: ${1 * GU}px;
-                `}
-              >
-                I Agree to the Pocket Dashboard's{' '}
-                <InlineLink href="https://dashboard.pokt.network/support/terms-of-service">
-                  T. &amp; C.
-                </InlineLink>{' '}
-                and{' '}
-                <InlineLink href="https://dashboard.pokt.network/support/privacy-policy">
-                  Privacy Policy
-                </InlineLink>
-              </span>
-            </label>
-            <Button
-              type="submit"
-              mode="strong"
-              disabled={isSubmitDisabled}
-              onClick={(e) => {
-                e.preventDefault()
-                mutate()
+              I Agree to the Pocket Dashboard's{' '}
+              <InlineLink href="https://dashboard.pokt.network/support/terms-of-service">
+                T. &amp; C.
+              </InlineLink>{' '}
+              and{' '}
+              <InlineLink href="https://dashboard.pokt.network/support/privacy-policy">
+                Privacy Policy
+              </InlineLink>
+            </span>
+          </label>
+          <Button
+            type="submit"
+            mode="strong"
+            disabled={isSubmitDisabled}
+            onClick={(e) => {
+              e.preventDefault()
+              mutate()
+            }}
+            css={`
+              margin-bottom: ${2 * GU}px;
+              max-width: ${22 * GU}px;
+            `}
+          >
+            Sign up
+          </Button>
+          <p>
+            Do you have an account?{' '}
+            <RouterLink
+              to={{
+                pathname: '/login',
               }}
-              css={`
-                margin-bottom: ${2 * GU}px;
-              `}
+              component={Link}
+              external={false}
             >
-              Sign up
-            </Button>
-          </form>
-          {isSuccess && !isError && (
-            <Info>
-              <p
-                css={`
-                  ${textStyle('body3')}
-                `}
-              >
-                You're almost there!{' '}
-                <span role="img" aria-label="Rocket Emoji">
-                  🚀
-                </span>
-              </p>
-              <Spacer size={1 * GU} />
-              <p
-                css={`
-                  ${textStyle('body3')}
-                `}
-              >
-                We've sent a verification email to {email}. Go and check it
-                before it expires!
-              </p>
-            </Info>
-          )}
-        </main>
-      </div>
-    </div>
+              Log in.
+            </RouterLink>
+          </p>
+        </form>
+      </main>
+    </>
   )
 }
+
+const InlineLink = styled(Link)`
+  display: inline;
+  vertical-align: bottom;
+`

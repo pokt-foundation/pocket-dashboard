@@ -198,6 +198,42 @@ router.post(
 )
 
 router.post(
+  '/send-verify-mail',
+  asyncMiddleware(async (req: Request, res: Response) => {
+    const { email } = req.body
+    const user: IUser = await User.findOne({ email })
+
+    if (!user) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          { id: 'EMAIL_DOES_NOT_EXIST', message: 'Email does not exist' },
+        ],
+      })
+    }
+    const validationToken = await createNewVerificationToken(
+      user._id,
+      user.email
+    )
+    const validationLink = `${env(
+      'FRONTEND_URL'
+    )}/#/validate?token=${validationToken}&email=${encodeURIComponent(
+      user.email
+    )}`
+    const emailService = new MailgunService()
+
+    await emailService.send({
+      templateData: {
+        user_email: user.email,
+        verify_link: validationLink,
+      },
+      templateName: 'SignUp',
+      toEmail: user.email,
+    })
+    return res.status(204).send()
+  })
+)
+
+router.post(
   '/send-reset-email',
   asyncMiddleware(async (req: Request, res: Response) => {
     const { email } = req.body

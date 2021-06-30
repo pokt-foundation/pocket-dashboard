@@ -26,8 +26,9 @@ import {
   KNOWN_QUERY_SUFFIXES,
 } from 'known-query-suffixes'
 import { sentryEnabled } from 'sentry'
+import AppStatus from 'components/AppStatus/AppStatus'
 
-export default function Security({ appData }) {
+export default function Security({ appData, stakedTokens, maxRelays }) {
   const [origin, setOrigin] = useState('')
   const [origins, setOrigins] = useState([])
   const [secretKeyRequired, setSecretKeyRequired] = useState(false)
@@ -127,36 +128,21 @@ export default function Security({ appData }) {
         <>
           <Split
             primary={
-              <Box>
-                <p
-                  css={`
-                    ${textStyle('body2')}
-                    margin-bottom: ${2 * GU}px;
-                  `}
-                >
-                  To maximize security for your application, you may add an
-                  additional secret key and/or whitelist user agents and
-                  origins. For more information take a look at the Pocket
-                  Gateway Docs.
-                </p>
-                <Spacer size={2 * GU} />
-                <p>
-                  Make sure to configure your user-agents and origins properly
-                  to protect your endpoints against unwanted users.
-                </p>
-                <Spacer size={1 * GU} />
-              </Box>
-            }
-            secondary={
               <>
-                <Button wide mode="strong" onClick={mutate}>
-                  Save changes
-                </Button>
-                <Spacer size={2 * GU} />
-                <Button wide onClick={() => history.goBack()}>
-                  Go back
-                </Button>
-                <Spacer size={2 * GU} />
+                <Box>
+                  <p
+                    css={`
+                      ${textStyle('body2')}
+                      margin-bottom: ${2 * GU}px;
+                    `}
+                  >
+                    To maximize security for your application, you may turn on
+                    the secret key requirement and/or whitelist user agents and
+                    origins. Make sure to configure your user-agents and origins
+                    properly to protect your endpoints against unwanted users.
+                  </p>
+                </Box>
+                <Spacer size={3 * GU} />
                 <Box
                   css={`
                     display: flex;
@@ -174,7 +160,7 @@ export default function Security({ appData }) {
                   >
                     <h3
                       css={`
-                        ${textStyle('body2')}
+                        ${textStyle('title2')}
                       `}
                     >
                       Secret key required
@@ -185,97 +171,110 @@ export default function Security({ appData }) {
                     onChange={onSecretKeyRequiredChange}
                   />
                 </Box>
+                <Spacer size={3 * GU} />
+                <Box
+                  title="Whitelisted User-Agents"
+                  css={`
+                    h3 {
+                      margin-bottom: ${1 * GU}px;
+                    }
+                    margin-bottom: ${3 * GU}px;
+                  `}
+                >
+                  <TextInput
+                    wide
+                    value={userAgent}
+                    onChange={(e) => setUserAgent(e.target.value)}
+                    adornment={
+                      <ButtonBase onClick={setWhitelistedUserAgent}>
+                        <IconPlus />
+                      </ButtonBase>
+                    }
+                    adornmentPosition="end"
+                  />
+                  <ul
+                    css={`
+                      list-style: none;
+                      margin-top: ${2 * GU}px;
+                      li:not(:last-child) {
+                        margin-bottom: ${2 * GU}px;
+                      }
+                    `}
+                  >
+                    {userAgents.map((agent, index) => (
+                      <li key={agent}>
+                        <TextCopy
+                          key={`${agent}/${index}`}
+                          onCopy={() => onDeleteUserAgentClick(agent)}
+                          value={agent}
+                          adornment={<IconCross />}
+                          css={`
+                            width: 100%;
+                            padding-left: 0;
+                          `}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </Box>
+                <Box
+                  title="Whitelisted Origins"
+                  css={`
+                    h3 {
+                      margin-bottom: ${1 * GU}px;
+                    }
+                  `}
+                >
+                  <TextInput
+                    wide
+                    value={origin}
+                    onChange={(e) => setOrigin(e.target.value)}
+                    adornment={
+                      <ButtonBase onClick={setWhitelistedOrigin}>
+                        <IconPlus />
+                      </ButtonBase>
+                    }
+                    adornmentPosition="end"
+                  />
+                  <ul
+                    css={`
+                      list-style: none;
+                      margin-top: ${2 * GU}px;
+                      li:not(:last-child) {
+                        margin-bottom: ${2 * GU}px;
+                      }
+                    `}
+                  >
+                    {origins.map((origin, index) => (
+                      <li key={origin}>
+                        <TextCopy
+                          key={`${origin}/${index}`}
+                          onCopy={() => onDeleteOriginClick(origin)}
+                          value={origin}
+                          css={`
+                            width: 100%;
+                          `}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </Box>
+              </>
+            }
+            secondary={
+              <>
+                <Button wide mode="strong" onClick={mutate}>
+                  Save changes
+                </Button>
+                <Spacer size={2 * GU} />
+                <Button wide onClick={() => history.goBack()}>
+                  Go back
+                </Button>
+                <Spacer size={2 * GU} />
+                <AppStatus stakedTokens={stakedTokens} maxRelays={maxRelays} />
               </>
             }
           />
-          <Spacer size={2 * GU} />
-          <Box
-            title="Whitelisted user-agents"
-            css={`
-              h3 {
-                margin-bottom: ${1 * GU}px;
-              }
-              margin-bottom: ${3 * GU}px;
-            `}
-          >
-            <TextInput
-              wide
-              value={userAgent}
-              onChange={(e) => setUserAgent(e.target.value)}
-              adornment={
-                <ButtonBase onClick={setWhitelistedUserAgent}>
-                  <IconPlus />
-                </ButtonBase>
-              }
-              adornmentPosition="end"
-            />
-            <ul
-              css={`
-                list-style: none;
-                margin-top: ${2 * GU}px;
-                li:not(:last-child) {
-                  margin-bottom: ${2 * GU}px;
-                }
-              `}
-            >
-              {userAgents.map((agent, index) => (
-                <li key={agent}>
-                  <TextCopy
-                    key={`${agent}/${index}`}
-                    onCopy={() => onDeleteUserAgentClick(agent)}
-                    value={agent}
-                    adornment={<IconCross />}
-                    css={`
-                      width: 100%;
-                      padding-left: 0;
-                    `}
-                  />
-                </li>
-              ))}
-            </ul>
-          </Box>
-          <Box
-            title="Whitelisted origins"
-            css={`
-              h3 {
-                margin-bottom: ${1 * GU}px;
-              }
-            `}
-          >
-            <TextInput
-              wide
-              value={origin}
-              onChange={(e) => setOrigin(e.target.value)}
-              adornment={
-                <ButtonBase onClick={setWhitelistedOrigin}>
-                  <IconPlus />
-                </ButtonBase>
-              }
-              adornmentPosition="end"
-            />
-            <ul
-              css={`
-                list-style: none;
-                margin-top: ${2 * GU}px;
-                li:not(:last-child) {
-                  margin-bottom: ${2 * GU}px;
-                }
-              `}
-            >
-              {origins.map((origin, index) => (
-                <li key={origin}>
-                  <TextCopy
-                    key={`${origin}/${index}`}
-                    onCopy={() => onDeleteOriginClick(origin)}
-                    value={origin}
-                    css={`
-                      width: 100%;
-                    `}
-                  />
-                </li>
-              ))}
-            </ul>
-          </Box>
         </>
       )}
     />

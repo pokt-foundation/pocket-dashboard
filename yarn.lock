@@ -4181,10 +4181,10 @@
     dotenv "^8.2.0"
     graphql-request "^3.4.0"
 
-"@pokt-foundation/ui@^0.1.0-alpha.2":
-  version "0.1.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/@pokt-foundation/ui/-/ui-0.1.0-alpha.2.tgz#8b1cb79eadfff843365a505f02589ae35bf0d9bc"
-  integrity sha512-QyseCSv3cwt4bMootEdKFuhQy7ibmhlK1Kd0JgOtp46owbEioHOe/0zT+8cv3YENLkOqSiwdskZJYYiaXeYxpA==
+"@pokt-foundation/ui@^0.2.0-alpha.1":
+  version "0.2.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@pokt-foundation/ui/-/ui-0.2.0-alpha.1.tgz#b866fd7522bbc0bbc4bf61e984fae9aadb2c2e36"
+  integrity sha512-BMlhf1t1ht2BxDQ/zdZasofoapYQ7baZYQWvGtZq0ctxeYRVWe8yCkmxJqWLtOkCqL+xzbtsL//m+Jw41yzO5w==
   dependencies:
     "@babel/runtime" "^7.3.1"
     "@fontsource/manrope" "^4.4.5"
@@ -4323,6 +4323,14 @@
     invariant "^2.2.3"
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
+
+"@reach/visually-hidden@^0.15.2":
+  version "0.15.2"
+  resolved "https://registry.yarnpkg.com/@reach/visually-hidden/-/visually-hidden-0.15.2.tgz#07794cb53f4bd23a9452d53a0ad7778711ee323f"
+  integrity sha512-suDSCuKKuqiEB4UDgwWHbrPRxNwrusZ3ImXr85kfsQXGmKptMogaq22xoaHn32NC++lzZXxdWtAJriieszzFXw==
+  dependencies:
+    prop-types "^15.7.2"
+    tslib "^2.3.0"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.1"
@@ -23026,7 +23034,7 @@ tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2, tslib@^2.1.0:
+tslib@^2, tslib@^2.1.0, tslib@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.0.tgz#803b8cdab3e12ba581a4ca41c8839bbb0dacb09e"
   integrity sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==

@@ -40,13 +40,47 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
   const [
     { data: totalRelays },
     { data: successfulRelays },
-    { data: dailyRelays },
-    { data: sessionRelays },
-    { data: previousSuccessfulRelays },
-    { data: previousRangedRelays },
-    { data: hourlyLatency },
+    { data: dailyRelayData },
+    { data: sessionRelayData },
+    { data: previousSuccessfulRelayData },
+    { data: previousRangedRelayData },
+    { data: hourlyLatencyData },
     { data: appOnChainData },
   ] = metrics
+
+  const sessionRelayDep = JSON.stringify(sessionRelayData)
+  const dailyRelaysDep = JSON.stringify(dailyRelayData)
+  const previousSuccessfulRelaysDep = JSON.stringify(
+    previousSuccessfulRelayData
+  )
+  const previousRangedRelaysDep = JSON.stringify(previousRangedRelayData)
+  const hourlyLatencyDep = JSON.stringify(hourlyLatencyData)
+  const appOnChainDep = JSON.stringify(appOnChainData)
+
+  const currentSessionRelays = useMemo(
+    () => sessionRelayData?.session_relays ?? 0,
+    [sessionRelayDep]
+  )
+  const dailyRelays = useMemo(() => dailyRelayData?.daily_relays ?? 0, [
+    dailyRelaysDep,
+  ])
+  const previousSuccessfulRelays = useMemo(
+    () => previousSuccessfulRelayData?.successful_relays ?? 0,
+    [previousSuccessfulRelaysDep]
+  )
+  const previousRangedRelays = useMemo(
+    () => previousRangedRelayData?.total_relays ?? 0,
+    [previousRangedRelaysDep]
+  )
+  const hourlyLatency = useMemo(() => hourlyLatencyData?.hourly_latency ?? [], [
+    hourlyLatencyDep,
+  ])
+  const { stakedTokens, maxDailyRelays } = useMemo(() => {
+    return {
+      stakedTokens: appOnChainData?.stake ?? 0n,
+      maxDailyRelays: appOnChainData?.relays * 24 ?? 0n,
+    }
+  }, [appOnChainDep])
 
   return metricsLoading ? (
     <AnimatedLoader />
@@ -55,36 +89,41 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
       <Route exact path={path}>
         <AppInfo
           appData={activeApplication}
-          appOnChainData={appOnChainData}
-          currentSessionRelays={sessionRelays.session_relays}
-          dailyRelayData={dailyRelays.daily_relays}
-          previousSuccessfulRelays={previousSuccessfulRelays.successful_relays}
-          previousRelays={previousRangedRelays.total_relays}
+          currentSessionRelays={currentSessionRelays}
+          dailyRelayData={dailyRelays}
+          maxDailyRelays={maxDailyRelays}
+          previousSuccessfulRelays={previousSuccessfulRelays}
+          previousRelays={previousRangedRelays}
+          stakedTokens={stakedTokens}
           successfulRelayData={successfulRelays}
           weeklyRelayData={totalRelays}
-          latestLatencyData={hourlyLatency.hourly_latency}
+          latestLatencyData={hourlyLatency}
         />
       </Route>
       <Route path={`${path}/security`}>
         <Security
           appData={activeApplication}
+          maxDailyRelays={maxDailyRelays}
           refetchActiveAppData={refetchActiveAppData}
+          stakedTokens={stakedTokens}
         />
       </Route>
       <Route path={`${path}/success-details`}>
         <SuccessDetails
           id={activeApplication.id}
           isLb={activeApplication.isLb}
-          appOnChainData={appOnChainData}
-          weeklyRelayData={totalRelays}
+          maxDailyRelays={maxDailyRelays}
+          stakedTokens={stakedTokens}
           successfulRelayData={successfulRelays}
+          weeklyRelayData={totalRelays}
         />
       </Route>
       <Route path={`${path}/notifications`}>
         <Notifications
           appData={activeApplication}
-          appOnChainData={appOnChainData}
-          dailyRelayData={dailyRelays.daily_relays}
+          dailyRelays={dailyRelays}
+          maxDailyRelays={maxDailyRelays}
+          stakedTokens={stakedTokens}
         />
       </Route>
       <Route path={`${path}/chains`}>

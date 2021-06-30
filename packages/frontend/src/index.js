@@ -4,6 +4,8 @@ import App from 'App'
 import env from 'environment'
 import initializeSentry from 'sentry'
 
+import '@fontsource/manrope'
+
 const REACT_AXE_THROTTLE_TIME = 2500
 
 initializeSentry()

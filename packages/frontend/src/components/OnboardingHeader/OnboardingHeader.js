@@ -1,46 +1,81 @@
 import React from 'react'
-import 'styled-components/macro'
-import { textStyle, GU } from '@pokt-foundation/ui'
-import PoktLogo from 'assets/poktlogo.png'
+import { useViewport } from 'use-viewport'
+import { Link, GU } from '@pokt-foundation/ui'
+import styled from 'styled-components/macro'
+import PortalLogo from 'assets/portal_logo_full.png'
 
 export default function OnboardingHeader() {
+  const { within } = useViewport()
+  const compactMode = within(-1, 'medium')
+
   return (
-    <a
-      href="https://pokt.network"
-      rel="noopener _noreferrer"
-      target="blank"
+    <nav
       css={`
-        width: 100%;
-        text-decoration: none;
+        width: 100vw;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        max-width: ${148 * GU}px;
+        margin: 0 auto;
       `}
     >
-      <header
+      <a
+        href="https://pokt.network"
+        rel="noopener _noreferrer"
+        target="blank"
         css={`
-          position: absolute;
-          top: ${2 * GU}px;
-          left: ${3 * GU}px;
-          ${textStyle('title1')}
-          display: flex;
-          justify-content: center;
+          text-decoration: none;
+          flex-grow: 1;
         `}
       >
         <img
-          src={PoktLogo}
-          alt="Pocket"
+          src={PortalLogo}
           width="100%"
-          height="66"
+          height="auto"
           css={`
-            max-width: ${23.5 * GU}px;
+            max-width: ${26.5 * GU}px;
           `}
+          alt="Pocket Portal"
         />
-        <h1
+      </a>
+      {!compactMode && (
+        <ul
           css={`
-            line-height: 1.9;
+            list-style: none;
+            list-decoration: none;
+            display: flex;
+            & > li:not(last-child) {
+              margin-right: ${6 * GU}px;
+            }
           `}
         >
-          &nbsp; Dashboard
-        </h1>
-      </header>
-    </a>
+          <li>
+            <BasicLink href="https://pokt.network">About Pocket</BasicLink>
+          </li>
+          <li>
+            <BasicLink href="https://docs.pokt.network">Docs</BasicLink>
+          </li>
+          <li>
+            <Link
+              href="https://dashboard.pokt.network"
+              css={`
+                && {
+                  text-decoration: none;
+                }
+              `}
+            >
+              Get Started
+            </Link>{' '}
+          </li>
+        </ul>
+      )}
+    </nav>
   )
 }
+
+const BasicLink = styled(Link)`
+  && {
+    text-decoration: none;
+    color: white;
+  }
+`

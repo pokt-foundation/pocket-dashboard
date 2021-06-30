@@ -24,7 +24,11 @@ function DashboardView({ children }) {
         height: 100%;
         display: flex;
         flex-direction: row;
-        background: ${theme.dashboardBackground};
+        background: linear-gradient(
+          126.96deg,
+          ${theme.backgroundGradient1} -5.41%,
+          ${theme.backgroundGradient2} 101.86%
+        );
         color: white;
         overflow-x: hidden;
       `}

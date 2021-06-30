@@ -3,6 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { isStrongPassword } from 'validator'
+import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import {
   Button,
@@ -12,11 +13,10 @@ import {
   textStyle,
   useTheme,
   GU,
-  RADIUS,
 } from '@pokt-foundation/ui'
-import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
+import Onboarding from 'components/Onboarding/Onboarding'
 import env from 'environment'
-import PoktShape from 'assets/poktshape.png'
+import { sentryEnabled } from 'sentry'
 
 export default function NewPassword() {
   const [password, setPassword] = useState('')
@@ -25,14 +25,12 @@ export default function NewPassword() {
   const [repeatedPasswordError, setRepeatedPasswordError] = useState(null)
   const [errors, setErrors] = useState([])
   const { search } = useLocation()
-  const history = useHistory()
-  const theme = useTheme()
 
   const token = new URLSearchParams(search).get('token')
   const rawEmail = new URLSearchParams(search).get('email')
   const email = decodeURIComponent(rawEmail)
 
-  const { isLoading, isError, mutate } = useMutation(
+  const { isLoading, isError, isSuccess, mutate } = useMutation(
     async function sendResetEmail() {
       const path = `${env('BACKEND_URL')}/api/users/reset-password`
 
@@ -43,10 +41,12 @@ export default function NewPassword() {
           password2: repeatedPassword,
           email,
         })
-
-        history.push('/login')
       } catch (err) {
-        console.log(Object.entries(err), 'rip')
+        if (sentryEnabled) {
+          Sentry.captureException(err)
+        }
+
+        throw err
       }
     }
   )
@@ -115,161 +115,205 @@ export default function NewPassword() {
 
   const isSubmitDisabled = useMemo(
     () =>
+      !password ||
+      !repeatedPassword ||
       isLoading ||
       isError ||
       errors.length > 0 ||
       passwordError ||
+      password !== repeatedPassword ||
       repeatedPasswordError,
-    [errors, isError, isLoading, passwordError, repeatedPasswordError]
+    [
+      errors,
+      isError,
+      isLoading,
+      password,
+      passwordError,
+      repeatedPassword,
+      repeatedPasswordError,
+    ]
   )
 
   return (
-    <div
-      css={`
-        position: relative;
-        width: 100%;
-        min-height: 100vh;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background: #091828;
-      `}
-    >
-      <OnboardingHeader />
-      <img
-        src={PoktShape}
+    <Onboarding>
+      {isSuccess ? (
+        <ResetSuccessful />
+      ) : (
+        <ResetPasswordForm
+          errors={errors}
+          password={password}
+          passwordError={passwordError}
+          repeatedPassword={repeatedPassword}
+          repeatedPasswordError={repeatedPasswordError}
+          isSubmitDisabled={isSubmitDisabled}
+          onInputFocus={onInputFocus}
+          onPasswordBlur={onPasswordBlur}
+          onPasswordChange={onPasswordChange}
+          onRepeatedPasswordBlur={onRepeatedPasswordBlur}
+          onRepeatedPasswordChange={onRepeatedPasswordChange}
+          mutate={mutate}
+        />
+      )}
+    </Onboarding>
+  )
+}
+
+function ResetPasswordForm({
+  errors,
+  password,
+  passwordError,
+  repeatedPassword,
+  repeatedPasswordError,
+  isSubmitDisabled,
+  onInputFocus,
+  onPasswordBlur,
+  onPasswordChange,
+  onRepeatedPasswordBlur,
+  onRepeatedPasswordChange,
+  mutate,
+}) {
+  const theme = useTheme()
+
+  return (
+    <>
+      <h2
         css={`
-          position: absolute;
-          bottom: 0%;
-          right: -5%;
-          width: 50%;
-          max-width: ${80 * GU}px;
-          height: auto;
-          z-index: 1;
-        `}
-        alt="Ball"
-      />
-      <div
-        css={`
-          width: 100%;
-          max-width: ${87 * GU}px;
+          ${textStyle('title2')}
+          margin-bottom: ${6 * GU}px;
+          align-self: flex-start;
         `}
       >
-        <div
+        Reset Password
+      </h2>
+      <main
+        css={`
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          height: auto;
+        `}
+      >
+        <Field
+          label="Password"
+          required
           css={`
-            display: flex;
+            margin-bottom: ${6 * GU}px;
           `}
         >
-          <Spacer size={8 * GU} />
-          <h2
-            css={`
-              ${textStyle('title2')}
-              margin-bottom: ${6 * GU}px;
-              align-self: flex-start;
-            `}
-          >
-            New password
-          </h2>
-        </div>
-        <main
-          css={`
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            height: auto;
-            max-width: ${120 * GU}px;
-            border-radius: ${RADIUS * 2}px;
-            padding: ${5 * GU}px ${8 * GU}px;
-            background: ${theme.surface};
-            display: flex;
-            flex-direction: column;
-          `}
-        >
-          <Field
-            label="Password"
-            required
-            css={`
-              margin-bottom: ${6 * GU}px;
-            `}
-          >
-            <TextInput
-              wide
-              value={password}
-              onChange={onPasswordChange}
-              onBlur={onPasswordBlur}
-              onFocus={onInputFocus}
-              type="password"
-            />
-            {passwordError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {passwordError.message}
-              </p>
-            )}
-          </Field>
-          <Field label="Password confirmation" required>
-            <TextInput
-              wide
-              value={repeatedPassword}
-              onChange={onRepeatedPasswordChange}
-              onBlur={onRepeatedPasswordBlur}
-              onFocus={onInputFocus}
-              type="password"
-            />
-            {repeatedPasswordError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {repeatedPasswordError.message}
-              </p>
-            )}
-            <Spacer size={1 * GU} />
+          <TextInput
+            wide
+            value={password}
+            onChange={onPasswordChange}
+            onBlur={onPasswordBlur}
+            onFocus={onInputFocus}
+            type="password"
+          />
+          {passwordError && (
             <p
               css={`
-                ${textStyle('body4')}
-                color: ${theme.surfaceContentSecondary};
+                color: ${theme.negative};
               `}
             >
-              A good password has at least 8 characters, 1 uppercase character,
-              1 number and 1 symbol.
+              {passwordError.message}
             </p>
-          </Field>
-          <ul
+          )}
+        </Field>
+        <Field label="Password confirmation" required>
+          <TextInput
+            wide
+            value={repeatedPassword}
+            onChange={onRepeatedPasswordChange}
+            onBlur={onRepeatedPasswordBlur}
+            onFocus={onInputFocus}
+            type="password"
+          />
+          {repeatedPasswordError && (
+            <p
+              css={`
+                color: ${theme.negative};
+              `}
+            >
+              {repeatedPasswordError.message}
+            </p>
+          )}
+          <Spacer size={1 * GU} />
+          <p
             css={`
-              list-style-type: none;
+              ${textStyle('body4')}
+              color: ${theme.surfaceContentSecondary};
             `}
           >
-            {errors.map(({ id, message }) => (
-              <li
-                key={`${id}_${message}`}
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {message}
-              </li>
-            ))}
-          </ul>
-          <Spacer size={2 * GU} />
-          <Button
-            css={`
-              margin-bottom: ${2 * GU}px;
-            `}
-            mode="strong"
-            disabled={isSubmitDisabled}
-            onClick={mutate}
-          >
-            Set new password
-          </Button>
-        </main>
-      </div>
-    </div>
+            A good password has at least 8 characters, 1 uppercase character, 1
+            number and 1 symbol.
+          </p>
+        </Field>
+        <ul
+          css={`
+            list-style-type: none;
+          `}
+        >
+          {errors.map(({ id, message }) => (
+            <li
+              key={`${id}_${message}`}
+              css={`
+                color: ${theme.negative};
+              `}
+            >
+              {message}
+            </li>
+          ))}
+        </ul>
+        <Spacer size={2 * GU} />
+        <Button
+          css={`
+            margin-bottom: ${2 * GU}px;
+          `}
+          mode="strong"
+          disabled={isSubmitDisabled}
+          onClick={mutate}
+        >
+          Set new password
+        </Button>
+      </main>
+    </>
+  )
+}
+
+function ResetSuccessful() {
+  const history = useHistory()
+
+  const goToLogin = useCallback(() => history.push('/login'), [history])
+
+  return (
+    <>
+      <h2
+        css={`
+          ${textStyle('title2')}
+          align-self: flex-start;
+        `}
+      >
+        Reset Password
+      </h2>
+      <Spacer size={4 * GU} />
+      <p
+        css={`
+          ${textStyle('body2')}
+        `}
+      >
+        You have reset your password successfully! You can now log in.
+      </p>
+      <Spacer size={3 * GU} />
+      <Button
+        mode="strong"
+        onClick={goToLogin}
+        css={`
+          && {
+            width: ${22 * GU}px;
+          }
+        `}
+      >
+        Log In
+      </Button>
+    </>
   )
 }
