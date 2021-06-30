@@ -14,9 +14,8 @@ import {
   GU,
   RADIUS,
 } from '@pokt-foundation/ui'
-import OnboardingHeader from 'components/OnboardingHeader/OnboardingHeader'
+import Onboarding from 'components/Onboarding/Onboarding'
 import env from 'environment'
-import PoktShape from 'assets/poktshape.png'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -93,181 +92,135 @@ export default function Login() {
   )
 
   return (
-    <div
-      css={`
-        position: relative;
-        width: 100%;
-        min-height: 100vh;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background: #091828;
-      `}
-    >
-      <img
-        src={PoktShape}
+    <Onboarding>
+      <h2
         css={`
-          position: absolute;
-          bottom: 0%;
-          right: -5%;
-          width: 50%;
-          max-width: ${80 * GU}px;
-          height: auto;
-          z-index: 1;
-        `}
-        alt="Ball"
-      />
-      <OnboardingHeader />
-      <div
-        css={`
-          width: 100%;
-          max-width: ${87 * GU}px;
-          height: 100%;
+          ${textStyle('title1')};
+          align-self: flex-start;
         `}
       >
-        <div
+        Welcome back
+      </h2>
+      <Spacer size={4 * GU} />
+      <main
+        css={`
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          height: auto;
+          border-radius: ${RADIUS * 2}px;
+        `}
+      >
+        <form
+          onSubmit={!isSubmitDisabled ? mutate : undefined}
           css={`
             display: flex;
+            flex-direction: column;
           `}
         >
-          <Spacer size={8 * GU} />
-          <h2
+          <Field label="Email" required>
+            <TextInput
+              wide
+              value={email}
+              placeholder="example@pokt.network"
+              onChange={onEmailChange}
+              onFocus={onInputFocus}
+              onBlur={onEmailBlur}
+            />
+            <Spacer size={GU / 2} />
+            {emailError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {emailError.message}
+              </p>
+            )}
+          </Field>
+          <Field label="Password" required>
+            <TextInput
+              wide
+              value={password}
+              placeholder="********"
+              onChange={onPasswordChange}
+              onFocus={onInputFocus}
+              onBlur={onPasswordBlur}
+              type="password"
+            />
+            <Spacer size={GU / 2} />
+            {passwordError && (
+              <p
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {passwordError.message}
+              </p>
+            )}
+          </Field>
+          {passwordError && <Spacer size={3 * GU} />}
+          <ul
             css={`
-              ${textStyle('title2')}
-              margin-bottom: ${6 * GU}px;
-              align-self: flex-start;
+              list-style-type: none;
             `}
           >
-            Welcome back
-          </h2>
-        </div>
-        <main
-          css={`
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            height: auto;
-            border-radius: ${RADIUS * 2}px;
-            padding: ${5 * GU}px ${8 * GU}px;
-            background: ${theme.surface};
-          `}
-        >
-          <form
-            onSubmit={!isSubmitDisabled ? mutate : undefined}
+            {errors.map(({ id, message }) => (
+              <li
+                key={`${id}_${message}`}
+                css={`
+                  color: ${theme.negative};
+                `}
+              >
+                {message}
+              </li>
+            ))}
+          </ul>
+          <RouterLink
+            to={{
+              pathname: '/forgotpassword',
+            }}
+            component={Link}
+            external={false}
             css={`
-              display: flex;
-              flex-direction: column;
+              && {
+                width: auto;
+                text-align: left;
+              }
             `}
           >
-            <Field label="Email" required>
-              <TextInput
-                wide
-                value={email}
-                placeholder="example@pokt.network"
-                onChange={onEmailChange}
-                onFocus={onInputFocus}
-                onBlur={onEmailBlur}
-              />
-              <Spacer size={GU / 2} />
-              {emailError && (
-                <p
-                  css={`
-                    color: ${theme.negative};
-                  `}
-                >
-                  {emailError.message}
-                </p>
-              )}
-            </Field>
-            <Field label="Password" required>
-              <TextInput
-                wide
-                value={password}
-                placeholder="********"
-                onChange={onPasswordChange}
-                onFocus={onInputFocus}
-                onBlur={onPasswordBlur}
-                type="password"
-              />
-              <Spacer size={GU / 2} />
-              {passwordError && (
-                <p
-                  css={`
-                    color: ${theme.negative};
-                  `}
-                >
-                  {passwordError.message}
-                </p>
-              )}
-            </Field>
-            {passwordError && <Spacer size={3 * GU} />}
-            <ul
-              css={`
-                list-style-type: none;
-              `}
-            >
-              {errors.map(({ id, message }) => (
-                <li
-                  key={`${id}_${message}`}
-                  css={`
-                    color: ${theme.negative};
-                  `}
-                >
-                  {message}
-                </li>
-              ))}
-            </ul>
+            Forgot your password?
+          </RouterLink>
+          <Spacer size={3 * GU} />
+          <Button
+            type="submit"
+            mode="strong"
+            disabled={isSubmitDisabled}
+            onClick={(e) => {
+              e.preventDefault()
+              mutate()
+            }}
+            css={`
+              max-width: ${22.5 * GU}px;
+              margin-bottom: ${2 * GU}px;
+            `}
+          >
+            Log in
+          </Button>
+          <p>
+            Don't have an account?{' '}
             <RouterLink
               to={{
-                pathname: '/forgotpassword',
+                pathname: '/signup',
               }}
               component={Link}
               external={false}
-              css={`
-                && {
-                  width: auto;
-                  text-align: left;
-                  margin-bottom: ${6 * GU}px;
-                }
-              `}
             >
-              Forgot your password?
+              Get started.
             </RouterLink>
-            <Button
-              type="submit"
-              mode="strong"
-              disabled={isSubmitDisabled}
-              onClick={(e) => {
-                e.preventDefault()
-                mutate()
-              }}
-              css={`
-                margin-bottom: ${2 * GU}px;
-              `}
-            >
-              Log in
-            </Button>
-            <p
-              css={`
-                text-align: center;
-              `}
-            >
-              Don't have an account?{' '}
-              <RouterLink
-                to={{
-                  pathname: '/signup',
-                }}
-                component={Link}
-                external={false}
-              >
-                Get started.
-              </RouterLink>
-            </p>
-          </form>
-        </main>
-      </div>
-    </div>
+          </p>
+        </form>
+      </main>
+    </Onboarding>
   )
 }
