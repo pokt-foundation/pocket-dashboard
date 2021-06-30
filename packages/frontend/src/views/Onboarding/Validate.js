@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
-import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import * as Sentry from '@sentry/react'
