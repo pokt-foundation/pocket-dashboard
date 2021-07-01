@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@fontsource/manrope": "^4.4.5",
-    "@pokt-foundation/ui": "^0.2.0-alpha.2",
+    "@pokt-foundation/ui": "^0.2.0-alpha.3",
     "@pokt-network/pocket-js": "^0.6.13-rc",
     "@reach/visually-hidden": "^0.15.2",
     "@sentry/browser": "^6.7.1",
