@@ -49,8 +49,7 @@ export default function ForgotPassword() {
     <Onboarding>
       <h2
         css={`
-          ${textStyle('title2')}
-          margin-bottom: ${6 * GU}px;
+          ${textStyle('title1')}
           align-self: flex-start;
         `}
       >
@@ -79,6 +78,17 @@ export default function ForgotPassword() {
             type="email"
             disabled={isLoading}
           />
+          <Spacer size={1 * GU} />
+          {isError && (
+            <p
+              css={`
+                ${textStyle('body2')};
+                color: ${theme.negative};
+              `}
+            >
+              There doesn't seem to be an account registered with that email.
+            </p>
+          )}
         </Field>
         <Button
           css={`
@@ -90,17 +100,6 @@ export default function ForgotPassword() {
         >
           Send email
         </Button>
-        <Spacer size={1 * GU} />
-        {isError && (
-          <p
-            css={`
-              ${textStyle('body2')};
-              color: ${theme.negative};
-            `}
-          >
-            There doesn't seem to be an account registered with that email.
-          </p>
-        )}
       </main>
     </Onboarding>
   )

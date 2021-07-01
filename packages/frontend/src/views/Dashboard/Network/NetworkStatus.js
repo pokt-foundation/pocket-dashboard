@@ -155,14 +155,14 @@ export default function NetworkStatus() {
                       </h4>
                       <h5
                         css={`
-                          ${textStyle('title4')}
+                          ${textStyle('body4')}
                         `}
                       >
                         Last 7 Days Count
                       </h5>
                     </div>
                   </div>
-                  <Spacer size={1 * GU} />
+                  <Spacer size={3 * GU} />
                   <LineChart
                     backgroundFill="#1B2331"
                     borderColor={`rgba(0,0,0,0)`}

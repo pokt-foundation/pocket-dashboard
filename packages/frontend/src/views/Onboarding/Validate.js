@@ -52,11 +52,11 @@ export default function Validate() {
     <Onboarding>
       <h2
         css={`
-          ${textStyle('title2')}
+          ${textStyle('title1')}
           align-self: flex-start;
         `}
       >
-        Verify your email
+        {isSuccess ? 'Verify your Account' : 'Verified Account'}
       </h2>
       <Spacer size={4 * GU} />
       <main
@@ -83,7 +83,16 @@ export default function Validate() {
                 ${textStyle('body2')}
               `}
             >
-              Your email has been verified! You can now log in .
+              Now you can access the Portal to create endpoints for different
+              networks, and monitor your app infrastructure, all in one place.
+            </p>
+            <Spacer size={2 * GU} />
+            <p
+              css={`
+                ${textStyle('body2')}
+              `}
+            >
+              Welcome to Web3 done the right way!
             </p>
             <Spacer size={3 * GU} />
             <Button

@@ -178,7 +178,7 @@ function ResetPasswordForm({
     <>
       <h2
         css={`
-          ${textStyle('title2')}
+          ${textStyle('title1')}
           margin-bottom: ${6 * GU}px;
           align-self: flex-start;
         `}
@@ -194,7 +194,7 @@ function ResetPasswordForm({
         `}
       >
         <Field
-          label="Password"
+          label="New Password"
           required
           css={`
             margin-bottom: ${6 * GU}px;
@@ -218,7 +218,7 @@ function ResetPasswordForm({
             </p>
           )}
         </Field>
-        <Field label="Password confirmation" required>
+        <Field label="Password Confirmation" required>
           <TextInput
             wide
             value={repeatedPassword}
