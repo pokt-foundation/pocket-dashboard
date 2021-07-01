@@ -802,13 +802,13 @@ function UsageTrends({
           >
             Current usage
           </h3>
-          <Spacer size={2 * GU} />
+          <Spacer size={5 * GU} />
           <CircleGraph
             value={Math.min(1, sessionRelays / maxSessionRelays)}
-            size={125}
+            size={140}
             color={usageColor}
           />
-          <Spacer size={2 * GU} />
+          <Spacer size={6 * GU} />
           <h4
             css={`
               ${textStyle('title2')}
@@ -819,7 +819,7 @@ function UsageTrends({
             <span
               css={`
                 display: block;
-                ${textStyle('body3')}
+                ${textStyle('body1')}
                 font-weight: 700;
               `}
             >
