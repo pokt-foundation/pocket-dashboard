@@ -23,7 +23,6 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState(null)
   const [errors, setErrors] = useState([])
-  const theme = useTheme()
   const history = useHistory()
 
   const { isLoading, mutate } = useMutation(async function login(e) {
@@ -128,15 +127,7 @@ export default function Login() {
               onBlur={onEmailBlur}
             />
             <Spacer size={GU / 2} />
-            {emailError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {emailError.message}
-              </p>
-            )}
+            {emailError && <ErrorMessage>{emailError.message}</ErrorMessage>}
           </Field>
           <Field label="Password" required>
             <TextInput
@@ -150,13 +141,7 @@ export default function Login() {
             />
             <Spacer size={GU / 2} />
             {passwordError && (
-              <p
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {passwordError.message}
-              </p>
+              <ErrorMessage>{passwordError.message}</ErrorMessage>
             )}
           </Field>
           {passwordError && <Spacer size={3 * GU} />}
@@ -166,13 +151,8 @@ export default function Login() {
             `}
           >
             {errors.map(({ id, message }) => (
-              <li
-                key={`${id}_${message}`}
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {message}
+              <li key={`${id}_${message}`}>
+                <ErrorMessage>{message}</ErrorMessage>
               </li>
             ))}
           </ul>
@@ -184,6 +164,7 @@ export default function Login() {
             external={false}
             css={`
               && {
+                ${textStyle('body3')};
                 width: auto;
                 text-align: left;
               }
@@ -207,7 +188,11 @@ export default function Login() {
           >
             Log in
           </Button>
-          <p>
+          <p
+            css={`
+              ${textStyle('body3')}
+            `}
+          >
             Don't have an account?{' '}
             <RouterLink
               to={{
@@ -222,5 +207,20 @@ export default function Login() {
         </form>
       </main>
     </Onboarding>
+  )
+}
+
+function ErrorMessage({ children }) {
+  const theme = useTheme()
+
+  return (
+    <p
+      css={`
+        ${textStyle('body3')};
+        color: ${theme.negative};
+      `}
+    >
+      {children}
+    </p>
   )
 }

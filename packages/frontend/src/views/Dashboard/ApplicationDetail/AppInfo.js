@@ -654,7 +654,8 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
               <Spacer size={GU / 2} />
               <span
                 css={`
-                  font-weight: 700;
+                  ${textStyle('body3')};
+                  font-weight: 800;
                 `}
               >
                 {Math.abs(successRateDelta)}%
@@ -688,7 +689,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
           </h3>
           <h4
             css={`
-              ${textStyle('title4')}
+              ${textStyle('body3')}
             `}
           >
             {Intl.NumberFormat().format(totalRequests)}

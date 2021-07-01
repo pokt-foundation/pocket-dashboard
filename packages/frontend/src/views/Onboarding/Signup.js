@@ -247,13 +247,13 @@ function SignupForm({
               onFocus={onInputFocus}
             />
             {emailError && (
-              <p
+              <ErrorMessage
                 css={`
                   color: ${theme.negative};
                 `}
               >
                 {emailError.message}
-              </p>
+              </ErrorMessage>
             )}
           </Field>
           <Field label="Password" required>
@@ -266,13 +266,13 @@ function SignupForm({
               type="password"
             />
             {passwordError && (
-              <p
+              <ErrorMessage
                 css={`
                   color: ${theme.negative};
                 `}
               >
                 {passwordError.message}
-              </p>
+              </ErrorMessage>
             )}
           </Field>
           <Field label="Repeat Password" required>
@@ -285,13 +285,13 @@ function SignupForm({
               type="password"
             />
             {repeatedPasswordError && (
-              <p
+              <ErrorMessage
                 css={`
                   color: ${theme.negative};
                 `}
               >
                 {repeatedPasswordError.message}
-              </p>
+              </ErrorMessage>
             )}
             <Spacer size={1 * GU} />
             <p
@@ -333,6 +333,7 @@ function SignupForm({
               aria-label="I agree to the pocket Dashboard terms and conditions"
               css={`
                 display: inline-block;
+                ${textStyle('body3')};
               `}
             />
             <span
@@ -340,14 +341,15 @@ function SignupForm({
                 padding-top: 5px;
                 vertical-align: bottom;
                 margin-left: ${1 * GU}px;
+                ${textStyle('body3')};
               `}
             >
               I Agree to the Pocket Dashboard's{' '}
-              <InlineLink href="https://dashboard.pokt.network/support/terms-of-service">
+              <InlineLink href="https://www.pokt.network/site-terms-of-use">
                 T. &amp; C.
               </InlineLink>{' '}
               and{' '}
-              <InlineLink href="https://dashboard.pokt.network/support/privacy-policy">
+              <InlineLink href="https://www.pokt.network/privacy-policy">
                 Privacy Policy
               </InlineLink>
             </span>
@@ -367,7 +369,11 @@ function SignupForm({
           >
             Sign up
           </Button>
-          <p>
+          <p
+            css={`
+              ${textStyle('body3')}
+            `}
+          >
             Do you have an account?{' '}
             <RouterLink
               to={{
@@ -382,6 +388,21 @@ function SignupForm({
         </form>
       </main>
     </>
+  )
+}
+
+function ErrorMessage({ children }) {
+  const theme = useTheme()
+
+  return (
+    <p
+      css={`
+        ${textStyle('body3')};
+        color: ${theme.negative};
+      `}
+    >
+      {children}
+    </p>
   )
 }
 

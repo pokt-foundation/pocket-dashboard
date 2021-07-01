@@ -2,7 +2,7 @@ import React from 'react'
 import 'styled-components/macro'
 import { useTheme, textStyle, GU, RADIUS } from '@pokt-foundation/ui'
 
-const DEFAULT_PADDING = 2 * GU
+const DEFAULT_PADDING = 3 * GU
 
 export default function Box({ children, title, className, padding, ...props }) {
   const theme = useTheme()

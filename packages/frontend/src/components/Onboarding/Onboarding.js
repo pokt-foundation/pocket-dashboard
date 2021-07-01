@@ -66,6 +66,7 @@ export default function Onboarding({ children }) {
               padding: ${1 * GU}px;
             `}
           >
+            <Spacer size={3 * GU} />
             {children}
           </div>
         </div>
