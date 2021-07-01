@@ -106,11 +106,15 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
     setSecretKeyRequired((r) => !r)
   }, [])
   const setWhitelistedUserAgent = useCallback(() => {
-    setUserAgents((userAgents) => [...userAgents, userAgent])
+    if (userAgent) {
+      setUserAgents((userAgents) => [...userAgents, userAgent])
+    }
     setUserAgent('')
   }, [userAgent])
   const setWhitelistedOrigin = useCallback(() => {
-    setOrigins((origins) => [...origins, origin])
+    if (origin) {
+      setOrigins((origins) => [...origins, origin])
+    }
     setOrigin('')
   }, [origin])
   const onDeleteUserAgentClick = useCallback((userAgent) => {
