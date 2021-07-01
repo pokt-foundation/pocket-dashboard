@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useMutation } from 'react-query'
-import { sentryEnabled } from 'sentry'
+import axios from 'axios'
 import { useViewport } from 'use-viewport'
 import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
@@ -18,9 +18,11 @@ import {
   RADIUS,
 } from '@pokt-foundation/ui'
 import env from 'environment'
-import axios from 'axios'
+import { shorten } from 'lib/utils'
+import { sentryEnabled } from 'sentry'
 
 const DEFAULT_TITLE = 'Pocket Dashboard'
+const MAX_CHARACTERS = 25
 
 function useRouteTitle(applications = []) {
   const { pathname } = useLocation()
@@ -43,7 +45,7 @@ function useRouteTitle(applications = []) {
       DEFAULT_TITLE
     )
 
-    return title
+    return shorten(title, MAX_CHARACTERS)
   }
 
   if (pathname.includes('home')) {
