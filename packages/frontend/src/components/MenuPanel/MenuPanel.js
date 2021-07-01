@@ -15,7 +15,7 @@ import {
 import IconApp from 'components/MenuPanel/IconApp'
 import IconNetwork from 'components/MenuPanel/IconNetwork'
 import PortalLogo from '../../assets/portal_logo.svg'
-import { log } from 'lib/utils'
+import { log, shorten } from 'lib/utils'
 
 const CHILD_INSTANCE_HEIGHT = 6 * GU
 
@@ -200,8 +200,6 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
     -1
   )
 
-  console.log(activeChildInstanceIndex)
-
   log(activeIndex, childInstances, 'activeIndeex')
 
   return (
@@ -288,7 +286,7 @@ function MenuPanelGroup({ active, activeIndex, appsLoading, instances }) {
                       text-align: center;
                     `}
                   >
-                    {label}
+                    {shorten(label, 10)}
                   </span>
                 </ButtonBase>
               </li>
