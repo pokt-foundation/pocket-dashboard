@@ -279,7 +279,7 @@ export default function AppInfo({
   )
 
   const onOpenModal = useCallback(() => {
-    if (!isSwitchable) {
+    if (isSwitchable) {
       setNetworkDenialModalVisible(true)
     } else {
       setNetworkModalVisible(true)
@@ -485,7 +485,15 @@ function SwitchDenialModal({ onClose, visible }) {
   const compactMode = within(-1, 'medium')
 
   return (
-    <Modal visible={visible} onClose={onClose}>
+    <Modal
+      visible={visible}
+      onClose={onClose}
+      css={`
+        & > div > div > div > div {
+          padding: 0 !important;
+        }
+      `}
+    >
       <div
         css={`
           max-width: ${87 * GU}px;
@@ -495,24 +503,6 @@ function SwitchDenialModal({ onClose, visible }) {
           Once a week has elapsed you will be able to switch chains again. In
           the interim, we invite you to join our Discord community.
         </Banner>
-        <Spacer size={3 * GU} />
-        <div
-          css={`
-            display: flex;
-            ${compactMode && `flex-direction: column-reverse;`}
-            justify-content: center;
-            align-items: center;
-            padding-left: ${2 * GU}px;
-            padding-right: ${2 * GU}px;
-          `}
-        >
-          <Spacer size={6 * GU} />
-          <Button onClick={onClose} wide mode="strong">
-            Cancel
-          </Button>
-          <Spacer size={6 * GU} />
-        </div>
-        <Spacer size={4 * GU} />
       </div>
     </Modal>
   )
