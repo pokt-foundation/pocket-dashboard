@@ -106,11 +106,15 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
     setSecretKeyRequired((r) => !r)
   }, [])
   const setWhitelistedUserAgent = useCallback(() => {
-    setUserAgents((userAgents) => [...userAgents, userAgent])
+    if (userAgent) {
+      setUserAgents((userAgents) => [...userAgents, userAgent])
+    }
     setUserAgent('')
   }, [userAgent])
   const setWhitelistedOrigin = useCallback(() => {
-    setOrigins((origins) => [...origins, origin])
+    if (origin) {
+      setOrigins((origins) => [...origins, origin])
+    }
     setOrigin('')
   }, [origin])
   const onDeleteUserAgentClick = useCallback((userAgent) => {
@@ -132,7 +136,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                 <Box>
                   <p
                     css={`
-                      ${textStyle('body2')}
+                      ${textStyle('body3')}
                       margin-bottom: ${2 * GU}px;
                     `}
                   >
@@ -176,7 +180,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                   title="Whitelisted User-Agents"
                   css={`
                     h3 {
-                      margin-bottom: ${1 * GU}px;
+                      margin-bottom: ${2 * GU}px;
                     }
                     margin-bottom: ${3 * GU}px;
                   `}
@@ -221,7 +225,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                   title="Whitelisted Origins"
                   css={`
                     h3 {
-                      margin-bottom: ${1 * GU}px;
+                      margin-bottom: ${2 * GU}px;
                     }
                   `}
                 >

@@ -279,7 +279,7 @@ export default function AppInfo({
   )
 
   const onOpenModal = useCallback(() => {
-    if (!isSwitchable) {
+    if (isSwitchable) {
       setNetworkDenialModalVisible(true)
     } else {
       setNetworkModalVisible(true)
@@ -480,12 +480,16 @@ function SwitchInfoModal({ onClose, onSwitch, visible }) {
 }
 
 function SwitchDenialModal({ onClose, visible }) {
-  const { within } = useViewport()
-
-  const compactMode = within(-1, 'medium')
-
   return (
-    <Modal visible={visible} onClose={onClose}>
+    <Modal
+      visible={visible}
+      onClose={onClose}
+      css={`
+        & > div > div > div > div {
+          padding: 0 !important;
+        }
+      `}
+    >
       <div
         css={`
           max-width: ${87 * GU}px;
@@ -495,24 +499,6 @@ function SwitchDenialModal({ onClose, visible }) {
           Once a week has elapsed you will be able to switch chains again. In
           the interim, we invite you to join our Discord community.
         </Banner>
-        <Spacer size={3 * GU} />
-        <div
-          css={`
-            display: flex;
-            ${compactMode && `flex-direction: column-reverse;`}
-            justify-content: center;
-            align-items: center;
-            padding-left: ${2 * GU}px;
-            padding-right: ${2 * GU}px;
-          `}
-        >
-          <Spacer size={6 * GU} />
-          <Button onClick={onClose} wide mode="strong">
-            Cancel
-          </Button>
-          <Spacer size={6 * GU} />
-        </div>
-        <Spacer size={4 * GU} />
       </div>
     </Modal>
   )
@@ -802,13 +788,13 @@ function UsageTrends({
           >
             Current usage
           </h3>
-          <Spacer size={2 * GU} />
+          <Spacer size={5 * GU} />
           <CircleGraph
             value={Math.min(1, sessionRelays / maxSessionRelays)}
-            size={125}
+            size={140}
             color={usageColor}
           />
-          <Spacer size={2 * GU} />
+          <Spacer size={6 * GU} />
           <h4
             css={`
               ${textStyle('title2')}
@@ -819,7 +805,7 @@ function UsageTrends({
             <span
               css={`
                 display: block;
-                ${textStyle('body3')}
+                ${textStyle('body1')}
                 font-weight: 700;
               `}
             >
@@ -995,11 +981,11 @@ function AppDetails({ apps, id, secret }) {
             margin-bottom: ${2 * GU}px;
           `}
         >
-          App public key(s)
+          App address(es)
         </h3>
-        {apps.map(({ publicKey }) => (
+        {apps.map(({ address }) => (
           <TextCopy
-            value={publicKey}
+            value={address}
             onCopy={() => toast('App public key copied to clipboard')}
           />
         ))}

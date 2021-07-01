@@ -60,7 +60,6 @@ export default function Notifications({
   appData,
   dailyRelays,
   maxDailyRelays,
-  stakedTokens,
 }) {
   const [chosenPercentages, setChosenPercentages] = useState(
     appData?.notificationSettings ?? DEFAULT_PERCENTAGES
@@ -203,7 +202,13 @@ export default function Notifications({
                     Weekly bandwith usage
                   </h2>
                   {compactMode && <Spacer size={1 * GU} />}
-                  <h3>Max relays per day: {maxRelays}</h3>
+                  <h3
+                    css={`
+                      ${textStyle('body3')}
+                    `}
+                  >
+                    Max relays per day: {maxRelays}
+                  </h3>
                 </div>
                 <Spacer size={2 * GU} />
                 <Inline>
@@ -493,4 +498,5 @@ const GraphContainer = Styled.div`
 const Stack = Styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
 `
