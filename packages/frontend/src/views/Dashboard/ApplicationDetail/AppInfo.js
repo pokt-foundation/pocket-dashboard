@@ -985,11 +985,11 @@ function AppDetails({ apps, id, secret }) {
             margin-bottom: ${2 * GU}px;
           `}
         >
-          App public key(s)
+          App address(es)
         </h3>
-        {apps.map(({ publicKey }) => (
+        {apps.map(({ address }) => (
           <TextCopy
-            value={publicKey}
+            value={address}
             onCopy={() => toast('App public key copied to clipboard')}
           />
         ))}
