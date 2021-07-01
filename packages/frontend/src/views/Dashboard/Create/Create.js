@@ -22,6 +22,7 @@ import {
   textStyle,
   GU,
 } from '@pokt-foundation/ui'
+import AppStatus from 'components/AppStatus/AppStatus'
 import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import { useUserApps } from 'contexts/AppsContext'
@@ -32,6 +33,9 @@ import {
   KNOWN_QUERY_SUFFIXES,
 } from 'known-query-suffixes'
 import { sentryEnabled } from 'sentry'
+
+const FREE_TIER_TOKENS = 8000000000
+const FREE_TIER_MAX_RELAYS = 1000000
 
 const SCREENS = new Map([
   [0, BasicSetup],
@@ -410,7 +414,10 @@ function BasicSetup({
               App Security
             </Button>
             <Spacer size={3 * GU} />
-            <FreeTierInfo />
+            <AppStatus
+              stakedTokens={FREE_TIER_TOKENS}
+              maxDailyRelays={FREE_TIER_MAX_RELAYS}
+            />
             <Spacer size={3 * GU} />
             <p
               css={`
