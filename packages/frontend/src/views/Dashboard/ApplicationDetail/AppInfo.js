@@ -480,10 +480,6 @@ function SwitchInfoModal({ onClose, onSwitch, visible }) {
 }
 
 function SwitchDenialModal({ onClose, visible }) {
-  const { within } = useViewport()
-
-  const compactMode = within(-1, 'medium')
-
   return (
     <Modal
       visible={visible}
