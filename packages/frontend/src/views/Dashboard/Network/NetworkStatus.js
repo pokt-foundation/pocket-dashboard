@@ -99,7 +99,7 @@ export default function NetworkStatus() {
         position: relative;
         width: 100%;
         /* TODO: This is leaky. fix up with a permanent component */
-        height: 60vh;
+        height: 70vh;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -166,7 +166,7 @@ export default function NetworkStatus() {
                   <LineChart
                     backgroundFill="#1B2331"
                     borderColor={`rgba(0,0,0,0)`}
-                    color={() => `#31A1D2`}
+                    color={() => theme.accentAlternative}
                     dotRadius={GU / 1.5}
                     height={240}
                     label={(index) => labels[index]}
