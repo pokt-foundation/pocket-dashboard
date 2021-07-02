@@ -28,6 +28,11 @@ import {
 import { sentryEnabled } from 'sentry'
 import AppStatus from 'components/AppStatus/AppStatus'
 
+const ADDORNMENT_SETTINGS = {
+  width: 36,
+  padding: 4,
+}
+
 export default function Security({ appData, stakedTokens, maxRelays }) {
   const [origin, setOrigin] = useState('')
   const [origins, setOrigins] = useState([])
@@ -137,7 +142,6 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                   <p
                     css={`
                       ${textStyle('body3')}
-                      margin-bottom: ${2 * GU}px;
                     `}
                   >
                     To maximize security for your application, you may turn on
@@ -212,6 +216,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                           onCopy={() => onDeleteUserAgentClick(agent)}
                           value={agent}
                           adornment={<IconCross />}
+                          adornmentSettings={ADDORNMENT_SETTINGS}
                           css={`
                             width: 100%;
                             padding-left: 0;
@@ -238,6 +243,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                         <IconPlus />
                       </ButtonBase>
                     }
+                    adornmentSettings={ADDORNMENT_SETTINGS}
                     adornmentPosition="end"
                   />
                   <ul
@@ -253,6 +259,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                       <li key={origin}>
                         <TextCopy
                           key={`${origin}/${index}`}
+                          adornment={<IconCross />}
                           onCopy={() => onDeleteOriginClick(origin)}
                           value={origin}
                           css={`

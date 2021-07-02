@@ -99,7 +99,7 @@ export default function NetworkStatus() {
         position: relative;
         width: 100%;
         /* TODO: This is leaky. fix up with a permanent component */
-        height: 60vh;
+        height: 70vh;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -166,7 +166,7 @@ export default function NetworkStatus() {
                   <LineChart
                     backgroundFill="#1B2331"
                     borderColor={`rgba(0,0,0,0)`}
-                    color={() => `#31A1D2`}
+                    color={() => theme.accentAlternative}
                     dotRadius={GU / 1.5}
                     height={240}
                     label={(index) => labels[index]}
@@ -184,17 +184,30 @@ export default function NetworkStatus() {
                 <Spacer size={4 * GU} />
                 <Box title="Available Networks">
                   <DataView
-                    fields={['Network', 'ID', 'Ticker']}
+                    fields={[
+                      { label: 'Network', align: 'start' },
+                      { label: 'ID', align: 'start' },
+                      { label: 'Ticker', align: 'start' },
+                    ]}
                     entries={chains}
                     mode={compactMode ? 'list' : 'table'}
                     entriesPerPage={PER_PAGE}
                     renderEntry={({ description, id, network, ticker }) => [
-                      <p>{description || network}</p>,
+                      <p
+                        css={`
+                          overflow-wrap: break-word;
+                          word-break: break-word;
+                          hyphens: auto;
+                        `}
+                      >
+                        {description || network}
+                      </p>,
                       <p>{id}</p>,
                       <p>{ticker}</p>,
                     ]}
                   />
                 </Box>
+                <Spacer size={3 * GU} />
               </>
             }
             secondary={

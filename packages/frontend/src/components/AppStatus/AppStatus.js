@@ -45,7 +45,11 @@ export default function AppStatus({ stakedTokens, maxDailyRelays }) {
         <Spacer size={2 * GU} />
         <li>
           Staked Amount
-          <span>
+          <span
+            css={`
+              ${textStyle('body3')}
+            `}
+          >
             {TokenAmount.format(stakedTokens, 6, {
               symbol: 'POKT',
             })}
@@ -54,7 +58,11 @@ export default function AppStatus({ stakedTokens, maxDailyRelays }) {
         <Spacer size={2 * GU} />
         <li>
           Max Relays Per Day
-          <span>
+          <span
+            css={`
+              ${textStyle('body3')}
+            `}
+          >
             {new Intl.NumberFormat('en-US', {
               notation: 'compact',
               compactDisplay: 'short',

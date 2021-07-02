@@ -59,19 +59,24 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
 
   const currentSessionRelays = useMemo(
     () => sessionRelayData?.session_relays ?? 0,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [sessionRelayDep]
   )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const dailyRelays = useMemo(() => dailyRelayData?.daily_relays ?? 0, [
     dailyRelaysDep,
   ])
   const previousSuccessfulRelays = useMemo(
     () => previousSuccessfulRelayData?.successful_relays ?? 0,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [previousSuccessfulRelaysDep]
   )
   const previousRangedRelays = useMemo(
     () => previousRangedRelayData?.total_relays ?? 0,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [previousRangedRelaysDep]
   )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const hourlyLatency = useMemo(() => hourlyLatencyData?.hourly_latency ?? [], [
     hourlyLatencyDep,
   ])
@@ -80,6 +85,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
       stakedTokens: appOnChainData?.stake ?? 0n,
       maxDailyRelays: appOnChainData?.relays * 24 ?? 0n,
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appOnChainDep])
 
   return metricsLoading ? (
@@ -140,7 +146,7 @@ function AnimatedLoader() {
         position: relative;
         width: 100%;
         /* TODO: This is leaky. fix up with a permanent component */
-        height: 60vh;
+        height: 70vh;
         display: flex;
         flex-direction: column;
         align-items: center;

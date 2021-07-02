@@ -322,7 +322,7 @@ function SignupForm({
           </ul>
           <label
             css={`
-              margin-bottom: ${6 * GU}px;
+              margin-bottom: ${3 * GU}px;
               ${textStyle('body2')}
               word-break: ${compactMode ? 'break-word' : 'break-all'};
             `}
