@@ -64,7 +64,7 @@ export default function OnboardingHeader() {
                 }
               `}
             >
-              Get Started
+              Log In
             </Link>{' '}
           </li>
         </ul>

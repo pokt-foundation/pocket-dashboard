@@ -139,6 +139,7 @@ function AnimatedLoader() {
       css={`
         position: relative;
         width: 100%;
+        /* TODO: This is leaky. fix up with a permanent component */
         height: 70vh;
         display: flex;
         flex-direction: column;

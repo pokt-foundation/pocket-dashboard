@@ -16,12 +16,13 @@ import Onboarding from 'components/Onboarding/Onboarding'
 import env from 'environment'
 import { KNOWN_MUTATION_SUFFIXES } from 'known-query-suffixes'
 import { sentryEnabled } from 'sentry'
+import VerifyNotice from 'components/VerifyResetNotice/VerifyResetNotice'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
   const theme = useTheme()
 
-  const { isLoading, isError, mutate } = useMutation(
+  const { isLoading, isError, isSuccess, mutate } = useMutation(
     async function sendResetEmail(e) {
       const path = `${env('BACKEND_URL')}/api/users/send-reset-email`
 
@@ -45,7 +46,9 @@ export default function ForgotPassword() {
 
   const onEmailChange = useCallback((e) => setEmail(e.target.value), [])
 
-  return (
+  return isSuccess ? (
+    <VerifyNotice email={email} mode="reset" />
+  ) : (
     <Onboarding>
       <h2
         css={`
@@ -53,7 +56,7 @@ export default function ForgotPassword() {
           align-self: flex-start;
         `}
       >
-        Password Reset
+        Reset Password
       </h2>
       <Spacer size={4 * GU} />
       <main
@@ -78,7 +81,6 @@ export default function ForgotPassword() {
             type="email"
             disabled={isLoading}
           />
-          <Spacer size={1 * GU} />
           {isError && (
             <p
               css={`
@@ -87,18 +89,21 @@ export default function ForgotPassword() {
               `}
             >
               There doesn't seem to be an account registered with that email.
+              Please try again.
             </p>
           )}
         </Field>
+        <Spacer size={3 * GU} />
         <Button
           css={`
             margin-bottom: ${2 * GU}px;
+            width: ${22 * GU}px;
           `}
           mode="strong"
           disabled={isLoading}
           onClick={(e) => mutate(e)}
         >
-          Send email
+          Reset Password
         </Button>
       </main>
     </Onboarding>

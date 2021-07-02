@@ -179,12 +179,12 @@ function ResetPasswordForm({
       <h2
         css={`
           ${textStyle('title1')}
-          margin-bottom: ${6 * GU}px;
           align-self: flex-start;
         `}
       >
         Reset Password
       </h2>
+      <Spacer size={4 * GU} />
       <main
         css={`
           position: relative;

@@ -56,7 +56,7 @@ export default function Validate() {
           align-self: flex-start;
         `}
       >
-        {isSuccess ? 'Verify your Account' : 'Verified Account'}
+        {isSuccess ? 'Verify your Account' : 'Account Verification Failed'}
       </h2>
       <Spacer size={4 * GU} />
       <main
@@ -109,13 +109,27 @@ export default function Validate() {
           </>
         )}
         {isError && (
-          <p
-            css={`
-              ${textStyle('body2')}
-            `}
-          >
-            There was a problem while verifying your email.
-          </p>
+          <>
+            <p
+              css={`
+                ${textStyle('body2')}
+              `}
+            >
+              There was a problem while verifying your email. Please try again.
+            </p>
+            <Spacer size={4 * GU} />
+            <Button
+              mode="strong"
+              onClick={goToLogin}
+              css={`
+                && {
+                  width: ${22 * GU}px;
+                }
+              `}
+            >
+              Log In
+            </Button>
+          </>
         )}
       </main>
     </Onboarding>

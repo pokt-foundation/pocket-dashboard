@@ -184,17 +184,30 @@ export default function NetworkStatus() {
                 <Spacer size={4 * GU} />
                 <Box title="Available Networks">
                   <DataView
-                    fields={['Network', 'ID', 'Ticker']}
+                    fields={[
+                      { label: 'Network', align: 'start' },
+                      { label: 'ID', align: 'start' },
+                      { label: 'Ticker', align: 'start' },
+                    ]}
                     entries={chains}
                     mode={compactMode ? 'list' : 'table'}
                     entriesPerPage={PER_PAGE}
                     renderEntry={({ description, id, network, ticker }) => [
-                      <p>{description || network}</p>,
+                      <p
+                        css={`
+                          overflow-wrap: break-word;
+                          word-break: break-word;
+                          hyphens: auto;
+                        `}
+                      >
+                        {description || network}
+                      </p>,
                       <p>{id}</p>,
                       <p>{ticker}</p>,
                     ]}
                   />
                 </Box>
+                <Spacer size={3 * GU} />
               </>
             }
             secondary={

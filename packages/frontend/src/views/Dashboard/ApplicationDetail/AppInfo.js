@@ -897,7 +897,12 @@ function LatestRequests({ id, isLb }) {
     >
       <DataView
         mode={compactMode ? 'list' : 'table'}
-        fields={['Request Type', 'Data transferred', 'Result', 'Time Elapsed']}
+        fields={[
+          { label: 'Request Type' },
+          { label: 'Data transferred', align: 'left' },
+          { label: 'Result', align: 'left' },
+          { label: 'Time Elapsed', align: 'left' },
+        ]}
         status={isLatestRelaysLoading ? 'loading' : 'default'}
         entries={latestRelays}
         renderEntry={({ bytes, method, result, elapsed_time: elapsedTime }) => {
