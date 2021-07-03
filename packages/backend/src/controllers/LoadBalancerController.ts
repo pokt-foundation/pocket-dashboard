@@ -338,6 +338,8 @@ router.get(
 
     const readableApps = apps.map((app: QueryAppResponse) => app.toJSON())
 
+    console.log('appResponses', readableApps)
+
     const appsStatus = readableApps.reduce(
       (status, app) => {
         return {

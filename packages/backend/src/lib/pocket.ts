@@ -25,15 +25,16 @@ const {
   freeTierFundAccount,
   freeTierFundAddress,
   httpProviderNode,
-  maxDispatchers,
   maxSessions,
   providerType,
   requestTimeout,
   transactionFee,
 } = env('POCKET_NETWORK') as PocketNetworkKeys
 
+const MAX_DISPATCHERS = 24
+
 const POCKET_CONFIGURATION = new Configuration(
-  Number(maxDispatchers),
+  MAX_DISPATCHERS,
   Number(maxSessions),
   0,
   Number(requestTimeout),

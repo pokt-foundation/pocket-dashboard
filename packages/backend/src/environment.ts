@@ -101,27 +101,6 @@ export const ENV_VARS = {
       mainFundAccount: process.env.POCKET_NETWORK_MAIN_FUND_ACCOUNT,
       mainFundAddress: process.env.POCKET_NETWORK_MAIN_FUND_ADDRESS,
       clientPubKey: process.env.POCKET_NETWORK_CLIENT_PUB_KEY,
-
-      // aat_version: process.env.POCKET_NETWORK_AAT_VERSION,
-      // transaction_fee: process.env.POCKET_NETWORK_TRANSACTION_FEE,
-      // chain_id: process.env.POCKET_NETWORK_CHAIN_ID,
-      // max_dispatchers: process.env.POCKET_NETWORK_MAX_DISPATCHER,
-      // request_timeout: process.env.POCKET_NETWORK_REQUEST_TIMEOUT,
-      // max_sessions: process.env.POCKET_NETWORK_MAX_SESSIONS,
-      // free_tier: {
-      // stake_amount: process.env.POCKET_FREE_TIER_STAKE_AMOUNT,
-      // max_relay_per_day_amount:
-      // process.env.POCKET_FREE_TIER_MAX_RELAY_PER_DAY_AMOUNT,
-      // fund_account: process.env.POCKET_NETWORK_FREE_TIER_FUND_ACCOUNT,
-      // fund_address: process.env.POCKET_NETWORK_FREE_TIER_FUND_ADDRESS,
-      // client_pub_key: process.env.POCKET_NETWORK_CLIENT_PUB_KEY,
-      // },
-      // dispatchers: process.env.POCKET_NETWORK_DISPATCHERS,
-      // chain_hash: process.env.POCKET_NETWORK_CHAIN_HASH,
-      // provider_type: process.env.POCKET_NETWORK_PROVIDER_TYPE,
-      // http_provider_node: process.env.POCKET_NETWORK_HTTP_PROVIDER_NODE,
-      // main_fund_account: process.env.POCKET_NETWORK_MAIN_FUND_ACCOUNT,
-      // main_fund_address: process.env.POCKET_NETWORK_MAIN_FUND_ADDRESS,
     }
   },
 }
