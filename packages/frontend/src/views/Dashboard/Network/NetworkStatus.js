@@ -303,7 +303,7 @@ export default function NetworkStatus() {
                       >
                         Nodes Staked
                       </h2>{' '}
-                      <span>{3456}</span>
+                      <span>{5400}+</span>
                     </li>
                     <Spacer size={2 * GU} />
                     <li>
