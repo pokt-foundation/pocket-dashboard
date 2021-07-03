@@ -43,7 +43,7 @@ const POCKET_CONFIGURATION = new Configuration(
   undefined,
   undefined,
   false,
-  true
+  false
 )
 
 export const POKT_DENOMINATIONS = {
