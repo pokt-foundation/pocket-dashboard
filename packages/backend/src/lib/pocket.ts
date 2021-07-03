@@ -21,28 +21,30 @@ import env, { PocketNetworkKeys } from '../environment'
 const {
   blockTime,
   chainId,
-  dispatchers,
   freeTierFundAccount,
   freeTierFundAddress,
-  httpProviderNode,
-  maxSessions,
-  providerType,
-  requestTimeout,
   transactionFee,
 } = env('POCKET_NETWORK') as PocketNetworkKeys
 
-const MAX_DISPATCHERS = 24
+const DEFAULT_DISPATCHER_LIST = 'https://mainnet-1.nodes.pokt.network:4201,https://mainnet-2.nodes.pokt.network:4202,https://mainnet-3.nodes.pokt.network:4203,https://mainnet-4.nodes.pokt.network:4204,https://mainnet-5.nodes.pokt.network:4205,https://mainnet-6.nodes.pokt.network:4206,https://mainnet-7.nodes.pokt.network:4207,https://mainnet-8.nodes.pokt.network:4208,https://mainnet-9.nodes.pokt.network:4209,https://mainnet-10.nodes.pokt.network:4210,https://mainnet-11.nodes.pokt.network:4211,https://mainnet-12.nodes.pokt.network:4212,https://mainnet-13.nodes.pokt.network:4213,https://mainnet-14.nodes.pokt.network:4214,https://mainnet-15.nodes.pokt.network:4215,https://mainnet-16.nodes.pokt.network:4216,https://mainnet-17.nodes.pokt.network:4217,https://mainnet-18.nodes.pokt.network:4218,https://mainnet-19.nodes.pokt.network:4219,https://mainnet-20.nodes.pokt.network:4220,https://mainnet-21.nodes.pokt.network:4221,https://mainnet-22.nodes.pokt.network:4222,https://mainnet-23.nodes.pokt.network:4223,https://mainnet-24.nodes.pokt.network:4224'
+  .split(',')
+  .map((uri) => new URL(uri))
+const DEFAULT_HTTP_PROVIDER_NODE = 'https://mainnet-1.nodes.pokt.network:4201/'
+const DEFAULT_MAX_DISPATCHERS = 24
+const DEFAULT_MAX_SESSIONS = 1000000
+const DEFAULT_MAX_SESSION_RETRIES = 1
+const DEFAULT_REQUEST_TIMEOUT = 60 * 1000
 
 const POCKET_CONFIGURATION = new Configuration(
-  MAX_DISPATCHERS,
-  Number(maxSessions),
+  DEFAULT_MAX_DISPATCHERS,
+  DEFAULT_MAX_SESSIONS,
   0,
-  Number(requestTimeout),
-  undefined,
+  DEFAULT_REQUEST_TIMEOUT,
+  false,
   undefined,
   Number(blockTime),
-  undefined,
-  undefined,
+  DEFAULT_MAX_SESSION_RETRIES,
+  false,
   false,
   false
 )
@@ -53,27 +55,11 @@ export const POKT_DENOMINATIONS = {
 }
 
 function getPocketDispatchers() {
-  if (dispatchers === '') {
-    return []
-  }
-  return dispatchers.split(',').map(function (dispatcherUri) {
-    return new URL(dispatcherUri)
-  })
-}
-
-function getHttpRPCProvider(): HttpRpcProvider {
-  if (!httpProviderNode || httpProviderNode === '') {
-    throw new Error(`Invalid HTTP Provider Node: ${httpProviderNode}`)
-  }
-  return new HttpRpcProvider(new URL(httpProviderNode))
+  return DEFAULT_DISPATCHER_LIST
 }
 
 function getRPCProvider(): HttpRpcProvider | PocketRpcProvider {
-  if (providerType.toLowerCase() === 'http') {
-    return getHttpRPCProvider()
-  } else {
-    return getHttpRPCProvider()
-  }
+  return new HttpRpcProvider(new URL(DEFAULT_HTTP_PROVIDER_NODE))
 }
 
 export async function getNodes(status: number): Promise<Node[]> {
