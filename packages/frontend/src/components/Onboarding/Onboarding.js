@@ -29,7 +29,9 @@ export default function Onboarding({ children }) {
       <Spacer size={4 * GU} />
       <div
         css={`
+          width: 100%;
           height: 100%;
+          height: calc(100vh-80px);
           display: grid;
           grid-template-columns: 50% 1fr;
           grid-template-rows: 1fr;

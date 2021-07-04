@@ -119,14 +119,14 @@ export default function Signup() {
         message: 'Password cannot be empty',
       }
 
-      setRepeatedPasswordError(passwordError)
+      setPasswordError(passwordError)
     } else if (password !== repeatedPassword) {
       const passwordError = {
         id: 'NON_MATCHING_PASSWORD',
         message: "Passwords don't match",
       }
 
-      setRepeatedPasswordError(passwordError)
+      setPasswordError(passwordError)
     }
   }, [password, repeatedPassword])
 
@@ -284,15 +284,6 @@ function SignupForm({
               onFocus={onInputFocus}
               type="password"
             />
-            {repeatedPasswordError && (
-              <ErrorMessage
-                css={`
-                  color: ${theme.negative};
-                `}
-              >
-                {repeatedPasswordError.message}
-              </ErrorMessage>
-            )}
             <Spacer size={1 * GU} />
             <p
               css={`
