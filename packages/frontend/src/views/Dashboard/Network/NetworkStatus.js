@@ -3,7 +3,6 @@ import { format } from 'd3-format'
 import { useViewport } from 'use-viewport'
 import 'styled-components/macro'
 import {
-  Button,
   ButtonBase,
   CircleGraph,
   DataView,
