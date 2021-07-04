@@ -128,6 +128,17 @@ export default function Login() {
             />
             <Spacer size={GU / 2} />
             {emailError && <ErrorMessage>{emailError.message}</ErrorMessage>}
+            <ul
+              css={`
+                list-style-type: none;
+              `}
+            >
+              {errors.map(({ id, message }) => (
+                <li key={`${id}_${message}`}>
+                  <ErrorMessage>{message}</ErrorMessage>
+                </li>
+              ))}
+            </ul>
           </Field>
           <Field label="Password" required>
             <TextInput
@@ -145,17 +156,6 @@ export default function Login() {
             )}
           </Field>
           {passwordError && <Spacer size={3 * GU} />}
-          <ul
-            css={`
-              list-style-type: none;
-            `}
-          >
-            {errors.map(({ id, message }) => (
-              <li key={`${id}_${message}`}>
-                <ErrorMessage>{message}</ErrorMessage>
-              </li>
-            ))}
-          </ul>
           <RouterLink
             to={{
               pathname: '/forgotpassword',

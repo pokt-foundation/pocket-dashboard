@@ -237,7 +237,7 @@ export default function Notifications({
                             font-weight: 700;
                           `}
                         >
-                          Average usage
+                          AVG usage
                         </span>
                         {Intl.NumberFormat().format(
                           totalDailyRelays.toFixed(0)
@@ -263,6 +263,7 @@ export default function Notifications({
                       <h3
                         css={`
                           ${textStyle('body3')}
+                          text-align: center;
                         `}
                       >
                         <span

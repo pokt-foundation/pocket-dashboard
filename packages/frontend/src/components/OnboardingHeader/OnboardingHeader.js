@@ -20,7 +20,7 @@ export default function OnboardingHeader() {
       `}
     >
       <a
-        href="https://pokt.network"
+        href="https://portal.pokt.network"
         rel="noopener _noreferrer"
         target="blank"
         css={`
