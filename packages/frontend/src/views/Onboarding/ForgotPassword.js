@@ -47,7 +47,9 @@ export default function ForgotPassword() {
   const onEmailChange = useCallback((e) => setEmail(e.target.value), [])
 
   return isSuccess ? (
-    <VerifyNotice email={email} mode="reset" />
+    <Onboarding>
+      <VerifyNotice email={email} mode="reset" />
+    </Onboarding>
   ) : (
     <Onboarding>
       <h2
