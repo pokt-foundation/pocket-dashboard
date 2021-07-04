@@ -4,6 +4,7 @@ import { useViewport } from 'use-viewport'
 import 'styled-components/macro'
 import {
   Button,
+  ButtonBase,
   CircleGraph,
   DataView,
   LineChart,
@@ -350,7 +351,8 @@ function EconomicsSection() {
       `}
     >
       <VisuallyHidden>Pocket Economics for App Developers</VisuallyHidden>
-      <Button
+      <ButtonBase
+        href="https://medium.com/pocket-network/pocket-economics-for-app-developers-487a6ce290c2"
         mode="strong"
         css={`
           && {
@@ -358,11 +360,20 @@ function EconomicsSection() {
             left: ${6 * GU}px;
             bottom: ${4 * GU}px;
             min-width: ${20 * GU}px;
+            display: inline-block;
+            ${textStyle('body3')};
+            line-height: ${0 * GU}px;
+            font-weight: bold;
+            height: ${5 * GU}px;
+            padding: ${3 * GU}px;
+            background: ${theme.accent};
+            color: ${theme.contentInverted};
+            border: '0';
           }
         `}
       >
         Read More
-      </Button>
+      </ButtonBase>
     </section>
   )
 }
