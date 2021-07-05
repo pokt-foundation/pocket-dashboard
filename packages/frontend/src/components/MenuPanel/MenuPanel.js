@@ -18,6 +18,7 @@ import PortalLogo from '../../assets/portal_logo.svg'
 import { log, shorten } from 'lib/utils'
 
 const CHILD_INSTANCE_HEIGHT = 6 * GU
+const MAX_USER_APPS = 4
 
 const MENU_ROUTES = [
   {
@@ -66,17 +67,21 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
 
     groups.push([MENU_ROUTES[1]])
 
-    if (userApps.length) {
-      groups[1].push(
-        ...userApps.map(({ name, id }) => ({
-          label: name,
-          id: `/app/${id}`,
-          appId: id,
-        }))
-      )
+    if (!userApps.length) {
+      return groups
     }
 
-    groups[1].push(...CREATE_APP_ROUTE)
+    groups[1].push(
+      ...userApps.map(({ name, id }) => ({
+        label: name,
+        id: `/app/${id}`,
+        appId: id,
+      }))
+    )
+
+    if (userApps.length < MAX_USER_APPS) {
+      groups[1].push(...CREATE_APP_ROUTE)
+    }
 
     return groups
   }, [userApps])
