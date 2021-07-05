@@ -1,3 +1,5 @@
+export const MAX_USER_APPS = 4
+
 /**
  * Shorten a Pocket address, `charsLength` allows to change the number of
  * characters on both sides of the ellipsis.

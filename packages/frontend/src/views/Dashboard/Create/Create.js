@@ -27,6 +27,7 @@ import Box from 'components/Box/Box'
 import FloatUp from 'components/FloatUp/FloatUp'
 import { useUserApps } from 'contexts/AppsContext'
 import { log } from 'lib/utils'
+import { MAX_USER_APPS } from 'lib/pocket-utils'
 import env from 'environment'
 import {
   KNOWN_MUTATION_SUFFIXES,
@@ -231,7 +232,7 @@ export default function Create() {
   })
 
   useEffect(() => {
-    if (appsData?.length) {
+    if (appsData?.length >= MAX_USER_APPS) {
       const [userApp] = appsData
 
       history.push(`/app/${userApp.appId}`)

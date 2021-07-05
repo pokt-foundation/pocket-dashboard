@@ -16,9 +16,9 @@ import IconApp from 'components/MenuPanel/IconApp'
 import IconNetwork from 'components/MenuPanel/IconNetwork'
 import PortalLogo from '../../assets/portal_logo.svg'
 import { log, shorten } from 'lib/utils'
+import { MAX_USER_APPS } from 'lib/pocket-utils'
 
 const CHILD_INSTANCE_HEIGHT = 6 * GU
-const MAX_USER_APPS = 4
 
 const MENU_ROUTES = [
   {
