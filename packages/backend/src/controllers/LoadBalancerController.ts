@@ -21,6 +21,7 @@ import HttpError from '../errors/http-error'
 import MailgunService from '../services/MailgunService'
 import { APPLICATION_STATUSES } from '../application-statuses'
 
+const BUCKETS_PER_HOUR = 2
 const DEFAULT_GATEWAY_SETTINGS = {
   secretKey: '',
   secretKeyRequired: false,
@@ -28,7 +29,7 @@ const DEFAULT_GATEWAY_SETTINGS = {
   whitelistUserAgents: [],
 }
 const DEFAULT_TIMEOUT = 2000
-const BUCKETS_PER_HOUR = 2
+const MAX_USER_APPS = 4
 
 const router = express.Router()
 
@@ -112,25 +113,19 @@ router.post(
     const { name, chain, gatewaySettings = DEFAULT_GATEWAY_SETTINGS } = req.body
 
     const id = (req.user as IUser)._id
-    // const isNewAppRequestInvalid =
-    // (await Application.exists({
-    // status: APPLICATION_STATUSES.READY,
-    // user: id,
-    // })) ||
-    // (await LoadBalancer.exists({
-    // user: id,
-    // }))
+    const userApps = await Application.find({ user: id })
+    const isNewAppRequestInvalid = userApps.length >= MAX_USER_APPS
 
-    // if (isNewAppRequestInvalid) {
-    // throw HttpError.BAD_REQUEST({
-    // errors: [
-    // {
-    // id: 'ALREADY_EXISTING',
-    // message: 'User already has an existing free tier app',
-    // },
-    // ],
-    // })
-    // }
+    if (isNewAppRequestInvalid) {
+      throw HttpError.BAD_REQUEST({
+        errors: [
+          {
+            id: 'ALREADY_EXISTING',
+            message: 'User has reached their free app limit.',
+          },
+        ],
+      })
+    }
     const preStakedApp: IPreStakedApp = await ApplicationPool.findOne({
       status: APPLICATION_STATUSES.READY,
       chain,

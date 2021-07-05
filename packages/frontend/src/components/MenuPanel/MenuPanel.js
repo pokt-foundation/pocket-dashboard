@@ -16,6 +16,7 @@ import IconApp from 'components/MenuPanel/IconApp'
 import IconNetwork from 'components/MenuPanel/IconNetwork'
 import PortalLogo from '../../assets/portal_logo.svg'
 import { log, shorten } from 'lib/utils'
+import { MAX_USER_APPS } from 'lib/pocket-utils'
 
 const CHILD_INSTANCE_HEIGHT = 6 * GU
 
@@ -66,17 +67,21 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
 
     groups.push([MENU_ROUTES[1]])
 
-    if (userApps.length) {
-      groups[1].push(
-        ...userApps.map(({ name, id }) => ({
-          label: name,
-          id: `/app/${id}`,
-          appId: id,
-        }))
-      )
+    if (!userApps.length) {
+      return groups
     }
 
-    groups[1].push(...CREATE_APP_ROUTE)
+    groups[1].push(
+      ...userApps.map(({ name, id }) => ({
+        label: name,
+        id: `/app/${id}`,
+        appId: id,
+      }))
+    )
+
+    if (userApps.length < MAX_USER_APPS) {
+      groups[1].push(...CREATE_APP_ROUTE)
+    }
 
     return groups
   }, [userApps])
