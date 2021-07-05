@@ -1,7 +1,5 @@
 import path from 'path'
-import { PartSetHeader } from '@pokt-network/pocket-js'
 import mailgun, { Mailgun, messages } from 'mailgun-js'
-import { pathToFileURL } from 'url'
 import env from '../environment'
 
 const FROM_EMAIL = 'Pocket Dashboard <dashboard@pokt.network>'
