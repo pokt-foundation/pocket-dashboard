@@ -175,7 +175,7 @@ export async function stakeAppPool(ctx): Promise<void> {
     ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
   )
   // limit apps staked to 100 each run so the node doesn't die
-  const appsToStake = readyPool.slice(500, 1284)
+  const appsToStake = readyPool.slice(600, 984)
 
   Promise.allSettled(
     appsToStake.map(async (app) => {
