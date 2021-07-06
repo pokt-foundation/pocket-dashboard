@@ -141,7 +141,7 @@ export async function fillAppPool(ctx): Promise<void> {
 
   const slotsAvailable = totalPoolSize - (appPool?.length ?? 0)
   // limit apps creaeted to 100 each run so the node doesn't die
-  const appsToCreate = slotsAvailable > 100 ? 100 : slotsAvailable
+  const appsToCreate = slotsAvailable > 25 ? 25 : slotsAvailable
 
   ctx.logger.log(`fillAppPool(): creating ${appsToCreate} apps`)
 
@@ -160,7 +160,7 @@ export async function stakeAppPool(ctx): Promise<void> {
     ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
   )
   // limit apps staked to 100 each run so the node doesn't die
-  const appsToStake = readyPool.slice(0, 100)
+  const appsToStake = readyPool.slice(0, 50)
 
   Promise.allSettled(
     appsToStake.map(async (app) => {
