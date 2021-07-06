@@ -20,7 +20,7 @@ import {
 import { APPLICATION_STATUSES } from '../application-statuses'
 import env, { PocketNetworkKeys } from '../environment'
 
-const MAX_POOL_SIZE = 1389 + 200
+const MAX_POOL_SIZE = 1389 + 200 + 25
 
 async function createApplicationAndFund(ctx): Promise<void> {
   const { clientPubKey, aatVersion } = env(
