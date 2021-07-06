@@ -80,8 +80,8 @@ async function createApplicationAndFund(ctx): Promise<void> {
 async function stakeApplication(
   ctx,
   app: IPreStakedApp,
-  chain = '0002'
-): Promise<void> {
+  chain = '0021'
+): Promise<boolean> {
   const { address, passPhrase, privateKey } = app.freeTierApplicationAccount
   const { balance } = (await getBalance(address)) as QueryBalanceResponse
 
@@ -111,23 +111,25 @@ async function stakeApplication(
   app.status = APPLICATION_STATUSES.READY
   app.stakingTxHash = txHash
   app.chain = chain
-  ctx.logger.log(
-    `App ${app.freeTierApplicationAccount.address} is now ready: tx hash ${txHash}`
-  )
   await app.save()
 
   ctx.logger.log(
     `Sent stake request on tx ${txHash} : app ${address}, chain ${chain}`
   )
+
+  return true
 }
 
 export async function fillAppPool(ctx): Promise<void> {
-  // const totalPoolSize = Object.values(chains).reduce(
-  //   (prev, { limit }) => prev + limit,
-  //   0
-  // );
-  const totalPoolSize = 42
+  const totalPoolSize = 100
   const appPool = await PreStakedApp.find()
+
+  if (appPool.length > 200) {
+    ctx.logger.log(
+      `fillAppPool(): script not allowed to run more than once, pool size ${appPool.length}`
+    )
+    return
+  }
 
   ctx.logger.log(
     `fillAppPool(): pool size limit ${totalPoolSize}, pool size ${appPool?.length}`
@@ -154,51 +156,13 @@ export async function stakeAppPool(ctx): Promise<void> {
   const appsToStake: IPreStakedApp[] = appPool.filter(
     ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
   )
-  const stakedApps = appPool.filter(
-    ({ status }) => status === APPLICATION_STATUSES.READY
-  )
-  const appAllocationCount = new Map()
 
-  if (!appsToStake.length) {
-    ctx.logger.log('No apps to stake')
-    return
-  }
-  // fill the allocation count with the default from all chains
-  for (const [, { id, limit }] of Object.entries(chains)) {
-    appAllocationCount.set(id, limit)
-  }
-  // Now, remove the excess entries depending on the pool allocation
-  for (const { chain } of stakedApps) {
-    if (chain && !appAllocationCount.has(chain)) {
-      ctx.logger.warn(
-        `stakeAppPool(): Found chain ${chain} not found in chains config`
+  Promise.all(
+    appsToStake.map(async (app) => {
+      ctx.logger.log(
+        `PRESTAKING APP ${app.freeTierApplicationAccount.address} for 0021`
       )
-      continue
-    }
-    const currentCount = appAllocationCount.get(chain)
-
-    appAllocationCount.set(chain, Math.max(currentCount - 1, 0))
-  }
-  for (const [chain, count] of appAllocationCount) {
-    if (!count) {
-      continue
-    }
-    ctx.logger.log(`Creating ${count} apps for chain ${chain}`)
-    Array(count)
-      .fill(0)
-      .map(async () => {
-        const chosenApplication: IPreStakedApp = appsToStake.pop()
-
-        if (!chosenApplication) {
-          ctx.logger.warn(
-            `NOTICE: No more space in the pool for app demand. Tried to stake for ${chain} but no more stake-ready apps were left in the pool.`
-          )
-          return
-        }
-        ctx.logger.log(
-          `Staking application ${chosenApplication.freeTierApplicationAccount.address} for chain ${chain}`
-        )
-        await stakeApplication(ctx, chosenApplication, chain)
-      })
-  }
+      await stakeApplication(ctx, app, '0021')
+    })
+  )
 }
