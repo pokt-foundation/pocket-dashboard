@@ -26,10 +26,10 @@ const {
   transactionFee,
 } = env('POCKET_NETWORK') as PocketNetworkKeys
 
-const DEFAULT_DISPATCHER_LIST = 'https://mainnet-1.nodes.pokt.network:4201'
+const DEFAULT_DISPATCHER_LIST = 'https://node1.mainnet.pokt.network:443'
   .split(',')
   .map((uri) => new URL(uri))
-const DEFAULT_HTTP_PROVIDER_NODE = 'https://mainnet-1.nodes.pokt.network:4201/'
+const DEFAULT_HTTP_PROVIDER_NODE = 'https://node1.mainnet.pokt.network:443'
 const DEFAULT_MAX_DISPATCHERS = 1
 const DEFAULT_MAX_SESSIONS = 1000000
 const DEFAULT_MAX_SESSION_RETRIES = 1
