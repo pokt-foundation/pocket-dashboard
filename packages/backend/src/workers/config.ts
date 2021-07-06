@@ -107,12 +107,12 @@ export const workers = [
   //   workerFn: (ctx): Promise<void> => fillAppPool(ctx),
   //   recurrence: ONE_MINUTES,
   // },
-  // {
-  //   name: 'App pool staker',
-  //   color: 'green',
-  //   workerFn: (ctx): Promise<void> => stakeAppPool(ctx),
-  //   recurrence: FIVE_MINUTES,
-  // },
+  {
+    name: 'App pool staker',
+    color: 'green',
+    workerFn: (ctx): Promise<void> => stakeAppPool(ctx),
+    recurrence: FIVE_MINUTES,
+  },
   {
     name: 'Network stats counter',
     color: 'yellow',
