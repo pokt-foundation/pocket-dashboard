@@ -118,7 +118,7 @@ async function stakeApplication(
 }
 
 export async function fillAppPool(ctx): Promise<void> {
-  const totalPoolSize = 105
+  const totalPoolSize = 605
   const appPool = await PreStakedApp.find()
 
   if (appPool.length > 200) {
