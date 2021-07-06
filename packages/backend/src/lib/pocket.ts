@@ -179,6 +179,7 @@ export async function transferFromFreeTierFund(
   if (typeGuard(rawTxResponse, RpcError)) {
     throw new Error(rawTxResponse.message)
   }
+  console.log(rawTxResponse.hash, 'done')
   return rawTxResponse.hash
 }
 
@@ -218,6 +219,7 @@ export async function getBalance(
     .rpc(pocketRpcProvider)
     .query.getBalance(addressHex)
 
+  console.log(applicationResponse, 'app response for', addressHex)
   return applicationResponse
 }
 

@@ -52,8 +52,6 @@ async function createApplicationAndFund(ctx): Promise<void> {
     createdAt: new Date(Date.now()),
   })
 
-  await newAppForPool.save()
-
   ctx.logger.log(
     `fillAppPool(): created app with addr ${freeTierAccount.addressHex}`
   )
@@ -71,11 +69,11 @@ async function createApplicationAndFund(ctx): Promise<void> {
 
   newAppForPool.status = APPLICATION_STATUSES.AWAITING_STAKING
   newAppForPool.fundingTxHash = txHash
-  await newAppForPool.save()
 
   ctx.logger.log(
     `fillAppPool(): sent funds to account ${freeTierAccount.addressHex} on tx ${txHash}`
   )
+  await newAppForPool.save()
 }
 async function stakeApplication(
   ctx,
@@ -121,7 +119,7 @@ async function stakeApplication(
 }
 
 export async function fillAppPool(ctx): Promise<void> {
-  const totalPoolSize = 100
+  const totalPoolSize = 110
   const appPool = await PreStakedApp.find()
 
   if (appPool.length > 200) {
