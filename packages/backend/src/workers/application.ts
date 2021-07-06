@@ -119,7 +119,7 @@ async function stakeApplication(
 }
 
 export async function fillAppPool(ctx): Promise<void> {
-  const totalPoolSize = 110
+  const totalPoolSize = 105
   const appPool = await PreStakedApp.find()
 
   if (appPool.length > 200) {
@@ -142,11 +142,13 @@ export async function fillAppPool(ctx): Promise<void> {
 
   ctx.logger.log(`fillAppPool(): creating ${appsToCreate} apps`)
 
-  Array(appsToCreate)
-    .fill(0)
-    .map(async () => {
+  const appsCreated = Array(appsToCreate).fill(0)
+
+  Promise.allSettled(
+    appsCreated.map(async () => {
       await createApplicationAndFund(ctx)
     })
+  )
 }
 
 export async function stakeAppPool(ctx): Promise<void> {
@@ -155,7 +157,7 @@ export async function stakeAppPool(ctx): Promise<void> {
     ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
   )
 
-  Promise.all(
+  Promise.allSettled(
     appsToStake.map(async (app) => {
       ctx.logger.log(
         `PRESTAKING APP ${app.freeTierApplicationAccount.address} for 0021`
