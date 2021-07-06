@@ -17,6 +17,8 @@ import {
 import { APPLICATION_STATUSES } from '../application-statuses'
 import env, { PocketNetworkKeys } from '../environment'
 
+const MAX_POOL_SIZE = 800
+
 async function createApplicationAndFund(ctx): Promise<void> {
   const { clientPubKey, aatVersion } = env(
     'POCKET_NETWORK'
@@ -118,10 +120,10 @@ async function stakeApplication(
 }
 
 export async function fillAppPool(ctx): Promise<void> {
-  const totalPoolSize = 605
+  const totalPoolSize = MAX_POOL_SIZE
   const appPool = await PreStakedApp.find()
 
-  if (appPool.length > 200) {
+  if (appPool.length >= MAX_POOL_SIZE) {
     ctx.logger.log(
       `fillAppPool(): script not allowed to run more than once, pool size ${appPool.length}`
     )
