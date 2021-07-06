@@ -17,7 +17,7 @@ import {
 import { APPLICATION_STATUSES } from '../application-statuses'
 import env, { PocketNetworkKeys } from '../environment'
 
-const MAX_POOL_SIZE = 800
+const MAX_POOL_SIZE = 1400
 
 async function createApplicationAndFund(ctx): Promise<void> {
   const { clientPubKey, aatVersion } = env(
@@ -156,9 +156,11 @@ export async function fillAppPool(ctx): Promise<void> {
 
 export async function stakeAppPool(ctx): Promise<void> {
   const appPool = await PreStakedApp.find()
-  const appsToStake: IPreStakedApp[] = appPool.filter(
+  const readyPool: IPreStakedApp[] = appPool.filter(
     ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
   )
+  // limit apps staked to 100 each run so the node doesn't die
+  const appsToStake = readyPool.slice(0, 100)
 
   Promise.allSettled(
     appsToStake.map(async (app) => {
