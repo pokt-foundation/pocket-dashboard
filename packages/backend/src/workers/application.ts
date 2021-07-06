@@ -52,10 +52,6 @@ async function createApplicationAndFund(ctx): Promise<void> {
     createdAt: new Date(Date.now()),
   })
 
-  ctx.logger.log(
-    `fillAppPool(): created app with addr ${freeTierAccount.addressHex}`
-  )
-
   const txHash = await transferFromFreeTierFund(
     FREE_TIER_STAKE_AMOUNT.toString(),
     freeTierAccount.addressHex
@@ -70,6 +66,9 @@ async function createApplicationAndFund(ctx): Promise<void> {
   newAppForPool.status = APPLICATION_STATUSES.AWAITING_STAKING
   newAppForPool.fundingTxHash = txHash
 
+  ctx.logger.log(
+    `fillAppPool(): created app with addr ${freeTierAccount.addressHex}`
+  )
   ctx.logger.log(
     `fillAppPool(): sent funds to account ${freeTierAccount.addressHex} on tx ${txHash}`
   )

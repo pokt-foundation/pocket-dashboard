@@ -176,6 +176,7 @@ export async function transferFromFreeTierFund(
     .send(freeTierFundAddress, customerAddress, totalAmount.toString())
     .submit(chainId, transactionFee)
 
+  console.log('rawTxResponse', rawTxResponse)
   if (typeGuard(rawTxResponse, RpcError)) {
     throw new Error(rawTxResponse.message)
   }
@@ -321,6 +322,7 @@ export async function submitRawTransaction(
     .rpc(pocketRpcProvider)
     .client.rawtx(fromAddress, rawTxBytes)
 
+  console.log('raw tx response stake', rawTxResponse)
   if (typeGuard(rawTxResponse, RpcError)) {
     throw new Error(rawTxResponse.message)
   }
