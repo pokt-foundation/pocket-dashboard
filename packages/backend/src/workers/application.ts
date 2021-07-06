@@ -1,8 +1,10 @@
 import crypto from 'crypto'
 import {
   PocketAAT,
+  QueryAppResponse,
   QueryBalanceResponse,
   RawTxRequest,
+  typeGuard,
 } from '@pokt-network/pocket-js'
 import Application from '../models/Application'
 import PreStakedApp, { IPreStakedApp } from '../models/PreStakedApp'
@@ -10,6 +12,7 @@ import { chains, FREE_TIER_STAKE_AMOUNT } from './config'
 import {
   createAppStakeTx,
   createUnlockedAccount,
+  getApp,
   getBalance,
   submitRawTransaction,
   transferFromFreeTierFund,
@@ -83,6 +86,18 @@ async function stakeApplication(
 ): Promise<boolean> {
   const { address, passPhrase, privateKey } = app.freeTierApplicationAccount
   const { balance } = (await getBalance(address)) as QueryBalanceResponse
+  const onChainApp = await getApp(address)
+
+  if (
+    balance < FREE_TIER_STAKE_AMOUNT &&
+    typeGuard(onChainApp, QueryAppResponse)
+  ) {
+    ctx.logger.warn(`app ${address} already exists ${chain}`)
+    app.status = APPLICATION_STATUSES.READY
+    app.chain = ((onChainApp as unknown) as QueryAppResponse).toJSON().chains[0]
+    await app.save()
+    return
+  }
 
   if (balance < FREE_TIER_STAKE_AMOUNT) {
     ctx.logger.warn(
@@ -160,7 +175,7 @@ export async function stakeAppPool(ctx): Promise<void> {
     ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
   )
   // limit apps staked to 100 each run so the node doesn't die
-  const appsToStake = readyPool.slice(0, 100)
+  const appsToStake = readyPool.slice(500, 1284)
 
   Promise.allSettled(
     appsToStake.map(async (app) => {
