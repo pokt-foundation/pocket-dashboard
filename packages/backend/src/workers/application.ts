@@ -139,7 +139,9 @@ export async function fillAppPool(ctx): Promise<void> {
     return
   }
 
-  const appsToCreate = totalPoolSize - (appPool?.length ?? 0)
+  const slotsAvailable = totalPoolSize - (appPool?.length ?? 0)
+  // limit apps creaeted to 100 each run so the node doesn't die
+  const appsToCreate = slotsAvailable > 100 ? 100 : slotsAvailable
 
   ctx.logger.log(`fillAppPool(): creating ${appsToCreate} apps`)
 
