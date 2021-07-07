@@ -1,5 +1,6 @@
 import express, { Response, Request } from 'express'
 import { GraphQLClient } from 'graphql-request'
+import { APPLICATION_STATUSES } from '../application-statuses'
 import env from '../environment'
 import { getSdk } from '../graphql/types'
 import Chain from '../models/Blockchains'
@@ -30,6 +31,7 @@ router.get(
       }) {
         const isAvailableForStaking = await ApplicationPool.exists({
           chain: _id,
+          status: APPLICATION_STATUSES.SWAPPABLE,
         })
 
         return {
@@ -55,6 +57,7 @@ router.get(
       chains.map(async function filterChain({ _id }) {
         const exists = await ApplicationPool.exists({
           chain: _id,
+          status: APPLICATION_STATUSES.SWAPPABLE,
         })
 
         return exists
