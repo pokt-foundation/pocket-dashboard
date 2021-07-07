@@ -8,7 +8,7 @@ import {
 } from '@pokt-network/pocket-js'
 import Application from '../models/Application'
 import PreStakedApp, { IPreStakedApp } from '../models/PreStakedApp'
-import { chains, FREE_TIER_STAKE_AMOUNT } from './config'
+import { chains, FREE_TIER_STAKE_AMOUNT, SLOT_STAKE_AMOUNT } from './config'
 import {
   createAppStakeTx,
   createUnlockedAccount,
@@ -88,29 +88,61 @@ async function createApplicationAndFund({
   await newAppForPool.save()
 }
 
+async function getApplicationAndFund({
+  chain,
+  ctx,
+}: {
+  chain: string
+  ctx: any
+}) {
+  const app = await PreStakedApp.findOne({ status: APPLICATION_STATUSES.READY })
+  const { address } = app.freeTierApplicationAccount
+  const { balance } = (await getBalance(address)) as QueryBalanceResponse
+
+  ctx.logger.log(`${address} balance is ${balance}`)
+
+  if (balance >= FREE_TIER_STAKE_AMOUNT) {
+    ctx.logger.warn(`app ${address} already had enough balance`)
+    app.status = APPLICATION_STATUSES.AWAITING_FREETIER_STAKING
+    app.chain = chain
+    await app.save()
+    return false
+  }
+
+  const txHash = await transferFromFreeTierFund(
+    FREE_TIER_STAKE_AMOUNT.toString(),
+    address
+  )
+
+  if (!txHash) {
+    ctx.logger.warn(
+      `Funds were not sent for app ${app.freeTierApplicationAccount.address}! This is an issue with connecting to the network with PocketJS.`
+    )
+    return false
+  }
+
+  app.status = APPLICATION_STATUSES.AWAITING_FREETIER_STAKING
+  app.fundingTxHash = txHash
+  app.chain = chain
+
+  ctx.logger.log(
+    `fillAppPool(): sent funds to account ${address} on tx ${txHash}`
+  )
+  await app.save()
+  return true
+}
+
 async function stakeApplication({
   app,
-  chain = '0021',
   ctx,
 }: {
   app: IPreStakedApp
   chain: string
   ctx: any
 }): Promise<boolean> {
-  const { address, passPhrase, privateKey } = app.freeTierApplicationAccount
+  const { chain, freeTierApplicationAccount } = app
+  const { address, passPhrase, privateKey } = freeTierApplicationAccount
   const { balance } = (await getBalance(address)) as QueryBalanceResponse
-  const onChainApp = await getApp(address)
-
-  if (
-    balance < FREE_TIER_STAKE_AMOUNT &&
-    typeGuard(onChainApp, QueryAppResponse)
-  ) {
-    ctx.logger.warn(`app ${address} already exists ${chain}`)
-    app.status = APPLICATION_STATUSES.READY
-    app.chain = ((onChainApp as unknown) as QueryAppResponse).toJSON().chains[0]
-    await app.save()
-    return
-  }
 
   if (balance < FREE_TIER_STAKE_AMOUNT) {
     ctx.logger.warn(
@@ -135,7 +167,7 @@ async function stakeApplication({
     (stakeTxToSend as RawTxRequest).txHex
   )
 
-  app.status = APPLICATION_STATUSES.READY
+  app.status = APPLICATION_STATUSES.SWAPPABLE
   app.stakingTxHash = txHash
   app.chain = chain
   await app.save()
@@ -147,13 +179,12 @@ async function stakeApplication({
   return true
 }
 
-async function getApplicationAndFund({ chain }: { chain: string }) {
-  // Get one "READY" app
-}
-
 export async function fillAppPool(ctx): Promise<void> {
   const appPool = await PreStakedApp.find({
-    status: APPLICATION_STATUSES.SWAPPABLE,
+    $or: [
+      { status: APPLICATION_STATUSES.SWAPPABLE },
+      { status: APPLICATION_STATUSES.AWAITING_FREETIER_STAKING },
+    ],
   })
 
   for (const [, { id, limit }] of Object.entries(chains)) {
@@ -167,40 +198,23 @@ export async function fillAppPool(ctx): Promise<void> {
       )
 
       for (let i = 0; i < slotsToFill; i++) {
-        await getApplicationAndFund({ chain: id })
+        await getApplicationAndFund({ chain: id, ctx })
       }
     }
   }
-
-  const slotsAvailable = totalPoolSize - (appPool?.length ?? 0)
-  // limit apps creaeted to 100 each run so the node doesn't die
-  const appsToCreate = slotsAvailable > 25 ? 25 : slotsAvailable
-
-  ctx.logger.log(`fillAppPool(): creating ${appsToCreate} apps`)
-
-  const appsCreated = Array(appsToCreate).fill(0)
-
-  Promise.allSettled(
-    appsCreated.map(async () => {
-      await createApplicationAndFund(ctx)
-    })
-  )
 }
 
 export async function stakeAppPool(ctx): Promise<void> {
-  const appPool = await PreStakedApp.find()
-  const readyPool: IPreStakedApp[] = appPool.filter(
-    ({ status }) => status === APPLICATION_STATUSES.AWAITING_STAKING
-  )
-  // limit apps staked to 100 each run so the node doesn't die
-  const appsToStake = readyPool.slice(0, 500)
+  const appPool = await PreStakedApp.find({
+    status: APPLICATION_STATUSES.AWAITING_FREETIER_STAKING,
+  })
 
   await Promise.allSettled(
-    appsToStake.map(async (app) => {
+    appPool.map(async (app) => {
       ctx.logger.log(
-        `PRESTAKING APP ${app.freeTierApplicationAccount.address} for 0021`
+        `Staking ${app.freeTierApplicationAccount.address} for ${app.chain}`
       )
-      await stakeApplication(ctx, app, '0021')
+      await stakeApplication({ ctx, app, chain: app.chain })
     })
   )
 }

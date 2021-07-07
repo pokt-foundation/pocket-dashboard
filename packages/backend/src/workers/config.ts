@@ -58,7 +58,7 @@ const MAIN_CHAINS = {
   ETHEREUM_MAINNET_FULL: {
     ticker: 'ETH',
     id: '0021',
-    limit: 3,
+    limit: 14,
   },
   ETHEREUM_RINKEBY_FULL: {
     ticker: 'ETH',
@@ -68,7 +68,7 @@ const MAIN_CHAINS = {
   ETHEREUM_XDAI_FULL: {
     ticker: 'POA',
     id: '0027',
-    limit: 0,
+    limit: 3,
   },
   POCKET_MAINNET: {
     ticker: 'POKT',
@@ -102,18 +102,18 @@ export const chains = getChainsByEnvironment()
  * misc workers are colored cyan
  */
 export const workers = [
-  // {
-  //   name: 'App pool filler',
-  //   color: 'green',
-  //   workerFn: (ctx): Promise<void> => fillAppPool(ctx),
-  //   recurrence: ONE_MINUTES,
-  // },
-  // {
-  //   name: 'App pool staker',
-  //   color: 'green',
-  //   workerFn: (ctx): Promise<void> => stakeAppPool(ctx),
-  //   recurrence: FIVE_MINUTES,
-  // },
+  {
+    name: 'App pool filler',
+    color: 'green',
+    workerFn: (ctx): Promise<void> => fillAppPool(ctx),
+    recurrence: ONE_MINUTES,
+  },
+  {
+    name: 'App pool staker',
+    color: 'green',
+    workerFn: (ctx): Promise<void> => stakeAppPool(ctx),
+    recurrence: FIVE_MINUTES,
+  },
   {
     name: 'Network stats counter',
     color: 'yellow',
