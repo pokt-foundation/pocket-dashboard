@@ -79,9 +79,9 @@ export default function MenuPanel({ appsLoading = true, userApps = [] }) {
       }))
     )
 
-    // if (userApps.length < MAX_USER_APPS) {
-    //   groups[1].push(...CREATE_APP_ROUTE)
-    // }
+    if (userApps.length < MAX_USER_APPS) {
+      groups[1].push(...CREATE_APP_ROUTE)
+    }
 
     return groups
   }, [userApps])
