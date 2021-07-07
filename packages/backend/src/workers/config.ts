@@ -38,22 +38,22 @@ const MAIN_CHAINS = {
   ETHEREUM_GOERLI_FULL: {
     ticker: 'ETH',
     id: '0026',
-    limit: 0,
+    limit: 2,
   },
   ETHEREUM_KOVAN_FULL: {
     ticker: 'POA',
     id: '0024',
-    limit: 0,
+    limit: 2,
   },
   ETHEREUM_MAINNET_ARCHIVAL: {
     ticker: 'ETH',
     id: '0022',
-    limit: 0,
+    limit: 3,
   },
   FUSE_FULL: {
     ticker: 'FUSE',
     id: '0005',
-    limit: 0,
+    limit: 3,
   },
   ETHEREUM_MAINNET_FULL: {
     ticker: 'ETH',
@@ -63,7 +63,7 @@ const MAIN_CHAINS = {
   ETHEREUM_RINKEBY_FULL: {
     ticker: 'ETH',
     id: '0025',
-    limit: 0,
+    limit: 3,
   },
   ETHEREUM_XDAI_FULL: {
     ticker: 'POA',
@@ -73,7 +73,7 @@ const MAIN_CHAINS = {
   POCKET_MAINNET: {
     ticker: 'POKT',
     id: '0001',
-    limit: 0,
+    limit: 2,
   },
 }
 

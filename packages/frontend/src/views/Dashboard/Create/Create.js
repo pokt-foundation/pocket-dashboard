@@ -173,7 +173,7 @@ export default function Create() {
           data: { chains },
         } = res
 
-        return []
+        return chains
       } catch (err) {
         if (sentryEnabled) {
           Sentry.configureScope((scope) => {
@@ -402,7 +402,12 @@ function BasicSetup({
         }
         secondary={
           <>
-            <Button wide onClick={onCreateApp} disabled={true} mode="strong">
+            <Button
+              wide
+              onClick={onCreateApp}
+              disabled={isCreateDisabled}
+              mode="strong"
+            >
               Launch Application
             </Button>
             <Spacer size={2 * GU} />
