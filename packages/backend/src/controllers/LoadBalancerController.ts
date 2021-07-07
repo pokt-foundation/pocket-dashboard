@@ -127,7 +127,7 @@ router.post(
       })
     }
     const preStakedApp: IPreStakedApp = await ApplicationPool.findOne({
-      status: APPLICATION_STATUSES.READY,
+      status: APPLICATION_STATUSES.SWAPPABLE,
       chain,
     })
 
@@ -145,7 +145,7 @@ router.post(
       chain,
       name,
       user: id,
-      status: APPLICATION_STATUSES.READY,
+      status: APPLICATION_STATUSES.IN_SERVICE,
       lastChangedStatusAt: new Date(Date.now()),
       // We enforce every app to be treated as a free-tier app for now.
       freeTier: true,
@@ -418,7 +418,7 @@ router.post(
 
     const appsInPool = await ApplicationPool.find({
       chain,
-      status: APPLICATION_STATUSES.READY,
+      status: APPLICATION_STATUSES.SWAPPABLE,
     })
 
     if (!loadBalancer) {
@@ -490,7 +490,7 @@ router.post(
           freeTierApplicationAccount:
             replacementApplication.freeTierApplicationAccount,
           gatewayAAT: replacementApplication.gatewayAAT,
-          status: APPLICATION_STATUSES.READY,
+          status: APPLICATION_STATUSES.IN_SERVICE,
           lastChangedStatusAt: Date.now(),
           freeTier: true,
           // We wanna preserve user-related configuration fields, so we just copy them over

@@ -30,7 +30,7 @@ router.get(
   asyncMiddleware(async (req: Request, res: Response) => {
     const id = (req.user as IUser)._id
     const application = await Application.find({
-      status: APPLICATION_STATUSES.READY,
+      status: APPLICATION_STATUSES.IN_SERVICE,
       user: id,
     })
 
@@ -241,7 +241,7 @@ router.post(
     const replacementApplication: IPreStakedApp = await ApplicationPool.findOne(
       {
         chain,
-        status: APPLICATION_STATUSES.READY,
+        status: APPLICATION_STATUSES.SWAPPABLE,
       }
     )
 
@@ -278,7 +278,7 @@ router.post(
       freeTierApplicationAccount:
         replacementApplication.freeTierApplicationAccount,
       gatewayAAT: replacementApplication.gatewayAAT,
-      status: APPLICATION_STATUSES.READY,
+      status: APPLICATION_STATUSES.IN_SERVICE,
       lastChangedStatusAt: Date.now(),
       freeTier: true,
       updatedAt: new Date(Date.now()),
