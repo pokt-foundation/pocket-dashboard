@@ -62,7 +62,7 @@ function ApplicationDetail({ activeApplication, refetchActiveAppData }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [sessionRelayDep]
   )
-  console.log(sessionRelayData, 'huh?')
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const dailyRelays = useMemo(() => dailyRelayData?.daily_relays ?? 0, [
     dailyRelaysDep,
