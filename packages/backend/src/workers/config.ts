@@ -38,22 +38,22 @@ const MAIN_CHAINS = {
   ETHEREUM_GOERLI_FULL: {
     ticker: 'ETH',
     id: '0026',
-    limit: 3,
+    limit: 0,
   },
   ETHEREUM_KOVAN_FULL: {
     ticker: 'POA',
     id: '0024',
-    limit: 2,
+    limit: 0,
   },
   ETHEREUM_MAINNET_ARCHIVAL: {
     ticker: 'ETH',
     id: '0022',
-    limit: 1,
+    limit: 0,
   },
   FUSE_FULL: {
     ticker: 'FUSE',
     id: '0005',
-    limit: 1,
+    limit: 0,
   },
   ETHEREUM_MAINNET_FULL: {
     ticker: 'ETH',
@@ -63,17 +63,17 @@ const MAIN_CHAINS = {
   ETHEREUM_RINKEBY_FULL: {
     ticker: 'ETH',
     id: '0025',
-    limit: 2,
+    limit: 0,
   },
   ETHEREUM_XDAI_FULL: {
     ticker: 'POA',
     id: '0027',
-    limit: 2,
+    limit: 0,
   },
   POCKET_MAINNET: {
     ticker: 'POKT',
     id: '0001',
-    limit: 1,
+    limit: 0,
   },
 }
 
@@ -89,7 +89,8 @@ function getChainsByEnvironment() {
   }
 }
 
-export const FREE_TIER_STAKE_AMOUNT = 1000000n
+export const FREE_TIER_STAKE_AMOUNT = 8000000000n
+export const SLOT_STAKE_AMOUNT = 1000n
 export const chains = getChainsByEnvironment()
 
 /**

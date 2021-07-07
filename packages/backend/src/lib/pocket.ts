@@ -176,11 +176,9 @@ export async function transferFromFreeTierFund(
     .send(freeTierFundAddress, customerAddress, totalAmount.toString())
     .submit(chainId, transactionFee)
 
-  console.log('rawTxResponse', rawTxResponse)
   if (typeGuard(rawTxResponse, RpcError)) {
     throw new Error(rawTxResponse.message)
   }
-  console.log(rawTxResponse.hash, 'done')
   return rawTxResponse.hash
 }
 
@@ -220,7 +218,6 @@ export async function getBalance(
     .rpc(pocketRpcProvider)
     .query.getBalance(addressHex)
 
-  console.log(applicationResponse, 'app response for', addressHex)
   return applicationResponse
 }
 
@@ -322,7 +319,6 @@ export async function submitRawTransaction(
     .rpc(pocketRpcProvider)
     .client.rawtx(fromAddress, rawTxBytes)
 
-  console.log('raw tx response stake', rawTxResponse)
   if (typeGuard(rawTxResponse, RpcError)) {
     throw new Error(rawTxResponse.message)
   }

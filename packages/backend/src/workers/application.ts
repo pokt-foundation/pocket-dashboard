@@ -20,9 +20,17 @@ import {
 import { APPLICATION_STATUSES } from '../application-statuses'
 import env, { PocketNetworkKeys } from '../environment'
 
-const MAX_POOL_SIZE = 1389 + 200 + 25
+const MAX_POOL_SIZE = 1607
 
-async function createApplicationAndFund(ctx): Promise<void> {
+type AppWorkerParams = {
+  app: IPreStakedApp
+  chain: string
+  ctx: any
+}
+
+async function createApplicationAndFund({
+  ctx,
+}: AppWorkerParams): Promise<void> {
   const { clientPubKey, aatVersion } = env(
     'POCKET_NETWORK'
   ) as PocketNetworkKeys
@@ -79,11 +87,16 @@ async function createApplicationAndFund(ctx): Promise<void> {
   )
   await newAppForPool.save()
 }
-async function stakeApplication(
+
+async function stakeApplication({
+  app,
+  chain = '0021',
   ctx,
-  app: IPreStakedApp,
-  chain = '0021'
-): Promise<boolean> {
+}: {
+  app: IPreStakedApp
+  chain: string
+  ctx: any
+}): Promise<boolean> {
   const { address, passPhrase, privateKey } = app.freeTierApplicationAccount
   const { balance } = (await getBalance(address)) as QueryBalanceResponse
   const onChainApp = await getApp(address)
@@ -134,24 +147,29 @@ async function stakeApplication(
   return true
 }
 
+async function getApplicationAndFund({ chain }: { chain: string }) {
+  // Get one "READY" app
+}
+
 export async function fillAppPool(ctx): Promise<void> {
-  const totalPoolSize = MAX_POOL_SIZE
-  const appPool = await PreStakedApp.find()
+  const appPool = await PreStakedApp.find({
+    status: APPLICATION_STATUSES.SWAPPABLE,
+  })
 
-  if (appPool.length >= MAX_POOL_SIZE) {
-    ctx.logger.log(
-      `fillAppPool(): script not allowed to run more than once, pool size ${appPool.length}`
-    )
-    return
-  }
+  for (const [, { id, limit }] of Object.entries(chains)) {
+    const availableApps = appPool.filter((app) => app?.chain === id)
 
-  ctx.logger.log(
-    `fillAppPool(): pool size limit ${totalPoolSize}, pool size ${appPool?.length}`
-  )
+    if (availableApps.length < limit) {
+      const slotsToFill = limit - availableApps.length
 
-  if (totalPoolSize <= appPool.length) {
-    ctx.logger.log('fillAppPool(): No need to fill the pool.')
-    return
+      ctx.logger.log(
+        `Filling ${slotsToFill} (out of ${limit}) slots for chain ${id}`
+      )
+
+      for (let i = 0; i < slotsToFill; i++) {
+        await getApplicationAndFund({ chain: id })
+      }
+    }
   }
 
   const slotsAvailable = totalPoolSize - (appPool?.length ?? 0)
@@ -177,7 +195,7 @@ export async function stakeAppPool(ctx): Promise<void> {
   // limit apps staked to 100 each run so the node doesn't die
   const appsToStake = readyPool.slice(0, 500)
 
-  Promise.allSettled(
+  await Promise.allSettled(
     appsToStake.map(async (app) => {
       ctx.logger.log(
         `PRESTAKING APP ${app.freeTierApplicationAccount.address} for 0021`

@@ -38,6 +38,7 @@ const MAX_RELAYS_PER_SESSION = 40000
 const ONE_MILLION = 1000000
 const ONE_SECOND = 1 // Data for graphs come in second
 const PER_PAGE = 10
+const SESSIONS_PER_DAY = 24
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -358,7 +359,7 @@ export default function AppInfo({
                   chartLabels={usageLabels}
                   chartLines={usageLines}
                   chartScales={usageScales}
-                  maxSessionRelays={maxDailyRelays}
+                  maxSessionRelays={maxDailyRelays / SESSIONS_PER_DAY}
                   sessionRelays={currentSessionRelays}
                 />
                 <Spacer size={3 * GU} />
