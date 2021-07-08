@@ -35,6 +35,16 @@ const TEST_CHAINS = {
 }
 
 const MAIN_CHAINS = {
+  AVAX_MAINNET: {
+    ticker: 'AVAX',
+    id: '0003',
+    limit: 2,
+  },
+  BINANCE_SMART_CHAIN: {
+    ticker: 'BSC',
+    id: '0004',
+    limit: 3,
+  },
   ETHEREUM_GOERLI_FULL: {
     ticker: 'ETH',
     id: '0026',
@@ -50,11 +60,6 @@ const MAIN_CHAINS = {
     id: '0022',
     limit: 3,
   },
-  FUSE_FULL: {
-    ticker: 'FUSE',
-    id: '0005',
-    limit: 3,
-  },
   ETHEREUM_MAINNET_FULL: {
     ticker: 'ETH',
     id: '0021',
@@ -68,6 +73,11 @@ const MAIN_CHAINS = {
   ETHEREUM_XDAI_FULL: {
     ticker: 'POA',
     id: '0027',
+    limit: 3,
+  },
+  FUSE_FULL: {
+    ticker: 'FUSE',
+    id: '0005',
     limit: 3,
   },
   POCKET_MAINNET: {
