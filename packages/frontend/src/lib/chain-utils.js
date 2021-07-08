@@ -6,7 +6,7 @@ const CHAIN_ID_PREFIXES = new Map([
   ['0005', { prefix: 'fuse-mainnet', name: 'Fuse Mainnet' }],
   ['0006', { prefix: 'solana-mainnet', name: 'Solana Mainnet' }],
   ['0009', { prefix: 'poly-mainnet', name: 'Polygon (Matic)' }],
-  [('0021', { prefix: 'eth-mainnet', name: 'Ethereum Mainnet' })],
+  ['0021', { prefix: 'eth-mainnet', name: 'Ethereum Mainnet' }],
   ['0022', { prefix: 'eth-archival', name: 'Ethereum Mainnet (Archival)' }],
   ['0023', { prefix: 'eth-ropsten', name: 'Ethereum Ropsten' }],
   ['0024', { prefix: 'poa-kovan', name: 'Kovan' }],
