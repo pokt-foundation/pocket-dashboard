@@ -2,38 +2,35 @@ import path from 'path'
 import mailgun, { Mailgun, messages } from 'mailgun-js'
 import env from '../environment'
 
-const FROM_EMAIL = 'Pocket Dashboard <dashboard@pokt.network>'
+const FROM_EMAIL = 'Pocket Portal <portal@pokt.network>'
 const DOMAIN = 'pokt.network'
 const WHITELISTED_TEMPLATES = new Map([
   [
     'NotificationChange',
     [
       'pocket-dashboard-notifications-changed',
-      'Pocket Dashboard: Notification settings',
+      'Pocket Portal: Notification settings',
     ],
   ],
   [
     'NotificationSignup',
     [
       'pocket-dashboard-notifications-signup',
-      "Pocket Dashboard: You've signed up for notifications",
+      "Pocket Portal: You've signed up for notifications",
     ],
   ],
   [
     'NotificationThresholdHit',
     [
       'pocket-dashboard-notifications-threshold-hit',
-      'Pocket Dashboard: App notification',
+      'Pocket Portal: App notification',
     ],
   ],
   [
     'PasswordReset',
-    [
-      'pocket-dashboard-password-reset',
-      'Pocket Dashboard: Reset your password',
-    ],
+    ['pocket-dashboard-password-reset', 'Pocket Portal: Reset your password'],
   ],
-  ['SignUp', ['pocket-dashboard-signup', 'Pocket Dashboard: Sign up']],
+  ['SignUp', ['pocket-dashboard-signup', 'Pocket Portal: Sign up']],
 ])
 
 export interface IResetPasswordTemplateData {
