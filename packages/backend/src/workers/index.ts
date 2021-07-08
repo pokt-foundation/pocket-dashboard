@@ -6,7 +6,7 @@ const ONE_SECOND = 1000
 
 export function startWorkers(): void {
   Logger.setDefaults({ silent: false, verbose: true })
-  const logger = Logger('dashboard-workers')
+  const logger = Logger('portal-workers')
 
   for (const { name, color, workerFn, recurrence } of workers) {
     cron.schedule(recurrence, async function handleWorkerProcess() {
