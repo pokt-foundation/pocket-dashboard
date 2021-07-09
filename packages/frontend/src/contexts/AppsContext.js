@@ -7,7 +7,7 @@ const DEFAULT_APP_STATE = {
   userApps: [],
 }
 
-const AppsContext = React.createContext()
+const AppsContext = React.createContext(DEFAULT_APP_STATE)
 
 export function useUserApps() {
   const context = useContext(AppsContext)

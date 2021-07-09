@@ -175,8 +175,8 @@ export default function Notifications({
                     ${textStyle('body2')}
                   `}
                 >
-                  Set up your usage alert notifications so you're always aware
-                  if you're close to maxing out on your alloted requests.
+                  Set up usage alerts to be warned when you are approaching your
+                  relay limits, to prevent any service interruption.
                 </p>
               </Box>
               <Spacer size={2 * GU} />
@@ -351,14 +351,14 @@ export default function Notifications({
                 Back to application
               </Button>
               <Spacer size={2 * GU} />
-              <Box title="Notification preferences">
+              <Box title="Activate alerts">
                 <p
                   css={`
                     ${textStyle('body2')}
                   `}
                 >
-                  Whenever an app reaches one of the bandwith thresholds defined
-                  below, we'll send an email notifying you about it.
+                  We will send an email when your usage crosses the thresholds
+                  specified below.
                 </p>
               </Box>
               <Spacer size={2 * GU} />

@@ -1,11 +1,11 @@
 {
   "name": "@pokt-foundation/pocket-dashboard-frontend",
   "version": "0.1.0",
-  "description": "Pocket dashboard",
+  "description": "Pocket Portal frontend",
   "homepage": "./",
   "private": false,
   "repository": {
-    "url": "https://github.com/pokt-network/pocket-dashboard",
+    "url": "https://github.com/pokt-foundation/portal",
     "type": "git"
   },
   "author": "Pocket Network",

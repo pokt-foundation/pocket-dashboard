@@ -12,7 +12,7 @@ export default function initializeSentry() {
       dsn: env('SENTRY_DSN'),
       environment: env('PROD') ? 'production' : 'development',
       integrations: [new Integrations.BrowserTracing()],
-      release: 'pocket-dashboard@' + env('BUILD'),
+      release: 'pocket-portal@' + env('BUILD'),
       tracesSampleRate: 1.0,
     })
   }

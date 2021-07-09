@@ -57,7 +57,7 @@ export default function OnboardingHeader() {
           </li>
           <li>
             <Link
-              href="https://dashboard.pokt.network"
+              href="https://mainnet.portal.pokt.network"
               css={`
                 && {
                   text-decoration: none;
