@@ -187,12 +187,11 @@ export default function NetworkStatus() {
                     fields={[
                       { label: 'Network', align: 'start' },
                       { label: 'ID', align: 'start' },
-                      { label: 'Ticker', align: 'start' },
                     ]}
                     entries={chains}
                     mode={compactMode ? 'list' : 'table'}
                     entriesPerPage={PER_PAGE}
-                    renderEntry={({ description, id, network, ticker }) => [
+                    renderEntry={({ description, id, network }) => [
                       <p
                         css={`
                           overflow-wrap: break-word;
@@ -203,7 +202,6 @@ export default function NetworkStatus() {
                         {description || network}
                       </p>,
                       <p>{id}</p>,
-                      <p>{ticker}</p>,
                     ]}
                   />
                 </Box>

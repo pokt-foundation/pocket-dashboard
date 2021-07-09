@@ -141,13 +141,12 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                 <Box>
                   <p
                     css={`
-                      ${textStyle('body3')}
+                      ${textStyle('body2')}
                     `}
                   >
-                    To maximize security for your application, you may turn on
-                    the secret key requirement and/or whitelist user agents and
-                    origins. Make sure to configure your user-agents and origins
-                    properly to protect your endpoints against unwanted users.
+                    To maximize the security of your application, you should
+                    activate the private secret key for all requests and enable
+                    the use of whitelist user agents and origins.
                   </p>
                 </Box>
                 <Spacer size={3 * GU} />
@@ -171,7 +170,7 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                         ${textStyle('title2')}
                       `}
                     >
-                      Secret key required
+                      Private Secret Key Required
                     </h3>
                   </div>
                   <Switch
@@ -275,11 +274,11 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
             secondary={
               <>
                 <Button wide mode="strong" onClick={mutate}>
-                  Save changes
+                  Save Changes
                 </Button>
                 <Spacer size={2 * GU} />
                 <Button wide onClick={() => history.goBack()}>
-                  Go back
+                  Go Back
                 </Button>
                 <Spacer size={2 * GU} />
                 <AppStatus stakedTokens={stakedTokens} maxRelays={maxRelays} />

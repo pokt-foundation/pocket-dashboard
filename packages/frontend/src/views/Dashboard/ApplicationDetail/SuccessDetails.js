@@ -221,7 +221,7 @@ export default function SuccessDetails({
                           ${textStyle('title3')}
                         `}
                       >
-                        Success rate
+                        Successful Requests
                       </h2>
                     </div>
                   </Inline>
@@ -248,7 +248,7 @@ export default function SuccessDetails({
                             ${textStyle('body3')}
                           `}
                         >
-                          Dropped requests
+                          Failure Rate
                         </span>
                       </h2>
                       <h2

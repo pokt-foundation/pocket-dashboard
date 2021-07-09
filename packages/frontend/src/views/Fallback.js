@@ -29,14 +29,14 @@ export default function Fallback() {
             color: #fff;
           `}
         >
-          Oh no! Something has gone wrong while you were using our Dashboard.
-          Our team has been notified and will triage this issue soon. If this
-          issue persists, you can contact our team on{' '}
-          <Link href="https://discord.gg/uCZZkHTQjV">Discord</Link> and we'll
-          help you out as soon as possible.
+          Oh no, the Portal has inexplicably closed! Click Reload to try opening
+          it again. If this issue persists,&nbsp;
+          <Link href="https://discord.gg/uCZZkHTQjV">
+            contact us on Discord.
+          </Link>
         </p>
         <Spacer size={2 * GU} />
-        <Button wide mode="strong" onClick={() => window.location.reload()}>
+        <Button wide onClick={() => window.location.reload()}>
           Reload
         </Button>
       </Box>

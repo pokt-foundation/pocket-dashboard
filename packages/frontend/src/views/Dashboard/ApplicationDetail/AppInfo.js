@@ -13,6 +13,7 @@ import {
   CircleGraph,
   DataView,
   LineChart,
+  Link,
   Modal,
   Pagination,
   Spacer,
@@ -254,6 +255,8 @@ export default function AppInfo({
 
     const diff = today.diff(appLastUpdated, 'day')
 
+    console.log(diff, today, appLastUpdated, 'aja')
+
     return diff >= 7
   }, [appData])
 
@@ -281,9 +284,9 @@ export default function AppInfo({
 
   const onOpenModal = useCallback(() => {
     if (isSwitchable) {
-      setNetworkDenialModalVisible(true)
-    } else {
       setNetworkModalVisible(true)
+    } else {
+      setNetworkDenialModalVisible(true)
     }
   }, [isSwitchable])
 
@@ -307,13 +310,18 @@ export default function AppInfo({
                 {exceedsMaxRelays && (
                   <>
                     <Banner
-                      mode="error"
-                      title="Your application has reached the max limit of relays per day"
+                      mode="warning"
+                      title="It's time to up your stake; your app is over the daily limit"
                     >
-                      You should extend your app relays limit to keep the
-                      service according to the demand. Contact our sales team to
-                      find the best solution for you and keep your
-                      infrastructure running.
+                      Don't worry, we've got you covered. To maintain service,
+                      the Portal automatically redirects all surplus relays to
+                      our backup infrastructure. If you want all relays to be
+                      served by Pocket Network, you'll need to stake more POKT.
+                      Please{' '}
+                      <Link href="mailto:sales@pokt.network">
+                        contact the team
+                      </Link>{' '}
+                      for further assistance.
                     </Banner>
                     <Spacer size={2 * GU} />
                   </>
@@ -321,13 +329,18 @@ export default function AppInfo({
                 {!exceedsMaxRelays && exceedsSessionRelays && (
                   <>
                     <Banner
-                      mode="error"
-                      title="Your application has reached the max limit of relays per session"
+                      mode="warning"
+                      title="It's time to up your stake; your app is over the session limit"
                     >
-                      You should extend your app relays limit to keep the
-                      service according to the demand. Contact our sales team to
-                      find the best solution for you and keep your
-                      infrastructure running.
+                      Don't worry, we've got you covered. To maintain service,
+                      the Portal automatically redirects all surplus relays to
+                      our backup infrastructure. If you want all relays to be
+                      served by Pocket Network, you'll need to stake more POKT.
+                      Please{' '}
+                      <Link href="mailto:sales@pokt.network">
+                        contact the team
+                      </Link>{' '}
+                      for further assistance.
                     </Banner>
                     <Spacer size={3 * GU} />
                   </>
@@ -380,7 +393,7 @@ export default function AppInfo({
                   wide
                   onClick={() => history.push(`${url}/notifications`)}
                 >
-                  Notifications
+                  Notification Setup
                 </Button>
                 <Spacer size={3 * GU} />
                 <AppStatus
@@ -437,12 +450,8 @@ function SwitchInfoModal({ onClose, onSwitch, visible }) {
         >
           <p>
             This action will change your endpoint URL, which means you'll need
-            to update it across your apps.
-          </p>
-          <Spacer size={2 * GU} />
-          <p>
-            This endpoint will remain available for 24 hours before it's
-            unstaked.
+            to update it across your apps to maintain service. The previous
+            endpoint will remain available for 24 hours before it is unstaked.
           </p>
         </Banner>
         <Spacer size={3 * GU} />
@@ -987,7 +996,7 @@ function AppDetails({ apps, id, secret }) {
             margin-bottom: ${2 * GU}px;
           `}
         >
-          App address(es)
+          App address{apps.length > 1 ? 'es' : ''}
         </h3>
         {apps.map(({ address }) => (
           <TextCopy

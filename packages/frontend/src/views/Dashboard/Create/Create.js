@@ -6,12 +6,14 @@ import axios from 'axios'
 import * as Sentry from '@sentry/react'
 import 'styled-components/macro'
 import {
+  Banner,
   Button,
   ButtonBase,
   DataView,
   Help,
   IconCross,
   IconPlus,
+  Modal,
   Link,
   Spacer,
   Split,
@@ -136,6 +138,7 @@ function useConfigureState() {
 }
 
 export default function Create() {
+  const [creationModalVisible, setCreationModalVisible] = useState(false)
   const history = useHistory()
   const {
     appConfigData,
@@ -152,7 +155,7 @@ export default function Create() {
     whitelistUserAgents,
     secretKeyRequired,
   } = appConfigData
-  const { appsData } = useUserApps()
+  const { isAppsLoading, userApps } = useUserApps()
   const queryClient = useQueryClient()
 
   const {
@@ -231,13 +234,19 @@ export default function Create() {
     }
   })
 
-  useEffect(() => {
-    if (appsData?.length >= MAX_USER_APPS) {
-      const [userApp] = appsData
+  const memoizableUserApps = JSON.stringify(userApps)
 
-      history.push(`/app/${userApp.appId}`)
+  useEffect(() => {
+    if (userApps.length >= MAX_USER_APPS) {
+      setCreationModalVisible(true)
     }
-  }, [appsData, history])
+
+  }, [memoizableUserApps])
+
+  const onCloseCreationModal = useCallback(
+    () => setCreationModalVisible(false),
+    []
+  )
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,
@@ -272,15 +281,20 @@ export default function Create() {
       isCreateLoading ||
       isCreateSuccess ||
       !appName ||
+      isAppsLoading ||
+      userApps.length >= MAX_USER_APPS ||
       !selectedNetwork,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       appName,
       selectedNetwork,
+      isAppsLoading,
       isChainsError,
       isChainsLoading,
       isCreateError,
       isCreateLoading,
       isCreateSuccess,
+      memoizableUserApps,
     ]
   )
 
@@ -314,6 +328,10 @@ export default function Create() {
                 isCreateDisabled={isCreateDisabled}
                 updateData={updateAppConfigData}
                 chains={chains}
+              />
+              <CreationDenialModal
+                onClose={onCloseCreationModal}
+                visible={creationModalVisible}
               />
             </animated.div>
           ))}
@@ -367,14 +385,14 @@ function BasicSetup({
                   ${textStyle('body3')}
                 `}
               >
-                Choose the Blockchain you want to connect your app to.{' '}
+                Choose the network you want to connect your app to.{' '}
                 <span
                   css={`
                     font-weight: bold;
                   `}
                 >
-                  Be aware that you will only be able to change this selected
-                  Network once a week.
+                  Be aware that you will only be able to change the selected
+                  network once a week.
                 </span>{' '}
               </p>
               <Spacer size={2 * GU} />
@@ -425,10 +443,10 @@ function BasicSetup({
                 ${textStyle('body4')}
               `}
             >
-              Launch your application for free for unlimited time subsidised by
-              Pocket Network Inc. for more information read our site{' '}
+              Your application will receive up to 1M free daily relays
+              subsidized by Pocket Network Inc. For more information read our{' '}
               <Link href="https://dashboard.pokt.network/support/terms-of-service">
-                T&amp;C of Use
+                Site T&amp;C of Use
               </Link>
               .
             </p>
@@ -698,5 +716,32 @@ function FreeTierInfo() {
         </li>
       </ul>
     </Box>
+  )
+}
+
+function CreationDenialModal({ onClose, visible }) {
+  return (
+    <Modal
+      visible={visible}
+      onClose={onClose}
+      css={`
+        & > div > div > div > div {
+          padding: 0 !important;
+        }
+      `}
+    >
+      <div
+        css={`
+          max-width: ${87 * GU}px;
+        `}
+      >
+        <Banner mode="warning" title="You've reached your endpoint limit">
+          Pocket Portal only allows each account to have 4 endpoints. If you
+          need more, please{' '}
+          <Link href="mailto:sales@pokt.network">contact our team</Link> and
+          we'll work out a solution for you.
+        </Banner>
+      </div>
+    </Modal>
   )
 }
