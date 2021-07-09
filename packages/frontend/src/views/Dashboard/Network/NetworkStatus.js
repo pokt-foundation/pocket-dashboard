@@ -27,6 +27,8 @@ import {
 import { norm } from 'lib/math-utils'
 import Economics from '../../../assets/economics.png'
 
+const OFFICIAL_CHAINS = ['0001', '0005', '0021', '0022']
+
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const PER_PAGE = 5
@@ -187,22 +189,28 @@ export default function NetworkStatus() {
                     fields={[
                       { label: 'Network', align: 'start' },
                       { label: 'ID', align: 'start' },
+                      { label: 'Status', align: 'start' },
                     ]}
                     entries={chains}
                     mode={compactMode ? 'list' : 'table'}
                     entriesPerPage={PER_PAGE}
-                    renderEntry={({ description, id, network }) => [
-                      <p
-                        css={`
-                          overflow-wrap: break-word;
-                          word-break: break-word;
-                          hyphens: auto;
-                        `}
-                      >
-                        {description || network}
-                      </p>,
-                      <p>{id}</p>,
-                    ]}
+                    renderEntry={({ description, id, network }) => {
+                      return [
+                        <p
+                          css={`
+                            overflow-wrap: break-word;
+                            word-break: break-word;
+                            hyphens: auto;
+                          `}
+                        >
+                          {description || network}
+                        </p>,
+                        <p>{id}</p>,
+                        <p>
+                          {OFFICIAL_CHAINS.includes(id) ? 'Official' : 'Beta'}
+                        </p>,
+                      ]
+                    }}
                   />
                 </Box>
                 <Spacer size={3 * GU} />

@@ -255,8 +255,6 @@ export default function AppInfo({
 
     const diff = today.diff(appLastUpdated, 'day')
 
-    console.log(diff, today, appLastUpdated, 'aja')
-
     return diff >= 7
   }, [appData])
 
