@@ -26,15 +26,34 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!--
-  This HTML file is a template.
-  If you open it directly in the browser, you will see an empty page.
+    <script type="text/javascript">
+      //some default pre init
+      var Countly = Countly || {}
+      Countly.q = Countly.q || []
 
-  You can add webfonts, meta tags, or analytics to this file.
-  The build step will place the bundled scripts into the <body> tag.
+      //provide countly initialization parameters
+      Countly.app_key = '84c93ef4b39edb8d4a9fca5a7d91685554e64218'
+      Countly.url = 'https://countly.portal.pokt.network'
 
-  To begin the development, run `npm start` or `yarn start`.
-  To create a production bundle, use `npm run build` or `yarn build`.
--->
+      Countly.q.push(['track_sessions'])
+      Countly.q.push(['track_pageview'])
+      Countly.q.push(['track_clicks'])
+      Countly.q.push(['track_links'])
+      Countly.q.push(['track_forms'])
+
+      //load countly script asynchronously
+      ;(function () {
+        var cly = document.createElement('script')
+        cly.type = 'text/javascript'
+        cly.async = true
+        //enter url of script here
+        cly.src = 'https://countly.portal.pokt.network/sdk/web/countly.min.js'
+        cly.onload = function () {
+          Countly.init()
+        }
+        var s = document.getElementsByTagName('script')[0]
+        s.parentNode.insertBefore(cly, s)
+      })()
+    </script>
   </body>
 </html>
