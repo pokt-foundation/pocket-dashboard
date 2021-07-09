@@ -240,8 +240,7 @@ export default function Create() {
     if (userApps.length >= MAX_USER_APPS) {
       setCreationModalVisible(true)
     }
-
-  }, [memoizableUserApps])
+  }, [memoizableUserApps, userApps.length])
 
   const onCloseCreationModal = useCallback(
     () => setCreationModalVisible(false),

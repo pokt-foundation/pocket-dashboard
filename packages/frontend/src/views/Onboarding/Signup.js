@@ -321,7 +321,7 @@ function SignupForm({
             <CheckBox
               checked={checked}
               onChange={onCheckChange}
-              aria-label="I agree to the pocket Dashboard terms and conditions"
+              aria-label="I agree to the Pocket Portal terms and conditions"
               css={`
                 display: inline-block;
                 ${textStyle('body3')};
@@ -335,7 +335,7 @@ function SignupForm({
                 ${textStyle('body3')};
               `}
             >
-              I Agree to the Pocket Dashboard's{' '}
+              I Agree to the Pocket Portal's{' '}
               <InlineLink href="https://www.pokt.network/site-terms-of-use">
                 T. &amp; C.
               </InlineLink>{' '}
