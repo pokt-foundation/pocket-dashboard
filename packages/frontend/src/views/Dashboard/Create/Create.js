@@ -242,10 +242,10 @@ export default function Create() {
     }
   }, [memoizableUserApps, userApps.length])
 
-  const onCloseCreationModal = useCallback(
-    () => setCreationModalVisible(false),
-    []
-  )
+  const onCloseCreationModal = useCallback(() => {
+    setCreationModalVisible(false)
+    history.push('/home')
+  }, [history])
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,

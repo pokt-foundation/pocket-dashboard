@@ -187,7 +187,7 @@ export default function SuccessDetails({
                           ${textStyle('body3')}
                         `}
                       >
-                        Last 7 days count
+                        Last 7 days
                       </span>
                     </h2>
                   </div>
@@ -248,7 +248,7 @@ export default function SuccessDetails({
                             ${textStyle('body3')}
                           `}
                         >
-                          Failure Rate
+                          Failed Requests
                         </span>
                       </h2>
                       <h2

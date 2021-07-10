@@ -160,7 +160,7 @@ export default function NetworkStatus() {
                           ${textStyle('body4')}
                         `}
                       >
-                        Last 7 Days Count
+                        Last 7 Days
                       </h5>
                     </div>
                   </div>
@@ -263,7 +263,7 @@ export default function NetworkStatus() {
                           ${textStyle('body4')}
                         `}
                       >
-                        Last 7 Days Count
+                        Last 7 Days
                       </p>
                     </div>
                   </div>
