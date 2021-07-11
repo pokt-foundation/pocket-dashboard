@@ -771,6 +771,8 @@ function UsageTrends({
 }) {
   const usageColor = useUsageColor(sessionRelays / maxSessionRelays)
   const theme = useTheme()
+  const { within } = useViewport()
+  const compactMode = within(-1, 'medium')
 
   return (
     <Box>
@@ -787,6 +789,7 @@ function UsageTrends({
           display: grid;
           grid-template-columns: 30% 1fr;
           grid-column-gap: ${1 * GU}px;
+          ${compactMode && `grid-template-columns: 1fr;`}
         `}
       >
         <div
@@ -795,12 +798,17 @@ function UsageTrends({
             flex-direction: column;
             align-items: center;
             grid-column: 1;
-            border-right: 1px solid ${theme.background};
+            ${!compactMode && `border-right: 1px solid ${theme.background};`}
+            ${compactMode &&
+            `border-bottom: 1px solid ${theme.background}; padding-bottom: ${
+              1 * GU
+            }px;`}
           `}
         >
           <h3
             css={`
               ${textStyle('title2')}
+              ${compactMode && `margin-top: ${1 * GU}px;`}
             `}
           >
             Current usage
@@ -815,7 +823,7 @@ function UsageTrends({
           <h4
             css={`
               ${textStyle('title2')}
-              text-align: center;
+              ${compactMode && `text-align: center;`}
             `}
           >
             {sessionRelays.toFixed(0)}
@@ -832,12 +840,13 @@ function UsageTrends({
         </div>
         <div
           css={`
-            grid-column: 2;
+            ${!compactMode && `grid-column: 2;`}
           `}
         >
           <h3
             css={`
               ${textStyle('title2')}
+              ${compactMode && `text-align: center;`}
             `}
           >
             Weekly usage
