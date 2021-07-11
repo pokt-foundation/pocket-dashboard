@@ -1051,7 +1051,7 @@ router.post(
       })
     )
 
-    const twentyFourHoursAgo = composeHoursFromNowUtcDate(1)
+    const twentyFourHoursAgo = composeHoursFromNowUtcDate(2)
 
     const latestRelaysPerApp = await Promise.all(
       appIds.map(async function getData(applicationId) {

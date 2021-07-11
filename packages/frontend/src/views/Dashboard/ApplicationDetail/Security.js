@@ -33,7 +33,7 @@ const ADDORNMENT_SETTINGS = {
   padding: 4,
 }
 
-export default function Security({ appData, stakedTokens, maxRelays }) {
+export default function Security({ appData, stakedTokens, maxDailyRelays }) {
   const [origin, setOrigin] = useState('')
   const [origins, setOrigins] = useState([])
   const [secretKeyRequired, setSecretKeyRequired] = useState(false)
@@ -144,9 +144,11 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                       ${textStyle('body2')}
                     `}
                   >
-                    To maximize the security of your application, you should
-                    activate the private secret key for all requests and enable
-                    the use of whitelist user agents and origins.
+                    Set up usage alerts to be warned when you are approaching
+                    your relay limits. The Portal automatically redirects all
+                    surplus relays to our backup infrastructure. If you want all
+                    relays to be unstoppable, stay under your limit or contact
+                    the team to up your stake.
                   </p>
                 </Box>
                 <Spacer size={3 * GU} />
@@ -281,7 +283,10 @@ export default function Security({ appData, stakedTokens, maxRelays }) {
                   Go Back
                 </Button>
                 <Spacer size={2 * GU} />
-                <AppStatus stakedTokens={stakedTokens} maxRelays={maxRelays} />
+                <AppStatus
+                  stakedTokens={stakedTokens}
+                  maxDailyRelays={maxDailyRelays}
+                />
               </>
             }
           />

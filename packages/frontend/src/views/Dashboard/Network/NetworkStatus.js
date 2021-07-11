@@ -74,7 +74,6 @@ export default function NetworkStatus() {
   const { isRelaysError, isRelaysLoading, relayData } = useTotalWeeklyRelays()
   const { isSuccessRateLoading, successRateData } = useNetworkSuccessRate()
 
-  console.log(successRateData?.totalRelays)
   const { isSummaryLoading, summaryData } = useNetworkSummary()
   const { isChainsLoading, chains } = useChains()
   const theme = useTheme()

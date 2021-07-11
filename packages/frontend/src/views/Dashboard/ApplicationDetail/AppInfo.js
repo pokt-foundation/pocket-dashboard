@@ -574,10 +574,12 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
     from: { number: 0 },
   })
   const [primarySuccessColor] = useSuccessRateColor(successRate)
-  const successRateDelta = useMemo(
-    () => (((successRate - previousSuccessRate) / 1) * 100).toFixed(2),
-    [previousSuccessRate, successRate]
-  )
+  const successRateDelta = useMemo(() => {
+    if (successRate >= 0.9999) {
+      return (0).toFixed(2)
+    }
+    return (((successRate - previousSuccessRate) / 1) * 100).toFixed(2)
+  }, [previousSuccessRate, successRate])
 
   const mode = successRateDelta > 0 ? 'positive' : 'negative'
 
