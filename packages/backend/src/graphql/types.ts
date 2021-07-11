@@ -2426,7 +2426,7 @@ export const GetLatestRelaysDocument = gql`
       limit: $limit
       offset: $offset
       order_by: { timestamp: desc }
-      where: { app_pub_key: { _eq: $_eq } }
+      where: { app_pub_key: { _eq: $_eq }, method: { _neq: "synccheck" } }
     ) {
       service_node
       method
@@ -2470,10 +2470,21 @@ export const GetLatestSuccessfulRelaysDocument = gql`
   }
 `
 export const GetLatestFailingRelaysDocument = gql`
-  query getLatestFailingRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+  query getLatestFailingRelays(
+    $_eq: String
+    $_eq1: numeric
+    $offset: Int
+    $_gte: timestamptz
+  ) {
     relay(
       limit: 10
-      where: { app_pub_key: { _eq: $_eq }, result: { _neq: $_eq1 } }
+      where: {
+        app_pub_key: { _eq: $_eq }
+        result: { _neq: $_eq1 }
+        method: { _neq: "synccheck" }
+        timestamp: { _gte: $_gte }
+        service_node: { _ilike: "fallback%" }
+      }
       order_by: { timestamp: desc }
       offset: $offset
     ) {

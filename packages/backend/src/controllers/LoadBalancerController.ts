@@ -1051,6 +1051,8 @@ router.post(
       })
     )
 
+    const twentyFourHoursAgo = composeHoursFromNowUtcDate(1)
+
     const latestRelaysPerApp = await Promise.all(
       appIds.map(async function getData(applicationId) {
         const application: IApplication = await Application.findById(
@@ -1060,6 +1062,8 @@ router.post(
         const result = await gqlClient.getLatestFailingRelays({
           _eq: application.freeTierApplicationAccount.publicKey,
           _eq1: 200,
+          // @ts-ignore
+          _gte: twentyFourHoursAgo,
           offset,
         })
 
