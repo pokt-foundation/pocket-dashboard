@@ -35,7 +35,6 @@ import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
 import { formatNumberToSICompact } from 'lib/formatting-utils'
 
-const MAX_RELAYS_PER_SESSION = 40000
 const ONE_MILLION = 1000000
 const ONE_SECOND = 1 // Data for graphs come in second
 const PER_PAGE = 10
@@ -276,8 +275,8 @@ export default function AppInfo({
   }, [dailyRelayData, maxDailyRelays])
 
   const exceedsSessionRelays = useMemo(() => {
-    return currentSessionRelays >= MAX_RELAYS_PER_SESSION
-  }, [currentSessionRelays])
+    return currentSessionRelays >= maxDailyRelays / 24
+  }, [currentSessionRelays, maxDailyRelays])
 
   const onCloseNetworkModal = useCallback(
     () => setNetworkModalVisible(false),
