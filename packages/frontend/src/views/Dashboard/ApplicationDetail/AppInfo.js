@@ -1008,7 +1008,7 @@ function AppDetails({ apps, id, secret }) {
         {apps.map(({ address }) => (
           <TextCopy
             value={address}
-            onCopy={() => toast('App public key copied to clipboard')}
+            onCopy={() => toast('App address copied to clipboard')}
           />
         ))}
       </div>

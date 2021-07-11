@@ -140,6 +140,8 @@ export default function SuccessDetails({
     }
   }, [activeKey, data])
 
+  log(weeklyRelayData.total_relays - successfulRelayData.total_relays)
+
   return (
     <FloatUp
       loading={false}
