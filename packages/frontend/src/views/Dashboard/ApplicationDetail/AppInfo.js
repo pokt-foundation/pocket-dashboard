@@ -248,6 +248,14 @@ export default function AppInfo({
     latestLatencyData,
   ])
 
+  const avgLatency = useMemo(
+    () =>
+      latestLatencyData.reduce((avg, { latency }) => {
+        return avg + latency
+      }, 0) / latestLatencyData.length,
+    [latestLatencyData]
+  )
+
   const isSwitchable = useMemo(() => {
     dayjs.extend(dayJsutcPlugin)
     const today = dayjs.utc()
@@ -359,7 +367,7 @@ export default function AppInfo({
                     totalRequests={weeklyRelayData.total_relays}
                   />
                   <AvgLatency
-                    avgLatency={successfulRelayData.elapsed_time}
+                    avgLatency={avgLatency}
                     chartLines={barValues}
                     chartLabels={latencyLabels}
                     chartScales={latencyScales}
@@ -660,7 +668,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
                 ${textStyle('body4')}
               `}
             >
-              Last 7 days
+              Last 24 hours
             </p>
           </div>
         </div>

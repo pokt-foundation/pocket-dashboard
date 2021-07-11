@@ -134,18 +134,17 @@ router.get(
       })
     )
 
-    // @ts-ignore
-    dayjs.extend(dayJsutcPlugin)
+    const sevenDaysAgo = composeDaysFromNowUtcDate(8)
+    const yesterday = composeDaysFromNowUtcDate(1)
 
-    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
-
-    const networkRelays = await gqlClient.getTotalSuccesfulNetworkRelays({
+    const networkRelays = await gqlClient.getTotalSuccessfulNetworkRelays({
       _gte: sevenDaysAgo,
+      _lte: yesterday,
     })
 
     res
       .status(200)
-      .send(networkRelays.relay_apps_hourly_aggregate.aggregate.sum)
+      .send(networkRelays.relay_nodes_hourly_aggregate.aggregate.sum)
   })
 )
 
@@ -161,15 +160,17 @@ router.get(
       })
     )
 
-    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
+    const sevenDaysAgo = composeDaysFromNowUtcDate(8)
+    const yesterday = composeDaysFromNowUtcDate(1)
 
     const networkRelays = await gqlClient.getTotalNetworkRelays({
       _gte: sevenDaysAgo,
+      _lte: yesterday,
     })
 
     res
       .status(200)
-      .send(networkRelays.relay_apps_hourly_aggregate.aggregate.sum)
+      .send(networkRelays.relay_nodes_hourly_aggregate.aggregate.sum)
   })
 )
 

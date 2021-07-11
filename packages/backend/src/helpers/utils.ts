@@ -15,6 +15,8 @@ export const errorHandler = () => (
     body = err.content
   }
 
+  console.log(err, 'huh')
+
   res.status(code || 500).send(
     body || {
       errors: [

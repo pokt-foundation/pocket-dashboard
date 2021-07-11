@@ -309,9 +309,7 @@ router.get(
           applicationId
         )
 
-        return await await getApp(
-          application.freeTierApplicationAccount.address
-        )
+        return await getApp(application.freeTierApplicationAccount.address)
       })
     )
 
@@ -574,7 +572,8 @@ router.get(
       })
     )
 
-    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
+    const twentyFoursHoursAgo = composeHoursFromNowUtcDate(24)
+    const now = composeHoursFromNowUtcDate(0)
 
     const totalRelaysAndLatency = await Promise.all(
       appIds.map(async function getData(applicationId) {
@@ -582,16 +581,14 @@ router.get(
           applicationId
         )
 
-        const result = await gqlClient.getTotalRelaysAndLatency({
-          _eq: application.freeTierApplicationAccount.publicKey,
-          _gte: sevenDaysAgo,
+        const result = await gqlClient.getTotalAppRelays({
+          _apk: application.freeTierApplicationAccount.publicKey,
+          _gte: twentyFoursHoursAgo,
+          _lte: now,
         })
 
         return {
-          total_relays:
-            result.relay_apps_daily_aggregate.aggregate.sum.total_relays ?? 0,
-          elapsed_time:
-            result.relay_apps_daily_aggregate.aggregate.avg.elapsed_time ?? 0,
+          total_relays: result.relay_aggregate.aggregate.count ?? 0,
         }
       })
     )
@@ -600,14 +597,12 @@ router.get(
       function processResults(prev, cur) {
         return {
           total_relays: prev.total_relays + cur.total_relays,
-          elapsed_time: prev.elapsed_time + cur.elapsed_time,
         }
       }
     )
 
     const processedRelaysAndLatency = {
       total_relays: cumulativeRelaysAndLatency.total_relays,
-      elapsed_time: cumulativeRelaysAndLatency.elapsed_time / appIds.length,
     }
 
     res.status(200).send(processedRelaysAndLatency)
@@ -654,7 +649,8 @@ router.get(
       })
     )
 
-    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
+    const twentyFoursHoursAgo = composeHoursFromNowUtcDate(24)
+    const now = composeHoursFromNowUtcDate(0)
 
     const totalRelaysAndLatency = await Promise.all(
       appIds.map(async function getData(applicationId) {
@@ -662,16 +658,14 @@ router.get(
           applicationId
         )
 
-        const result = await gqlClient.getTotalSuccessfulRelays({
-          _eq: application.freeTierApplicationAccount.publicKey,
-          _gte: sevenDaysAgo,
+        const result = await gqlClient.getSuccessfulAppRelays({
+          _apk: application.freeTierApplicationAccount.publicKey,
+          _gte: twentyFoursHoursAgo,
+          _lte: now,
         })
 
         return {
-          total_relays:
-            result.relay_apps_daily_aggregate.aggregate.sum.total_relays ?? 0,
-          elapsed_time:
-            result.relay_apps_daily_aggregate.aggregate.avg.elapsed_time ?? 0,
+          total_relays: result.relay_aggregate.aggregate.count ?? 0,
         }
       })
     )
@@ -680,18 +674,15 @@ router.get(
       function processResults(prev, cur) {
         return {
           total_relays: prev.total_relays + cur.total_relays,
-          elapsed_time: prev.elapsed_time + cur.elapsed_time,
         }
       },
       {
         total_relays: 0,
-        elapsed_time: 0,
       }
     )
 
     const processedRelaysAndLatency = {
       total_relays: cumulativeRelaysAndLatency.total_relays,
-      elapsed_time: cumulativeRelaysAndLatency.elapsed_time / appIds.length,
     }
 
     res.status(200).send(processedRelaysAndLatency)
@@ -1140,8 +1131,8 @@ router.get(
       })
     )
 
-    const fourteenDaysAgo = composeDaysFromNowUtcDate(14)
-    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
+    const fourtyEightHoursAgo = composeHoursFromNowUtcDate(48)
+    const twentyFourHoursAgo = composeHoursFromNowUtcDate(24)
 
     const previousSuccessfulRelaysPerApp = await Promise.all(
       appIds.map(async function getData(applicationId) {
@@ -1149,15 +1140,14 @@ router.get(
           applicationId
         )
 
-        const result = await gqlClient.getTotalRangedRelaysAndLatency({
-          _eq: application.freeTierApplicationAccount.publicKey,
-          _gte: fourteenDaysAgo,
-          _lte: sevenDaysAgo,
+        const result = await gqlClient.getTotalAppRelays({
+          _apk: application.freeTierApplicationAccount.publicKey,
+          _gte: fourtyEightHoursAgo,
+          _lte: twentyFourHoursAgo,
         })
 
         return {
-          total_relays:
-            result.relay_apps_daily_aggregate.aggregate.sum.total_relays ?? 0,
+          total_relays: result.relay_aggregate.aggregate.count ?? 0,
         }
       })
     )
@@ -1215,8 +1205,8 @@ router.get(
       })
     )
 
-    const fourteenDaysAgo = composeDaysFromNowUtcDate(14)
-    const sevenDaysAgo = composeDaysFromNowUtcDate(7)
+    const fourtyEightHoursAgo = composeHoursFromNowUtcDate(48)
+    const twentyFourHoursAgo = composeHoursFromNowUtcDate(24)
 
     const previousSuccessfulRelaysPerApp = await Promise.all(
       appIds.map(async function getData(applicationId) {
@@ -1224,15 +1214,14 @@ router.get(
           applicationId
         )
 
-        const result = await gqlClient.getTotalSuccessfulRangedRelays({
-          _eq: application.freeTierApplicationAccount.publicKey,
-          _gte: fourteenDaysAgo,
-          _lte: sevenDaysAgo,
+        const result = await gqlClient.getSuccessfulAppRelays({
+          _apk: application.freeTierApplicationAccount.publicKey,
+          _gte: fourtyEightHoursAgo,
+          _lte: twentyFourHoursAgo,
         })
 
         return {
-          successful_relays:
-            result.relay_apps_daily_aggregate.aggregate.sum.total_relays ?? 0,
+          successful_relays: result.relay_aggregate.aggregate.count ?? 0,
         }
       })
     )

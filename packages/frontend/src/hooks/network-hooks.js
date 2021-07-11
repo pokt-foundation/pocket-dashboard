@@ -20,20 +20,6 @@ const RELAY_APPS_QUERY = gql`
   }
 `
 
-const SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY = gql`
-  query DAILY_RELAYS_QUERY($_gte: timestamptz!) {
-    relay_apps_hourly_aggregate(
-      where: { bucket: { _gte: $_gte }, result: { _eq: "200" } }
-    ) {
-      aggregate {
-        sum {
-          total_relays
-        }
-      }
-    }
-  }
-`
-
 const WEEKLY_RELAY_COUNT_QUERY = gql`
   query DAILY_RELAYS_QUERY($_gte: timestamptz!) {
     relay_apps_hourly_aggregate(where: { bucket: { _gte: $_gte } }) {
@@ -158,28 +144,24 @@ export function useNetworkSuccessRate() {
     isError: isSuccessRateError,
     data: successRateData,
   } = useQuery('network/success-rate', async function getWeeklyRelays() {
+    const successfulPath = `${env(
+      'BACKEND_URL'
+    )}/api/network/weekly-successful-relays`
+    const totalPath = `${env('BACKEND_URL')}/api/network/total-weekly-relays`
+
     try {
-      dayjs.extend(dayJsutcPlugin)
-
-      const sevenDaysAgo = dayjs.utc().subtract(7, 'day')
-
-      const formattedTimestamp = `${sevenDaysAgo.year()}-0${
-        sevenDaysAgo.month() + 1
-      }-${sevenDaysAgo.date()}T00:00:00+00:00`
-
-      const res = await gqlClient.request(SUCCESSFUL_WEEKLY_RELAY_COUNT_QUERY, {
-        _gte: formattedTimestamp,
+      const {
+        data: { total_relays: successfulRelays },
+      } = await axios.get(successfulPath, {
+        withCredentials: true,
+      })
+      const {
+        data: { total_relays: totalRelays },
+      } = await axios.get(totalPath, {
+        withCredentials: true,
       })
 
-      const {
-        relay_apps_hourly_aggregate: {
-          aggregate: {
-            sum: { total_relays: totalSuccessfulWeeklyRelays },
-          },
-        },
-      } = res
-
-      return { totalSuccessfulWeeklyRelays }
+      return { successfulRelays, totalRelays }
     } catch (err) {
       console.log(err, 'rip')
     }

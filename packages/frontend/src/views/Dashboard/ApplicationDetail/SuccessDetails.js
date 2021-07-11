@@ -37,7 +37,6 @@ const PER_PAGE = 10
 const SUCCESSFUL_RELAYS_KEY = 'successfulRelays'
 
 export default function SuccessDetails({
-  appOnChainData,
   id,
   isLb,
   maxDailyRelays,
@@ -187,7 +186,7 @@ export default function SuccessDetails({
                           ${textStyle('body3')}
                         `}
                       >
-                        Last 7 days
+                        Last 24 hours
                       </span>
                     </h2>
                   </div>
@@ -205,7 +204,10 @@ export default function SuccessDetails({
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          successfulRelayData.total_relays
+                          Math.min(
+                            successfulRelayData.total_relays,
+                            weeklyRelayData.total_relays
+                          )
                         )}
                         <span
                           css={`
@@ -239,8 +241,11 @@ export default function SuccessDetails({
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          weeklyRelayData.total_relays -
-                            successfulRelayData.total_relays
+                          Math.max(
+                            weeklyRelayData.total_relays -
+                              successfulRelayData.total_relays,
+                            0
+                          )
                         )}
                         <span
                           css={`
