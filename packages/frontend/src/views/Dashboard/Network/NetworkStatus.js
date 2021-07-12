@@ -26,7 +26,7 @@ import {
 } from 'hooks/network-hooks'
 import { norm } from 'lib/math-utils'
 import { PRODUCTION_CHAINS } from 'lib/chain-utils'
-import Economics from '../../../assets/economics.png'
+import Economics from '../../../assets/economics.jpg'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
