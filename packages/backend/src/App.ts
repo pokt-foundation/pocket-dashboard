@@ -23,11 +23,8 @@ app.use(morgan('dev'))
 app.use(
   cors({
     origin: [
-      'https://dashboard.pokt.network',
       'https://mainnet.portal.pokt.network',
       'https://mainnet.dashboard.pokt.network',
-      'https://testnet.dashboard.pokt.network',
-      'http://localhost:3000',
     ],
     methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
     credentials: true,
