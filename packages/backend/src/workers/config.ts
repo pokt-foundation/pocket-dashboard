@@ -60,6 +60,11 @@ const MAIN_CHAINS = {
     id: '0022',
     limit: 3,
   },
+  EHEREUM_MAINNET_ARCHIVAL_TRACING: {
+    ticker: 'ETH',
+    id: '0028',
+    limit: 5,
+  },
   ETHEREUM_MAINNET_FULL: {
     ticker: 'ETH',
     id: '0021',
