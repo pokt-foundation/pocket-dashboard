@@ -247,13 +247,16 @@ export default function AppInfo({
     latestLatencyData,
   ])
 
-  const avgLatency = useMemo(
-    () =>
+  const avgLatency = useMemo(() => {
+    if (!latestLatencyData.length) {
+      return 0
+    }
+    return (
       latestLatencyData.reduce((avg, { latency }) => {
         return avg + latency
-      }, 0) / latestLatencyData.length,
-    [latestLatencyData]
-  )
+      }, 0) / latestLatencyData.length
+    )
+  }, [latestLatencyData])
 
   const isSwitchable = useMemo(() => {
     dayjs.extend(dayJsutcPlugin)
