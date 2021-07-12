@@ -199,7 +199,7 @@ export default function Notifications({
                       ${textStyle('title2')}
                     `}
                   >
-                    Weekly bandwith usage
+                    Weekly bandwidth usage
                   </h2>
                   {compactMode && <Spacer size={1 * GU} />}
                   <h3
@@ -328,7 +328,7 @@ export default function Notifications({
                 `}
               >
                 If you need more relays for your application or you are looking
-                to stake your own POKT or please{' '}
+                to stake your own POKT, please{' '}
                 <Link href="https://pocketnetwork.typeform.com/to/UPb0xJhS">
                   contact us
                 </Link>{' '}
