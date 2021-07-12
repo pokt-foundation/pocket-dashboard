@@ -259,7 +259,7 @@ export default function NetworkStatus() {
                           ${textStyle('body2')}
                         `}
                       >
-                        Sucessful relays
+                        Successful relays
                       </p>
                       <Spacer size={0.5 * GU} />
                       <p
