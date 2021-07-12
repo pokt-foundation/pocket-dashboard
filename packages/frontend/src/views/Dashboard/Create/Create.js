@@ -691,33 +691,6 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
   )
 }
 
-function FreeTierInfo() {
-  return (
-    <Box title="Free-tier info">
-      <ul
-        css={`
-          list-style: none;
-          height: 100%;
-          li {
-            display: flex;
-            justify-content: space-between;
-          }
-          li:not(:last-child) {
-            margin-bottom: ${2 * GU}px;
-          }
-        `}
-      >
-        <li>
-          Amount of POKT: <span>8,000</span>
-        </li>
-        <li>
-          Max relays per day: <span>1M</span>
-        </li>
-      </ul>
-    </Box>
-  )
-}
-
 function CreationDenialModal({ onClose, visible }) {
   return (
     <Modal
