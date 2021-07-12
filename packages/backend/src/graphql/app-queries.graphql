@@ -1,3 +1,40 @@
+# limited to 24h!
+query getSuccessfulAppRelays(
+  $_apk: String
+  $_gte: timestamptz
+  $_lte: timestamptz
+) {
+  relay_aggregate(
+    where: {
+      timestamp: { _gte: $_gte }
+      _and: { timestamp: { _lte: $_lte } }
+      app_pub_key: { _eq: $_apk }
+      method: { _neq: "synccheck" }
+      result: { _eq: "200" }
+    }
+  ) {
+    aggregate {
+      count
+    }
+  }
+}
+
+query getTotalAppRelays($_apk: String, $_gte: timestamptz, $_lte: timestamptz) {
+  relay_aggregate(
+    where: {
+      timestamp: { _gte: $_gte }
+      _and: { timestamp: { _lte: $_lte } }
+      app_pub_key: { _eq: $_apk }
+      method: { _neq: "synccheck" }
+      service_node: { _nilike: "fallback%" }
+    }
+  ) {
+    aggregate {
+      count
+    }
+  }
+}
+
 query getTotalRelaysAndLatency($_eq: String, $_gte: timestamptz) {
   relay_apps_daily_aggregate(
     where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
@@ -85,7 +122,11 @@ query getDailyTotalRelays($_eq: String, $_gte: timestamptz) {
   }
 }
 
-query getLastSessionAppRelays($_eq: String, $_gte: timestamptz, $_buckets: Int) {
+query getLastSessionAppRelays(
+  $_eq: String
+  $_gte: timestamptz
+  $_buckets: Int
+) {
   relay_app_hourly(
     where: { app_pub_key: { _eq: $_eq }, bucket: { _gte: $_gte } }
     order_by: { bucket: desc }

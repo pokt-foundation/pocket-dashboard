@@ -25,15 +25,16 @@ import {
   useChains,
 } from 'hooks/network-hooks'
 import { norm } from 'lib/math-utils'
+import { PRODUCTION_CHAINS } from 'lib/chain-utils'
 import Economics from '../../../assets/economics.png'
-
-const OFFICIAL_CHAINS = ['0001', '0005', '0021', '0022']
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const PER_PAGE = 5
 
-function formatDailyRelaysForGraphing(dailyRelays) {
+function formatDailyRelaysForGraphing(dailyRelays = []) {
+  dailyRelays = dailyRelays.slice(0, -1)
+
   const labels = dailyRelays
     .map(({ bucket }) => bucket.split('T')[0])
     .map((bucket) => DAYS[new Date(bucket).getUTCDay()])
@@ -72,6 +73,7 @@ function formatDailyRelaysForGraphing(dailyRelays) {
 export default function NetworkStatus() {
   const { isRelaysError, isRelaysLoading, relayData } = useTotalWeeklyRelays()
   const { isSuccessRateLoading, successRateData } = useNetworkSuccessRate()
+
   const { isSummaryLoading, summaryData } = useNetworkSummary()
   const { isChainsLoading, chains } = useChains()
   const theme = useTheme()
@@ -152,7 +154,7 @@ export default function NetworkStatus() {
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          relayData.totalWeeklyRelays
+                          successRateData.totalRelays
                         )}
                       </h4>
                       <h5
@@ -160,7 +162,7 @@ export default function NetworkStatus() {
                           ${textStyle('body4')}
                         `}
                       >
-                        Last 7 Days Count
+                        Last 7 Days
                       </h5>
                     </div>
                   </div>
@@ -207,7 +209,9 @@ export default function NetworkStatus() {
                         </p>,
                         <p>{id}</p>,
                         <p>
-                          {OFFICIAL_CHAINS.includes(id) ? 'Official' : 'Beta'}
+                          {PRODUCTION_CHAINS.includes(id)
+                            ? 'Production'
+                            : 'Beta'}
                         </p>,
                       ]
                     }}
@@ -234,8 +238,8 @@ export default function NetworkStatus() {
                       size={20 * GU}
                       strokeWidth={GU}
                       value={
-                        successRateData.totalSuccessfulWeeklyRelays /
-                        relayData.totalWeeklyRelays
+                        successRateData.successfulRelays /
+                        successRateData.totalRelays
                       }
                       color={theme.accent}
                     />
@@ -247,7 +251,7 @@ export default function NetworkStatus() {
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          successRateData.totalSuccessfulWeeklyRelays
+                          successRateData.successfulRelays
                         )}
                       </p>
                       <p
@@ -263,7 +267,7 @@ export default function NetworkStatus() {
                           ${textStyle('body4')}
                         `}
                       >
-                        Last 7 Days Count
+                        Last 7 Days
                       </p>
                     </div>
                   </div>

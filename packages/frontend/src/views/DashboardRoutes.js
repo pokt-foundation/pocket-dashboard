@@ -31,9 +31,7 @@ export default function DashboardRoutes() {
           on large screen sizes.
         */
         min-width: 100vw;
-        min-height: 100vh;
-        height: 100%;
-        overflow-y: scroll;
+        height: 100vh;
         background: ${theme.background};
         /* We also wanna "trap" any absolute elements so that they don't end up behind the div. */
         display: relative;

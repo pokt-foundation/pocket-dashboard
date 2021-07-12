@@ -36,6 +36,7 @@ import {
   KNOWN_QUERY_SUFFIXES,
 } from 'known-query-suffixes'
 import { sentryEnabled } from 'sentry'
+import { PRODUCTION_CHAINS } from 'lib/chain-utils'
 
 const FREE_TIER_TOKENS = 8000000000
 const FREE_TIER_MAX_RELAYS = 1000000
@@ -242,10 +243,10 @@ export default function Create() {
     }
   }, [memoizableUserApps, userApps.length])
 
-  const onCloseCreationModal = useCallback(
-    () => setCreationModalVisible(false),
-    []
-  )
+  const onCloseCreationModal = useCallback(() => {
+    setCreationModalVisible(false)
+    history.push('/home')
+  }, [history])
 
   const ActiveScreen = useMemo(() => SCREENS.get(screenIndex) ?? null, [
     screenIndex,
@@ -396,22 +397,18 @@ function BasicSetup({
               </p>
               <Spacer size={2 * GU} />
               <DataView
-                fields={['', 'Network', 'ID', 'Ticker']}
+                fields={['', 'Network', 'Status']}
                 entries={chains}
-                renderEntry={({
-                  description,
-                  id,
-                  ticker,
-                  isAvailableForStaking,
-                }) => [
+                renderEntry={({ description, id, isAvailableForStaking }) => [
                   <Switch
                     onChange={() => onSwitchClick(id)}
                     checked={data.selectedNetwork === id}
                     disabled={!isAvailableForStaking}
                   />,
-                  description,
-                  id,
-                  ticker,
+                  <p>{description}</p>,
+                  <p>
+                    {PRODUCTION_CHAINS.includes(id) ? 'Production' : 'Beta'}
+                  </p>,
                 ]}
               />
             </Box>

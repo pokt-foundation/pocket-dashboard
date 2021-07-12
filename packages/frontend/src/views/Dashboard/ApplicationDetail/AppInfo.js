@@ -35,7 +35,6 @@ import { prefixFromChainId } from 'lib/chain-utils'
 import { norm } from 'lib/math-utils'
 import { formatNumberToSICompact } from 'lib/formatting-utils'
 
-const MAX_RELAYS_PER_SESSION = 40000
 const ONE_MILLION = 1000000
 const ONE_SECOND = 1 // Data for graphs come in second
 const PER_PAGE = 10
@@ -248,6 +247,14 @@ export default function AppInfo({
     latestLatencyData,
   ])
 
+  const avgLatency = useMemo(
+    () =>
+      latestLatencyData.reduce((avg, { latency }) => {
+        return avg + latency
+      }, 0) / latestLatencyData.length,
+    [latestLatencyData]
+  )
+
   const isSwitchable = useMemo(() => {
     dayjs.extend(dayJsutcPlugin)
     const today = dayjs.utc()
@@ -268,8 +275,8 @@ export default function AppInfo({
   }, [dailyRelayData, maxDailyRelays])
 
   const exceedsSessionRelays = useMemo(() => {
-    return currentSessionRelays >= MAX_RELAYS_PER_SESSION
-  }, [currentSessionRelays])
+    return currentSessionRelays >= maxDailyRelays / 24
+  }, [currentSessionRelays, maxDailyRelays])
 
   const onCloseNetworkModal = useCallback(
     () => setNetworkModalVisible(false),
@@ -359,7 +366,7 @@ export default function AppInfo({
                     totalRequests={weeklyRelayData.total_relays}
                   />
                   <AvgLatency
-                    avgLatency={successfulRelayData.elapsed_time}
+                    avgLatency={avgLatency}
                     chartLines={barValues}
                     chartLabels={latencyLabels}
                     chartScales={latencyScales}
@@ -567,10 +574,12 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
     from: { number: 0 },
   })
   const [primarySuccessColor] = useSuccessRateColor(successRate)
-  const successRateDelta = useMemo(
-    () => (((successRate - previousSuccessRate) / 1) * 100).toFixed(2),
-    [previousSuccessRate, successRate]
-  )
+  const successRateDelta = useMemo(() => {
+    if (successRate >= 0.9999) {
+      return (0).toFixed(2)
+    }
+    return (((successRate - previousSuccessRate) / 1) * 100).toFixed(2)
+  }, [previousSuccessRate, successRate])
 
   const mode = successRateDelta > 0 ? 'positive' : 'negative'
 
@@ -660,7 +669,7 @@ function SuccessRate({ previousSuccessRate = 0, successRate, totalRequests }) {
                 ${textStyle('body4')}
               `}
             >
-              Last 7 days
+              Last 24 hours
             </p>
           </div>
         </div>
@@ -762,6 +771,8 @@ function UsageTrends({
 }) {
   const usageColor = useUsageColor(sessionRelays / maxSessionRelays)
   const theme = useTheme()
+  const { within } = useViewport()
+  const compactMode = within(-1, 'medium')
 
   return (
     <Box>
@@ -778,6 +789,7 @@ function UsageTrends({
           display: grid;
           grid-template-columns: 30% 1fr;
           grid-column-gap: ${1 * GU}px;
+          ${compactMode && `grid-template-columns: 1fr;`}
         `}
       >
         <div
@@ -786,12 +798,17 @@ function UsageTrends({
             flex-direction: column;
             align-items: center;
             grid-column: 1;
-            border-right: 1px solid ${theme.background};
+            ${!compactMode && `border-right: 1px solid ${theme.background};`}
+            ${compactMode &&
+            `border-bottom: 1px solid ${theme.background}; padding-bottom: ${
+              1 * GU
+            }px;`}
           `}
         >
           <h3
             css={`
               ${textStyle('title2')}
+              ${compactMode && `margin-top: ${1 * GU}px;`}
             `}
           >
             Current usage
@@ -823,12 +840,13 @@ function UsageTrends({
         </div>
         <div
           css={`
-            grid-column: 2;
+            ${!compactMode && `grid-column: 2;`}
           `}
         >
           <h3
             css={`
               ${textStyle('title2')}
+              ${compactMode && `text-align: center;`}
             `}
           >
             Weekly usage
@@ -999,7 +1017,7 @@ function AppDetails({ apps, id, secret }) {
         {apps.map(({ address }) => (
           <TextCopy
             value={address}
-            onCopy={() => toast('App public key copied to clipboard')}
+            onCopy={() => toast('App address copied to clipboard')}
           />
         ))}
       </div>

@@ -15,6 +15,8 @@ const CHAIN_ID_PREFIXES = new Map([
   ['0027', { prefix: 'poa-xdai', name: 'XDAI Mainnet' }],
 ])
 
+export const PRODUCTION_CHAINS = ['0001', '0005', '0021', '0022']
+
 export function prefixFromChainId(chainId) {
   return CHAIN_ID_PREFIXES.get(chainId)
 }

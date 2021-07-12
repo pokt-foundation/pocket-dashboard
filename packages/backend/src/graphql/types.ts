@@ -2004,6 +2004,48 @@ export type Timestamptz_Comparison_Exp = {
   _nin?: Maybe<Array<Scalars['timestamptz']>>
 }
 
+export const GetSuccessfulAppRelays = gql`
+  query getSuccessfulAppRelays(
+    $_apk: String
+    $_gte: timestamptz
+    $_lte: timestamptz
+  ) {
+    relay_aggregate(
+      where: {
+        timestamp: { _gte: $_gte }
+        _and: { timestamp: { _lte: $_lte } }
+        app_pub_key: { _eq: $_apk }
+        method: { _neq: "synccheck" }
+        result: { _eq: "200" }
+      }
+    ) {
+      aggregate {
+        count
+      }
+    }
+  }
+`
+export const GetTotalAppRelays = gql`
+  query getTotalAppRelays(
+    $_apk: String
+    $_gte: timestamptz
+    $_lte: timestamptz
+  ) {
+    relay_aggregate(
+      where: {
+        timestamp: { _gte: $_gte }
+        _and: { timestamp: { _lte: $_lte } }
+        app_pub_key: { _eq: $_apk }
+        method: { _neq: "synccheck" }
+        service_node: { _nilike: "fallback%" }
+      }
+    ) {
+      aggregate {
+        count
+      }
+    }
+  }
+`
 export const GetTotalRelaysAndLatency = gql`
   query getTotalRelaysAndLatency($_eq: String, $_gte: timestamptz) {
     relay_apps_daily_aggregate(
@@ -2187,10 +2229,17 @@ export const GetDailyNetworkRelays = gql`
     }
   }
 `
-export const GetTotalSuccesfulNetworkRelays = gql`
-  query getTotalSuccesfulNetworkRelays($_gte: timestamptz!) {
-    relay_apps_hourly_aggregate(
-      where: { bucket: { _gte: $_gte }, result: { _eq: "200" } }
+export const GetTotalSuccessfulNetworkRelays = gql`
+  query getTotalSuccessfulNetworkRelays(
+    $_gte: timestamptz
+    $_lte: timestamptz
+  ) {
+    relay_nodes_hourly_aggregate(
+      where: {
+        result: { _eq: "200" }
+        bucket: { _gte: $_gte }
+        _and: { bucket: { _lte: $_lte } }
+      }
     ) {
       aggregate {
         sum {
@@ -2201,8 +2250,14 @@ export const GetTotalSuccesfulNetworkRelays = gql`
   }
 `
 export const GetTotalNetworkRelays = gql`
-  query getTotalNetworkRelays($_gte: timestamptz!) {
-    relay_apps_hourly_aggregate(where: { bucket: { _gte: $_gte } }) {
+  query getTotalNetworkRelays($_gte: timestamptz, $_lte: timestamptz) {
+    relay_nodes_hourly_aggregate(
+      where: {
+        bucket: { _gte: $_gte }
+        _and: { bucket: { _lte: $_lte } }
+        service_node: { _nilike: "fallback%" }
+      }
+    ) {
       aggregate {
         sum {
           total_relays
@@ -2212,6 +2267,48 @@ export const GetTotalNetworkRelays = gql`
   }
 `
 
+export const GetSuccessfulAppRelaysDocument = gql`
+  query getSuccessfulAppRelays(
+    $_apk: String
+    $_gte: timestamptz
+    $_lte: timestamptz
+  ) {
+    relay_aggregate(
+      where: {
+        timestamp: { _gte: $_gte }
+        _and: { timestamp: { _lte: $_lte }, method: { _neq: "chaincheck" } }
+        app_pub_key: { _eq: $_apk }
+        method: { _neq: "synccheck" }
+        result: { _eq: "200" }
+      }
+    ) {
+      aggregate {
+        count
+      }
+    }
+  }
+`
+export const GetTotalAppRelaysDocument = gql`
+  query getTotalAppRelays(
+    $_apk: String
+    $_gte: timestamptz
+    $_lte: timestamptz
+  ) {
+    relay_aggregate(
+      where: {
+        timestamp: { _gte: $_gte }
+        _and: { timestamp: { _lte: $_lte }, method: { _neq: "chaincheck" } }
+        app_pub_key: { _eq: $_apk }
+        method: { _neq: "synccheck" }
+        service_node: { _nilike: "fallback%" }
+      }
+    ) {
+      aggregate {
+        count
+      }
+    }
+  }
+`
 export const GetTotalRelaysAndLatencyDocument = gql`
   query getTotalRelaysAndLatency($_eq: String, $_gte: timestamptz) {
     relay_apps_daily_aggregate(
@@ -2329,7 +2426,7 @@ export const GetLatestRelaysDocument = gql`
       limit: $limit
       offset: $offset
       order_by: { timestamp: desc }
-      where: { app_pub_key: { _eq: $_eq } }
+      where: { app_pub_key: { _eq: $_eq }, method: { _neq: "synccheck" } }
     ) {
       service_node
       method
@@ -2346,8 +2443,8 @@ export const GetTotalRelayDurationDocument = gql`
       where: {
         app_pub_key: { _eq: $_eq }
         bucket: { _gte: $_gte }
-        elapsed_time: { _lte: "2" }
-        result: { _eq: 200 }
+        elapsed_time: { _lte: "3" }
+        result: { _eq: "200" }
       }
       order_by: { bucket: desc }
     ) {
@@ -2373,10 +2470,21 @@ export const GetLatestSuccessfulRelaysDocument = gql`
   }
 `
 export const GetLatestFailingRelaysDocument = gql`
-  query getLatestFailingRelays($_eq: String, $_eq1: numeric, $offset: Int) {
+  query getLatestFailingRelays(
+    $_eq: String
+    $_eq1: numeric
+    $offset: Int
+    $_gte: timestamptz
+  ) {
     relay(
       limit: 10
-      where: { app_pub_key: { _eq: $_eq }, result: { _neq: $_eq1 } }
+      where: {
+        app_pub_key: { _eq: $_eq }
+        result: { _neq: $_eq1 }
+        method: { _neq: "synccheck" }
+        timestamp: { _gte: $_gte }
+        service_node: { _ilike: "fallback%" }
+      }
       order_by: { timestamp: desc }
       offset: $offset
     ) {
@@ -2396,10 +2504,17 @@ export const GetDailyNetworkRelaysDocument = gql`
     }
   }
 `
-export const GetTotalSuccesfulNetworkRelaysDocument = gql`
-  query getTotalSuccesfulNetworkRelays($_gte: timestamptz!) {
-    relay_apps_hourly_aggregate(
-      where: { bucket: { _gte: $_gte }, result: { _eq: "200" } }
+export const GetTotalSuccessfulNetworkRelaysDocument = gql`
+  query getTotalSuccessfulNetworkRelays(
+    $_gte: timestamptz
+    $_lte: timestamptz
+  ) {
+    relay_nodes_hourly_aggregate(
+      where: {
+        result: { _eq: "200" }
+        bucket: { _gte: $_gte }
+        _and: { bucket: { _lte: $_lte } }
+      }
     ) {
       aggregate {
         sum {
@@ -2410,8 +2525,14 @@ export const GetTotalSuccesfulNetworkRelaysDocument = gql`
   }
 `
 export const GetTotalNetworkRelaysDocument = gql`
-  query getTotalNetworkRelays($_gte: timestamptz!) {
-    relay_apps_hourly_aggregate(where: { bucket: { _gte: $_gte } }) {
+  query getTotalNetworkRelays($_gte: timestamptz, $_lte: timestamptz) {
+    relay_nodes_hourly_aggregate(
+      where: {
+        bucket: { _gte: $_gte }
+        _and: { bucket: { _lte: $_lte } }
+        service_node: { _nilike: "fallback%" }
+      }
+    ) {
       aggregate {
         sum {
           total_relays
@@ -2433,6 +2554,34 @@ export function getSdk(
   withWrapper: SdkFunctionWrapper = defaultWrapper
 ) {
   return {
+    getSuccessfulAppRelays(
+      variables?: GetSuccessfulAppRelaysQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetSuccessfulAppRelaysQuery> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<GetSuccessfulAppRelaysQuery>(
+            GetSuccessfulAppRelaysDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getSuccessfulAppRelays'
+      )
+    },
+    getTotalAppRelays(
+      variables?: GetTotalAppRelaysQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetTotalAppRelaysQuery> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<GetTotalAppRelaysQuery>(
+            GetTotalAppRelaysDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getTotalAppRelays'
+      )
+    },
     getTotalRelaysAndLatency(
       variables?: GetTotalRelaysAndLatencyQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -2587,22 +2736,22 @@ export function getSdk(
         'getDailyNetworkRelays'
       )
     },
-    getTotalSuccesfulNetworkRelays(
-      variables: GetTotalSuccesfulNetworkRelaysQueryVariables,
+    getTotalSuccessfulNetworkRelays(
+      variables?: GetTotalSuccessfulNetworkRelaysQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
-    ): Promise<GetTotalSuccesfulNetworkRelaysQuery> {
+    ): Promise<GetTotalSuccessfulNetworkRelaysQuery> {
       return withWrapper(
         (wrappedRequestHeaders) =>
-          client.request<GetTotalSuccesfulNetworkRelaysQuery>(
-            GetTotalSuccesfulNetworkRelaysDocument,
+          client.request<GetTotalSuccessfulNetworkRelaysQuery>(
+            GetTotalSuccessfulNetworkRelaysDocument,
             variables,
             { ...requestHeaders, ...wrappedRequestHeaders }
           ),
-        'getTotalSuccesfulNetworkRelays'
+        'getTotalSuccessfulNetworkRelays'
       )
     },
     getTotalNetworkRelays(
-      variables: GetTotalNetworkRelaysQueryVariables,
+      variables?: GetTotalNetworkRelaysQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
     ): Promise<GetTotalNetworkRelaysQuery> {
       return withWrapper(
@@ -2618,6 +2767,40 @@ export function getSdk(
   }
 }
 export type Sdk = ReturnType<typeof getSdk>
+export type GetSuccessfulAppRelaysQueryVariables = Exact<{
+  _apk?: Maybe<Scalars['String']>
+  _gte?: Maybe<Scalars['timestamptz']>
+  _lte?: Maybe<Scalars['timestamptz']>
+}>
+
+export type GetSuccessfulAppRelaysQuery = { __typename?: 'query_root' } & {
+  relay_aggregate: { __typename?: 'relay_aggregate' } & {
+    aggregate?: Maybe<
+      { __typename?: 'relay_aggregate_fields' } & Pick<
+        Relay_Aggregate_Fields,
+        'count'
+      >
+    >
+  }
+}
+
+export type GetTotalAppRelaysQueryVariables = Exact<{
+  _apk?: Maybe<Scalars['String']>
+  _gte?: Maybe<Scalars['timestamptz']>
+  _lte?: Maybe<Scalars['timestamptz']>
+}>
+
+export type GetTotalAppRelaysQuery = { __typename?: 'query_root' } & {
+  relay_aggregate: { __typename?: 'relay_aggregate' } & {
+    aggregate?: Maybe<
+      { __typename?: 'relay_aggregate_fields' } & Pick<
+        Relay_Aggregate_Fields,
+        'count'
+      >
+    >
+  }
+}
+
 export type GetTotalRelaysAndLatencyQueryVariables = Exact<{
   _eq?: Maybe<Scalars['String']>
   _gte?: Maybe<Scalars['timestamptz']>
@@ -2828,21 +3011,22 @@ export type GetDailyNetworkRelaysQuery = { __typename?: 'query_root' } & {
   >
 }
 
-export type GetTotalSuccesfulNetworkRelaysQueryVariables = Exact<{
-  _gte: Scalars['timestamptz']
+export type GetTotalSuccessfulNetworkRelaysQueryVariables = Exact<{
+  _gte?: Maybe<Scalars['timestamptz']>
+  _lte?: Maybe<Scalars['timestamptz']>
 }>
 
-export type GetTotalSuccesfulNetworkRelaysQuery = {
+export type GetTotalSuccessfulNetworkRelaysQuery = {
   __typename?: 'query_root'
 } & {
-  relay_apps_hourly_aggregate: {
-    __typename?: 'relay_apps_hourly_aggregate'
+  relay_nodes_hourly_aggregate: {
+    __typename?: 'relay_nodes_hourly_aggregate'
   } & {
     aggregate?: Maybe<
-      { __typename?: 'relay_apps_hourly_aggregate_fields' } & {
+      { __typename?: 'relay_nodes_hourly_aggregate_fields' } & {
         sum?: Maybe<
-          { __typename?: 'relay_apps_hourly_sum_fields' } & Pick<
-            Relay_Apps_Hourly_Sum_Fields,
+          { __typename?: 'relay_nodes_hourly_sum_fields' } & Pick<
+            Relay_Nodes_Hourly_Sum_Fields,
             'total_relays'
           >
         >
@@ -2852,18 +3036,19 @@ export type GetTotalSuccesfulNetworkRelaysQuery = {
 }
 
 export type GetTotalNetworkRelaysQueryVariables = Exact<{
-  _gte: Scalars['timestamptz']
+  _gte?: Maybe<Scalars['timestamptz']>
+  _lte?: Maybe<Scalars['timestamptz']>
 }>
 
 export type GetTotalNetworkRelaysQuery = { __typename?: 'query_root' } & {
-  relay_apps_hourly_aggregate: {
-    __typename?: 'relay_apps_hourly_aggregate'
+  relay_nodes_hourly_aggregate: {
+    __typename?: 'relay_nodes_hourly_aggregate'
   } & {
     aggregate?: Maybe<
-      { __typename?: 'relay_apps_hourly_aggregate_fields' } & {
+      { __typename?: 'relay_nodes_hourly_aggregate_fields' } & {
         sum?: Maybe<
-          { __typename?: 'relay_apps_hourly_sum_fields' } & Pick<
-            Relay_Apps_Hourly_Sum_Fields,
+          { __typename?: 'relay_nodes_hourly_sum_fields' } & Pick<
+            Relay_Nodes_Hourly_Sum_Fields,
             'total_relays'
           >
         >

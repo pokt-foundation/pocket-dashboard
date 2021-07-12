@@ -5,9 +5,13 @@ query getDailyNetworkRelays {
   }
 }
 
-query getTotalSuccesfulNetworkRelays($_gte: timestamptz!) {
-  relay_apps_hourly_aggregate(
-    where: { bucket: { _gte: $_gte }, result: { _eq: "200" } }
+query getTotalSuccessfulNetworkRelays($_gte: timestamptz, $_lte: timestamptz) {
+  relay_nodes_hourly_aggregate(
+    where: {
+      result: { _eq: "200" }
+      bucket: { _gte: $_gte }
+      _and: { bucket: { _lte: $_lte } }
+    }
   ) {
     aggregate {
       sum {
@@ -17,8 +21,14 @@ query getTotalSuccesfulNetworkRelays($_gte: timestamptz!) {
   }
 }
 
-query getTotalNetworkRelays($_gte: timestamptz!) {
-  relay_apps_hourly_aggregate(where: { bucket: { _gte: $_gte } }) {
+query getTotalNetworkRelays($_gte: timestamptz, $_lte: timestamptz) {
+  relay_nodes_hourly_aggregate(
+    where: {
+      bucket: { _gte: $_gte }
+      _and: { bucket: { _lte: $_lte } }
+      service_node: { _nilike: "fallback%" }
+    }
+  ) {
     aggregate {
       sum {
         total_relays
