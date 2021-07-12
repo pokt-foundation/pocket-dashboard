@@ -56,7 +56,11 @@ export default function Validate() {
           align-self: flex-start;
         `}
       >
-        {isSuccess ? 'Verify your Account' : 'Account Verification Failed'}
+        {isLoading
+          ? 'Verifying your Account...'
+          : isSuccess
+          ? 'Verify your Account'
+          : 'Account Verification Failed'}
       </h2>
       <Spacer size={4 * GU} />
       <main
