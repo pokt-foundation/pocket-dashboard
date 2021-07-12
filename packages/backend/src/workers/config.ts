@@ -43,7 +43,7 @@ const MAIN_CHAINS = {
   BINANCE_SMART_CHAIN: {
     ticker: 'BSC',
     id: '0004',
-    limit: 3,
+    limit: 5,
   },
   ETHEREUM_GOERLI_FULL: {
     ticker: 'ETH',
@@ -58,7 +58,7 @@ const MAIN_CHAINS = {
   ETHEREUM_MAINNET_ARCHIVAL: {
     ticker: 'ETH',
     id: '0022',
-    limit: 3,
+    limit: 5,
   },
   EHEREUM_MAINNET_ARCHIVAL_TRACING: {
     ticker: 'ETH',
