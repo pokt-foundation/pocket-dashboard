@@ -13,9 +13,10 @@ const CHAIN_ID_PREFIXES = new Map([
   ['0025', { prefix: 'eth-rinkeby', name: 'Ethereum Rinkeby' }],
   ['0026', { prefix: 'eth-goerli', name: 'Ethereum Goerli' }],
   ['0027', { prefix: 'poa-xdai', name: 'XDAI Mainnet' }],
+  ['0028', { prefix: 'eth-trace', name: 'Ethereum Mainnet (Trace)' }],
 ])
 
-export const PRODUCTION_CHAINS = ['0001', '0005', '0021', '0022']
+export const PRODUCTION_CHAINS = ['0001', '0005', '0021', '0022', '0028']
 
 export function prefixFromChainId(chainId) {
   return CHAIN_ID_PREFIXES.get(chainId)
