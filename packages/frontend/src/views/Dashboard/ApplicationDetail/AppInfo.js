@@ -823,7 +823,7 @@ function UsageTrends({
           <h4
             css={`
               ${textStyle('title2')}
-              ${compactMode && `text-align: center;`}
+              text-align: center;
             `}
           >
             {sessionRelays.toFixed(0)}
