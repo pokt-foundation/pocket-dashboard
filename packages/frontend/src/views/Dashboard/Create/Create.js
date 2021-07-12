@@ -441,8 +441,8 @@ function BasicSetup({
             >
               Your application will receive up to 1M free daily relays
               subsidized by Pocket Network Inc. For more information read our{' '}
-              <Link href="https://dashboard.pokt.network/support/terms-of-service">
-                Site T&amp;C of Use
+              <Link href="https://www.pokt.network/site-terms-of-use">
+                Site Terms of Use
               </Link>
               .
             </p>
@@ -568,7 +568,7 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
                 </h3>
                 <Spacer size={1 * GU} />
                 <Help hint="What is this?">
-                  Turn this on if you wanna have an "extra" layer of security
+                  Turn this on if you want to have an extra layer of security
                   for all of your requests. You'll have to send a password with
                   each request that we will verify. You'll have access to this
                   key once you create the application.
@@ -680,7 +680,10 @@ function SecuritySetup({ data, decrementScreen, updateData }) {
               Go back
             </Button>
             <Spacer size={3 * GU} />
-            <FreeTierInfo />
+            <AppStatus
+              stakedTokens={FREE_TIER_TOKENS}
+              maxDailyRelays={FREE_TIER_MAX_RELAYS}
+            />
           </>
         }
       />
