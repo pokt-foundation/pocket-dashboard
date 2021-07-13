@@ -154,7 +154,10 @@ export default function NetworkStatus() {
                         `}
                       >
                         {Intl.NumberFormat().format(
-                          successRateData.totalRelays
+                          Math.min(
+                            successRateData.totalRelays,
+                            successRateData.successfulRelays
+                          )
                         )}
                       </h4>
                       <h5
