@@ -38,57 +38,57 @@ const MAIN_CHAINS = {
   AVAX_MAINNET: {
     ticker: 'AVAX',
     id: '0003',
-    limit: 2,
+    limit: 0,
   },
   BINANCE_SMART_CHAIN: {
     ticker: 'BSC',
     id: '0004',
-    limit: 5,
+    limit: 0,
   },
   ETHEREUM_GOERLI_FULL: {
     ticker: 'ETH',
     id: '0026',
-    limit: 2,
+    limit: 0,
   },
   ETHEREUM_KOVAN_FULL: {
     ticker: 'POA',
     id: '0024',
-    limit: 2,
+    limit: 0,
   },
   ETHEREUM_MAINNET_ARCHIVAL: {
     ticker: 'ETH',
     id: '0022',
-    limit: 5,
+    limit: 0,
   },
   EHEREUM_MAINNET_ARCHIVAL_TRACING: {
     ticker: 'ETH',
     id: '0028',
-    limit: 5,
+    limit: 0,
   },
   ETHEREUM_MAINNET_FULL: {
     ticker: 'ETH',
     id: '0021',
-    limit: 14,
+    limit: 0,
   },
   ETHEREUM_RINKEBY_FULL: {
     ticker: 'ETH',
     id: '0025',
-    limit: 3,
+    limit: 0,
   },
   ETHEREUM_XDAI_FULL: {
     ticker: 'POA',
     id: '0027',
-    limit: 3,
+    limit: 0,
   },
   FUSE_FULL: {
     ticker: 'FUSE',
     id: '0005',
-    limit: 3,
+    limit: 5,
   },
   POCKET_MAINNET: {
     ticker: 'POKT',
     id: '0001',
-    limit: 2,
+    limit: 0,
   },
 }
 
@@ -104,7 +104,7 @@ function getChainsByEnvironment() {
   }
 }
 
-export const FREE_TIER_STAKE_AMOUNT = 8000000000n
+export const FREE_TIER_STAKE_AMOUNT = 40000000000n
 export const SLOT_STAKE_AMOUNT = 1000n
 export const chains = getChainsByEnvironment()
 
