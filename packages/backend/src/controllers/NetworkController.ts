@@ -19,7 +19,7 @@ router.use(authenticate)
 router.get(
   '/chains',
   asyncMiddleware(async (_: Request, res: Response) => {
-    const chains = await Chain.find({ nodeCount: { $exists: true } })
+    const chains = await Chain.find()
 
     const processedChains = await Promise.all(
       chains.map(async function processChain({
